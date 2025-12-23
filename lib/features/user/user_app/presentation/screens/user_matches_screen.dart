@@ -14,12 +14,12 @@ class UserMatchesScreen extends StatelessWidget {
       slivers: [
         SliverAppBar(
           pinned: true,
-          floating: true,
+
           snap: false,
           stretch: true,
-          backgroundColor: Colors.transparent,
           elevation: 0,
           toolbarHeight: 88,
+          titleSpacing: 0,
 
           flexibleSpace: ClipRRect(
             child: BackdropFilter(
@@ -42,29 +42,15 @@ class UserMatchesScreen extends StatelessWidget {
           title: Row(
             children: [
               // 🌸 Glowing logo
-              Container(
-                height: 50,
+              SizedBox(
+                height: 100,
                 width: 100,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).primaryColor,
-                      Colors.pinkAccent.shade100,
-                    ],
-                  ),
-                  // boxShadow: [
-                  //   BoxShadow(
-                  //     color: Colors.pinkAccent.withOpacity(0.4),
-                  //     blurRadius: 14,
-                  //     spreadRadius: 2,
-                  //   ),
-                  // ],
-                ),
+
                 child: Padding(
                   padding: const EdgeInsets.all(3),
                   child: ClipRRect(
                     child: Image.asset(
-                      'assets/images/logo.jpg',
+                      'assets/images/logo.png',
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) =>
                           const Icon(Icons.favorite, color: Colors.white),
@@ -87,8 +73,9 @@ class UserMatchesScreen extends StatelessWidget {
                         Colors.pinkAccent,
                       ],
                     ).createShader(bounds),
+
                     child: const Text(
-                      'Arvika',
+                      'Arvika Marriage Bureau',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -99,7 +86,7 @@ class UserMatchesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   const Text(
-                    'Marriage Bureau',
+                    'Find your perfect match',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.black54,

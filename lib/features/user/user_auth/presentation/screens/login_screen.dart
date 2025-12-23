@@ -203,13 +203,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               TextButton(
                 onPressed: () {
                   // TODO: Implement forgot password functionality
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        "Forgot password functionality coming soon!",
-                      ),
-                    ),
-                  );
+
+                  context.navigateTo(const ResetPasswordRoute());
                 },
                 child: const Text(
                   "Forgot Password?",

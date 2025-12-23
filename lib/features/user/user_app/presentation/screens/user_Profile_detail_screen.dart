@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
 import 'package:auto_route/annotations.dart';
@@ -21,89 +22,180 @@ class MyProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text('My Profile'),
-        centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-      ),
+
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text("Error: $e")),
         data: (profile) {
           if (profile.identity == null) {
-            return const Center(child: Text('Profile incomplete'));
+            return const Center(child: Text("Profile incomplete"));
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 32),
+            padding: const EdgeInsets.only(bottom: 40),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 16),
+                const SizedBox(height: 46),
 
-                // 🔹 HEADER
-                _MyProfileHeader(profile: profile),
-
-                const SizedBox(height: 16),
-
-                // 🔹 PROFILE COMPLETION
-                _ProfileCompletion(progress: 0.75),
-
-                const SizedBox(height: 16),
-
-                // 🔹 QUICK ACTIONS
-                _QuickActions(),
+                // 👤 TOP CARD
+                _ProfileHeroCard(profile: profile),
 
                 const SizedBox(height: 24),
 
-                // 🔹 SECTIONS
-                _SectionTitle('Personal Information'),
-                _InfoTile('Age', '${profile.identity!.age} years'),
-                _InfoTile('Gender', profile.identity!.gender),
-                _InfoTile(
-                  'Location',
-                  '${profile.address?.city ?? 'N/A'}, ${profile.address?.state ?? 'N/A'}',
+// build Image card that dispaly all images of user 
+
+                _DetailSection(
+                  title: "Photos",
+                  actionChip: AppActionChip(
+                    label: "Manage",
+                    icon: Icons.photo_library_outlined,
+                    onTap: () {},
+                  ),
+                  children: [
+                    profile.images != null && profile.images!.secondaryImageUrls.isNotEmpty
+                        ? SizedBox(
+                            height: 120,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: profile.images!.secondaryImageUrls.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      profile.images!.secondaryImageUrls[index],
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                        : const Text("No additional photos available."),
+                  ],
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),   
 
-                _SectionTitle('Education & Career'),
-                _InfoTile(
-                  'Qualification',
-                  profile.education?.highestQualification ?? 'N/A',
+
+                // 📋 BASIC INFO
+                _DetailSection(
+                  title: "Basic Information",
+                  actionChip: AppActionChip(
+                    label: "Edit",
+                    icon: Icons.edit,
+                    onTap: () {},
+                  ),
+
+                  children: [
+                    _DetailRow("Age", "${profile.identity!.age} years"),
+                    _DetailRow("Gender", profile.identity!.gender),
+                    _DetailRow(
+                      "Date of Birth",
+                      profile.identity!.dob.toString().split(" ").first,
+                    ),
+                  ],
                 ),
-                _InfoTile('Occupation', profile.education?.occupation ?? 'N/A'),
-                _InfoTile('Company', profile.employment?.company ?? 'N/A'),
 
-                const SizedBox(height: 16),
+                // 🎓 EDUCATION & CAREER
+                _DetailSection(
+                  title: "Education & Career",
+                  actionChip: AppActionChip(
+                    label: "Edit",
+                    icon: Icons.edit,
+                    onTap: () {},
+                  ),
 
-                _SectionTitle('Lifestyle'),
-                _InfoTile('Diet', profile.lifestyle?.diet ?? 'N/A'),
-                _InfoTile('Smoking', profile.lifestyle?.smoke ?? 'N/A'),
-                _InfoTile('Drinking', profile.lifestyle?.drink ?? 'N/A'),
+                  children: [
+                    _DetailRow(
+                      "Qualification",
+                      profile.education?.highestQualification ?? "N/A",
+                    ),
+                    _DetailRow(
+                      "Occupation",
+                      profile.education?.occupation ?? "N/A",
+                    ),
+                    _DetailRow("Company", profile.employment?.company ?? "N/A"),
+                    _DetailRow(
+                      "Income",
+                      profile.employment?.annualIncome?.toString() ?? "N/A",
+                    ),
+                  ],
+                ),
 
+                // 🌿 LIFESTYLE
+                _DetailSection(
+                  title: "Lifestyle",
+                  actionChip: AppActionChip(
+                    label: "Edit",
+                    icon: Icons.edit,
+                    onTap: () {},
+                  ),
+
+                  children: [
+                    _DetailRow("Diet", profile.lifestyle?.diet ?? "N/A"),
+                    _DetailRow("Smoking", profile.lifestyle?.smoke ?? "N/A"),
+                    _DetailRow("Drinking", profile.lifestyle?.drink ?? "N/A"),
+                  ],
+                ),
+
+                // 🏠 ADDRESS
+                _DetailSection(
+                  title: "Address",
+                  actionChip: AppActionChip(
+                    label: "Edit",
+                    icon: Icons.edit,
+                    onTap: () {},
+                  ),
+
+                  children: [
+                    _DetailRow("City", profile.address?.city ?? "N/A"),
+                    _DetailRow("State", profile.address?.state ?? "N/A"),
+                    _DetailRow("Country", profile.address?.country ?? "N/A"),
+                  ],
+                ),
+
+                // 👪 FAMILY
+                _DetailSection(
+                  title: "Family Details",
+                  actionChip: AppActionChip(
+                    label: "Edit",
+                    icon: Icons.edit,
+                    onTap: () {},
+                  ),
+
+                  children: [
+                    _DetailRow("Father", profile.family?.fatherName ?? "N/A"),
+                    _DetailRow("Mother", profile.family?.motherName ?? "N/A"),
+                    _DetailRow(
+                      "Family Type",
+                      profile.family?.familyType ?? "N/A",
+                    ),
+                  ],
+                ),
+                // 🌟 RELIGIOUS & ASTROLOGICAL
+                _DetailSection(
+                  title: "Religious & Astrological",
+                  actionChip: AppActionChip(
+                    label: "Edit",
+                    icon: Icons.edit,
+                    onTap: () {},
+                  ),
+                  children: [
+                    _DetailRow("Religion", profile.cultural?.religion ?? "N/A"),
+                    _DetailRow("Caste", profile.cultural?.caste ?? "N/A"),
+                    _DetailRow(
+                      "Sub-caste",
+                      profile.cultural?.subCaste ?? "N/A",
+                    ),
+                  ],
+                ),
+
+                // 💖 PARTNER PREFERENCES
                 const SizedBox(height: 24),
-
-                // 🔹 SETTINGS
-                _SectionTitle('Account'),
-                _SettingsTile(
-                  icon: Icons.photo_library_outlined,
-                  title: 'Manage Photos',
-                  onTap: () {},
-                ),
-                _SettingsTile(
-                  icon: Icons.lock_outline,
-                  title: 'Privacy Settings',
-                  onTap: () {},
-                ),
-                _SettingsTile(
-                  icon: Icons.logout,
-                  title: 'Logout',
-                  color: Colors.red,
-                  onTap: () {},
-                ),
               ],
             ),
           );
@@ -113,13 +205,9 @@ class MyProfileScreen extends ConsumerWidget {
   }
 }
 
-////////////////////////////////////////////////////////////
-/// HEADER
-////////////////////////////////////////////////////////////
-
-class _MyProfileHeader extends StatelessWidget {
+class _ProfileHeroCard extends StatelessWidget {
   final MatrimonyProfile profile;
-  const _MyProfileHeader({required this.profile});
+  const _ProfileHeroCard({required this.profile});
 
   @override
   Widget build(BuildContext context) {
@@ -127,62 +215,66 @@ class _MyProfileHeader extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.canvasColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(26),
+        gradient: LinearGradient(
+          colors: [theme.primaryColor.withOpacity(0.12), Colors.white],
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: Colors.black.withOpacity(0.10),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 42,
-            backgroundColor: theme.primaryColor.withOpacity(0.12),
+            radius: 48,
+            backgroundColor: theme.primaryColor.withOpacity(0.15),
             backgroundImage:
                 (profile.images?.primaryImageUrl?.isNotEmpty ?? false)
                 ? NetworkImage(profile.images!.primaryImageUrl)
                 : null,
             child: (profile.images?.primaryImageUrl?.isEmpty ?? true)
-                ? Icon(Icons.person, size: 42, color: theme.primaryColor)
+                ? Icon(Icons.person, size: 48, color: theme.primaryColor)
                 : null,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 18),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        profile.user?.fullName ?? 'N/A',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (profile.user?.isVerified == true)
-                      const Icon(Icons.verified, color: Colors.green, size: 20),
-                  ],
+                Text(
+                  profile.user?.fullName ?? "N/A",
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '${profile.identity?.age ?? 'N/A'} yrs • ${profile.education?.occupation ?? 'N/A'}',
-                  style: TextStyle(color: Colors.grey[600]),
+                  "${profile.identity!.age} yrs • ${profile.education?.occupation ?? "N/A"}",
+                  style: TextStyle(color: Colors.grey[700]),
                 ),
                 const SizedBox(height: 10),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.edit, size: 18),
-                  label: const Text('Edit Profile'),
-                  onPressed: () {},
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 16,
+                      color: theme.primaryColor,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        "${profile.address?.city ?? "N/A"}, ${profile.address?.state ?? "N/A"}",
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -193,161 +285,81 @@ class _MyProfileHeader extends StatelessWidget {
   }
 }
 
-////////////////////////////////////////////////////////////
-/// PROFILE COMPLETION
-////////////////////////////////////////////////////////////
+class _DetailSection extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
 
-class _ProfileCompletion extends StatelessWidget {
-  final double progress;
-  const _ProfileCompletion({required this.progress});
+  final AppActionChip actionChip;
+
+  const _DetailSection({
+    required this.title,
+    required this.children,
+    required this.actionChip,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Profile Completion',
-            style: TextStyle(fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              //   adding chip or action chip
+              const Spacer(),
+
+              actionChip,
+
+              const SizedBox(width: 8),
+            ],
           ),
-          const SizedBox(height: 6),
-          LinearProgressIndicator(
-            value: progress,
-            minHeight: 6,
-            borderRadius: BorderRadius.circular(10),
-          ),
+          const SizedBox(height: 12),
+          ...children,
         ],
       ),
     );
   }
 }
 
-////////////////////////////////////////////////////////////
-/// QUICK ACTIONS
-////////////////////////////////////////////////////////////
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
 
-class _QuickActions extends StatelessWidget {
+  const _DetailRow(this.label, this.value);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
           Expanded(
-            child: _ActionCard(
-              icon: Icons.photo_camera,
-              label: 'Photos',
-              onTap: () {},
-            ),
+            child: Text(label, style: TextStyle(color: Colors.grey[600])),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _ActionCard(
-              icon: Icons.description_outlined,
-              label: 'Bio',
-              onTap: () {},
-            ),
-          ),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
       ),
-    );
-  }
-}
-
-class _ActionCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _ActionCard({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).canvasColor,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 28),
-            const SizedBox(height: 6),
-            Text(label),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-////////////////////////////////////////////////////////////
-/// REUSABLES
-////////////////////////////////////////////////////////////
-
-class _SectionTitle extends StatelessWidget {
-  final String text;
-  const _SectionTitle(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-}
-
-class _InfoTile extends StatelessWidget {
-  final String label;
-  final String value;
-  const _InfoTile(this.label, this.value);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      dense: true,
-      title: Text(label),
-      trailing: Text(
-        value,
-        style: const TextStyle(fontWeight: FontWeight.w600),
-      ),
-    );
-  }
-}
-
-class _SettingsTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final VoidCallback onTap;
-  final Color? color;
-
-  const _SettingsTile({
-    required this.icon,
-    required this.title,
-    required this.onTap,
-    this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(title, style: TextStyle(color: color)),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
     );
   }
 }

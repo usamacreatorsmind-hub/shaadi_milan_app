@@ -1,4 +1,3 @@
- 
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../user_app/domain/states/user_state.dart';
@@ -11,11 +10,9 @@ class AuthRepositoryImpl implements AuthRepository {
   final FirebaseFirestore firestore;
   AuthRepositoryImpl(this.ds, this.firestore);
 
- 
   @override
   User? get currentUser => ds.currentUser;
-  
-   
+
   @override
   Stream<AppUser?> authStateChanges() => ds.authStateChanges().asyncMap((
     user,
@@ -74,5 +71,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<bool> checkUserIfExists() async {
     return await ds.checkUserIfExists();
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String trim) {
+    return ds.sendPasswordResetEmail(trim);
   }
 }

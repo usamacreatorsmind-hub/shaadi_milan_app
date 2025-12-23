@@ -86,6 +86,16 @@ class FirebaseAuthDS {
     }
   }
 
+  Future<void> deleteUser() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      // Delete user document from Firestore
+      await _firestore.collection('temp_users').doc(user.uid).delete();
+      // Delete user from Firebase Authentication
+      await user.delete();
+    }
+  }
+
   Future<bool> checkUserIfExists() async {
     final user = _auth.currentUser;
     if (user != null) {

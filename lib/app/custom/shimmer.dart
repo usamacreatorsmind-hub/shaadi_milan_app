@@ -4,13 +4,26 @@ import 'package:shimmer/shimmer.dart';
 //
 // create shimmer for circle rectangle  and list shimmer
 
+class ShimmerColors {
+  static Color base(BuildContext context) =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.12);
+
+  static Color highlight(BuildContext context) =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.04);
+
+  static Color surface(BuildContext context) =>
+      Theme.of(context).colorScheme.surface;
+}
+
 class ShimmerLoading extends StatelessWidget {
   final double? width;
   final double? height;
   final ShapeBorder shapeBorder;
 
   const ShimmerLoading.rectangular({super.key, this.width, this.height})
-    : shapeBorder = const RoundedRectangleBorder();
+    : shapeBorder = const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(8)),
+      );
 
   const ShimmerLoading.circular({super.key, this.width, this.height})
     : shapeBorder = const CircleBorder();
@@ -18,13 +31,13 @@ class ShimmerLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: ShimmerColors.base(context),
+      highlightColor: ShimmerColors.highlight(context),
       child: Container(
         width: width,
         height: height,
         decoration: ShapeDecoration(
-          color: Colors.grey[300]!,
+          color: ShimmerColors.surface(context),
           shape: shapeBorder,
         ),
       ),
@@ -41,7 +54,7 @@ class ListShimmer extends StatelessWidget {
     super.key,
     this.itemCount = 5,
     this.itemHeight = 100,
-    this.padding = const EdgeInsets.all(16.0),
+    this.padding = const EdgeInsets.all(16),
   });
 
   @override
@@ -49,9 +62,9 @@ class ListShimmer extends StatelessWidget {
     return Padding(
       padding: padding,
       child: Column(
-        children: List.generate(itemCount, (index) {
+        children: List.generate(itemCount, (_) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
+            padding: const EdgeInsets.only(bottom: 16),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -60,15 +73,15 @@ class ListShimmer extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const ShimmerLoading.rectangular(
+                    children: const [
+                      ShimmerLoading.rectangular(
                         height: 16,
                         width: double.infinity,
                       ),
-                      const SizedBox(height: 8),
-                      const ShimmerLoading.rectangular(height: 12, width: 150),
-                      const SizedBox(height: 8),
-                      const ShimmerLoading.rectangular(height: 12, width: 100),
+                      SizedBox(height: 8),
+                      ShimmerLoading.rectangular(height: 12, width: 150),
+                      SizedBox(height: 8),
+                      ShimmerLoading.rectangular(height: 12, width: 100),
                     ],
                   ),
                 ),
@@ -87,53 +100,50 @@ class ShimmerListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: ShimmerColors.base(context),
+      highlightColor: ShimmerColors.highlight(context),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(16),
+        child: Row(
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 60.0,
-                  height: 60.0,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const Padding(padding: EdgeInsets.symmetric(horizontal: 8.0)),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        height: 8.0,
-                        color: Colors.white,
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 2.0),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: 8.0,
-                        color: Colors.white,
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 2.0),
-                      ),
-                      Container(width: 100.0, height: 8.0, color: Colors.white),
-                    ],
-                  ),
-                ),
-              ],
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ShimmerColors.surface(context),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  shimmerLine(context, width: double.infinity),
+                  const SizedBox(height: 6),
+                  shimmerLine(context, width: double.infinity),
+                  const SizedBox(height: 6),
+                  shimmerLine(context, width: 120),
+                ],
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget shimmerLine(
+    BuildContext context, {
+    required double width,
+    double height = 10,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: ShimmerColors.surface(context),
+        borderRadius: BorderRadius.circular(6),
       ),
     );
   }
@@ -152,67 +162,37 @@ class ShimmerProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: ShimmerColors.base(context),
+      highlightColor: ShimmerColors.highlight(context),
       child: Container(
         height: height,
         width: width,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: ShimmerColors.surface(context),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ================= IMAGE PLACEHOLDER =================
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                decoration: BoxDecoration(
+                  color: ShimmerColors.surface(context),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
                 ),
               ),
             ),
-
-            // ================= CONTENT PLACEHOLDER =================
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Name line
-                  Container(
-                    width: width * 0.6,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-
+                  shimmerBox(context, width * 0.6, 16),
                   const SizedBox(height: 8),
-
-                  // Subtitle line
-                  Container(
-                    width: width * 0.4,
-                    height: 14,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-
+                  shimmerBox(context, width * 0.4, 14),
                   const SizedBox(height: 16),
-
-                  // Button placeholder
-                  Container(
-                    width: double.infinity,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
+                  shimmerBox(context, double.infinity, 40, radius: 10),
                 ],
               ),
             ),
@@ -221,37 +201,19 @@ class ShimmerProfileCard extends StatelessWidget {
       ),
     );
   }
-}
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Shimmer Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Shimmer Demo')),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ShimmerProfileCard(
-                  height: MediaQuery.of(context).size.height * 0.3,
-                  width: double.infinity,
-                ),
-              ),
-              ListShimmer(),
-              ShimmerListTile(),
-            ],
-          ),
-        ),
+  Widget shimmerBox(
+    BuildContext context,
+    double width,
+    double height, {
+    double radius = 6,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: ShimmerColors.surface(context),
+        borderRadius: BorderRadius.circular(radius),
       ),
     );
   }

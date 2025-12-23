@@ -41,6 +41,12 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const AuthWrapperScreen(),
       );
     },
+    ChangePasswordRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ChangePasswordScreen(),
+      );
+    },
     LoginRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -73,6 +79,12 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const RegisterScreen(),
+      );
+    },
+    ResetPasswordRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ResetPasswordScreen(),
       );
     },
     SearchRoute.name: (routeData) {
@@ -177,6 +189,12 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const UserNotificationScreen(),
+      );
+    },
+    UserPaymentRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserPaymentScreen(),
       );
     },
     UserPhysicalFormRoute.name: (routeData) {
@@ -290,6 +308,20 @@ class AuthWrapperRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ChangePasswordScreen]
+class ChangePasswordRoute extends PageRouteInfo<void> {
+  const ChangePasswordRoute({List<PageRouteInfo>? children})
+      : super(
+          ChangePasswordRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'ChangePasswordRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [LoginScreen]
 class LoginRoute extends PageRouteInfo<void> {
   const LoginRoute({List<PageRouteInfo>? children})
@@ -379,6 +411,20 @@ class RegisterRoute extends PageRouteInfo<void> {
         );
 
   static const String name = 'RegisterRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [ResetPasswordScreen]
+class ResetPasswordRoute extends PageRouteInfo<void> {
+  const ResetPasswordRoute({List<PageRouteInfo>? children})
+      : super(
+          ResetPasswordRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'ResetPasswordRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -651,6 +697,20 @@ class UserNotificationRoute extends PageRouteInfo<void> {
         );
 
   static const String name = 'UserNotificationRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [UserPaymentScreen]
+class UserPaymentRoute extends PageRouteInfo<void> {
+  const UserPaymentRoute({List<PageRouteInfo>? children})
+      : super(
+          UserPaymentRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'UserPaymentRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }

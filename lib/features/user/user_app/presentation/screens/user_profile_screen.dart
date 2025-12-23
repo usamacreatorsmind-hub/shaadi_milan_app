@@ -1,6 +1,7 @@
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -134,7 +135,15 @@ class UserProfileScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      //LOGOUT HERE
+
+                      ref.read(authRepositoryProvider).signOut();
+
+                      AutoRouter.of(context).replace(const LoginRoute());
+
+                      print("Logout button pressed");
+                    },
                     child: const Text("Logout"),
                   ),
                 ),
@@ -158,9 +167,7 @@ class _ProfileHeaderCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        AutoRouter.of(
-          context,
-        ).push(MyProfileRoute(uid: profile.user!.uid));
+        AutoRouter.of(context).push(MyProfileRoute(uid: profile.user!.uid));
       },
 
       child: Container(
@@ -367,10 +374,14 @@ class _PremiumCard extends StatelessWidget {
             color: theme.primaryColor,
           ),
           const SizedBox(width: 16),
-          const Expanded(
-            child: Text(
-              "Upgrade Account to Premium",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          GestureDetector(
+            onTap: () => AutoRouter.of(context).push(const UserPaymentRoute()),
+
+            child: const Expanded(
+              child: Text(
+                "Upgrade Account to Premium",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
           const Icon(Icons.arrow_forward_ios, size: 16),

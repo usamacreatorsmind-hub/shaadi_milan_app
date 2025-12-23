@@ -12,7 +12,7 @@ class UserMainShellScreen extends StatefulWidget {
 }
 
 class _UserMainShellState extends State<UserMainShellScreen> {
-  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final String uid = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,6 @@ class _UserMainShellState extends State<UserMainShellScreen> {
       routes: [
         const UserHomeRoute(),
         const UserMatchesRoute(),
-
         UserProfileRoute(userId: uid),
       ],
       transitionBuilder: (context, child, animation) =>
@@ -29,32 +28,105 @@ class _UserMainShellState extends State<UserMainShellScreen> {
         final tabsRouter = AutoTabsRouter.of(context);
 
         return Scaffold(
+          backgroundColor: Colors.grey[100],
           body: child,
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
+          bottomNavigationBar: CustomBottomNavBar(
             currentIndex: tabsRouter.activeIndex,
             onTap: tabsRouter.setActiveIndex,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.favorite_outline),
-                activeIcon: Icon(Icons.favorite),
-                label: 'WishList',
-              ),
-
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
           ),
         );
       },
+    );
+  }
+}
+
+class BottomNavItem {
+  final IconData icon;
+  final String label;
+
+  const BottomNavItem({required this.icon, required this.label});
+}
+
+class CustomBottomNavBar extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  const CustomBottomNavBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
+
+  static const List<BottomNavItem> items = [
+    BottomNavItem(icon: Icons.home_outlined, label: 'Home'),
+    BottomNavItem(icon: Icons.favorite_outline, label: 'WishList'),
+    BottomNavItem(icon: Icons.person_outline, label: 'Profile'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(items.length, (index) {
+            final bool isSelected = index == currentIndex;
+
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => onTap(index),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 35,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.red.withOpacity(0.15)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      items[index].icon,
+                      size: 24,
+                      color: isSelected ? Colors.red : Colors.grey,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      items[index].label,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isSelected ? Colors.red : Colors.grey,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
     );
   }
 }

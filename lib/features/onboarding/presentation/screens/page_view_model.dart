@@ -7,7 +7,13 @@ List<PageViewModel> pageViewModelList = [
     body:
         "Join thousands of verified profiles and discover your life partner with trust and confidence.",
     image: const Center(
-      child: Icon(Icons.favorite, size: 120, color: Colors.pink),
+      child: Icon(Icons.favorite, size: 120, color: 
+      
+      // apply theme color every where
+
+Colors.red
+
+      ),
     ),
     decoration: const PageDecoration(
       titleTextStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -19,7 +25,9 @@ List<PageViewModel> pageViewModelList = [
     body:
         "All profiles are manually verified to ensure safety, privacy, and genuine connections.",
     image: const Center(
-      child: Icon(Icons.verified_user, size: 120, color: Colors.green),
+      
+
+child: Icon(Icons.verified_user, size: 120, color: Colors.green),
     ),
     decoration: const PageDecoration(
       titleTextStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

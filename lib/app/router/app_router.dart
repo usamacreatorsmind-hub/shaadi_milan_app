@@ -19,11 +19,14 @@ import 'package:arvika_marriage_bureau/features/user/user_app/presentation/scree
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_main_shell.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_matches_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_notification_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_payment_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_physical_form_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_profile_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/screens/auth_wrapper.dart';
+import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/screens/change_password_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/screens/login_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/screens/register_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/screens/reset_password_screen.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
@@ -69,6 +72,10 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: UserNotificationRoute.page),
 
     AutoRoute(page: MyProfileRoute.page),
+    AutoRoute(page: UserPaymentRoute.page),
+    AutoRoute(page: ResetPasswordRoute.page),
+    AutoRoute(page: ChangePasswordRoute.page),
+    
 
     // ================= AGENT =================
     AutoRoute(page: AgentDashboardRoute.page),

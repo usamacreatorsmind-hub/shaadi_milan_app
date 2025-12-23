@@ -1,4 +1,4 @@
-import 'dart:io'; 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../features/user/user_app/presentation/controllers/image_picker_controller.dart';
@@ -10,28 +10,36 @@ class ImagePickerWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final imageState = ref.watch(imagePickerProvider);
     final controller = ref.read(imagePickerProvider.notifier);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // PRIMARY IMAGE
+        // ================= PRIMARY IMAGE =================
         GestureDetector(
           onTap: controller.pickPrimaryImage,
           child: Container(
             height: 180,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.grey[200],
+              color: colors.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey),
+              border: Border.all(color: colors.outline),
             ),
             child: imageState.primaryImage == null
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.camera_alt, size: 40),
-                      SizedBox(height: 8),
-                      Text('Select Primary Image'),
+                    children: [
+                      Icon(Icons.camera_alt,
+                          size: 40, color: colors.primary),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Select Primary Image',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
                     ],
                   )
                 : ClipRRect(
@@ -47,34 +55,38 @@ class ImagePickerWidget extends ConsumerWidget {
 
         const SizedBox(height: 16),
 
-        // HEADER
+        // ================= HEADER =================
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Gallery Images',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             ActionChip(
-              labelStyle: TextStyle(
-                 
-              ),
-             
-              elevation: 0,
-              shadowColor: Colors.transparent,
               onPressed: controller.pickSecondaryImages,
+              elevation: 0,
+              backgroundColor: colors.primaryContainer,
               avatar: Icon(
                 Icons.image_outlined,
-                color: const Color.fromARGB(255, 105, 69, 15),
+                color: colors.primary,
               ),
-              label: const Text('Add More'),
+              label: Text(
+                'Add More',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
 
         const SizedBox(height: 8),
 
-        // EMPTY PLACEHOLDER
+        // ================= EMPTY PLACEHOLDER =================
         if (imageState.secondaryImages.isEmpty)
           SizedBox(
             height: 90,
@@ -82,21 +94,20 @@ class ImagePickerWidget extends ConsumerWidget {
               scrollDirection: Axis.horizontal,
               itemCount: 3,
               itemBuilder: (_, __) => Container(
-                margin: const EdgeInsets.all(5),
-
+                margin: const EdgeInsets.all(6),
                 width: MediaQuery.of(context).size.width * 0.29,
-                // height: MediaQuery.of(context).size.height * 0.28,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: colors.surfaceVariant,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.camera_alt),
+                child: Icon(Icons.camera_alt,
+                    color: colors.onSurfaceVariant),
               ),
             ),
           ),
 
-        // GALLERY IMAGES
+        // ================= GALLERY IMAGES =================
         if (imageState.secondaryImages.isNotEmpty)
           SizedBox(
             height: 90,
@@ -122,11 +133,13 @@ class ImagePickerWidget extends ConsumerWidget {
                       right: 4,
                       top: 4,
                       child: GestureDetector(
-                        onTap: () => controller.removeSecondaryImage(path),
-                        child: const CircleAvatar(
+                        onTap: () =>
+                            controller.removeSecondaryImage(path),
+                        child: CircleAvatar(
                           radius: 12,
-                          backgroundColor: Colors.black54,
-                          child: Icon(
+                          backgroundColor:
+                              colors.scrim.withOpacity(0.6),
+                          child: const Icon(
                             Icons.close,
                             size: 14,
                             color: Colors.white,
@@ -139,23 +152,6 @@ class ImagePickerWidget extends ConsumerWidget {
               },
             ),
           ),
-
-        // Center(
-        //   child: Container(
-        //     width: double.infinity,
-        //     padding: const EdgeInsets.all(9),
-        //     child: ElevatedButton(
-        //       onPressed: () {
-        //         controller.uploadImages(
-        //           ref,
-
-        //           ref.read(authStateProvider).value!.uid,
-        //         );
-        //       },
-        //       child: Icon(Icons.cloud_upload_outlined, size: 30),
-        //     ),
-        //   ),
-        // ),
       ],
     );
   }

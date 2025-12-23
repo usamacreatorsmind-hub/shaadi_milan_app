@@ -1,14 +1,6 @@
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/carousel_slider.dart';
-import 'package:arvika_marriage_bureau/features/agent/domain/states/agent_entity.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/address_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/cultural_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/education_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/employee_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/family_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/lifestyle_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/physical_state.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,19 +43,40 @@ class UserDetailScreen extends ConsumerWidget {
               DefaultTabController(
                 length: 5,
                 child: NestedScrollView(
+                  floatHeaderSlivers: true,
+
                   headerSliverBuilder: (context, innerBoxIsScrolled) {
                     return [
                       SliverAppBar(
                         automaticallyImplyLeading: false,
                         expandedHeight:
                             MediaQuery.of(context).size.height * 0.50,
-
-                        backgroundColor: Colors.transparent,
-
+                        backgroundColor: Colors.black,
                         flexibleSpace: FlexibleSpaceBar(
                           background: CustomCarouselSlider(imageUrls: images),
                         ),
                       ),
+
+                      /// 🔒 FIXED HEADER (NO COLLAPSE, NO JUMP)
+                      SliverAppBar(
+                        pinned: true,
+                        automaticallyImplyLeading: false,
+                        // APPLY THEME COLOR HERE
+                        backgroundColor: Theme.of(context).canvasColor,
+
+                        elevation: 0,
+
+                        // 🔑 IMPORTANT
+                        toolbarHeight: 120,
+                        centerTitle: true,
+                        collapsedHeight: 120,
+
+                        expandedHeight: 120,
+
+                        titleSpacing: 0,
+                        title: ProfileHeaderCard(profile: profile),
+                      ),
+
                       SliverToBoxAdapter(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -71,7 +84,6 @@ class UserDetailScreen extends ConsumerWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              ProfileHeaderCard(profile: profile),
                               const SizedBox(height: 16),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -717,104 +729,66 @@ class ProfileHeaderCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          colors: [theme.primaryColor.withOpacity(0.08), Colors.white],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(22),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 🔹 Name + Verified
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    profile.user?.fullName ?? 'N/A',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.3,
-                    ),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 4),
+      decoration: const BoxDecoration(color: Colors.transparent),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // NAME + VERIFIED
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  profile.user?.fullName ?? 'N/A',
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+
+                    letterSpacing: 0.2,
                   ),
                 ),
-                if (profile.user?.isVerified == true)
-                  Container(
-                    margin: const EdgeInsets.only(left: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(6),
-                    child: const Icon(
-                      Icons.verified,
-                      color: Colors.green,
-                      size: 22,
-                    ),
-                  ),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-
-            // 🔹 Age & Occupation
-            Text(
-              '${profile.identity?.age ?? 'N/A'} years • ${profile.education?.occupation ?? 'N/A'}',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[700],
-                height: 1.4,
               ),
-            ),
+              if (profile.user?.isVerified == true)
+                const Icon(Icons.verified, color: Colors.green, size: 22),
+            ],
+          ),
 
-            const SizedBox(height: 14),
+          const SizedBox(height: 6),
 
-            // 🔹 Divider
-            Divider(color: Colors.grey.shade300, height: 1),
+          // AGE + OCCUPATION
+          Text(
+            '${profile.identity?.age ?? 'N/A'} yrs • ${profile.education?.occupation ?? 'N/A'}',
+            style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
+          ),
 
-            const SizedBox(height: 14),
+          const SizedBox(height: 8),
 
-            // 🔹 Location
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: theme.primaryColor.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Icons.location_on_outlined,
-                    size: 20,
-                    color: theme.primaryColor,
-                  ),
+          // LOCATION
+          Row(
+            children: [
+              Icon(
+                Icons.location_on_outlined,
+                size: 18,
+                color: theme.primaryColor,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  '${profile.address?.city ?? 'N/A'}, ${profile.address?.state ?? 'N/A'}',
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    '${profile.address?.city ?? 'N/A'}, ${profile.address?.state ?? 'N/A'}',
-                    style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 14),
+
+          // DIVIDER (VERY IMPORTANT FOR VISUAL SEPARATION)
+          Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
+        ],
       ),
     );
   }

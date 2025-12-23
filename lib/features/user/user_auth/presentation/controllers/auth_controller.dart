@@ -57,6 +57,30 @@ class AuthController extends StateNotifier<User?> {
     await _authRepository.signOut();
   }
 
+
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _authRepository.sendPasswordResetEmail(email);
+  }
+   
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   @override
   void dispose() {
     _authStateSubscription?.cancel();

@@ -18,4 +18,6 @@ abstract class AuthRepository {
   Future<void> signInWithEmail(String email, String password);
   Future<void> signOut();
   Future<bool> checkUserIfExists();
+
+  Future<void> sendPasswordResetEmail(String trim) async {}
 }

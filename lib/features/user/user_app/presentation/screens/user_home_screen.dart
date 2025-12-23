@@ -56,73 +56,17 @@ class UserHomeScreen extends ConsumerWidget {
     final location = ref.watch(locationProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       body: CustomScrollView(
         slivers: [
           /// ================= APP BAR =================
-          // SliverAppBar(
-          //   floating: true,
-          //   pinned: true,
-          //   backgroundColor: Colors.white,
-          //   elevation: 0,
-          //   title: Row(
-          //     children: [
-          //       Container(
-          //         height: 40,
-          //         width: 40,
-          //         decoration: BoxDecoration(
-          //           color: Theme.of(context)
-          //               .primaryColor
-          //               .withOpacity(0.1),
-          //           borderRadius: BorderRadius.circular(12),
-          //         ),
-          //         child: const Icon(Icons.favorite),
-          //       ),
-          //       const SizedBox(width: 12),
-          //       const Column(
-          //         crossAxisAlignment: CrossAxisAlignment.start,
-          //         children: [
-          //           Text(
-          //             'Anavika',
-          //             style: TextStyle(
-          //               fontWeight: FontWeight.bold,
-          //               fontSize: 20,
-          //             ),
-          //           ),
-          //           Text(
-          //             'Marriage Bureau',
-          //             style: TextStyle(
-          //               fontSize: 12,
-          //               color: Colors.grey,
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     ],
-          //   ),
-          //   actions: [
-          //     IconButton(
-          //       onPressed: () {
-          //         context.router.push(
-          //           const UserNotificationRoute(),
-          //         );
-          //       },
-          //       icon: const Icon(Icons.notifications_outlined),
-          //     ),
-          //   ],
-          // ),
-
-          /// ================= APP BAR =================
-          SliverToBoxAdapter(child: Container(height: 10, color: Colors.white)),
-
           SliverAppBar(
             pinned: true,
-            floating: true,
+
             snap: false,
             stretch: true,
-            backgroundColor: Colors.transparent,
             elevation: 0,
             toolbarHeight: 88,
+            titleSpacing: 0,
 
             flexibleSpace: ClipRRect(
               child: BackdropFilter(
@@ -145,29 +89,15 @@ class UserHomeScreen extends ConsumerWidget {
             title: Row(
               children: [
                 // 🌸 Glowing logo
-                Container(
-                  height: 50,
+                SizedBox(
+                  height: 100,
                   width: 100,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).primaryColor,
-                        Colors.pinkAccent.shade100,
-                      ],
-                    ),
-                    // boxShadow: [
-                    //   BoxShadow(
-                    //     color: Colors.pinkAccent.withOpacity(0.4),
-                    //     blurRadius: 14,
-                    //     spreadRadius: 2,
-                    //   ),
-                    // ],
-                  ),
+
                   child: Padding(
                     padding: const EdgeInsets.all(3),
                     child: ClipRRect(
                       child: Image.asset(
-                        'assets/images/logo.jpg',
+                        'assets/images/logo.png',
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) =>
                             const Icon(Icons.favorite, color: Colors.white),
@@ -190,8 +120,9 @@ class UserHomeScreen extends ConsumerWidget {
                           Colors.pinkAccent,
                         ],
                       ).createShader(bounds),
+
                       child: const Text(
-                        'Anavika',
+                        'Arvika Marriage Bureau',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
@@ -202,7 +133,7 @@ class UserHomeScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 3),
                     const Text(
-                      'Marriage Bureau',
+                      'Find your perfect match',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.black54,
@@ -526,7 +457,7 @@ class ProfileCard extends StatelessWidget {
               ),
               child: Image.network(
                 imageUrl,
-                height: MediaQuery.of(context).size.height * 0.6,
+                height: MediaQuery.of(context).size.height * 0.7,
                 width: double.infinity,
                 fit: BoxFit.fill,
                 errorBuilder: (_, __, ___) => Container(
@@ -558,17 +489,6 @@ class ProfileCard extends StatelessWidget {
                         context.router.push(UserDetailRoute(uid: uid));
                       },
                       child: const Text('View Profile'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () {
-                        context.router.push(
-                          AgentProfileVerifyRoute(agentId: "81266"),
-                        );
-                      },
-                      child: const Text('View agentProfile'),
                     ),
                   ),
                 ],
