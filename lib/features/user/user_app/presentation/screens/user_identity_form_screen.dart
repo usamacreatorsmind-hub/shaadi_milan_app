@@ -1,7 +1,5 @@
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_biodata_check_screen.dart';
-
-import '../../../../../app/custom/image_picker/image_picker_widget.dart';
+import 'package:intl/intl.dart';
 import '../controllers/user_identity_controllers.dart';
 import '../../domain/states/identity_state.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +38,9 @@ class _UserIdentityFormScreenState
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
+      helpText: "Select your date of birth",
+      cancelText: "Cancel",
+      confirmText: "Select",
     );
 
     if (picked != null) {
@@ -61,6 +62,12 @@ class _UserIdentityFormScreenState
     return age;
   }
 
+  // ✅ SAFE AGE GETTER
+  int? get _age {
+    if (_selectedDate == null) return null;
+    return _calculateAge(_selectedDate!);
+  }
+
   // ----------------------------
   // SUBMIT
   // ----------------------------
@@ -68,9 +75,9 @@ class _UserIdentityFormScreenState
     if (!_formKey.currentState!.validate()) return;
 
     if (_gender == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please select gender')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select gender')),
+      );
       return;
     }
 
@@ -81,14 +88,19 @@ class _UserIdentityFormScreenState
       return;
     }
 
-    final age = _calculateAge(_selectedDate!);
+    if (_age! < 18) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You must be at least 18 years old'),
+        ),
+      );
+      return;
+    }
 
-    ref
-        .read(identityControllerProvider.notifier)
-        .saveIdentity(
+    ref.read(identityControllerProvider.notifier).saveIdentity(
           gender: _gender!,
           dob: _selectedDate!,
-          age: age,
+          age: _age!,
           aadhar: _aadharController.text.trim(),
         );
   }
@@ -100,21 +112,17 @@ class _UserIdentityFormScreenState
   Widget build(BuildContext context) {
     final identityState = ref.watch(identityControllerProvider);
 
-    /// ✅ CORRECT PLACE FOR ref.listen
     ref.listen<IdentityState>(identityControllerProvider, (previous, current) {
       if (current.error != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${current.error}')),
+        );
       }
 
       if (current.identity != null && previous?.identity == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Identity profile saved successfully')),
+          const SnackBar(content: Text('Identity saved successfully')),
         );
-
-        /// OPTIONAL: move to next step
-        // context.router.push(const AddressFormRoute());
       }
     });
 
@@ -128,6 +136,9 @@ class _UserIdentityFormScreenState
             children: [
               const SizedBox(height: 12),
 
+              // ----------------------------
+              // AADHAR
+              // ----------------------------
               AppTextField(
                 controller: _aadharController,
                 prefixIcon: Icons.credit_card,
@@ -136,11 +147,22 @@ class _UserIdentityFormScreenState
                 hint: "Enter your Aadhar number",
                 obscureText: false,
                 keyboardType: TextInputType.number,
-                validator: (value) {},
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Aadhar number is required';
+                  }
+                  if (value.length != 12) {
+                    return 'Enter valid 12-digit Aadhar number';
+                  }
+                  return null;
+                },
               ),
 
               const SizedBox(height: 12),
 
+              // ----------------------------
+              // GENDER
+              // ----------------------------
               AppDropDown(
                 label: "Gender",
                 items: const ['Male', 'Female', 'Other'],
@@ -150,7 +172,7 @@ class _UserIdentityFormScreenState
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select your gender';
+                    return 'Please select gender';
                   }
                   return null;
                 },
@@ -158,40 +180,62 @@ class _UserIdentityFormScreenState
 
               const SizedBox(height: 12),
 
+              // ----------------------------
+              // DOB PICKER
+              // ----------------------------
               ListTile(
+                leading: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(0.15),
+                  child: Icon(
+                    Icons.date_range_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
                 title: Text(
                   _selectedDate == null
                       ? 'Select Date of Birth'
-                      : 'Date of Birth: ${_selectedDate!.toLocal().toString().split(' ')[0]}',
+                      : 'DOB: ${DateFormat('dd/MM/yyyy').format(_selectedDate!)}',
                 ),
-                trailing: const Icon(Icons.calendar_today),
+                subtitle:
+                    _age == null ? null : Text('Age: $_age years'),
                 onTap: () => _selectDate(context),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  side: BorderSide(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withOpacity(0.5),
+                  ),
+                ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 34),
 
-              // /// ✅ SAFE IMAGE PICKER
-              // const ImagePickerWidget(),
-              const SizedBox(height: 24),
-
-              identityState.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : AppButton(onPressed: _submitForm, text: 'Save Identity'),
+              // ----------------------------
+              // SUBMIT / AGE VALIDATION
+              // ----------------------------
+              if (_age == null)
+                const SizedBox.shrink()
+              else if (_age! >= 18)
+                identityState.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : AppButton(
+                        onPressed: _submitForm,
+                        text: 'Save Identity',
+                      )
+              else
+                const Text(
+                  "You are not eligible to create a profile as you are under 18 years old.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.red),
+                ),
 
               const SizedBox(height: 16),
-
-              // AppButton(
-              //   onPressed: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: (context) =>
-              //             UserBiodataCheckScreen(isAgreed: true),
-              //       ),
-              //     );
-              //   },
-              //   text: 'Go to Biodata Check Screen',
-              // ),
             ],
           ),
         ),

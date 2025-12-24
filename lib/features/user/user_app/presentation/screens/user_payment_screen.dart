@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
@@ -93,6 +94,7 @@ class UserPaymentScreen extends StatelessWidget {
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
+                    AutoRouter.of(context).push(const PaymentOptionRoute());
                   },
                 ),
 

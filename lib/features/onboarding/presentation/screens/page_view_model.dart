@@ -1,45 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
+// create page view model with stack
+
 List<PageViewModel> pageViewModelList = [
   PageViewModel(
-    title: "Find Your Perfect Match 💍",
-    body:
-        "Join thousands of verified profiles and discover your life partner with trust and confidence.",
-    image: const Center(
-      child: Icon(Icons.favorite, size: 120, color: 
-      
-      // apply theme color every where
+    title: "Find Your Perfect Match ❤️",
 
-Colors.red
+    body: "Trusted matrimony platform for genuine connections",
 
+    backgroundImage: "assets/images/image_1.jpeg",
+
+    decoration: PageDecoration(
+      titleTextStyle: const TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
       ),
-    ),
-    decoration: const PageDecoration(
-      titleTextStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      bodyTextStyle: TextStyle(fontSize: 16),
+      bodyTextStyle: const TextStyle(fontSize: 16, color: Colors.white70),
     ),
   ),
   PageViewModel(
-    title: "Verified & Secure Profiles 🔐",
-    body:
-        "All profiles are manually verified to ensure safety, privacy, and genuine connections.",
-    image: const Center(
-      
+    title: "Connect with Like-Minded Individuals",
 
-child: Icon(Icons.verified_user, size: 120, color: Colors.green),
-    ),
-    decoration: const PageDecoration(
-      titleTextStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      bodyTextStyle: TextStyle(fontSize: 16),
+    body: "Explore profiles and start meaningful conversations",
+
+    backgroundImage: "assets/images/image_2.jpeg",
+
+    decoration: PageDecoration(
+      titleTextStyle: const TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+      bodyTextStyle: const TextStyle(fontSize: 16, color: Colors.white70),
     ),
   ),
   PageViewModel(
-    title: "Start Your Journey Today ✨",
-    body:
-        "Create your profile, connect with matches, and take the first step towards a happy marriage.",
-    image: const Center(
-      child: Icon(Icons.celebration, size: 120, color: Colors.deepPurple),
+    title: "Secure & Private Platform",
+    body: "Your privacy is our priority. Connect with confidence.",
+
+    backgroundImage: "assets/images/image_3.jpeg",
+
+    decoration: PageDecoration(
+      titleTextStyle: const TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+      bodyTextStyle: const TextStyle(fontSize: 16, color: Colors.white70),
     ),
   ),
 ];

@@ -1,12 +1,10 @@
-import 'dart:ui';
-
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
-
-import '../controllers/auth_controller.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
+import '../controllers/auth_controller.dart';
 
 @RoutePage()
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -20,18 +18,80 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final formKey = GlobalKey<FormState>();
 
   final nameCtrl = TextEditingController();
+  final phoneCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
   final pwCtrl = TextEditingController();
   final agentIdCtrl = TextEditingController();
-  final phoneCtrl = TextEditingController();
+
+  bool isLoading = false;
 
   @override
   void dispose() {
     nameCtrl.dispose();
+    phoneCtrl.dispose();
     emailCtrl.dispose();
     pwCtrl.dispose();
     agentIdCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _register(BuildContext context) async {
+    if (!formKey.currentState!.validate()) return;
+
+    setState(() => isLoading = true);
+
+    try {
+      await ref
+          .read(authControllerProvider.notifier)
+          .signUpWithEmail(
+            nameCtrl.text.trim(),
+            emailCtrl.text.trim(),
+            pwCtrl.text.trim(),
+            agentIdCtrl.text.trim(),
+            phoneCtrl.text.trim(),
+          );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("🎉 Account created successfully! Welcome aboard."),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      context.router.popUntilRoot();
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String message;
+
+      switch (e.code) {
+        case 'weak-password':
+          message = "Password must be at least 8 characters long.";
+          break;
+        case 'email-already-in-use':
+          message = "This email is already registered.";
+          break;
+        case 'invalid-email':
+          message = "Please enter a valid email address.";
+          break;
+        case 'operation-not-allowed':
+          message = "Registration is currently disabled.";
+          break;
+        case 'network-request-failed':
+          message = "No internet connection.";
+          break;
+        default:
+          message = "Registration failed. Please try again.";
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -48,198 +108,138 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // ---------------- HEADER ----------------
-                Icon(
-                  Icons.favorite,
-                  size: 80,
-                  color: theme.colorScheme.primary,
+                // ---------------- LOGO ----------------
+                Material(
+                  shape: const CircleBorder(),
+                  elevation: 6,
+                  shadowColor: theme.colorScheme.primary.withOpacity(0.4),
+                  child: CircleAvatar(
+                    radius: MediaQuery.of(context).size.width * 0.25,
+                    backgroundImage: const AssetImage('assets/images/logo.png'),
+                    backgroundColor: Colors.transparent,
+                  ),
                 ),
-                const SizedBox(height: 10),
+
+                const SizedBox(height: 12),
+
                 Text(
                   "Create Your Account",
-                  style: theme.textTheme.headlineSmall?.copyWith(
+                  style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
+
                 const SizedBox(height: 6),
+
                 Text(
-                  "Start your journey towards a happy marriage",
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
+                  "Join us and find your perfect match!",
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 5),
 
-                // ---------------- CARD ----------------
+                // ---------------- REGISTER CARD ----------------
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: theme.cardColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
+                        color: Colors.black.withOpacity(0.08),
                         blurRadius: 10,
-                        offset: const Offset(0, 5),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: Column(
                     children: [
+                      SizedBox(height: 10),
                       AppTextField(
-                        obscureText: false,
-                        keyboardType: TextInputType.name,
-
                         controller: nameCtrl,
                         prefixIcon: Icons.person,
                         iconColor: theme.colorScheme.primary,
                         label: "Full Name",
                         hint: "Enter your full name",
+                        keyboardType: TextInputType.name,
+                        obscureText: false,
                       ),
 
-                      const SizedBox(height: 16),
+                      SizedBox(height: 10),
                       AppTextField(
                         controller: phoneCtrl,
-                        obscureText: false,
                         prefixIcon: Icons.phone,
                         iconColor: theme.colorScheme.primary,
                         label: "Phone Number",
                         hint: "Enter your phone number",
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.phone,
+                        obscureText: false,
                       ),
 
-                      const SizedBox(height: 16),
-
+                      SizedBox(height: 10),
                       AppTextField(
                         controller: emailCtrl,
-                        obscureText: false,
-
                         prefixIcon: Icons.email,
                         iconColor: theme.colorScheme.primary,
                         label: "Email",
                         hint: "Enter your email",
                         keyboardType: TextInputType.emailAddress,
+                        obscureText: false,
                       ),
-                      const SizedBox(height: 16),
 
+                      SizedBox(height: 10),
                       AppTextField(
                         controller: pwCtrl,
                         prefixIcon: Icons.lock,
                         iconColor: theme.colorScheme.primary,
                         label: "Password",
                         hint: "Enter your password",
+                        keyboardType: TextInputType.visiblePassword,
                         obscureText: true,
-                        keyboardType: TextInputType.emailAddress,
                       ),
-                      const SizedBox(height: 16),
 
+                      SizedBox(height: 10),
                       AppTextField(
                         controller: agentIdCtrl,
                         prefixIcon: Icons.badge,
                         iconColor: theme.colorScheme.primary,
                         label: "Agent ID",
                         hint: "Enter Agent ID",
+                        keyboardType: TextInputType.text,
                         obscureText: false,
-                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 55,
+                        child: AppButton(
+                          text: isLoading
+                              ? "Creating Account..."
+                              : "Create Account",
+                          onPressed: isLoading
+                              ? () {}
+                              : () => _register(context),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context.router.pop();
+                        },
+                        child: const Text(
+                          "Already have an account? Login",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 30),
-
                 // ---------------- REGISTER BUTTON ----------------
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: AppButton(
-                    text: 'Create Account',
-                    onPressed: () async {
-                      if (!formKey.currentState!.validate()) return;
-
-                      try {
-                        await ref
-                            .read(authControllerProvider.notifier)
-                            .signUpWithEmail(
-                              nameCtrl.text.trim(),
-                              emailCtrl.text.trim(),
-                              pwCtrl.text.trim(),
-                              agentIdCtrl.text.trim(),
-                              phoneCtrl.text.trim(),
-                            );
-
-                        if (!mounted) return;
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              "🎉 Account created successfully! Welcome aboard.",
-                            ),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-
-                        context.router.popUntilRoot();
-                      } on FirebaseAuthException catch (e) {
-                        if (!mounted) return;
-
-                        String message;
-
-                        switch (e.code) {
-                          case 'weak-password':
-                            message =
-                                "Your password is too weak. Please use at least 8 characters.";
-                            break;
-
-                          case 'email-already-in-use':
-                            message =
-                                "This email is already registered. Try logging in instead.";
-                            break;
-
-                          case 'invalid-email':
-                            message =
-                                "Please enter a valid email address (example@gmail.com).";
-                            break;
-
-                          case 'operation-not-allowed':
-                            message =
-                                "Registration is temporarily unavailable. Please try later.";
-                            break;
-
-                          case 'network-request-failed':
-                            message =
-                                "No internet connection. Please check your network.";
-                            break;
-
-                          default:
-                            message =
-                                "Something went wrong. Please try again in a moment.";
-                        }
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(message),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 20),
 
                 // ---------------- FOOTER ----------------
-                TextButton(
-                  onPressed: () {
-                    context.router.pop();
-                  },
-                  child: const Text(
-                    "Already have an account? Login",
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
               ],
             ),
           ),

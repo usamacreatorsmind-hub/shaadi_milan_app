@@ -23,7 +23,6 @@ class UserDetailScreen extends ConsumerWidget {
     final profileAsync = ref.watch(matrimonyProfileProvider(uid));
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
@@ -48,7 +47,6 @@ class UserDetailScreen extends ConsumerWidget {
                   headerSliverBuilder: (context, innerBoxIsScrolled) {
                     return [
                       SliverAppBar(
-                        automaticallyImplyLeading: false,
                         expandedHeight:
                             MediaQuery.of(context).size.height * 0.50,
                         backgroundColor: Colors.black,
@@ -84,11 +82,8 @@ class UserDetailScreen extends ConsumerWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 16),
                               Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
+                                padding: const EdgeInsets.symmetric(),
                                 child: Wrap(
                                   spacing: 8,
                                   runSpacing: 8,
@@ -730,8 +725,11 @@ class ProfileHeaderCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.fromLTRB(0, 12, 0, 4),
-      decoration: const BoxDecoration(color: Colors.transparent),
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      decoration: BoxDecoration(
+        // apply same colors a sliveer app bar color
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -786,8 +784,8 @@ class ProfileHeaderCard extends StatelessWidget {
 
           const SizedBox(height: 14),
 
-          // DIVIDER (VERY IMPORTANT FOR VISUAL SEPARATION)
-          Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
+          // // DIVIDER (VERY IMPORTANT FOR VISUAL SEPARATION)
+          // Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
         ],
       ),
     );

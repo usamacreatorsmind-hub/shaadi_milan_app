@@ -11,7 +11,7 @@ class UserFirestoreDS {
   UserFirestoreDS(this._firestore);
 
   CollectionReference<Map<String, dynamic>> get _users =>
-      _firestore.collection('temp_users');
+      _firestore.collection('users');
 
   Future<Map<String, dynamic>> fetchUser(String uid) async {
     final doc = await _users.doc(uid).get();

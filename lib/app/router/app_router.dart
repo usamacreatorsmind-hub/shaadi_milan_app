@@ -2,6 +2,7 @@ import 'package:arvika_marriage_bureau/features/agent/presentation/screens/agent
 import 'package:arvika_marriage_bureau/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/agent_profile_verify_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/metrimony_flow_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/payment_option_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/search_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_Profile_detail_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_address_form_screen.dart';
@@ -75,6 +76,8 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: UserPaymentRoute.page),
     AutoRoute(page: ResetPasswordRoute.page),
     AutoRoute(page: ChangePasswordRoute.page),
+    AutoRoute(page: PaymentOptionRoute.page),
+    
     
 
     // ================= AGENT =================

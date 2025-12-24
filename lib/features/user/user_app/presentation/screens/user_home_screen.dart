@@ -452,8 +452,8 @@ class ProfileCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-                bottom: Radius.circular(20),
+                top: Radius.circular(10),
+                bottom: Radius.circular(10),
               ),
               child: Image.network(
                 imageUrl,
@@ -473,13 +473,16 @@ class ProfileCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$name, $age',
+                    name,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
+                  Text('$age years', style: TextStyle(color: Colors.grey[700])),
+                  const SizedBox(height: 4),
+
                   Text(occupation, style: TextStyle(color: Colors.grey[700])),
                   const SizedBox(height: 12),
                   SizedBox(

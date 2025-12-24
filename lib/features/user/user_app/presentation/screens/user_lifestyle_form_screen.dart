@@ -78,84 +78,82 @@ class _UserLifestyleFormScreenState
 
     return Scaffold(
       appBar: AppBar(title: const Text('Lifestyle Details')),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                AppDropDown(
-                  label: "Marital Status",
-                  items: const [
-                    'Never Married',
-                    'Divorced',
-                    'Widowed',
-                    'Annulled',
-                  ],
-                  value: _maritalStatus,
-                  onChanged: (value) {
-                    setState(() => _maritalStatus = value);
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select marital status';
-                    }
-                    return null;
-                  },
-                ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              AppDropDown(
+                label: "Marital Status",
+                items: const [
+                  'Never Married',
+                  'Divorced',
+                  'Widowed',
+                  'Annulled',
+                ],
+                value: _maritalStatus,
+                onChanged: (value) {
+                  setState(() => _maritalStatus = value);
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select marital status';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 20),
+              AppDropDown(
+                label: "Food Habit",
+                items: const ['Vegetarian', 'Non-Vegetarian', 'Eggetarian'],
+                value: _foodHabit,
+                onChanged: (value) {
+                  setState(() => _foodHabit = value);
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select food habit';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _hobbiesController,
+                prefixIcon: Icons.sports_handball,
+                iconColor: Theme.of(context).colorScheme.primary,
+                label: "Hobbies",
+                hint: "Enter your hobbies (comma separated)",
+                obscureText: false,
+                keyboardType: TextInputType.text,
+              ),
+              const SizedBox(height: 16),
+              AppSwitch(
+                title: 'Smoking',
+                value: _smoking,
+                onChanged: (bool value) {
+                  setState(() {
+                    _smoking = value;
+                  });
+                },
+              ),
+              AppSwitch(
+                title: 'Drinking',
+                value: _drinking,
+                onChanged: (bool value) {
+                  setState(() {
+                    _drinking = value;
+                  });
+                },
+              ),
 
-                AppDropDown(
-                  label: "Food Habit",
-                  items: const ['Vegetarian', 'Non-Vegetarian', 'Eggetarian'],
-                  value: _foodHabit,
-                  onChanged: (value) {
-                    setState(() => _foodHabit = value);
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select food habit';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                AppTextField(
-                  controller: _hobbiesController,
-                  prefixIcon: Icons.sports_handball,
-                  iconColor: Theme.of(context).colorScheme.primary,
-                  label: "Hobbies",
-                  hint: "Enter your hobbies (comma separated)",
-                  obscureText: false,
-                  keyboardType: TextInputType.text,
-                ),
-                const SizedBox(height: 16),
-                AppSwitch(
-                  title: 'Smoking',
-                  value: _smoking,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _smoking = value;
-                    });
-                  },
-                ),
-                AppSwitch(
-                  title: 'Drinking',
-                  value: _drinking,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _drinking = value;
-                    });
-                  },
-                ),
-
-                const SizedBox(height: 20),
-                if (lifestyleState.isLoading)
-                  const CircularProgressIndicator()
-                else
-                  AppButton(onPressed: _submitForm, text: 'Save Lifestyle'),
-              ],
-            ),
+              const SizedBox(height: 20),
+              if (lifestyleState.isLoading)
+                const CircularProgressIndicator()
+              else
+                AppButton(onPressed: _submitForm, text: 'Save Lifestyle'),
+            ],
           ),
         ),
       ),

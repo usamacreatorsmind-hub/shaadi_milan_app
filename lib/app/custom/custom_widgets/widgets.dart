@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -86,82 +87,6 @@ class AppSwitch extends StatelessWidget {
   }
 }
 
-class AppDropDown extends ConsumerStatefulWidget {
-  final String label;
-  final List<String> items;
-  final String? value;
-  final void Function(String?) onChanged;
-  final String? Function(String?)? validator;
-
-  const AppDropDown({
-    super.key,
-    required this.label,
-    required this.items,
-    required this.value,
-    required this.onChanged,
-    this.validator,
-  });
-
-  @override
-  ConsumerState<AppDropDown> createState() => _AppDropDownWidgetState();
-}
-
-class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: DropdownButtonFormField<String>(
-        value: widget.value,
-        decoration: InputDecoration(
-          labelText: widget.label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary,
-              width: 2,
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.error,
-              width: 2,
-            ),
-          ),
-        ),
-        items: widget.items
-            .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-            .toList(),
-        onChanged: widget.onChanged,
-        validator: widget.validator,
-
-        dropdownColor: Theme.of(context).cardColor,
-        icon: Icon(
-          Icons.arrow_drop_down,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        isExpanded: true,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
-          fontSize: 16,
-        ),
-      ),
-    );
-  }
-}
-
 class AppTextField extends ConsumerStatefulWidget {
   final TextEditingController? controller;
   final IconData prefixIcon;
@@ -192,7 +117,7 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(4),
       child: SizedBox(
         width: MediaQuery.sizeOf(context).width * 0.8,
         child: TextFormField(
@@ -202,7 +127,22 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
           decoration: InputDecoration(
             labelText: widget.label,
             hintText: widget.hint,
-            prefixIcon: Icon(widget.prefixIcon, color: widget.iconColor),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: widget.iconColor.withOpacity(0.15),
+                child: Icon(
+                  widget.prefixIcon,
+                  color: widget.iconColor,
+                  size: 20,
+                ),
+              ),
+            ),
+
+            filled: true,
+            fillColor: Theme.of(context).cardColor,
+
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
@@ -261,6 +201,105 @@ class _SearchWidgetState extends ConsumerState<SearchWidget> {
         filled: true,
         fillColor: Colors.grey[200],
       ),
+    );
+  }
+}
+
+class AppDropDown extends ConsumerStatefulWidget {
+  final String label;
+  final List<String> items;
+  final String? value;
+  final void Function(String?) onChanged;
+  final String? Function(String?)? validator;
+
+  const AppDropDown({
+    super.key,
+    required this.label,
+    required this.items,
+    required this.value,
+    required this.onChanged,
+    this.validator,
+  });
+
+  @override
+  ConsumerState<AppDropDown> createState() => _AppDropDownWidgetState();
+}
+
+class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField2<String>(
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: widget.label,
+        hintText: 'Select ${widget.label.toLowerCase()}',
+        prefixIcon: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withOpacity(0.15),
+            child: Icon(
+              Icons.arrow_drop_down_circle_outlined,
+              color: Theme.of(context).colorScheme.primary,
+              size: 30,
+            ),
+          ),
+        ),
+        filled: true,
+        fillColor: Theme.of(context).cardColor,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 2,
+          ),
+        ),
+      ),
+      value: widget.value,
+
+      dropdownStyleData: DropdownStyleData(
+        isOverButton: true,
+        maxHeight: 200, 
+
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
+      ),
+      items: widget.items
+          .map(
+            (item) => DropdownMenuItem<String>(
+              value: item,
+              child: Text(item, style: const TextStyle(fontSize: 14)),
+            ),
+          )
+          .toList(),
+      onChanged: widget.onChanged,
+      validator:
+          widget.validator ??
+          (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please select ${widget.label.toLowerCase()}';
+            }
+            return null;
+          },
     );
   }
 }

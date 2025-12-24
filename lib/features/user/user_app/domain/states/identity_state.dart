@@ -23,6 +23,11 @@ class IdentityProfile {
     };
   }
 
+  @override
+  String toString() {
+    return 'Gender: $gender, DOB: ${dob.toLocal().toString().split(' ')[0]}, Age: $age, Aadhar: $aadhar';
+  }
+
   factory IdentityProfile.fromMap(Map<String, dynamic> map) {
     return IdentityProfile(
       profileId: map['profileId'] as String,

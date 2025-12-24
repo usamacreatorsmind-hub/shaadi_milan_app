@@ -70,79 +70,96 @@ class _UserPhysicalFormScreenState
 
     return Scaffold(
       appBar: AppBar(title: const Text('Physical Details')),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                AppTextField(
-                  controller: _heightController,
-                  prefixIcon: Icons.height,
-                  iconColor: Theme.of(context).colorScheme.primary,
-                  label: "Height (in cm)",
-                  hint: "Enter your height in centimeters",
-                  obscureText: false,
-                  keyboardType: TextInputType.number,
-                ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              AppTextField(
+                controller: _heightController,
+                prefixIcon: Icons.height,
+                iconColor: Theme.of(context).colorScheme.primary,
+                label: "Height (in cm)",
+                hint: "Enter your height in centimeters",
+                obscureText: false,
+                keyboardType: TextInputType.number,
+              ),
 
-                const SizedBox(height: 16),
-                AppTextField(
-                  controller: _weightController,
-                  prefixIcon: Icons.monitor_weight,
-                  iconColor: Theme.of(context).colorScheme.primary,
-                  label: "Weight (in kg)",
-                  hint: "Enter your weight in kilograms",
-                  obscureText: false,
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 16),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _weightController,
+                prefixIcon: Icons.monitor_weight,
+                iconColor: Theme.of(context).colorScheme.primary,
+                label: "Weight (in kg)",
+                hint: "Enter your weight in kilograms",
+                obscureText: false,
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 16),
 
-                AppDropDown(
-                  label: "Body Type",
-                  items: const ['Slim', 'Athletic', 'Average', 'Heavy'],
-                  value: _bodyTypeController.text.isEmpty
-                      ? null
-                      : _bodyTypeController.text,
-                  onChanged: (value) {
-                    setState(() => _bodyTypeController.text = value!);
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a body type';
-                    }
-                    return null;
-                  },
-                ),
+              AppDropDown(
+                label: "Body Type",
+                items: const [
+                  'Slim',
+                  'Athletic',
+                  'Average',
+                  'Heavy',
+                  'Muscular',
+                  'Obese',
+                ],
 
-                const SizedBox(height: 16),
-                AppDropDown(
-                  label: "Complexion",
-                  items: const ['Fair', 'Light', 'Medium', 'Dark'],
-                  value: _complexionController.text.isEmpty
-                      ? null
-                      : _complexionController.text,
-                  onChanged: (value) {
-                    setState(() => _complexionController.text = value!);
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a complexion';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                const SizedBox(height: 16),
+                value: _bodyTypeController.text.isEmpty
+                    ? null
+                    : _bodyTypeController.text,
+                onChanged: (value) {
+                  setState(() => _bodyTypeController.text = value!);
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a body type';
+                  }
+                  return null;
+                },
+              ),
 
-                const SizedBox(height: 20),
-                if (physicalState.isLoading)
-                  const CircularProgressIndicator()
-                else
-                  AppButton(onPressed: _submitForm, text: 'Physical Profile'),
-              ],
-            ),
+              const SizedBox(height: 16),
+              AppDropDown(
+                label: "Complexion",
+
+                items: const [
+                  'Very Fair',
+                  'Fair',
+                  'Wheatish',
+                  'Dark',
+                  'Brown',
+                  'Duskey',
+                  'Dark Brown',
+                  'Black',
+                ],
+
+                value: _complexionController.text.isEmpty
+                    ? null
+                    : _complexionController.text,
+                onChanged: (value) {
+                  setState(() => _complexionController.text = value!);
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a complexion';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              const SizedBox(height: 16),
+
+              const SizedBox(height: 20),
+              if (physicalState.isLoading)
+                const CircularProgressIndicator()
+              else
+                AppButton(onPressed: _submitForm, text: 'Physical Profile'),
+            ],
           ),
         ),
       ),

@@ -11,15 +11,20 @@ class NetworkErrorScreen extends ConsumerStatefulWidget {
 class _NetworkErrorScreenState extends ConsumerState<NetworkErrorScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-body: Column(
-  children: [
+    return Scaffold(body: Column(children: [
+
+      const Text('Network Error'),
+      ElevatedButton(
+        onPressed: () {
+          // Implement retry logic here
+        },
+        child: const Text('Retry'),
+      ),
+      
     
 
 
   ],
-),
-
-    );
+));
   }
 }

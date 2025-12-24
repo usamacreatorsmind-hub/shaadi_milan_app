@@ -53,7 +53,9 @@ class UserImageFormScreen extends ConsumerWidget {
                 try {
                   await ref
                       .read(imagePickerProvider.notifier)
-                      .uploadImages(ref, user.uid);
+                      .uploadImages(user.uid);
+                await ref .read(imagePickerProvider.notifier) .uploadImages( user.uid);
+                      
 
                   if (context.mounted) {
                     // Navigator.pop(context); // Pop loading
@@ -84,6 +86,7 @@ class UserImageFormScreen extends ConsumerWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
+                height: 50,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,

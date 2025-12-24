@@ -18,7 +18,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
   MatrimonyFirestoreDS(this._firestore);
 
   CollectionReference<Map<String, dynamic>> get _profiles =>
-      _firestore.collection('temp_profiles');
+      _firestore.collection('metrimony_profiles');
 
   Future<void> _updateProfileSection(
     String uid,

@@ -1,18 +1,33 @@
+import 'package:arvika_marriage_bureau/app/app.dart';
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/user_firestore_ds.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final matrimonyProfileProvider =
-    FutureProvider.family<MatrimonyProfile, String>((ref, uid) {
-      return ref.read(matrimonyRepositoryProvider).getMatrimonyProfile(uid);
+    FutureProvider.family<MatrimonyProfile, String>((ref, uid) async {
+      var profile = await ref
+          .read(matrimonyRepositoryProvider)
+          .getMatrimonyProfile(uid);
+
+      if (profile.user == null) {
+        try {
+          final userDS = ref.read(userFirestoreDSProvider);
+          final userData = await userDS.fetchUser(uid);
+          profile = profile.copyWith(user: AppUser.fromMap(userData));
+        } catch (_) {}
+      }
+
+      return profile;
     });
 
 @RoutePage()
 class MyProfileScreen extends ConsumerWidget {
-  final String uid;
+  final String uid; 
   const MyProfileScreen({super.key, required this.uid});
 
   @override
@@ -27,10 +42,6 @@ class MyProfileScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text("Error: $e")),
         data: (profile) {
-          if (profile.identity == null) {
-            return const Center(child: Text("Profile incomplete"));
-          }
-
           return SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 40),
             child: Column(
@@ -42,22 +53,23 @@ class MyProfileScreen extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
-// build Image card that dispaly all images of user 
-
+                // build Image card that dispaly all images of user
                 _DetailSection(
                   title: "Photos",
-                  actionChip: AppActionChip(
-                    label: "Manage",
-                    icon: Icons.photo_library_outlined,
+                  actionChip: AppChip(
+                    label: "Edit",
+                    icon: Icons.edit,
                     onTap: () {},
                   ),
                   children: [
-                    profile.images != null && profile.images!.secondaryImageUrls.isNotEmpty
+                    profile.images != null &&
+                            profile.images!.secondaryImageUrls.isNotEmpty
                         ? SizedBox(
                             height: 120,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: profile.images!.secondaryImageUrls.length,
+                              itemCount:
+                                  profile.images!.secondaryImageUrls.length,
                               itemBuilder: (context, index) {
                                 return Padding(
                                   padding: const EdgeInsets.only(right: 10),
@@ -78,24 +90,30 @@ class MyProfileScreen extends ConsumerWidget {
                   ],
                 ),
 
-                const SizedBox(height: 24),   
-
+                const SizedBox(height: 24),
 
                 // 📋 BASIC INFO
                 _DetailSection(
                   title: "Basic Information",
-                  actionChip: AppActionChip(
-                    label: "Edit",
-                    icon: Icons.edit,
-                    onTap: () {},
-                  ),
+
+                  actionChip: AppChip(label: "Edit", icon: Icons.edit),
 
                   children: [
-                    _DetailRow("Age", "${profile.identity!.age} years"),
-                    _DetailRow("Gender", profile.identity!.gender),
+                    _DetailRow(
+                      "Aadhar",
+                      profile.identity?.aadhar.toString() ?? 'N/A',
+                    ),
+
+                    _DetailRow(
+                      "Age",
+                      "${profile.identity?.age ?? 'N/A'} years",
+                    ),
+                    _DetailRow("Gender", profile.identity?.gender ?? 'N/A'),
                     _DetailRow(
                       "Date of Birth",
-                      profile.identity!.dob.toString().split(" ").first,
+                      profile.identity?.dob != null
+                          ? profile.identity!.dob.toString().split(" ").first
+                          : 'N/A',
                     ),
                   ],
                 ),
@@ -103,7 +121,7 @@ class MyProfileScreen extends ConsumerWidget {
                 // 🎓 EDUCATION & CAREER
                 _DetailSection(
                   title: "Education & Career",
-                  actionChip: AppActionChip(
+                  actionChip: AppChip(
                     label: "Edit",
                     icon: Icons.edit,
                     onTap: () {},
@@ -129,7 +147,7 @@ class MyProfileScreen extends ConsumerWidget {
                 // 🌿 LIFESTYLE
                 _DetailSection(
                   title: "Lifestyle",
-                  actionChip: AppActionChip(
+                  actionChip: AppChip(
                     label: "Edit",
                     icon: Icons.edit,
                     onTap: () {},
@@ -145,10 +163,10 @@ class MyProfileScreen extends ConsumerWidget {
                 // 🏠 ADDRESS
                 _DetailSection(
                   title: "Address",
-                  actionChip: AppActionChip(
+                  actionChip: AppChip(
                     label: "Edit",
-                    icon: Icons.edit,
                     onTap: () {},
+                    icon: Icons.edit,
                   ),
 
                   children: [
@@ -161,10 +179,11 @@ class MyProfileScreen extends ConsumerWidget {
                 // 👪 FAMILY
                 _DetailSection(
                   title: "Family Details",
-                  actionChip: AppActionChip(
+                  actionChip: AppChip(
                     label: "Edit",
-                    icon: Icons.edit,
                     onTap: () {},
+
+                    icon: Icons.edit,
                   ),
 
                   children: [
@@ -179,11 +198,13 @@ class MyProfileScreen extends ConsumerWidget {
                 // 🌟 RELIGIOUS & ASTROLOGICAL
                 _DetailSection(
                   title: "Religious & Astrological",
-                  actionChip: AppActionChip(
+
+                  actionChip: AppChip(
                     label: "Edit",
                     icon: Icons.edit,
                     onTap: () {},
                   ),
+
                   children: [
                     _DetailRow("Religion", profile.cultural?.religion ?? "N/A"),
                     _DetailRow("Caste", profile.cultural?.caste ?? "N/A"),
@@ -256,7 +277,7 @@ class _ProfileHeroCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  "${profile.identity!.age} yrs • ${profile.education?.occupation ?? "N/A"}",
+                  "${profile.identity?.age ?? 'N/A'} yrs • ${profile.education?.occupation ?? "N/A"}",
                   style: TextStyle(color: Colors.grey[700]),
                 ),
                 const SizedBox(height: 10),
@@ -289,7 +310,7 @@ class _DetailSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
 
-  final AppActionChip actionChip;
+  final AppChip actionChip;
 
   const _DetailSection({
     required this.title,

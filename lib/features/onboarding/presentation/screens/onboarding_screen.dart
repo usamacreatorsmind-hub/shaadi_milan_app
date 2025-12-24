@@ -20,21 +20,48 @@ class OnboardingScreen extends StatelessWidget {
       pages: pageViewModelList,
       onDone: () => _onDone(context),
       onSkip: () => _onDone(context), // You can also override onSkip behavior
-      showSkipButton: true,
-      skip: const Text('Skip'),
-      next: const Icon(Icons.arrow_forward),
-      done: const Text(
-        "Get Started",
-        style: TextStyle(fontWeight: FontWeight.w600),
+
+      next: Container(
+        height: 60,
+        width: 60,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.secondary,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.arrow_forward_ios,
+          size: 20,
+          color: Theme.of(context).colorScheme.onSecondary,
+        ),
       ),
+
+      curve: Curves.bounceOut,
+      
+
+      // need icon
+      done: Container(
+        height: 60,
+        width: 60,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.secondary,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.check,
+          size: 20,
+          color: Theme.of(context).colorScheme.onSecondary,
+        ),
+      ),
+
       dotsDecorator: DotsDecorator(
         size: const Size.square(10.0),
         activeSize: const Size(20.0, 10.0),
         activeColor: Theme.of(context).colorScheme.secondary,
-      // theme color
+        // theme color
         color: Colors.black26,
-      
-      
+
         spacing: const EdgeInsets.symmetric(horizontal: 3.0),
         activeShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(25.0),

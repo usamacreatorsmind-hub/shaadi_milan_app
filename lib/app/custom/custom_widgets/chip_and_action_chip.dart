@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AppChip extends StatelessWidget {
+class AppActionChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback? onTap;
@@ -9,7 +9,7 @@ class AppChip extends StatelessWidget {
   final Color? selectedTextColor;
   final Color? unselectedTextColor;
 
-  const AppChip({
+  const AppActionChip({
     super.key,
     required this.label,
     this.isSelected = false,
@@ -59,7 +59,7 @@ class AppChip extends StatelessWidget {
   }
 }
 
-class AppActionChip extends StatelessWidget {
+class AppChip extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback? onTap;
@@ -67,7 +67,7 @@ class AppActionChip extends StatelessWidget {
   final Color? iconColor;
   final Color? textColor;
 
-  const AppActionChip({
+  const AppChip({
     super.key,
     required this.label,
     required this.icon,

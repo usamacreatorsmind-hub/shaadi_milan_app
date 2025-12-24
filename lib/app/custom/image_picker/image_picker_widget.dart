@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../../../features/user/user_app/presentation/controllers/image_picker_controller.dart';
+
+final _imagePickingProvider = StateProvider<bool>((ref) => false);
 
 class ImagePickerWidget extends ConsumerWidget {
   const ImagePickerWidget({super.key});
@@ -10,15 +14,27 @@ class ImagePickerWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final imageState = ref.watch(imagePickerProvider);
     final controller = ref.read(imagePickerProvider.notifier);
+    final isPicking = ref.watch(_imagePickingProvider);
+
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+
+    Future<void> safePick(Future<void> Function() action) async {
+      if (isPicking) return;
+      ref.read(_imagePickingProvider.notifier).state = true;
+      try {
+        await action();
+      } finally {
+        ref.read(_imagePickingProvider.notifier).state = false;
+      }
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ================= PRIMARY IMAGE =================
         GestureDetector(
-          onTap: controller.pickPrimaryImage,
+          onTap: () => safePick(controller.pickPrimaryImage),
           child: Container(
             height: 180,
             width: double.infinity,
@@ -31,8 +47,7 @@ class ImagePickerWidget extends ConsumerWidget {
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.camera_alt,
-                          size: 40, color: colors.primary),
+                      Icon(Icons.camera_alt, size: 40, color: colors.primary),
                       const SizedBox(height: 8),
                       Text(
                         'Select Primary Image',
@@ -65,21 +80,13 @@ class ImagePickerWidget extends ConsumerWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            ActionChip(
-              onPressed: controller.pickSecondaryImages,
-              elevation: 0,
-              backgroundColor: colors.primaryContainer,
-              avatar: Icon(
-                Icons.image_outlined,
-                color: colors.primary,
-              ),
-              label: Text(
-                'Add More',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colors.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+
+            AppChip(
+              label: 'Add Image',
+              onTap: () => safePick(controller.pickSecondaryImages),
+              backgroundColor: colors.secondaryContainer,
+              textColor: colors.onSecondaryContainer,
+              icon: Icons.add,
             ),
           ],
         ),
@@ -101,8 +108,7 @@ class ImagePickerWidget extends ConsumerWidget {
                   color: colors.surfaceVariant,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.camera_alt,
-                    color: colors.onSurfaceVariant),
+                child: Icon(Icons.camera_alt, color: colors.onSurfaceVariant),
               ),
             ),
           ),
@@ -133,12 +139,10 @@ class ImagePickerWidget extends ConsumerWidget {
                       right: 4,
                       top: 4,
                       child: GestureDetector(
-                        onTap: () =>
-                            controller.removeSecondaryImage(path),
+                        onTap: () => controller.removeSecondaryImage(path),
                         child: CircleAvatar(
                           radius: 12,
-                          backgroundColor:
-                              colors.scrim.withOpacity(0.6),
+                          backgroundColor: colors.scrim.withOpacity(0.6),
                           child: const Icon(
                             Icons.close,
                             size: 14,

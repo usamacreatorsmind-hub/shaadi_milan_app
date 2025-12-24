@@ -1,6 +1,8 @@
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/user_firestore_ds.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
@@ -8,9 +10,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final matrimonyProfileProvider =
-    FutureProvider.family<MatrimonyProfile, String>((ref, userId) {
+    FutureProvider.family<MatrimonyProfile, String>((ref, userId) async {
       final repository = ref.watch(matrimonyRepositoryProvider);
-      return repository.getMatrimonyProfile(userId);
+      var profile = await repository.getMatrimonyProfile(userId);
+
+      if (profile.user == null) {
+        try {
+          final userDS = ref.watch(userFirestoreDSProvider);
+          final userData = await userDS.fetchUser(userId);
+          profile = profile.copyWith(user: AppUser.fromMap(userData));
+        } catch (_) {}
+      }
+
+      return profile;
     });
 
 @RoutePage()
@@ -18,7 +30,6 @@ class UserProfileScreen extends ConsumerWidget {
   final String userId;
   const UserProfileScreen({super.key, required this.userId});
 
-  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(matrimonyProfileProvider(userId));
     final theme = Theme.of(context);
@@ -29,10 +40,6 @@ class UserProfileScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
         data: (profile) {
-          if (profile.identity == null) {
-            return const Center(child: Text('User identity not found'));
-          }
-
           return SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 30),
             child: Column(
@@ -167,7 +174,9 @@ class _ProfileHeaderCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        AutoRouter.of(context).push(MyProfileRoute(uid: profile.user!.uid));
+        AutoRouter.of(
+          context,
+        ).push(MyProfileRoute(uid: profile.user?.uid ?? ''));
       },
 
       child: Container(
@@ -359,33 +368,32 @@ class _PremiumCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: theme.primaryColor.withOpacity(0.1),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.workspace_premium_outlined,
-            size: 30,
-            color: theme.primaryColor,
-          ),
-          const SizedBox(width: 16),
-          GestureDetector(
-            onTap: () => AutoRouter.of(context).push(const UserPaymentRoute()),
-
-            child: const Expanded(
+    return GestureDetector(
+      onTap: () => AutoRouter.of(context).push(const UserPaymentRoute()),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: theme.primaryColor.withOpacity(0.1),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.workspace_premium_outlined,
+              size: 30,
+              color: theme.primaryColor,
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
               child: Text(
                 "Upgrade Account to Premium",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
-          ),
-          const Icon(Icons.arrow_forward_ios, size: 16),
-        ],
+            const Icon(Icons.arrow_forward_ios, size: 16),
+          ],
+        ),
       ),
     );
   }

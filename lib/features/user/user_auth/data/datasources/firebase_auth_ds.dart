@@ -68,7 +68,7 @@ class FirebaseAuthDS {
       await userCredential.user!.updateDisplayName(fullName);
 
       // 4️⃣ Save user data to Firestore
-      await _firestore.collection('temp_users').doc(uid).set({
+      await _firestore.collection('users').doc(uid).set({
         'uid': uid,
         'fullName': fullName,
         'email': email,
@@ -90,7 +90,7 @@ class FirebaseAuthDS {
     final user = _auth.currentUser;
     if (user != null) {
       // Delete user document from Firestore
-      await _firestore.collection('temp_users').doc(user.uid).delete();
+      await _firestore.collection('users').doc(user.uid).delete();
       // Delete user from Firebase Authentication
       await user.delete();
     }

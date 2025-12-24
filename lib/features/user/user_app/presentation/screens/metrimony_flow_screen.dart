@@ -35,7 +35,7 @@ class MatrimonyFormFlowScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Step ${MatrimonyStep.values.indexOf(state.step)} / ${MatrimonyStep.values.length - 1}',
+          'Step ${MatrimonyStep.values.indexOf(state.step) + 1} / ${MatrimonyStep.values.length - 1}',
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

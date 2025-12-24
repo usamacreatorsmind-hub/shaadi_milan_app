@@ -1,4 +1,3 @@
-import 'package:arvika_marriage_bureau/core/env/app_env_config.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +19,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final emailCtrl = TextEditingController();
   final pwCtrl = TextEditingController();
 
+  bool isLoading = false;
+
   @override
   void dispose() {
     emailCtrl.dispose();
@@ -27,11 +28,80 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _login(BuildContext context) async {
+    if (emailCtrl.text.isEmpty || pwCtrl.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter email and password"),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    final authRepo = ref.read(authRepositoryProvider);
+
+    try {
+      await authRepo.signInWithEmail(emailCtrl.text.trim(), pwCtrl.text.trim());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("🎉 Welcome back! Login successful."),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      context.router.replace(const AuthWrapperRoute());
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String message;
+
+      switch (e.code) {
+        case 'user-not-found':
+          message = "No account found with this email.";
+          break;
+        case 'wrong-password':
+          message = "Incorrect password.";
+          break;
+        case 'invalid-email':
+          message = "Invalid email address.";
+          break;
+        case 'user-disabled':
+          message = "This account has been disabled.";
+          break;
+        case 'network-request-failed':
+          message = "No internet connection.";
+          break;
+        default:
+          message = "Login failed. Try again later.";
+          message = e.toString();
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Something went wrong."),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final authRepo = ref.read(authRepositoryProvider);
-    final env = AppEnvConfig.instance;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -39,42 +109,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Text(env.environment.name),
-              // Text(
-              //   'Firebase Project ID from Provider: ${ref.watch(appEnvProvider).firebaseProjectId}',
-              // ),
+              // ---------------- LOGO ----------------
+              Material(
+                shape: const CircleBorder(),
+                elevation: 6,
+                shadowColor: theme.colorScheme.primary.withOpacity(0.4),
+                child: CircleAvatar(
+                  radius: MediaQuery.of(context).size.width * 0.25,
+                  backgroundImage: const AssetImage('assets/images/logo.png'),
+                  backgroundColor: Colors.transparent,
+                ),
+              ),
 
-              // ---------------- HEADER ----------------
-              Icon(Icons.favorite, size: 80, color: theme.colorScheme.primary),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
+
               Text(
-                "Welcome Back 💍",
-                style: theme.textTheme.headlineSmall?.copyWith(
+                "Welcome Back!",
+                style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
                 ),
               ),
+
               const SizedBox(height: 6),
+
               Text(
-                "Login to continue your journey",
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey.shade600,
+                "Login to your account",
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
-              // ---------------- CARD ----------------
+              // ---------------- LOGIN CARD ----------------
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: theme.cardColor,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withOpacity(0.08),
                       blurRadius: 10,
-                      offset: const Offset(0, 5),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -86,132 +164,57 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       iconColor: theme.colorScheme.primary,
                       label: "Email",
                       hint: "Enter your email",
-                      obscureText: false,
                       keyboardType: TextInputType.emailAddress,
+                      obscureText: false,
                     ),
-                    const SizedBox(height: 16),
+
+                    const SizedBox(height: 12),
 
                     AppTextField(
                       controller: pwCtrl,
-                      obscureText: true,
                       prefixIcon: Icons.lock,
                       iconColor: theme.colorScheme.primary,
                       label: "Password",
                       hint: "Enter your password",
                       keyboardType: TextInputType.visiblePassword,
+                      obscureText: true,
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: AppButton(
+                        text: isLoading ? "Logging in..." : "Login",
+                        onPressed: isLoading ? () {} : () => _login(context),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TextButton(
+                      onPressed: () {
+                        context.navigateTo(const RegisterRoute());
+                      },
+                      child: const Text(
+                        "New here? Create an account",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+
+                    TextButton(
+                      onPressed: () {
+                        context.navigateTo(const ResetPasswordRoute());
+                      },
+                      child: const Text(
+                        "Forgot Password?",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 30),
-
-              // ---------------- LOGIN BUTTON ----------------
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: AppButton(
-                  text: "Login",
-                  onPressed: () async {
-                    try {
-                      await authRepo.signInWithEmail(
-                        emailCtrl.text.trim(),
-                        pwCtrl.text.trim(),
-                      );
-
-                      if (!mounted) return;
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("🎉 Welcome back! Login successful."),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-
-                      // Navigate to home
-                      context.router.replace(const AuthWrapperRoute());
-                    } on FirebaseAuthException catch (e) {
-                      if (!mounted) return;
-
-                      String message;
-
-                      switch (e.code) {
-                        case 'user-not-found':
-                          message =
-                              "No account found with this email. Please register first.";
-                          break;
-
-                        case 'wrong-password':
-                          message = "Incorrect password. Please try again.";
-                          break;
-
-                        case 'invalid-email':
-                          message = "Please enter a valid email address.";
-                          break;
-
-                        case 'user-disabled':
-                          message =
-                              "This account has been disabled. Contact support.";
-                          break;
-
-                        case 'network-request-failed':
-                          message =
-                              "No internet connection. Please check your network.";
-                          break;
-
-                        default:
-                          message =
-                              "Unable to login right now. Please try again later.";
-                      }
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(message),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    } catch (_) {
-                      if (!mounted) return;
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            "Something went wrong. Please try again.",
-                          ),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ---------------- REGISTER LINK ----------------
-              TextButton(
-                onPressed: () {
-                  context.navigateTo(const RegisterRoute());
-                },
-                child: const Text(
-                  "New here? Create an account",
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-
-              // ---------------- FORGOT PASSWORD ----------------
-              TextButton(
-                onPressed: () {
-                  // TODO: Implement forgot password functionality
-
-                  context.navigateTo(const ResetPasswordRoute());
-                },
-                child: const Text(
-                  "Forgot Password?",
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-              const SizedBox(height: 20),
             ],
           ),
         ),

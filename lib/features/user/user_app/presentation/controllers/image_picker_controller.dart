@@ -6,35 +6,56 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImagePickerController extends StateNotifier<ImagesState> {
-  ImagePickerController() : super(ImagesState.initial());
+  ImagePickerController(this.ref) : super(ImagesState.initial());
 
+  final Ref ref;
   final ImagePicker _picker = ImagePicker();
+
   static const int maxSecondaryImages = 3;
+
+  bool _isPicking = false;
 
   // 📸 Pick primary image
   Future<void> pickPrimaryImage() async {
-    final XFile? image = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
+    if (_isPicking) return;
+    _isPicking = true;
 
-    if (image == null) return;
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
 
-    state = state.copyWith(primaryImage: image.path);
+      if (image == null) return;
+
+      state = state.copyWith(primaryImage: image.path);
+    } finally {
+      _isPicking = false;
+    }
   }
 
   // 🖼 Pick multiple gallery images
   Future<void> pickSecondaryImages() async {
-    final images = await _picker.pickMultiImage(imageQuality: 50, limit: 3);
-    if (images.isEmpty) return;
+    if (_isPicking) return;
+    _isPicking = true;
 
-    final paths = images.map((e) => e.path).toList();
+    try {
+      final images = await _picker.pickMultiImage(
+        imageQuality: 50,
+        limit: maxSecondaryImages,
+      );
 
-    final updated = {...state.secondaryImages, ...paths}.toList();
+      if (images.isEmpty) return;
 
-    state = state.copyWith(
-      secondaryImages: updated.take(maxSecondaryImages).toList(),
-    );
+      final paths = images.map((e) => e.path).toList();
+      final updated = {...state.secondaryImages, ...paths}.toList();
+
+      state = state.copyWith(
+        secondaryImages: updated.take(maxSecondaryImages).toList(),
+      );
+    } finally {
+      _isPicking = false;
+    }
   }
 
   // ❌ Remove one gallery image
@@ -58,27 +79,36 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     state = ImagesState.initial();
   }
 
-  Future<void> uploadImages(WidgetRef ref, String uid) async {
-    final String? primaryImageUrl = await ref
-        .read(userImageRepositoryProvider)
-        .uploadPrimaryImage(uid: uid, filePath: state.primaryImage!);
+  // ☁️ Upload images
+  Future<void> uploadImages(String uid) async {
+    if (state.primaryImage == null) {
+      throw Exception('Primary image is required');
+    }
 
-    final List<String> secondaryImageUrls = await ref
-        .read(userImageRepositoryProvider)
-        .uploadSecondaryImages(uid: uid, filePaths: state.secondaryImages);
+    try {
+      final primaryImageUrl = await ref
+          .read(userImageRepositoryProvider)
+          .uploadPrimaryImage(uid: uid, filePath: state.primaryImage!);
 
-    ref
-        .read(metrimonyControllerProvider.notifier)
-        .saveImages(
-          ProfileImages(
-            primaryImageUrl: primaryImageUrl!,
-            secondaryImageUrls: secondaryImageUrls,
-          ),
-        );
+      final secondaryImageUrls = await ref
+          .read(userImageRepositoryProvider)
+          .uploadSecondaryImages(uid: uid, filePaths: state.secondaryImages);
+
+      ref
+          .read(metrimonyControllerProvider.notifier)
+          .saveImages(
+            ProfileImages(
+              primaryImageUrl: primaryImageUrl,
+              secondaryImageUrls: secondaryImageUrls,
+            ),
+          );
+    } catch (e) {
+      rethrow; // UI will handle snackbar
+    }
   }
 }
 
 final imagePickerProvider =
     StateNotifierProvider<ImagePickerController, ImagesState>(
-      (ref) => ImagePickerController(),
+      (ref) => ImagePickerController(ref),
     );
