@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,16 +21,17 @@ class _UserEmploymentFormScreenState
   final _companyController = TextEditingController();
   final _annualIncomeController = TextEditingController();
 
+  final _designationController = TextEditingController();
+  final _workLocationController = TextEditingController();
+
+  String? _jobType;
+
   @override
   void dispose() {
     _companyController.dispose();
     _annualIncomeController.dispose();
     super.dispose();
   }
-
-  String? _jobType;
-  final _designationController = TextEditingController();
-  final _workLocationController = TextEditingController();
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {

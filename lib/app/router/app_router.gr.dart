@@ -15,6 +15,12 @@ abstract class _$AppRouter extends RootStackRouter {
 
   @override
   final Map<String, PageFactory> pagesMap = {
+    AboutUsRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AboutUsScreen(),
+      );
+    },
     AgentDashboardRoute.name: (routeData) {
       final args = routeData.argsAs<AgentDashboardRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -113,7 +119,6 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const UserCultureFormScreen(),
-        
       );
     },
     UserDetailRoute.name: (routeData) {
@@ -171,12 +176,6 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const UserMainShellScreen(),
       );
     },
-    UserMatchesRoute.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const UserMatchesScreen(),
-      );
-    },
     UserNotificationRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -202,7 +201,25 @@ abstract class _$AppRouter extends RootStackRouter {
         child: UserProfileScreen(key: args.key, userId: args.userId),
       );
     },
+    UserWishListRoute.name: (routeData) {
+      final args = routeData.argsAs<UserWishListRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserWishListScreen(key: args.key, userId: args.userId),
+      );
+    },
   };
+}
+
+/// generated route for
+/// [AboutUsScreen]
+class AboutUsRoute extends PageRouteInfo<void> {
+  const AboutUsRoute({List<PageRouteInfo>? children})
+    : super(AboutUsRoute.name, initialChildren: children);
+
+  static const String name = 'AboutUsRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -585,17 +602,6 @@ class UserMainShellRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [UserMatchesScreen]
-class UserMatchesRoute extends PageRouteInfo<void> {
-  const UserMatchesRoute({List<PageRouteInfo>? children})
-    : super(UserMatchesRoute.name, initialChildren: children);
-
-  static const String name = 'UserMatchesRoute';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
 /// [UserNotificationScreen]
 class UserNotificationRoute extends PageRouteInfo<void> {
   const UserNotificationRoute({List<PageRouteInfo>? children})
@@ -657,5 +663,37 @@ class UserProfileRouteArgs {
   @override
   String toString() {
     return 'UserProfileRouteArgs{key: $key, userId: $userId}';
+  }
+}
+
+/// generated route for
+/// [UserWishListScreen]
+class UserWishListRoute extends PageRouteInfo<UserWishListRouteArgs> {
+  UserWishListRoute({
+    Key? key,
+    required String userId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserWishListRoute.name,
+         args: UserWishListRouteArgs(key: key, userId: userId),
+         initialChildren: children,
+       );
+
+  static const String name = 'UserWishListRoute';
+
+  static const PageInfo<UserWishListRouteArgs> page =
+      PageInfo<UserWishListRouteArgs>(name);
+}
+
+class UserWishListRouteArgs {
+  const UserWishListRouteArgs({this.key, required this.userId});
+
+  final Key? key;
+
+  final String userId;
+
+  @override
+  String toString() {
+    return 'UserWishListRouteArgs{key: $key, userId: $userId}';
   }
 }

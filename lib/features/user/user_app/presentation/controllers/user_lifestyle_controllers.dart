@@ -17,20 +17,23 @@ class UserLifestyleController extends StateNotifier<LifestyleState> {
 
   Future<void> saveLifestyle({
     required String maritalStatus,
-    required bool smoking,
-    required bool drinking,
+    required String interests,
+    required String music,
+    required String movies,
+    required String sports,
+    required String fitness,
+
     required String foodHabit,
     required String hobbies,
   }) async {
     final lifestyleProfile = LifestyleProfile(
       diet: foodHabit,
-      smoke: smoking.toString(),
-      drink: drinking.toString(),
-      hobbies: hobbies,
-      interests: '',
-      music: '',
-      movies: '',
-      sports: '',
+
+      hobbies: [hobbies],
+      interests: [],
+      music: [],
+      movies: [],
+      sports: [],
       fitness: '',
     );
 

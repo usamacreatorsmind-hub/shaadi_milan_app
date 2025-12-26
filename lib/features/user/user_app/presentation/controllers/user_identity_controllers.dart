@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../user_auth/presentation/providers/auth_providers.dart';
@@ -5,8 +7,6 @@ import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import '../../domain/states/identity_state.dart';
 import 'metrimony_profile_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserIdentityController extends StateNotifier<IdentityState> {
   final MatrimonyRepository _matrimonyRepository;

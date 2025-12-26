@@ -39,15 +39,12 @@ class UserFamilyController extends StateNotifier<FamilyState> {
     final familyProfile = FamilyProfile(
       fatherName: fatherName,
       motherName: motherName,
-      fatherOccupation: '',
-      motherOccupation: '',
+
       numberOfBrothers: brothers,
       numberOfSisters: sisters,
-      brothersMarried: 0,
-      sistersMarried: 0,
+
       familyType: familyType,
       familyStatus: '',
-      familyValues: '',
     );
 
     try {

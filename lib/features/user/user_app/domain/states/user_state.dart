@@ -7,6 +7,7 @@ class AppUser {
   final String? agentId;
   final String? profileId;
   final bool isVerified;
+  final List<String>? wishlists;
 
   AppUser({
     required this.uid,
@@ -17,6 +18,7 @@ class AppUser {
     this.agentId,
     this.profileId,
     this.isVerified = false,
+    this.wishlists,
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +31,7 @@ class AppUser {
       'agentId': agentId,
       'profileId': profileId,
       'isVerified': isVerified,
+      'wishlists': wishlists,
     };
   }
 
@@ -42,12 +45,16 @@ class AppUser {
       agentId: map['agentId'] as String?,
       profileId: map['profileId'] as String?,
       isVerified: map['isVerified'] as bool,
+
+      wishlists: (map['wishlists'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
   }
 
   @override
   String toString() {
-    return 'AppUser(uid: $uid, fullName: $fullName, email: $email, role: $role, phone: $phone, agentId: $agentId, profileId: $profileId, isVerified: $isVerified)';
+    return 'AppUser(uid: $uid, fullName: $fullName, wishlists: $wishlists, email: $email, role: $role, phone: $phone, agentId: $agentId, profileId: $profileId, isVerified: $isVerified)';
   }
 
   AppUser copyWith({
@@ -58,6 +65,8 @@ class AppUser {
     String? phone,
     String? agentId,
     String? profileId,
+    List<String>? wishlists,
+
     bool? isVerified,
   }) {
     return AppUser(
@@ -65,6 +74,12 @@ class AppUser {
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       role: role ?? this.role,
+
+      agentId: agentId ?? this.agentId,
+      profileId: profileId ?? this.profileId,
+      isVerified: isVerified ?? this.isVerified,
+      wishlists: wishlists ?? this.wishlists,
+
       phone: phone ?? this.phone,
     );
   }
@@ -77,6 +92,7 @@ class AppUser {
       role: '',
       phone: '',
       agentId: '',
+      wishlists: [],
       profileId: '',
       isVerified: false,
     );

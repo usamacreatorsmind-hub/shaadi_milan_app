@@ -1,7 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../user_app/domain/states/user_state.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/firebase_auth_ds.dart';
 
@@ -63,8 +63,16 @@ class AuthRepositoryImpl implements AuthRepository {
     String password,
     String agentId,
     String phone,
+    List<String> wishlists,
   ) async {
-    await ds.signUpWithEmail(email, fullName, password, agentId, phone);
+    await ds.signUpWithEmail(
+      email,
+      fullName,
+      password,
+      agentId,
+      phone,
+      wishlists,
+    );
   }
 
   @override

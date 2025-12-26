@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/user_image_firestore.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_image_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart';
+import '../datasources/firebase/user_image_firestore.dart';
+import '../../domain/repositories/user_image_repository.dart';
+import '../../domain/states/image_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserImageRepositoryImpl implements UserImageRepository {

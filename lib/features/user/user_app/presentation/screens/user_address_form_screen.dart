@@ -1,6 +1,6 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/state_city.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_home_screen.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../domain/states/state_city.dart';
+import 'user_home_screen.dart';
 import '../../domain/states/address_state.dart';
 import '../controllers/user_address_controllers.dart';
 
@@ -23,16 +23,17 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
 
   final _atController = TextEditingController();
   final _postController = TextEditingController();
-  final _psController = TextEditingController();
+  final _policeStationController = TextEditingController();
+
   final _districtController = TextEditingController();
   final _stateController = TextEditingController();
-  final _pinController = TextEditingController();
+  final _pinController = TextEditingController(); 
+  
 
   @override
   void dispose() {
     _atController.dispose();
     _postController.dispose();
-    _psController.dispose();
     _districtController.dispose();
     _stateController.dispose();
     _pinController.dispose();
@@ -47,7 +48,8 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
         .saveAddress(
           at: _atController.text.trim(),
           post: _postController.text.trim(),
-          ps: _psController.text.trim(),
+          policeStation: _policeStationController.text.trim(),
+
           district: _districtController.text.trim(),
           stateName: _stateController.text.trim(),
           pin: _pinController.text.trim(),
@@ -109,14 +111,13 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
                 const SizedBox(height: 16),
-
-                /// ================= PS =================
                 AppTextField(
-                  controller: _psController,
+                  controller: _policeStationController,
                   prefixIcon: Icons.local_police,
+
                   iconColor: Theme.of(context).colorScheme.primary,
                   label: "Police Station",
-                  hint: "Enter police station",
+                  hint: "Enter Police station",
                   obscureText: false,
                   keyboardType: TextInputType.text,
                   validator: (v) => v == null || v.isEmpty ? 'Required' : null,

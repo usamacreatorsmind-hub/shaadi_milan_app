@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/core/env/app_env.dart';
-import 'package:arvika_marriage_bureau/core/env/app_env_config.dart';
+import 'core/env/app_env.dart';
+import 'core/env/app_env_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -1,8 +1,8 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/user_firestore_ds.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../data/datasources/firebase/user_firestore_ds.dart';
+import '../../data/repositories_impl/matrimony_repository_impl.dart';
+import '../../domain/states/metrimony_state.dart';
+import '../../domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
@@ -75,7 +75,10 @@ class UserProfileScreen extends ConsumerWidget {
                 _SettingsTile(
                   icon: Icons.lock_outline,
                   title: "Change Password",
-                  onTap: () {},
+                  onTap: () {
+                    // navigate to change password screen
+                    AutoRouter.of(context).push(const ChangePasswordRoute());
+                  },
                 ),
                 _SettingsTile(
                   icon: Icons.privacy_tip_outlined,
@@ -92,7 +95,9 @@ class UserProfileScreen extends ConsumerWidget {
                 _SettingsTile(
                   icon: Icons.info_outline,
                   title: "About Us",
-                  onTap: () {},
+                  onTap: () {
+                    AutoRouter.of(context).push(const AboutUsRoute());
+                  },
                 ),
 
                 // 🔹 ACCOUNT SETTINGS SECTION
@@ -329,7 +334,7 @@ class _ProfileHeaderCard extends StatelessWidget {
 
                     // 🔹 Age & Occupation
                     Text(
-                      '${profile.identity?.age ?? 'N/A'} yrs • ${profile.education?.occupation ?? 'N/A'}',
+                      '${profile.identity?.age ?? 'N/A'} yrs • ${profile.employment?.jobType ?? 'N/A'}',
                       style: TextStyle(color: Colors.grey[700]),
                     ),
 

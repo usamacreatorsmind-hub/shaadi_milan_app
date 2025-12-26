@@ -1,7 +1,8 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../../app/router/app_router.dart';
 
 @RoutePage()
 class UserMainShellScreen extends StatefulWidget {
@@ -19,7 +20,8 @@ class _UserMainShellState extends State<UserMainShellScreen> {
     return AutoTabsRouter(
       routes: [
         const UserHomeRoute(),
-        const UserMatchesRoute(),
+        UserWishListRoute(userId: uid),
+
         UserProfileRoute(userId: uid),
       ],
       transitionBuilder: (context, child, animation) =>

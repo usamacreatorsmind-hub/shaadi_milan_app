@@ -1,16 +1,18 @@
-import 'package:arvika_marriage_bureau/core/env/app_env.dart';
+import '../../../../../core/env/app_env.dart';
+import '../../domain/states/agent_state.dart';
+import '../../domain/states/home_state.dart';
 
 import '../../domain/states/address_state.dart';
 import '../../domain/states/cultural_state.dart';
-import 'package:arvika_marriage_bureau/core/env/app_env_config.dart';
+import '../../../../../core/env/app_env_config.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/states/education_state.dart';
 import '../../domain/states/employee_state.dart';
 import '../../domain/states/family_state.dart';
 import '../../domain/states/identity_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/lifestyle_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/physical_state.dart';
+import '../../domain/states/lifestyle_state.dart';
+import '../../domain/states/metrimony_state.dart';
+import '../../domain/states/physical_state.dart';
 
 import '../../../../agent/domain/states/agent_entity.dart';
 import '../datasources/data_source/metrimony_data_source.dart';
@@ -24,6 +26,11 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   final MatrimonyFirestoreDS _remoteDS;
 
   MatrimonyRepositoryImpl(this._remoteDS);
+
+
+
+ 
+
 
   @override
   Future<void> createMatrimonyProfile(
@@ -144,6 +151,8 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
     // TODO: implement getAllMatrimonyProfiles
     return _remoteDS.getAllMatrimonyProfiles();
   }
+  
+   
 }
 
 final matrimonyFirestoreDSProvider = Provider<MatrimonyFirestoreDS>((ref) {

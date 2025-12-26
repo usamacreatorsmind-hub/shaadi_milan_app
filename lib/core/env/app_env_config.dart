@@ -1,6 +1,6 @@
  
-import 'package:arvika_marriage_bureau/core/env/dev_env.dart';
-import 'package:arvika_marriage_bureau/core/env/prod_env.dart';
+import 'dev_env.dart';
+import 'prod_env.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_env.dart';

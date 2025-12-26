@@ -13,6 +13,7 @@ abstract class AuthRepository {
     String password,
     String agentId,
     String phone,
+    List<String> wishlists,
     
   );
   Future<void> signInWithEmail(String email, String password);

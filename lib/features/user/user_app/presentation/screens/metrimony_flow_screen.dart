@@ -1,18 +1,18 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/metrimony_profile_controller.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/agent_profile_verify_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_address_form_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_culture_form_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_biodata_check_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_education_form_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_employement_form_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_family_form_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_home_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_identity_form_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_image_form_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_lifestyle_form_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_physical_form_screen.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../domain/states/metrimony_state.dart';
+import '../controllers/metrimony_profile_controller.dart';
+import 'agent_profile_verify_screen.dart';
+import 'user_address_form_screen.dart';
+import 'user_culture_form_screen.dart';
+import 'user_biodata_check_screen.dart';
+import 'user_education_form_screen.dart';
+import 'user_employement_form_screen.dart';
+import 'user_family_form_screen.dart';
+import 'user_home_screen.dart';
+import 'user_identity_form_screen.dart';
+import 'user_image_form_screen.dart';
+import 'user_lifestyle_form_screen.dart';
+import 'user_physical_form_screen.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +62,7 @@ class MatrimonyFormFlowScreen extends ConsumerWidget {
 
       case MatrimonyStep.family:
         return const UserFamilyFormScreen();
+ 
 
       case MatrimonyStep.cultural:
         return const UserCultureFormScreen();
@@ -83,7 +84,7 @@ enum MatrimonyStep {
   address,
   education,
   employment,
-  family,
+  family, 
   cultural,
   lifestyle,
   physical,

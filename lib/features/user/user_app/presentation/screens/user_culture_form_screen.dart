@@ -1,10 +1,10 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../controllers/user_cultural_controllers.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../domain/states/cultural_state.dart';
+import '../controllers/user_cultural_controllers.dart';
 
 @RoutePage()
 class UserCultureFormScreen extends ConsumerStatefulWidget {
@@ -15,8 +15,7 @@ class UserCultureFormScreen extends ConsumerStatefulWidget {
       _UserCultureFormScreenState();
 }
 
-class _UserCultureFormScreenState
-    extends ConsumerState<UserCultureFormScreen> {
+class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _religionController = TextEditingController();
@@ -25,6 +24,7 @@ class _UserCultureFormScreenState
   final _gothraController = TextEditingController();
   final _motherTongueController = TextEditingController();
   final _languagesController = TextEditingController();
+
 
   @override
   void dispose() {
@@ -46,7 +46,9 @@ class _UserCultureFormScreenState
         .where((e) => e.isNotEmpty)
         .toList();
 
-    ref.read(userCulturalControllerProvider.notifier).saveCultural(
+    ref
+        .read(userCulturalControllerProvider.notifier)
+        .saveCultural(
           religion: _religionController.text.trim(),
           caste: _casteController.text.trim(),
           subCaste: _subCasteController.text.trim(),
@@ -62,24 +64,22 @@ class _UserCultureFormScreenState
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     // ✅ ref.listen MUST stay in build
-    ref.listen<CulturalState>(
-      userCulturalControllerProvider,
-      (previous, current) {
-        if (current.error != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(current.error!)),
-          );
-        }
+    ref.listen<CulturalState>(userCulturalControllerProvider, (
+      previous,
+      current,
+    ) {
+      if (current.error != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(current.error!)));
+      }
 
-        if (current.cultural != null && previous?.cultural == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Cultural profile saved successfully'),
-            ),
-          );
-        }
-      },
-    );
+      if (current.cultural != null && previous?.cultural == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Cultural profile saved successfully')),
+        );
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Cultural Details')),

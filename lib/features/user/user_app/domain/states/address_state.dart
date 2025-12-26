@@ -1,74 +1,79 @@
 class AddressProfile {
   final String addressLine1;
-  final String? addressLine2;
+  final String post;
+  final String policeStation;
   final String city;
   final String state;
   final String pincode;
-  final String country;
 
   AddressProfile({
     required this.addressLine1,
-    this.addressLine2,
+    required this.post,
     required this.city,
     required this.state,
+    required this.policeStation,
+
     required this.pincode,
-    required this.country,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'addressLine1': addressLine1,
-      'addressLine2': addressLine2,
+      'post': post,
       'city': city,
       'state': state,
       'pincode': pincode,
-      'country': country,
     };
   }
 
   factory AddressProfile.fromMap(Map<String, dynamic> map) {
     return AddressProfile(
-      addressLine1: map['addressLine1'] as String,
-      addressLine2: map['addressLine2'] as String?,
-      city: map['city'] as String,
-      state: map['state'] as String,
-      pincode: map['pincode'] as String,
-      country: map['country'] as String,
-    );
-  }
+      addressLine1: map['addressLine1'] ?? '',
+      policeStation: map['policeStation'] ?? '',
 
-  @override
-  String toString() {
-    return 'AddressProfile(addressLine1: $addressLine1, addressLine2: $addressLine2, city: $city, state: $state, pincode: $pincode, country: $country)';
+      post: map['post'] ?? '',
+      city: map['city'] ?? '',
+      state: map['state'] ?? '',
+      pincode: map['pincode'] ?? '',
+    );
   }
 
   AddressProfile copyWith({
     String? addressLine1,
-    String? addressLine2,
+    String? post,
     String? city,
     String? state,
+    String? police_station,
+
     String? pincode,
     String? country,
   }) {
     return AddressProfile(
       addressLine1: addressLine1 ?? this.addressLine1,
-      addressLine2: addressLine2 ?? this.addressLine2,
+      post: post ?? this.post,
       city: city ?? this.city,
       state: state ?? this.state,
       pincode: pincode ?? this.pincode,
-      country: country ?? this.country,
+
+      policeStation: police_station ?? this.policeStation,
     );
   }
 
   factory AddressProfile.empty() {
     return AddressProfile(
       addressLine1: '',
-      addressLine2: '',
+      post: '',
       city: '',
       state: '',
+      policeStation: '',
+
       pincode: '',
-      country: '',
     );
+  }
+
+  @override
+  String toString() {
+    return 'AddressProfile(addressLine1: $addressLine1, post: $post, city: $city, state: $state, pincode: $pincode, police_station: $policeStation)';
   }
 }
 

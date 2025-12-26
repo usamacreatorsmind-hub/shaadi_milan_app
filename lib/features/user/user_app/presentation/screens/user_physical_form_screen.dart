@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +21,8 @@ class _UserPhysicalFormScreenState
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
   final _bodyTypeController = TextEditingController();
-  final _complexionController = TextEditingController();
+  final _complexionController = TextEditingController(); 
+  
   bool _physicallyChallenged = false;
 
   @override
@@ -151,8 +152,17 @@ class _UserPhysicalFormScreenState
                   return null;
                 },
               ),
+
               const SizedBox(height: 16),
-              const SizedBox(height: 16),
+              AppSwitch(
+                title: "Physically Challenged",
+                value: _physicallyChallenged,
+                onChanged: (value) {
+                  setState(() {
+                    _physicallyChallenged = value;
+                  });
+                },
+              ),
 
               const SizedBox(height: 20),
               if (physicalState.isLoading)

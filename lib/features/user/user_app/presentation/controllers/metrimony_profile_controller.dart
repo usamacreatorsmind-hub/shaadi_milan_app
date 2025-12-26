@@ -1,12 +1,18 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/user_status_firestore.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/userstatus_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_status_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_status_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/metrimony_flow_screen.dart';
+import '../../../../agent/domain/states/agent_entity.dart';
+import '../../data/datasources/firebase/agent_firestore_ds.dart';
+import '../../data/datasources/firebase/metrimony_firestore.dart';
+import '../../data/datasources/firebase/user_status_firestore.dart';
+import '../../data/repositories_impl/matrimony_repository_impl.dart';
+import '../../data/repositories_impl/userstatus_repository.dart';
+import '../../domain/repositories/user_status_repository.dart';
+import '../../domain/states/agent_state.dart';
+import '../../domain/states/image_state.dart';
+import '../../domain/states/user_state.dart';
+import '../../domain/states/user_status_state.dart';
+import '../screens/metrimony_flow_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../../domain/states/metrimony_state.dart';
@@ -100,8 +106,24 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     nextStep();
   }
 
+  // ---------------- SUBMIT METHODS ----------------
   Future<void> submitProfile(WidgetRef ref, String uid) async {
-    final profile = ref.read(metrimonyControllerProvider).metrimony;
+    // fetch current user data  from firestore
+    final userData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+    AppUser user = AppUser.fromMap(userData.data()!);
+
+    // fetch agent id using agent_id field using agentfirestore ds
+
+    AgentProfile agentData = await AgentFirestoreDs(
+      FirebaseFirestore.instance,
+    ).fetchAgentbyAgentId(user.agentId!);
+
+    var profile = ref.read(metrimonyControllerProvider).metrimony;
+
+    profile = profile.copyWith(user: user, agent: agentData);
 
     await ref
         .read(matrimonyRepositoryProvider)
@@ -115,4 +137,58 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     );
     nextStep();
   }
+
+  Future<void> createEmptyMatrimonyProfile(String uid, String agentId) async {
+    debugPrint("Creating empty metrimony profile for $uid");
+    // fetch current user data  from firestore
+    final userData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+    AppUser user = AppUser.fromMap(userData.data()!);
+
+    // fetch agent id using agent_id field using agentfirestore ds
+
+    AgentProfile agentData = await AgentFirestoreDs(
+      FirebaseFirestore.instance,
+    ).fetchAgentbyAgentId(agentId);
+
+    // create empty metrimony profile
+
+    final matrimonyRepository = MatrimonyRepositoryImpl(
+      MatrimonyFirestoreDS(FirebaseFirestore.instance),
+    );
+    final userStatusRepository = UserStatusRepositoryImpl(
+      UserStatusFirestoreDS(),
+    );
+
+    debugPrint("this is user data ");
+    debugPrint(user.toString());
+    debugPrint("this is agent data ");
+    debugPrint(agentData.toString());
+
+    final metrimonyProfile = MatrimonyProfile(
+      user: user,
+
+      agent: agentData,
+      identity: IdentityProfile.empty(),
+      address: AddressProfile.empty(),
+      cultural: CulturalProfile.empty(),
+      education: EducationProfile.empty(),
+      employment: EmploymentProfile.empty(),
+      family: FamilyProfile.empty(),
+      lifestyle: LifestyleProfile.empty(),
+      physical: PhysicalProfile.empty(),
+      images: ProfileImages.empty(),
+    );
+    debugPrint(metrimonyProfile.toString());
+
+    await matrimonyRepository.createMatrimonyProfile(
+      uid,
+      metrimonyProfile.toMap(),
+    );
+    await userStatusRepository.createUserStatus(uid);
+  }
+
+   
 }

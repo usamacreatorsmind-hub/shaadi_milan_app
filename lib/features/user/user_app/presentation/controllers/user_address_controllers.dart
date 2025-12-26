@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../user_auth/presentation/providers/auth_providers.dart';
@@ -5,8 +7,6 @@ import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import '../../domain/states/address_state.dart';
 import 'metrimony_profile_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserAddressController extends StateNotifier<AddressState> {
   final MatrimonyRepository _matrimonyRepository;
@@ -19,19 +19,21 @@ class UserAddressController extends StateNotifier<AddressState> {
   Future<void> saveAddress({
     required String at,
     required String post,
-    required String ps,
+    required String policeStation,
+
     required String district,
     required String stateName,
     required String pin,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     final addressProfile = AddressProfile(
+      policeStation: policeStation,
+
       addressLine1: at,
-      addressLine2: post,
-      city: ps,
-      state: district,
+      post: post,
+      city: district,
+      state: stateName,
       pincode: pin,
-      country: stateName,
     );
 
     try {

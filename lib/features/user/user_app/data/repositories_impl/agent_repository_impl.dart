@@ -1,6 +1,7 @@
-import 'package:arvika_marriage_bureau/features/agent/domain/states/agent_entity.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/agent_repository.dart';
+import '../../../../agent/domain/states/agent_entity.dart';
+import '../datasources/firebase/agent_firestore_ds.dart';
+import '../../domain/repositories/agent_repository.dart';
+import '../../domain/states/agent_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

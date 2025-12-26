@@ -25,11 +25,11 @@ class PhysicalProfile {
 
   factory PhysicalProfile.fromMap(Map<String, dynamic> map) {
     return PhysicalProfile(
-      height: map['height'] as String,
-      weight: map['weight'] as int,
-      bodyType: map['bodyType'] as String,
-      complexion: map['complexion'] as String,
-      physicallyChallenged: map['physicallyChallenged'] as bool,
+      height: map['height'] as String? ?? '',
+      weight: map['weight'] as int? ?? 0,
+      bodyType: map['bodyType'] as String? ?? '',
+      complexion: map['complexion'] as String? ?? '',
+      physicallyChallenged: map['physicallyChallenged'] as bool? ?? false,
     );
   }
 

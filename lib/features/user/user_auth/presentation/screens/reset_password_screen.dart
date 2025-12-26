@@ -1,6 +1,6 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../app/router/app_router.dart';
+import '../providers/auth_providers.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';

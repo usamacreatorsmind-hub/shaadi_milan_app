@@ -38,6 +38,7 @@ class FirebaseAuthDS {
     String password,
     String agentId,
     String phone,
+    List<String> wishlists,
   ) async {
     try {
       // 1️⃣ Validate Agent ID (if provided)
@@ -76,7 +77,10 @@ class FirebaseAuthDS {
         'phone': phone,
         'profileId': '${phone}', // Initialize with an empty string
         'isVerified': false,
-        if (agentId.isNotEmpty) 'agentId': agentId,
+        'wishlists': wishlists,
+
+        'agentId': agentId,
+
         'createdAt': FieldValue.serverTimestamp(),
       });
 

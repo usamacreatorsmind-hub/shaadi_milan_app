@@ -1,9 +1,10 @@
-import 'package:arvika_marriage_bureau/app/app.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/user_firestore_ds.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
+import '../../../../../app/app.dart';
+import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
+import '../../../../../app/custom/shimmer.dart';
+import '../../data/datasources/firebase/user_firestore_ds.dart';
+import '../../data/repositories_impl/matrimony_repository_impl.dart';
+import '../../domain/states/metrimony_state.dart';
+import '../../domain/states/user_state.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,7 +28,7 @@ final matrimonyProfileProvider =
 
 @RoutePage()
 class MyProfileScreen extends ConsumerWidget {
-  final String uid; 
+  final String uid;
   const MyProfileScreen({super.key, required this.uid});
 
   @override
@@ -80,6 +81,32 @@ class MyProfileScreen extends ConsumerWidget {
                                       width: 100,
                                       height: 100,
                                       fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child; // image loaded
+                                            }
+                                            return ShimmerProfileCard(
+                                              width: 100,
+                                              height: 100,
+                                            );
+                                          },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              width: 100,
+                                              height: 100,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade200,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: const Icon(
+                                                Icons.broken_image,
+                                                color: Colors.grey,
+                                              ),
+                                            );
+                                          },
                                     ),
                                   ),
                                 );
@@ -128,14 +155,6 @@ class MyProfileScreen extends ConsumerWidget {
                   ),
 
                   children: [
-                    _DetailRow(
-                      "Qualification",
-                      profile.education?.highestQualification ?? "N/A",
-                    ),
-                    _DetailRow(
-                      "Occupation",
-                      profile.education?.occupation ?? "N/A",
-                    ),
                     _DetailRow("Company", profile.employment?.company ?? "N/A"),
                     _DetailRow(
                       "Income",
@@ -155,8 +174,6 @@ class MyProfileScreen extends ConsumerWidget {
 
                   children: [
                     _DetailRow("Diet", profile.lifestyle?.diet ?? "N/A"),
-                    _DetailRow("Smoking", profile.lifestyle?.smoke ?? "N/A"),
-                    _DetailRow("Drinking", profile.lifestyle?.drink ?? "N/A"),
                   ],
                 ),
 
@@ -172,7 +189,6 @@ class MyProfileScreen extends ConsumerWidget {
                   children: [
                     _DetailRow("City", profile.address?.city ?? "N/A"),
                     _DetailRow("State", profile.address?.state ?? "N/A"),
-                    _DetailRow("Country", profile.address?.country ?? "N/A"),
                   ],
                 ),
 
@@ -276,10 +292,10 @@ class _ProfileHeroCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  "${profile.identity?.age ?? 'N/A'} yrs • ${profile.education?.occupation ?? "N/A"}",
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
+                // Text(
+                //   "${profile.identity?.age ?? 'N/A'} yrs • ${profile.education?. ?? "N/A"}",
+                //   style: TextStyle(color: Colors.grey[700]),
+                // ),
                 const SizedBox(height: 10),
                 Row(
                   children: [

@@ -20,4 +20,9 @@ abstract class UserRepository {
     String password,
   ); // Note: Should be handled by FirebaseAuth
   Future<void> updateAddress(String uid, AddressProfile address);
+
+  Future<void> updateProfilePhoto(String uid, String profilePhotoUrl);
+
+  Future<void> addWishlist(String uid, String profileId);
+  Future<void> removeWishlist(String uid, String profileId);
 }

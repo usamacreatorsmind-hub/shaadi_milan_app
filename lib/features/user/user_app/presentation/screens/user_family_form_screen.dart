@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
 
 import '../../domain/states/family_state.dart';
 import '../controllers/user_family_controllers.dart';
@@ -22,7 +22,10 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
   final _fatherNameController = TextEditingController();
   final _motherNameController = TextEditingController();
   final _brothersController = TextEditingController();
+  final _familyStatusController = TextEditingController();
+
   final _sistersController = TextEditingController();
+
   String? _familyType;
 
   @override
@@ -131,6 +134,25 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please select a family type';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // use dropdown
+              AppDropDown(
+                label: "Family Status",
+                items: const ['Rich', 'Middle Class', 'Poor'],
+                value: _familyStatusController.text.isEmpty
+                    ? null
+                    : _familyStatusController.text,
+                onChanged: (value) {
+                  setState(() => _familyStatusController.text = value!);
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a family status';
                   }
                   return null;
                 },

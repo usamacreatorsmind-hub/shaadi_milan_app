@@ -1,5 +1,7 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/metrimony_flow_screen.dart';
+import 'agent_state.dart';
+import 'home_state.dart';
+import 'image_state.dart';
+import '../../presentation/screens/metrimony_flow_screen.dart';
 
 import '../../../../agent/domain/states/agent_entity.dart';
 import 'address_state.dart';
@@ -23,11 +25,11 @@ class MatrimonyProfile {
   final LifestyleProfile? lifestyle;
   final PhysicalProfile? physical;
   final AgentProfile? agent;
+  
   final ProfileImages? images;
 
   MatrimonyProfile({
     this.user,
-    this.images,
     this.identity,
     this.address,
     this.cultural,
@@ -37,15 +39,17 @@ class MatrimonyProfile {
     this.lifestyle,
     this.physical,
     this.agent,
+    this.images,
   });
+
+  factory MatrimonyProfile.empty() => MatrimonyProfile();
 
   @override
   String toString() {
-    return 'MatrimonyProfile(user: $user, identity: $identity, address: $address, cultural: $cultural, education: $education, employment: $employment, family: $family, lifestyle: $lifestyle, physical: $physical, agent: $agent, images: $images)';
-  }
-
-  factory MatrimonyProfile.empty() {
-    return MatrimonyProfile();
+    return 'MatrimonyProfile(user: $user, identity: $identity, address: $address, '
+        'cultural: $cultural, education: $education, employment: $employment, '
+        'family: $family, lifestyle: $lifestyle, physical: $physical, '
+        'agent: $agent, images: $images)';
   }
 
   MatrimonyProfile copyWith({
@@ -88,49 +92,76 @@ class MatrimonyProfile {
       'lifestyle': lifestyle?.toMap(),
       'physical': physical?.toMap(),
       'agent': agent?.toMap(),
-
       'images': images?.toMap(),
     };
   }
 
+  /// ================== 🔥 SAFE FROM MAP 🔥 ==================
   factory MatrimonyProfile.fromMap(Map<String, dynamic> map) {
-    return MatrimonyProfile(
-      user: map['user'] != null
-          ? AppUser.fromMap(map['user'] as Map<String, dynamic>)
-          : null,
+    try {
+      return MatrimonyProfile(
+        user: map['user'] != null
+            ? AppUser.fromMap(Map<String, dynamic>.from(map['user']))
+            : null,
 
-      images: map['images'] != null
-          ? ProfileImages.fromMap(map['images'] as Map<String, dynamic>)
-          : null,
+        identity: map['identity'] != null
+            ? IdentityProfile.fromMap(
+                Map<String, dynamic>.from(map['identity']),
+              )
+            : null,
 
-      identity: map['identity'] != null
-          ? IdentityProfile.fromMap(map['identity'] as Map<String, dynamic>)
-          : null,
-      address: map['address'] != null
-          ? AddressProfile.fromMap(map['address'] as Map<String, dynamic>)
-          : null,
-      cultural: map['cultural'] != null
-          ? CulturalProfile.fromMap(map['cultural'] as Map<String, dynamic>)
-          : null,
-      education: map['education'] != null
-          ? EducationProfile.fromMap(map['education'] as Map<String, dynamic>)
-          : null,
-      employment: map['employment'] != null
-          ? EmploymentProfile.fromMap(map['employment'] as Map<String, dynamic>)
-          : null,
-      family: map['family'] != null
-          ? FamilyProfile.fromMap(map['family'] as Map<String, dynamic>)
-          : null,
-      lifestyle: map['lifestyle'] != null
-          ? LifestyleProfile.fromMap(map['lifestyle'] as Map<String, dynamic>)
-          : null,
-      physical: map['physical'] != null
-          ? PhysicalProfile.fromMap(map['physical'] as Map<String, dynamic>)
-          : null,
-      agent: map['agent'] != null
-          ? AgentProfile.fromMap(map['agent'] as Map<String, dynamic>)
-          : null,
-    );
+        address: map['address'] != null
+            ? AddressProfile.fromMap(Map<String, dynamic>.from(map['address']))
+            : null,
+
+        cultural: map['cultural'] != null
+            ? CulturalProfile.fromMap(
+                Map<String, dynamic>.from(map['cultural']),
+              )
+            : null,
+
+        education: map['education'] != null
+            ? EducationProfile.fromMap(
+                Map<String, dynamic>.from(map['education']),
+              )
+            : null,
+
+        employment: map['employment'] != null
+            ? EmploymentProfile.fromMap(
+                Map<String, dynamic>.from(map['employment']),
+              )
+            : null,
+
+        family: map['family'] != null
+            ? FamilyProfile.fromMap(Map<String, dynamic>.from(map['family']))
+            : null,
+
+        /// 🔥 CRITICAL FIX — MERGE ROOT HOBBIES INTO LIFESTYLE
+        lifestyle: map['lifestyle'] != null
+            ? LifestyleProfile.fromMap({
+                ...Map<String, dynamic>.from(map['lifestyle']),
+                'hobbies': map['hobbies'] ?? [],
+              })
+            : null,
+
+        physical: map['physical'] != null
+            ? PhysicalProfile.fromMap(
+                Map<String, dynamic>.from(map['physical']),
+              )
+            : null,
+
+        agent: map['agent'] != null
+            ? AgentProfile.fromMap(Map<String, dynamic>.from(map['agent']))
+            : null,
+
+        images: map['images'] != null
+            ? ProfileImages.fromMap(Map<String, dynamic>.from(map['images']))
+            : null,
+      );
+    } catch (e) {
+      // 🔥 THIS MAKES DEBUGGING EASY
+      throw Exception('❌ MatrimonyProfile.fromMap failed → $e\nData: $map');
+    }
   }
 }
 
@@ -177,7 +208,3 @@ class MetrimonyState {
     );
   }
 }
-
-/* ============================================================
-   =================== STEPS ENUM =============================
-   ============================================================ */

@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
-import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../providers/auth_providers.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -214,6 +214,75 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 child: AppButton(
                   text: "Change Password",
                   onPressed: _changePassword,
+                ),
+              ),
+              // change password using email verification
+              TextButton(
+                onPressed: () async {
+                  final authRepo = ref.read(authRepositoryProvider);
+                  final user = authRepo.currentUser;
+
+                  if (user == null || user.email == null) {
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "You must be logged in to reset your password.",
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                    return;
+                  }
+
+                  try {
+                    await authRepo.sendPasswordResetEmail(user.email!);
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Password reset email sent to ${user.email}. Please check your inbox.",
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  } on FirebaseAuthException catch (e) {
+                    if (!mounted) return;
+                    String message;
+                    switch (e.code) {
+                      case 'network-request-failed':
+                        message =
+                            "No internet connection. Please check your network.";
+                        break;
+                      case 'user-not-found':
+                        message =
+                            "No user found with this email. Please ensure you are logged in.";
+                        break;
+                      default:
+                        message = "Failed to send reset email: ${e.message}";
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(message),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  } catch (e) {
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("An unexpected error occurred: $e"),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
+                },
+                child: Text(
+                  "Forgot Password? Reset via Email",
+                  style: TextStyle(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],

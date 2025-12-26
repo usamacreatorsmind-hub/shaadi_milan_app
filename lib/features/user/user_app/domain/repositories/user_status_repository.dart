@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_status_state.dart';
+import '../states/user_status_state.dart';
 
 import 'metrimony_repository.dart';
 

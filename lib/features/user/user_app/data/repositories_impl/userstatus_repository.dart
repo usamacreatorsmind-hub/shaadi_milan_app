@@ -1,10 +1,8 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_status_state.dart';
-
-import '../../domain/repositories/metrimony_repository.dart';
-import '../../domain/repositories/user_status_repository.dart';
-
-import '../datasources/firebase/user_status_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../domain/repositories/user_status_repository.dart';
+import '../../domain/states/user_status_state.dart';
+import '../datasources/firebase/user_status_firestore.dart';
 
 class UserStatusRepositoryImpl implements UserStatusRepository {
   final UserStatusFirestoreDS _remoteDS;

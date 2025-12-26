@@ -1,10 +1,9 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../user_auth/presentation/providers/auth_providers.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../domain/states/address_state.dart';
 import '../../domain/states/user_state.dart';
-import '../../../user_auth/presentation/providers/auth_providers.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../datasources/firebase/user_firestore_ds.dart';
 
 class UserRepositoryImpl implements UserRepository {
@@ -79,6 +78,21 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> updateAddress(String uid, AddressProfile address) {
     return _ds.updateField(uid, 'address', address.toMap());
   }
+
+  @override
+  Future<void> updateProfilePhoto(String uid, String profilePhotoUrl) {
+    return _ds.updateField(uid, 'profilePhoto', profilePhotoUrl);
+  }
+
+  @override
+  Future<void> addWishlist(String uid, String profileId) {
+    return _ds.addWishlist(uid, profileId);
+  }
+
+  @override
+  Future<void> removeWishlist(String uid, String profileId) {
+    return _ds.removeWishlist(uid, profileId);
+  }
 }
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {
@@ -100,5 +114,21 @@ final currentUserProvider = StreamProvider<AppUser?>((ref) {
     },
     loading: () => const Stream.empty(),
     error: (_, __) => const Stream.empty(),
+  );
+});
+
+final currentUserProfileProvider = StreamProvider<AppUser?>((ref) {
+  final authState = ref.watch(authStateProvider);
+  final userRepository = ref.watch(userRepositoryProvider);
+
+  return authState.when(
+    data: (user) {
+      if (user == null) {
+        return Stream.value(null);
+      }
+      return userRepository.watchUser(user.uid);
+    },
+    loading: () => Stream.value(null),
+    error: (error, stackTrace) => Stream.value(null),
   );
 });

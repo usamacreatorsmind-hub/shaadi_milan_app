@@ -1,8 +1,8 @@
-import 'package:arvika_marriage_bureau/app/custom/image_picker/image_picker_widget.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/image_picker_controller.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/metrimony_profile_controller.dart';
-import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
+import '../../../../../app/custom/image_picker/image_picker_widget.dart';
+import '../../../../../app/router/app_router.dart';
+import '../controllers/image_picker_controller.dart';
+import '../controllers/metrimony_profile_controller.dart';
+import '../../../user_auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,16 +46,29 @@ class UserImageFormScreen extends ConsumerWidget {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (context) =>
-                      const Center(child: CircularProgressIndicator()),
+                  builder: (context) => Consumer(
+                    builder: (context, ref, _) {
+                      final progress = ref.watch(uploadProgressProvider);
+                      return AlertDialog(
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text("Uploading Images..."),
+                            const SizedBox(height: 20),
+                            LinearProgressIndicator(value: progress),
+                            const SizedBox(height: 10),
+                            Text("${(progress * 100).toInt()}%"),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 );
 
                 try {
                   await ref
                       .read(imagePickerProvider.notifier)
                       .uploadImages(user.uid);
-                await ref .read(imagePickerProvider.notifier) .uploadImages( user.uid);
-                      
 
                   if (context.mounted) {
                     // Navigator.pop(context); // Pop loading

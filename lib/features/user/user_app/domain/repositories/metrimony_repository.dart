@@ -1,3 +1,5 @@
+import '../states/agent_state.dart';
+
 import '../../../../agent/domain/states/agent_entity.dart';
 import '../states/address_state.dart';
 import '../states/cultural_state.dart';
@@ -27,11 +29,9 @@ abstract class MatrimonyRepository {
   // READ (FULL PROFILE)
   // ─────────────────────────────────────────────
   Future<MatrimonyProfile> getMatrimonyProfile(String uid);
-  
-// read stream all metrimony profiles from server
-  Future<List<MatrimonyProfile>> getAllMatrimonyProfiles(); 
 
-
+  // read stream all metrimony profiles from server
+  Future<List<MatrimonyProfile>> getAllMatrimonyProfiles();
 
   Stream<MatrimonyProfile> watchMatrimonyProfile(String uid);
 

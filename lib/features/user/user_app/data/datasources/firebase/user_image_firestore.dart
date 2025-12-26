@@ -8,12 +8,21 @@ class ImageUploadService {
   Future<String> uploadPrimaryImage({
     required String uid,
     required String filePath,
+    void Function(double)? onProgress,
   }) async {
     final file = File(filePath);
 
     final ref = _storage.ref().child('profile_images/$uid/primary.jpg');
 
-    await ref.putFile(file);
+    final task = ref.putFile(file);
+
+    task.snapshotEvents.listen((event) {
+      if (onProgress != null && event.totalBytes > 0) {
+        onProgress(event.bytesTransferred / event.totalBytes);
+      }
+    });
+
+    await task;
 
     return await ref.getDownloadURL();
   }
@@ -22,6 +31,7 @@ class ImageUploadService {
   Future<List<String>> uploadSecondaryImages({
     required String uid,
     required List<String> filePaths,
+    void Function(double)? onProgress,
   }) async {
     List<String> urls = [];
 
@@ -30,7 +40,18 @@ class ImageUploadService {
 
       final ref = _storage.ref().child('profile_images/$uid/gallery_$i.jpg');
 
-      await ref.putFile(file);
+      final task = ref.putFile(file);
+
+      task.snapshotEvents.listen((event) {
+        if (onProgress != null && event.totalBytes > 0) {
+          final fileProgress = event.bytesTransferred / event.totalBytes;
+          // Calculate total progress for the batch
+          final totalProgress = (i + fileProgress) / filePaths.length;
+          onProgress(totalProgress);
+        }
+      });
+
+      await task;
 
       final url = await ref.getDownloadURL();
       urls.add(url);

@@ -1,5 +1,5 @@
  
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/carusel_image.dart';
+import 'carusel_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 

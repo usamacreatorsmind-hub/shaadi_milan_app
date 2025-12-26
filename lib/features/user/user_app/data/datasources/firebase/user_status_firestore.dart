@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/metrimony_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_status_state.dart';
+import '../../../domain/repositories/metrimony_repository.dart';
+import '../../../domain/states/user_status_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

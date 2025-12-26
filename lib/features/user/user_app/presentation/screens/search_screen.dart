@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_home_screen.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import 'user_home_screen.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 

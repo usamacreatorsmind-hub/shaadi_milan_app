@@ -1,4 +1,6 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../data/datasources/firebase/agent_firestore_ds.dart';
+import '../../../user_auth/presentation/controllers/auth_controller.dart';
 import 'package:intl/intl.dart';
 import '../controllers/user_identity_controllers.dart';
 import '../../domain/states/identity_state.dart';
@@ -75,9 +77,9 @@ class _UserIdentityFormScreenState
     if (!_formKey.currentState!.validate()) return;
 
     if (_gender == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select gender')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select gender')));
       return;
     }
 
@@ -90,14 +92,14 @@ class _UserIdentityFormScreenState
 
     if (_age! < 18) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You must be at least 18 years old'),
-        ),
+        const SnackBar(content: Text('You must be at least 18 years old')),
       );
       return;
     }
 
-    ref.read(identityControllerProvider.notifier).saveIdentity(
+    ref
+        .read(identityControllerProvider.notifier)
+        .saveIdentity(
           gender: _gender!,
           dob: _selectedDate!,
           age: _age!,
@@ -114,9 +116,9 @@ class _UserIdentityFormScreenState
 
     ref.listen<IdentityState>(identityControllerProvider, (previous, current) {
       if (current.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${current.error}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
       }
 
       if (current.identity != null && previous?.identity == null) {
@@ -186,10 +188,9 @@ class _UserIdentityFormScreenState
               ListTile(
                 leading: CircleAvatar(
                   radius: 20,
-                  backgroundColor: Theme.of(context)
-                      .colorScheme
-                      .primary
-                      .withOpacity(0.15),
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(0.15),
                   child: Icon(
                     Icons.date_range_outlined,
                     color: Theme.of(context).colorScheme.primary,
@@ -200,16 +201,14 @@ class _UserIdentityFormScreenState
                       ? 'Select Date of Birth'
                       : 'DOB: ${DateFormat('dd/MM/yyyy').format(_selectedDate!)}',
                 ),
-                subtitle:
-                    _age == null ? null : Text('Age: $_age years'),
+                subtitle: _age == null ? null : Text('Age: $_age years'),
                 onTap: () => _selectDate(context),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                   side: BorderSide(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withOpacity(0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.5),
                   ),
                 ),
               ),
@@ -224,10 +223,7 @@ class _UserIdentityFormScreenState
               else if (_age! >= 18)
                 identityState.isLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : AppButton(
-                        onPressed: _submitForm,
-                        text: 'Save Identity',
-                      )
+                    : AppButton(onPressed: _submitForm, text: 'Save Identity')
               else
                 const Text(
                   "You are not eligible to create a profile as you are under 18 years old.",
@@ -236,6 +232,48 @@ class _UserIdentityFormScreenState
                 ),
 
               const SizedBox(height: 16),
+
+
+
+
+
+              // // elevated button to fetch agent data
+              // ElevatedButton(
+              //   onPressed: () async {
+              //     // Example: Fetch agent data using agentId from a text field
+              //     // For demonstration, let's assume agentId is hardcoded or comes from another input
+              //     final agentId = _aadharController.text
+              //         .trim(); // Using aadhar field for agentId for example
+              //     if (agentId.isEmpty) {
+              //       ScaffoldMessenger.of(context).showSnackBar(
+              //         const SnackBar(
+              //           content: Text('Please enter an Agent ID to fetch data'),
+              //         ),
+              //       );
+              //       return;
+              //     }
+
+              //     try {
+              //       final agentData = await ref
+              //           .read(agentFirestoreDsProvider)
+              //           .fetchAgentbyAgentId(agentId);
+              //       ScaffoldMessenger.of(context).showSnackBar(
+              //         SnackBar(
+              //           content: Text('Agent Name: ${agentData}'),
+              //           behavior: SnackBarBehavior.floating,
+              //         ),
+              //       );
+              //     } catch (e) {
+              //       ScaffoldMessenger.of(context).showSnackBar(
+              //         SnackBar(
+              //           content: Text('Error fetching agent data: $e'),
+              //           behavior: SnackBarBehavior.floating,
+              //         ),
+              //       );
+              //     }
+              //   },
+              //   child: const Text('Fetch Agent Data (Example)'),
+              // ),
             ],
           ),
         ),

@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/user_status_firestore.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
+import '../../../user_app/data/datasources/firebase/user_status_firestore.dart';
+import '../../../user_app/domain/states/user_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
@@ -39,6 +39,7 @@ class AuthController extends StateNotifier<User?> {
       password,
       agentId,
       phone,
+      [],
     );
 
     // create empyt user status
@@ -57,29 +58,9 @@ class AuthController extends StateNotifier<User?> {
     await _authRepository.signOut();
   }
 
-
-
   Future<void> sendPasswordResetEmail(String email) async {
     await _authRepository.sendPasswordResetEmail(email);
   }
-   
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   @override
   void dispose() {

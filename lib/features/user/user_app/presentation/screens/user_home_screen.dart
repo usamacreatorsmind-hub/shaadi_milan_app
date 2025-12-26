@@ -1,6 +1,6 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/state_city.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_home_controller.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../domain/states/state_city.dart';
+import '../controllers/home_controller.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -235,8 +235,15 @@ class UserHomeScreen extends ConsumerWidget {
             loading: () => const SliverToBoxAdapter(
               child: Center(child: CircularProgressIndicator()),
             ),
-            error: (e, _) =>
-                SliverToBoxAdapter(child: Center(child: Text(e.toString()))),
+            error: (e, _) {
+              print('Error loading profiles: $e');
+
+              print(e);
+
+              return SliverToBoxAdapter(
+                child: Center(child: Text(e.toString())),
+              );
+            },
             data: (profiles) {
               final filteredProfiles = profiles.where((profile) {
                 // If no state is selected, or if state matches
@@ -272,11 +279,12 @@ class UserHomeScreen extends ConsumerWidget {
                       vertical: 8,
                     ),
                     child: ProfileCard(
-                      uid: profile.user!.uid,
-                      name: profile.user!.fullName,
-                      age: profile.identity!.age,
-                      occupation: profile.education!.occupation,
-                      imageUrl: profile.images!.primaryImageUrl,
+                      uid: profile.user?.uid ?? "",
+
+                      name: profile.user?.fullName ?? "N/A",
+                      age: profile.identity?.age ?? 0,
+                      designation: profile.employment?.designation ?? "N/A",
+                      imageUrl: profile.images?.primaryImageUrl ?? "",
                     ),
                   );
                 }, childCount: filteredProfiles.length),
@@ -418,7 +426,7 @@ class ProfileCard extends StatelessWidget {
   final String uid;
   final String name;
   final int age;
-  final String occupation;
+  final String designation;
   final String imageUrl;
 
   const ProfileCard({
@@ -426,7 +434,8 @@ class ProfileCard extends StatelessWidget {
     required this.uid,
     required this.name,
     required this.age,
-    required this.occupation,
+    required this.designation,
+
     required this.imageUrl,
   });
 
@@ -457,7 +466,7 @@ class ProfileCard extends StatelessWidget {
               ),
               child: Image.network(
                 imageUrl,
-                height: MediaQuery.of(context).size.height * 0.7,
+                height: MediaQuery.of(context).size.height * 0.55,
                 width: double.infinity,
                 fit: BoxFit.fill,
                 errorBuilder: (_, __, ___) => Container(
@@ -483,7 +492,7 @@ class ProfileCard extends StatelessWidget {
                   Text('$age years', style: TextStyle(color: Colors.grey[700])),
                   const SizedBox(height: 4),
 
-                  Text(occupation, style: TextStyle(color: Colors.grey[700])),
+                  Text(designation, style: TextStyle(color: Colors.grey[700])),
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,

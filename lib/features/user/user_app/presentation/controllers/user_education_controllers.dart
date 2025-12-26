@@ -19,34 +19,25 @@ class UserEducationController extends StateNotifier<EducationState> {
     : super(EducationState.initial);
 
   Future<void> saveEducation({
-    required String highestQualification,
-    required String college,
-    required String degree,
-    required String occupation,
-    required String annualIncome,
+    required Metriculation metriculation,
+    required IntremidiateProfile intremidiate,
+    required Graduation graduation,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-
-    final educationProfile = EducationProfile(
-      highestQualification: highestQualification,
-      college: college,
-      degree: degree,
-      occupation: occupation,
-
-      passingYear: 0,
-    );
-
     try {
+      final educationProfile = EducationProfile(
+        metriculation: metriculation,
+        intremidiate: intremidiate,
+        graduation: graduation,
+      );
+      await _matrimonyRepository.updateEducationProfile(_uid, educationProfile);
+      state = state.copyWith(isLoading: false, education: educationProfile);
       _ref
           .read(metrimonyControllerProvider.notifier)
           .saveEducation(educationProfile);
-
-      state = state.copyWith(education: educationProfile, isLoading: false);
-      debugPrint('✅ Education Saved Successfully');
-      debugPrint(educationProfile.toString());
     } catch (e) {
-      debugPrint('❌ Education Save Failed: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
+      debugPrint(e.toString());
     }
   }
 }

@@ -1,8 +1,8 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/metrimony_profile_controller.dart';
-import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
+import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../domain/states/image_state.dart';
+import '../controllers/metrimony_profile_controller.dart';
+import '../../../user_auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +29,9 @@ class _UserBiodataCheckScreenState
     final currentUser = authState.value;
 
     if (state.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     return Scaffold(
@@ -42,102 +44,135 @@ class _UserBiodataCheckScreenState
         padding: const EdgeInsets.all(16),
         children: [
           _warningCard(),
-          const SizedBox(height: 16),
 
-          _expandableSection('User Details', Icons.person, [
-            _tile('Full Name', profile.user?.fullName ?? currentUser?.fullName),
-            _tile('Email', profile.user?.email ?? currentUser?.email),
-            _tile('Phone Number', profile.user?.phone ?? currentUser?.phone),
-            _tile(
+          _section('User Details', Icons.person, [
+            _infoRow('Full Name',
+                profile.user?.fullName ?? currentUser?.fullName),
+            _infoRow('Email', profile.user?.email ?? currentUser?.email),
+            _infoRow('Phone', profile.user?.phone ?? currentUser?.phone),
+            _infoRow(
               'Verification',
-              profile.user?.isVerified ?? currentUser?.isVerified,
+              (profile.user?.isVerified ?? currentUser?.isVerified) == true
+                  ? 'Verified'
+                  : 'Not Verified',
             ),
           ]),
 
-          _expandableSection('Identity', Icons.badge, [
-            _tile('Gender', profile.identity?.gender),
-            _tile('Aadhar', profile.identity?.aadhar),
-
-            // intl package for data
-            _tile(
+          _section('Identity', Icons.badge, [
+            _infoRow('Gender', profile.identity?.gender),
+            _infoRow(
               'Date of Birth',
-              DateFormat('dd-MM-yyyy').format(profile.identity!.dob),
+              profile.identity?.dob != null
+                  ? DateFormat('dd MMM yyyy')
+                      .format(profile.identity!.dob)
+                  : null,
             ),
-            _tile('Age', profile.identity?.age),
+            _infoRow('Age', profile.identity?.age != null
+                ? '${profile.identity?.age} Years'
+                : null),
+            _infoRow('Aadhar', profile.identity?.aadhar),
           ]),
 
-          _expandableSection('Physical', Icons.accessibility_new, [
-            _tile('Height', profile.physical?.height),
-            _tile('Weight', profile.physical?.weight),
-            _tile('Complexion', profile.physical?.complexion),
-            _tile('Body Type', profile.physical?.bodyType),
+          _section('Physical', Icons.accessibility_new, [
+            _infoRow('Height', profile.physical?.height),
+            _infoRow('Weight', profile.physical?.weight),
+            _infoRow('Complexion', profile.physical?.complexion),
+            _infoRow('Body Type', profile.physical?.bodyType),
           ]),
 
-          _expandableSection('Cultural', Icons.temple_hindu, [
-            _tile('Religion', profile.cultural?.religion),
-            _tile('Caste', profile.cultural?.caste),
-            _tile('Sub Caste', profile.cultural?.subCaste),
-            _tile('Gothra', profile.cultural?.gothra),
-            _tile('Mother Tongue', profile.cultural?.motherTongue),
-            _tile('Languages Known', profile.cultural?.languages?.join(', ')),
+          _section('Cultural', Icons.temple_hindu, [
+            _infoRow('Religion', profile.cultural?.religion),
+            _infoRow('Caste', profile.cultural?.caste),
+            _infoRow('Sub Caste', profile.cultural?.subCaste),
+            _infoRow('Gothra', profile.cultural?.gothra),
+            _infoRow('Mother Tongue', profile.cultural?.motherTongue),
+            _chipWrap('Languages Known', profile.cultural?.languages),
           ]),
 
-          _expandableSection('Lifestyle', Icons.favorite, [
-            _tile('Diet', profile.lifestyle?.diet),
-            _tile('Smoking', profile.lifestyle?.smoke),
-            _tile('Drinking', profile.lifestyle?.drink),
+          _section('Lifestyle', Icons.favorite, [
+            _infoRow('Diet', profile.lifestyle?.diet),
+            _chipWrap('Hobbies', profile.lifestyle?.hobbies),
+            _chipWrap('Interests', profile.lifestyle?.interests),
+            _chipWrap('Music', profile.lifestyle?.music),
+            _chipWrap('Movies', profile.lifestyle?.movies),
+            _chipWrap('Sports', profile.lifestyle?.sports),
           ]),
 
-          _expandableSection('Education', Icons.school, [
-            _tile(
-              'Highest Qualification',
-              profile.education?.highestQualification,
-            ),
-            _tile('College', profile.education?.college),
-            _tile('Degree', profile.education?.degree),
-            _tile('Occupation', profile.education?.occupation),
-            _tile('Job Type', profile.employment?.jobType),
+          _section('Education', Icons.school, [
+            _infoRow(
+                'Metriculation School',
+                profile.education?.metriculation?.schoolName),
+            _infoRow(
+                'Metriculation Board',
+                profile.education?.metriculation?.board),
+            _infoRow(
+                'Metriculation %',
+                profile.education?.metriculation?.percentage),
+            _infoRow(
+                'Passing Year',
+                profile.education?.metriculation?.passingYear),
+            _infoRow(
+                'Intermediate College',
+                profile.education?.intremidiate?.collegeName),
+            _infoRow(
+                'Intermediate Board',
+                profile.education?.intremidiate?.board),
+            _infoRow(
+                'Intermediate %',
+                profile.education?.intremidiate?.percentage),
+            _infoRow(
+                'Passing Year',
+                profile.education?.intremidiate?.passingYear),
+            _infoRow(
+                'Graduation College',
+                profile.education?.graduation?.college),
+            _infoRow(
+                'Degree',
+                profile.education?.graduation?.degree),
+            _infoRow(
+                'Graduation %',
+                profile.education?.graduation?.percentage),
+            _infoRow(
+                'Passing Year',
+                profile.education?.graduation?.passingYear),
           ]),
 
-          _expandableSection('Employment', Icons.work, [
-            _tile('Company', profile.employment?.company),
-            _tile('Role', profile.employment?.designation),
-            _tile('Annual Income', profile.employment?.annualIncome),
+          _section('Employment', Icons.work, [
+            _infoRow('Company', profile.employment?.company),
+            _infoRow('Role', profile.employment?.designation),
+            _infoRow('Annual Income', profile.employment?.annualIncome),
           ]),
 
-          _expandableSection('Family', Icons.family_restroom, [
-            _tile('Father Name', profile.family?.fatherName),
-            _tile('Mother Name', profile.family?.motherName),
-            _tile('Brothers', profile.family?.numberOfBrothers),
-            _tile('Sisters', profile.family?.numberOfSisters),
-            _tile('Family Type', profile.family?.familyType),
+          _section('Family', Icons.family_restroom, [
+            _infoRow('Father Name', profile.family?.fatherName),
+            _infoRow('Mother Name', profile.family?.motherName),
+            _infoRow('Brothers', profile.family?.numberOfBrothers),
+            _infoRow('Sisters', profile.family?.numberOfSisters),
+            _infoRow('Family Type', profile.family?.familyType),
           ]),
 
-          _expandableSection('Address', Icons.location_on, [
-            _tile('Address Line 1', profile.address?.addressLine1),
-            _tile('Address Line 2', profile.address?.addressLine2),
-            _tile('City', profile.address?.city),
-            _tile('State', profile.address?.state),
-            _tile('Pincode', profile.address?.pincode),
-            _tile('Country', profile.address?.country),
+          _section('Address', Icons.location_on, [
+            _infoRow('Address', profile.address?.addressLine1),
+            _infoRow('Post', profile.address?.post),
+            _infoRow('City', profile.address?.city),
+            _infoRow('State', profile.address?.state),
+            _infoRow('Pincode', profile.address?.pincode),
           ]),
 
           _imageSection(profile.images),
 
-          const SizedBox(height: 20),
-
           CheckboxListTile(
+            contentPadding: EdgeInsets.zero,
             value: isAgreed,
             onChanged: (v) => setState(() => isAgreed = v ?? false),
             title: const Text(
-              'I confirm that all details above are correct',
+              'I confirm all details are correct',
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
             subtitle: const Text(
-              'Once submitted, profile cannot be edited.',
-              style: TextStyle(color: Colors.red),
+              'Once submitted, profile cannot be edited',
+              style: TextStyle(color: Colors.redAccent),
             ),
-            controlAffinity: ListTileControlAffinity.leading,
           ),
 
           const SizedBox(height: 12),
@@ -147,14 +182,13 @@ class _UserBiodataCheckScreenState
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).primaryColor,
               foregroundColor: Colors.white,
-
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
             ),
             child: const Text(
-              'FINAL SUBMIT (Cannot be Undone)',
+              'FINAL SUBMIT',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
@@ -163,27 +197,72 @@ class _UserBiodataCheckScreenState
     );
   }
 
-  // ================= COMMON TILE =================
-  Widget _tile(String label, dynamic value) {
+  // ================= UI HELPERS =================
+
+  Widget _section(String title, IconData icon, List<Widget> children) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _infoRow(String label, dynamic value) {
     if (value == null || value.toString().trim().isEmpty) {
       return const SizedBox();
     }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 2,
+          SizedBox(
+            width: 130,
             child: Text(
               label,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value.toString(),
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -191,15 +270,65 @@ class _UserBiodataCheckScreenState
               ),
             ),
           ),
-          const SizedBox(width: 10),
+        ],
+      ),
+    );
+  }
+
+  Widget _chipWrap(String label, List<String>? values) {
+    if (values == null || values.isEmpty) return const SizedBox();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Colors.black54,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: values
+                .map(
+                  (e) => Chip(
+                    label: Text(e),
+                    backgroundColor:
+                        Theme.of(context).primaryColor.withOpacity(0.08),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _warningCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.red.shade50,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: const [
+          Icon(Icons.warning_amber_rounded,
+              color: Colors.red, size: 30),
+          SizedBox(width: 12),
           Expanded(
-            flex: 3,
             child: Text(
-              value.toString(),
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-                height: 1.4,
+              'Please verify carefully.\nOnce submitted, profile cannot be edited.',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.red,
               ),
             ),
           ),
@@ -208,218 +337,54 @@ class _UserBiodataCheckScreenState
     );
   }
 
-  // ================= SECTION =================
-  Widget _expandableSection(
-    String title,
-    IconData icon,
-    List<Widget> children,
-  ) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: ExpansionTile(
-        initiallyExpanded: true,
-        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        childrenPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 8,
-        ),
-
-        collapsedShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-
-        leading: Icon(icon, color: Theme.of(context).primaryColor),
-        trailing: const Icon(Icons.arrow_drop_down),
-
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        children: children,
-      ),
-    );
-  }
-
-  // ================= WARNING =================
-  Widget _warningCard() {
-    return Card(
-      color: Colors.red.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: const Padding(
-        padding: EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 30),
-            SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Please verify carefully.\nOnce submitted, profile cannot be edited.',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.red,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ================= IMAGES =================
   Widget _imageSection(ProfileImages? images) {
     if (images == null) return const SizedBox();
 
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Profile Images',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-
-            if (images.primaryImageUrl != null)
-              Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    images.primaryImageUrl!,
-                    height: 160,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-
-            if (images.secondaryImageUrls.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 100,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: images.secondaryImageUrls.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 8),
-                  itemBuilder: (_, i) => ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      images.secondaryImageUrls[i],
-                      width: 100,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ],
+    return _section('Profile Images', Icons.photo, [
+      if (images.primaryImageUrl != null)
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Image.network(
+            images.primaryImageUrl!,
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
         ),
-      ),
-    );
+      if (images.secondaryImageUrls.isNotEmpty) ...[
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 90,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: images.secondaryImageUrls.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (_, i) => ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                images.secondaryImageUrls[i],
+                width: 90,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+      ],
+    ]);
   }
+
+  // ================= SUBMIT =================
 
   Future<void> _confirmSubmit() async {
     final user = ref.read(authStateProvider).value;
-    if (user == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('User not found')));
-      return;
+    if (user == null) return;
+
+    await ref
+        .read(metrimonyControllerProvider.notifier)
+        .submitProfile(ref, user.uid);
+
+    if (context.mounted) {
+      context.router.replaceAll([const UserMainShellRoute()]);
     }
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        bool isLoading = false;
-
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              title: const Text(
-                'Final Confirmation',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              content: const Text(
-                'Are you absolutely sure?\n\n'
-                'Once submitted, your profile details cannot be edited or changed.',
-                style: TextStyle(height: 1.4),
-              ),
-              actionsPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-              actions: [
-                // 🔹 REVIEW AGAIN
-                AppActionChip(
-                  label: "Review Again",
-                  onTap: isLoading ? null : () => Navigator.pop(dialogContext),
-                ),
-
-                // 🔴 FINAL SUBMIT
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 14,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  onPressed: isLoading
-                      ? null
-                      : () async {
-                          setDialogState(() => isLoading = true);
-
-                          try {
-                            // 🔥 FINAL SUBMIT API CALL
-                            await ref
-                                .read(metrimonyControllerProvider.notifier)
-                                .submitProfile(ref, user.uid);
-
-                            if (context.mounted) {
-                              Navigator.pop(dialogContext);
-                              context.router.replaceAll([
-                                const UserMainShellRoute(),
-                              ]);
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              Navigator.pop(dialogContext);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: $e')),
-                              );
-                            }
-                          }
-                        },
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text(
-                          'FINAL SUBMIT',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
   }
 }

@@ -1,9 +1,11 @@
+import '../../../../../app/router/app_router.dart';
+import '../../../user_app/presentation/controllers/metrimony_profile_controller.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../controllers/auth_controller.dart';
 
 @RoutePage()
@@ -51,8 +53,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             phoneCtrl.text.trim(),
           );
 
-      if (!mounted) return;
+      // create empty metrimony profile
 
+      if (!mounted) return;
+      await ref
+          .read(metrimonyControllerProvider.notifier)
+          .createEmptyMatrimonyProfile(
+            FirebaseAuth.instance.currentUser!.uid,
+            agentIdCtrl.text.trim(),
+          );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("🎉 Account created successfully! Welcome aboard."),
@@ -60,7 +69,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
       );
 
-      context.router.popUntilRoot();
+      // navigate to auth wrapper screen
+      context.router.replaceAll([const AuthWrapperRoute()]);
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 

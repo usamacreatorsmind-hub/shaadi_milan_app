@@ -65,4 +65,17 @@ class UserFirestoreDS {
   Future<void> updateProfilePhoto(String uid, String profilePhotoUrl) async {
     await _users.doc(uid).update({'profilePhoto': profilePhotoUrl});
   }
+
+  // implement add to wishlist  in user collection
+  Future<void> addWishlist(String uid, String profileId) async {
+    await _users.doc(uid).update({
+      'wishlists': FieldValue.arrayUnion([profileId]),
+    });
+  }
+
+  Future<void> removeWishlist(String uid, String profileId) async {
+    await _users.doc(uid).update({
+      'wishlists': FieldValue.arrayRemove([profileId]),
+    });
+  }
 }

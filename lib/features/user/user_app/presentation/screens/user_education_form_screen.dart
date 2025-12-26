@@ -1,11 +1,11 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
-import '../../domain/states/education_state.dart';
-import '../controllers/user_education_controllers.dart';
-import '../providers/providers.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:auto_route/auto_route.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../domain/states/education_state.dart';
+import '../controllers/user_education_controllers.dart';
+import '../providers/providers.dart';
 
 @RoutePage()
 class UserEducationFormScreen extends ConsumerStatefulWidget {
@@ -19,51 +19,91 @@ class UserEducationFormScreen extends ConsumerStatefulWidget {
 class _UserEducationFormScreenState
     extends ConsumerState<UserEducationFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _highestQualificationController = TextEditingController();
-  final _collegeUniversityController = TextEditingController();
-  final _degreeController = TextEditingController();
-  final _majorSubjectController = TextEditingController();
+
+  // ================= Metriculation =================
+  final _schoolNameCtrl = TextEditingController();
+  final _schoolBoardCtrl = TextEditingController();
+  final _schoolPercentageCtrl = TextEditingController();
+  final _schoolPassingYearCtrl = TextEditingController();
+
+  // ================= Intermediate =================
+  final _collegeNameCtrl = TextEditingController();
+  final _collegeBoardCtrl = TextEditingController();
+  final _collegePercentageCtrl = TextEditingController();
+  final _collegePassingYearCtrl = TextEditingController();
+
+  // ================= Graduation =================
+  final _gradCollegeCtrl = TextEditingController();
+  final _gradDegreeCtrl = TextEditingController();
+  final _gradPercentageCtrl = TextEditingController();
+  final _gradPassingYearCtrl = TextEditingController();
+
 
   @override
   void dispose() {
-    _highestQualificationController.dispose();
-    _collegeUniversityController.dispose();
-    _degreeController.dispose();
-    _majorSubjectController.dispose();
+    _schoolNameCtrl.dispose();
+    _schoolBoardCtrl.dispose();
+    _schoolPercentageCtrl.dispose();
+    _schoolPassingYearCtrl.dispose();
+
+    _collegeNameCtrl.dispose();
+    _collegeBoardCtrl.dispose();
+    _collegePercentageCtrl.dispose();
+    _collegePassingYearCtrl.dispose();
+
+    _gradCollegeCtrl.dispose();
+    _gradDegreeCtrl.dispose();
+    _gradPercentageCtrl.dispose();
+    _gradPassingYearCtrl.dispose();
     super.dispose();
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      ref
-          .read(userEducationControllerProvider.notifier)
-          .saveEducation(
-            highestQualification: _highestQualificationController.text,
-            college: '',
-            degree: '',
-            occupation: _majorSubjectController.text,
-            annualIncome: 'Not provided',
-          );
-    }
+    if (!_formKey.currentState!.validate()) return;
+
+    final educationProfile = EducationProfile(
+      metriculation: Metriculation(
+        schoolName: _schoolNameCtrl.text.trim(),
+        board: _schoolBoardCtrl.text.trim(),
+        percentage: double.parse(_schoolPercentageCtrl.text),
+        passingYear: int.parse(_schoolPassingYearCtrl.text),
+      ),
+      intremidiate: IntremidiateProfile(
+        collegeName: _collegeNameCtrl.text.trim(),
+        board: _collegeBoardCtrl.text.trim(),
+        percentage: double.parse(_collegePercentageCtrl.text),
+        passingYear: int.parse(_collegePassingYearCtrl.text),
+      ),
+      graduation: Graduation(
+        college: _gradCollegeCtrl.text.trim(),
+        degree: _gradDegreeCtrl.text.trim(),
+        percentage: double.parse(_gradPercentageCtrl.text),
+        passingYear: int.parse(_gradPassingYearCtrl.text),
+      ),
+    );
+
+    ref
+        .read(userEducationControllerProvider.notifier) 
+        
+.saveEducation(
+          metriculation: educationProfile.metriculation!,
+          intremidiate: educationProfile.intremidiate!,
+          graduation: educationProfile.graduation!,
+        );
   }
 
   @override
   Widget build(BuildContext context) {
-    final educationState = ref.watch(userEducationControllerProvider);
+    final state = ref.watch(userEducationControllerProvider);
 
-    ref.listen<EducationState>(userEducationControllerProvider, (
-      previous,
-      next,
-    ) {
+    ref.listen<EducationState>(userEducationControllerProvider, (prev, next) {
       if (next.error != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${next.error}')));
-      } else if (next.education != null && previous?.education == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Education details saved successfully!'),
-          ),
+          SnackBar(content: Text(next.error!)),
+        );
+      } else if (next.education != null && prev?.education == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Education details saved successfully')),
         );
         context.router.pop();
       }
@@ -72,64 +112,86 @@ class _UserEducationFormScreenState
     return Scaffold(
       appBar: AppBar(title: const Text('Education Details')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
-              AppTextField(
-                controller: _highestQualificationController,
-                prefixIcon: Icons.school,
-                iconColor: Theme.of(context).colorScheme.primary,
-                label: "Highest Qualification",
-                hint: "Enter your highest qualification",
-                obscureText: false,
-                keyboardType: TextInputType.text,
-              ),
+              _sectionTitle('Metriculation'),
+              _textField(_schoolNameCtrl, 'School Name'),
+              _textField(_schoolBoardCtrl, 'Board'),
+              _numberField(_schoolPercentageCtrl, 'Percentage'),
+              _numberField(_schoolPassingYearCtrl, 'Passing Year'),
 
-              const SizedBox(height: 16.0),
+              _sectionTitle('Intermediate'),
+              _textField(_collegeNameCtrl, 'College Name'),
+              _textField(_collegeBoardCtrl, 'Board'),
+              _numberField(_collegePercentageCtrl, 'Percentage'),
+              _numberField(_collegePassingYearCtrl, 'Passing Year'),
 
-              AppTextField(
-                controller: _collegeUniversityController,
-                prefixIcon: Icons.school,
-                iconColor: Theme.of(context).colorScheme.primary,
-                label: "College/University",
-                hint: "Enter your college or university",
-                obscureText: false,
-                keyboardType: TextInputType.text,
-              ),
+              _sectionTitle('Graduation'),
+              _textField(_gradCollegeCtrl, 'College / University'),
+              _textField(_gradDegreeCtrl, 'Degree'),
+              _numberField(_gradPercentageCtrl, 'Percentage'),
+              _numberField(_gradPassingYearCtrl, 'Passing Year'),
 
-              const SizedBox(height: 16.0),
-
-              AppTextField(
-                controller: _degreeController,
-                prefixIcon: Icons.book,
-                iconColor: Theme.of(context).colorScheme.primary,
-                label: "Degree",
-                hint: "Enter your degree",
-                obscureText: false,
-                keyboardType: TextInputType.text,
-              ),
-
-              const SizedBox(height: 16.0),
-
-              AppTextField(
-                controller: _majorSubjectController,
-                prefixIcon: Icons.subject,
-                iconColor: Theme.of(context).colorScheme.primary,
-                label: "Major Subject",
-                hint: "Enter your major subject",
-                obscureText: false,
-                keyboardType: TextInputType.text,
-              ),
-
-              const SizedBox(height: 16.0),
-              educationState.isLoading
+              const SizedBox(height: 24),
+              state.isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : AppButton(onPressed: _submitForm, text: 'Save Education'),
+                  : AppButton(
+                      onPressed: _submitForm,
+                      text: 'Save Education',
+                    ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // ================= Helpers =================
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _textField(TextEditingController controller, String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: AppTextField(
+        controller: controller,
+        prefixIcon: Icons.school,
+        iconColor: Theme.of(context).colorScheme.primary,
+        label: label,
+        hint: label,
+        obscureText: false,
+        keyboardType: TextInputType.text,
+        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+      ),
+    );
+  }
+
+  Widget _numberField(TextEditingController controller, String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: AppTextField(
+        controller: controller,
+        prefixIcon: Icons.numbers,
+        iconColor: Theme.of(context).colorScheme.primary,
+        label: label,
+        hint: label,
+        obscureText: false,
+        keyboardType: TextInputType.number,
+        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
       ),
     );
   }

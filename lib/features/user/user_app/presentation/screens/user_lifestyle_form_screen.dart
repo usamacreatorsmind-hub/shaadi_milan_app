@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
 
 import '../../domain/states/lifestyle_state.dart';
 import '../controllers/user_lifestyle_controllers.dart';
@@ -21,10 +21,14 @@ class _UserLifestyleFormScreenState
     extends ConsumerState<UserLifestyleFormScreen> {
   final _formKey = GlobalKey<FormState>();
   String? _maritalStatus;
-  bool _smoking = false;
-  bool _drinking = false;
   String? _foodHabit;
   final _hobbiesController = TextEditingController();
+  final _interestsController = TextEditingController();
+  final _musicController = TextEditingController();
+  final _moviesController = TextEditingController();
+  final _sportsController = TextEditingController();
+
+  final _fitnessController = TextEditingController();
 
   @override
   void dispose() {
@@ -47,8 +51,11 @@ class _UserLifestyleFormScreenState
           .read(userLifestyleControllerProvider.notifier)
           .saveLifestyle(
             maritalStatus: _maritalStatus!,
-            smoking: _smoking,
-            drinking: _drinking,
+            interests: _interestsController.text,
+            music: _musicController.text,
+            movies: _moviesController.text,
+            sports: _sportsController.text,
+            fitness: _fitnessController.text,
             foodHabit: _foodHabit!,
             hobbies: _hobbiesController.text,
           );
@@ -119,34 +126,68 @@ class _UserLifestyleFormScreenState
                 },
               ),
               const SizedBox(height: 16),
+
               AppTextField(
                 controller: _hobbiesController,
                 prefixIcon: Icons.sports_handball,
                 iconColor: Theme.of(context).colorScheme.primary,
                 label: "Hobbies",
-                hint: "Enter your hobbies (comma separated)",
+                hint: "Reading, Traveling, Cooking",
                 obscureText: false,
                 keyboardType: TextInputType.text,
               ),
               const SizedBox(height: 16),
-              AppSwitch(
-                title: 'Smoking',
-                value: _smoking,
-                onChanged: (bool value) {
-                  setState(() {
-                    _smoking = value;
-                  });
-                },
+              AppTextField(
+                controller: _interestsController,
+                prefixIcon: Icons.interests,
+                iconColor: Theme.of(context).colorScheme.primary,
+                label: "Interests",
+                hint: "Photography, Gaming, Writing",
+                obscureText: false,
+                keyboardType: TextInputType.text,
               ),
-              AppSwitch(
-                title: 'Drinking',
-                value: _drinking,
-                onChanged: (bool value) {
-                  setState(() {
-                    _drinking = value;
-                  });
-                },
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _musicController,
+                prefixIcon: Icons.music_note,
+                iconColor: Theme.of(context).colorScheme.primary,
+                label: "Favorite Music",
+                hint: "Pop, Rock, Classical",
+                obscureText: false,
+                keyboardType: TextInputType.text,
               ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _moviesController,
+                prefixIcon: Icons.movie,
+                iconColor: Theme.of(context).colorScheme.primary,
+                label: "Favorite Movies",
+                hint: "Action, Comedy, Drama",
+                obscureText: false,
+                keyboardType: TextInputType.text,
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _sportsController,
+                prefixIcon: Icons.sports_soccer,
+                iconColor: Theme.of(context).colorScheme.primary,
+                label: "Favorite Sports",
+                hint: "Football, Basketball, Cricket",
+                obscureText: false,
+                keyboardType: TextInputType.text,
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _fitnessController,
+                prefixIcon: Icons.fitness_center,
+                iconColor: Theme.of(context).colorScheme.primary,
+                label: "Fitness Regime",
+                hint: "Gym, Yoga, Running",
+                obscureText: false,
+                keyboardType: TextInputType.text,
+              ),
+
+              const SizedBox(height: 16),
 
               const SizedBox(height: 20),
               if (lifestyleState.isLoading)

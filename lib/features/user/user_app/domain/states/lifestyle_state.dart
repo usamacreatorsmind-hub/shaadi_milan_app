@@ -1,18 +1,15 @@
 class LifestyleProfile {
   final String diet;
-  final String smoke;
-  final String drink;
-  final String hobbies;
-  final String interests;
-  final String music;
-  final String movies;
-  final String sports;
+  final List<String> hobbies;
+  final List<String> interests;
+  final List<String> music;
+  final List<String> movies;
+  final List<String> sports;
   final String fitness;
 
   LifestyleProfile({
     required this.diet,
-    required this.smoke,
-    required this.drink,
+
     required this.hobbies,
     required this.interests,
     required this.music,
@@ -24,8 +21,6 @@ class LifestyleProfile {
   Map<String, dynamic> toMap() {
     return {
       'diet': diet,
-      'smoke': smoke,
-      'drink': drink,
       'hobbies': hobbies,
       'interests': interests,
       'music': music,
@@ -37,38 +32,32 @@ class LifestyleProfile {
 
   factory LifestyleProfile.fromMap(Map<String, dynamic> map) {
     return LifestyleProfile(
-      diet: map['diet'] as String,
-      smoke: map['smoke'] as String,
-      drink: map['drink'] as String,
-      hobbies: map['hobbies'] as String,
-      interests: map['interests'] as String,
-      music: map['music'] as String,
-      movies: map['movies'] as String,
-      sports: map['sports'] as String,
-      fitness: map['fitness'] as String,
+      diet: map['diet'] ?? '',
+      hobbies: List<String>.from(map['hobbies'] ?? []),
+      interests: List<String>.from(map['interests'] ?? []),
+      music: List<String>.from(map['music'] ?? []),
+      movies: List<String>.from(map['movies'] ?? []),
+      sports: List<String>.from(map['sports'] ?? []),
+      fitness: map['fitness'] ?? '',
     );
   }
 
   @override
   String toString() {
-    return 'LifestyleProfile(diet: $diet, smoke: $smoke, drink: $drink, hobbies: $hobbies, interests: $interests, music: $music, movies: $movies, sports: $sports, fitness: $fitness)';
+    return 'LifestyleProfile(diet: $diet, hobbies: $hobbies, interests: $interests, music: $music, movies: $movies, sports: $sports, fitness: $fitness)';
   }
 
   LifestyleProfile copyWith({
     String? diet,
-    String? smoke,
-    String? drink,
-    String? hobbies,
-    String? interests,
-    String? music,
-    String? movies,
-    String? sports,
+    List<String>? hobbies,
+    List<String>? interests,
+    List<String>? music,
+    List<String>? movies,
+    List<String>? sports,
     String? fitness,
   }) {
     return LifestyleProfile(
       diet: diet ?? this.diet,
-      smoke: smoke ?? this.smoke,
-      drink: drink ?? this.drink,
       hobbies: hobbies ?? this.hobbies,
       interests: interests ?? this.interests,
       music: music ?? this.music,
@@ -81,13 +70,11 @@ class LifestyleProfile {
   factory LifestyleProfile.empty() {
     return LifestyleProfile(
       diet: '',
-      smoke: '',
-      drink: '',
-      hobbies: '',
-      interests: '',
-      music: '',
-      movies: '',
-      sports: '',
+      hobbies: [],
+      interests: [],
+      music: [],
+      movies: [],
+      sports: [],
       fitness: '',
     );
   }

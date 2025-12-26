@@ -1,9 +1,11 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_image_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/metrimony_profile_controller.dart';
+import '../../data/repositories_impl/user_image_repo_impl.dart';
+import '../../domain/states/image_state.dart';
+import 'metrimony_profile_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:image_picker/image_picker.dart';
+
+final uploadProgressProvider = StateProvider<double>((ref) => 0.0);
 
 class ImagePickerController extends StateNotifier<ImagesState> {
   ImagePickerController(this.ref) : super(ImagesState.initial());
@@ -86,13 +88,31 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     }
 
     try {
-      final primaryImageUrl = await ref
-          .read(userImageRepositoryProvider)
-          .uploadPrimaryImage(uid: uid, filePath: state.primaryImage!);
+      ref.read(uploadProgressProvider.notifier).state = 0.0;
 
-      final secondaryImageUrls = await ref
-          .read(userImageRepositoryProvider)
-          .uploadSecondaryImages(uid: uid, filePaths: state.secondaryImages);
+      // Use service directly to access progress callbacks
+      final service = ref.read(imageUploadServiceProvider);
+
+      void updateProgress(double p, {bool isSecondary = false}) {
+        // Weighted progress: 50% primary, 50% secondary (if exists)
+        double total = p;
+        if (state.secondaryImages.isNotEmpty) {
+          total = isSecondary ? 0.5 + (p * 0.5) : p * 0.5;
+        }
+        ref.read(uploadProgressProvider.notifier).state = total;
+      }
+
+      final primaryImageUrl = await service.uploadPrimaryImage(
+        uid: uid,
+        filePath: state.primaryImage!,
+        onProgress: (p) => updateProgress(p),
+      );
+
+      final secondaryImageUrls = await service.uploadSecondaryImages(
+        uid: uid,
+        filePaths: state.secondaryImages,
+        onProgress: (p) => updateProgress(p, isSecondary: true),
+      );
 
       ref
           .read(metrimonyControllerProvider.notifier)

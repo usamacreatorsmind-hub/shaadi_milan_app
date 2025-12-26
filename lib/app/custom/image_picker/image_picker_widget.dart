@@ -1,9 +1,11 @@
 import 'dart:io';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+
 import '../../../features/user/user_app/presentation/controllers/image_picker_controller.dart';
+import '../custom_widgets/chip_and_action_chip.dart';
 
 final _imagePickingProvider = StateProvider<bool>((ref) => false);
 

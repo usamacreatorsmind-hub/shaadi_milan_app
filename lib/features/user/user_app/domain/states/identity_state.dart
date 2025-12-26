@@ -30,11 +30,13 @@ class IdentityProfile {
 
   factory IdentityProfile.fromMap(Map<String, dynamic> map) {
     return IdentityProfile(
-      profileId: map['profileId'] as String,
-      gender: map['gender'] as String,
-      dob: DateTime.parse(map['dob'] as String),
-      age: map['age'] as int,
-      aadhar: map['aadhar'] as String,
+      profileId: map['profileId'] as String? ?? '',
+      gender: map['gender'] as String? ?? '',
+      dob: map['dob'] != null
+          ? DateTime.tryParse(map['dob'].toString()) ?? DateTime(1900)
+          : DateTime(1900),
+      age: map['age'] as int? ?? 0,
+      aadhar: map['aadhar'] as String? ?? '',
     );
   }
 
