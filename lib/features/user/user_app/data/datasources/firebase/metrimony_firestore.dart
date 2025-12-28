@@ -13,6 +13,12 @@ import '../../../domain/states/physical_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../domain/states/image_state.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
+
+// provider
+
 class MatrimonyFirestoreDS implements MatrimonyDataSource {
   final FirebaseFirestore _firestore;
 
@@ -128,7 +134,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
 
     // 🔥 MANUAL FILTER
     final List<MatrimonyProfile> profileData = profiles
-        .where((profile) => profile.user?.uid != currentUid)
+        .where((profile) => profile.userId != currentUid)
         .toList();
 
     return profileData;

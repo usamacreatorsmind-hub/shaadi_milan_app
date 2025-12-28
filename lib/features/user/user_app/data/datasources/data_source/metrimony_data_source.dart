@@ -30,8 +30,10 @@ abstract class MatrimonyDataSource {
   Future<void> updateEducation(String uid, EducationProfile education);
   Future<void> updateEmployment(String uid, EmploymentProfile employment);
   Future<void> updateFamily(String uid, FamilyProfile family);
-  Future<void> updateAddress(String uid, AddressProfile address);
-  Future<void> updateAgent(String uid, AgentProfile agent);
+  Future<void> updateAddress(String uid, AddressProfile address);  
+  Future<List<MatrimonyProfile>> getAllMatrimonyProfiles();
+  
+
 
   Future<void> updateProfile(String uid, MatrimonyProfile profile);
 

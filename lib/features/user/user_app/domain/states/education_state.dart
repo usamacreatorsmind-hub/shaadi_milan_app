@@ -1,130 +1,10 @@
-class Metriculation {
-  final String schoolName;
-  final String board;
-  final double percentage;
-  final int passingYear;
-
-  Metriculation({
-    required this.schoolName,
-    required this.board,
-    required this.percentage,
-    required this.passingYear,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'schoolName': schoolName,
-      'board': board,
-      'percentage': percentage,
-      'passingYear': passingYear,
-    };
-  }
-
-  factory Metriculation.fromMap(Map<String, dynamic> map) {
-    return Metriculation(
-      schoolName: map['schoolName'] as String,
-      board: map['board'] as String,
-      percentage: map['percentage'] as double,
-      passingYear: map['passingYear'] as int,
-    );
-  }
-
-  @override
-  String toString() {
-    return 'MetriculationProfile(schoolName: $schoolName, board: $board, percentage: $percentage, passingYear: $passingYear)';
-  }
-
-  Metriculation copyWith({
-    String? schoolName,
-    String? board,
-    double? percentage,
-    int? passingYear,
-  }) {
-    return Metriculation(
-      schoolName: schoolName ?? this.schoolName,
-      board: board ?? this.board,
-      percentage: percentage ?? this.percentage,
-      passingYear: passingYear ?? this.passingYear,
-    );
-  }
-
-  factory Metriculation.empty() {
-    return Metriculation(
-      schoolName: '',
-      board: '',
-      percentage: 0.0,
-      passingYear: 0,
-    );
-  }
-}
-
-class IntremidiateProfile {
-  final String collegeName;
-  final String board;
-  final double percentage;
-  final int passingYear;
-
-  IntremidiateProfile({
-    required this.collegeName,
-    required this.board,
-    required this.percentage,
-    required this.passingYear,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'collegeName': collegeName,
-      'board': board,
-      'percentage': percentage,
-      'passingYear': passingYear,
-    };
-  }
-
-  factory IntremidiateProfile.fromMap(Map<String, dynamic> map) {
-    return IntremidiateProfile(
-      collegeName: map['collegeName'] as String,
-      board: map['board'] as String,
-      percentage: map['percentage'] as double,
-      passingYear: map['passingYear'] as int,
-    );
-  }
-
-  @override
-  String toString() {
-    return 'IntremidiateProfile(collegeName: $collegeName, board: $board, percentage: $percentage, passingYear: $passingYear)';
-  }
-
-  IntremidiateProfile copyWith({
-    String? collegeName,
-    String? board,
-    double? percentage,
-    int? passingYear,
-  }) {
-    return IntremidiateProfile(
-      collegeName: collegeName ?? this.collegeName,
-      board: board ?? this.board,
-      percentage: percentage ?? this.percentage,
-      passingYear: passingYear ?? this.passingYear,
-    );
-  }
-
-  factory IntremidiateProfile.empty() {
-    return IntremidiateProfile(
-      collegeName: '',
-      board: '',
-      percentage: 0.0,
-      passingYear: 0,
-    );
-  }
-}
-
-class Graduation {
+class Education {
   final String college;
   final String degree;
   final int passingYear;
   final double percentage;
 
-  Graduation({
+  Education({
     required this.college,
     required this.degree,
     required this.passingYear,
@@ -139,8 +19,8 @@ class Graduation {
     };
   }
 
-  factory Graduation.fromMap(Map<String, dynamic> map) {
-    return Graduation(
+  factory Education.fromMap(Map<String, dynamic> map) {
+    return Education(
       college: map['college'] as String,
       degree: map['degree'] as String,
       passingYear: map['passingYear'] as int,
@@ -153,13 +33,13 @@ class Graduation {
     return 'GraduationProfile(college: $college, degree: $degree, passingYear: $passingYear, percentage: $percentage)';
   }
 
-  Graduation copyWith({
+  Education copyWith({
     String? college,
     String? degree,
     int? passingYear,
     double? percentage,
   }) {
-    return Graduation(
+    return Education(
       college: college ?? this.college,
       degree: degree ?? this.degree,
       passingYear: passingYear ?? this.passingYear,
@@ -167,64 +47,87 @@ class Graduation {
     );
   }
 
-  factory Graduation.empty() {
-    return Graduation(college: '', degree: '', passingYear: 0, percentage: 0.0);
+  factory Education.empty() {
+    return Education(college: '', degree: '', passingYear: 0, percentage: 0.0);
+  }
+}
+
+class ExtraQualification {
+  List<String> qualifications;
+
+  ExtraQualification({required this.qualifications});
+
+  Map<String, dynamic> toMap() {
+    return {'qualifications': qualifications};
+  }
+
+  factory ExtraQualification.fromMap(Map<String, dynamic> map) {
+    return ExtraQualification(
+      qualifications: List<String>.from(map['qualifications']),
+    );
+  }
+
+  @override
+  String toString() {
+    return 'ExtraQualification(qualifications: $qualifications)';
+  }
+
+  ExtraQualification copyWith({List<String>? qualifications}) {
+    return ExtraQualification(
+      qualifications: qualifications ?? this.qualifications,
+    );
+  }
+
+  factory ExtraQualification.empty() {
+    return ExtraQualification(qualifications: []);
   }
 }
 
 class EducationProfile {
-  final Metriculation? metriculation;
-  final IntremidiateProfile? intremidiate;
-  final Graduation? graduation;
+  final Education? education;
+  final ExtraQualification? extraQualification;
 
-  EducationProfile({this.metriculation, this.intremidiate, this.graduation});
+  EducationProfile({this.education, this.extraQualification});
 
   Map<String, dynamic> toMap() {
     return {
-      'metriculation': metriculation?.toMap(),
-      'intremidiate': intremidiate?.toMap(),
-      'graduation': graduation?.toMap(),
+      'graduation': education?.toMap(),
+      'extraQualification': extraQualification?.toMap(),
     };
   }
 
   factory EducationProfile.fromMap(Map<String, dynamic> map) {
     return EducationProfile(
-      metriculation: map['metriculation'] != null
-          ? Metriculation.fromMap(map['metriculation'] as Map<String, dynamic>)
+      education: map['education'] != null
+          ? Education.fromMap(map['education'] as Map<String, dynamic>)
           : null,
-      intremidiate: map['intremidiate'] != null
-          ? IntremidiateProfile.fromMap(
-              map['intremidiate'] as Map<String, dynamic>,
+      extraQualification: map['extraQualification'] != null
+          ? ExtraQualification.fromMap(
+              map['extraQualification'] as Map<String, dynamic>,
             )
-          : null,
-      graduation: map['graduation'] != null
-          ? Graduation.fromMap(map['graduation'] as Map<String, dynamic>)
           : null,
     );
   }
 
   @override
   String toString() {
-    return 'EducationProfile(metriculation: $metriculation, intremidiate: $intremidiate, graduation: $graduation)';
+    return 'EducationProfile(education: $education, extraQualification: $extraQualification)';
   }
 
   EducationProfile copyWith({
-    Metriculation? metriculation,
-    IntremidiateProfile? intremidiate,
-    Graduation? graduation,
+    Education? education,
+    ExtraQualification? extraQualification,
   }) {
     return EducationProfile(
-      metriculation: metriculation ?? this.metriculation,
-      intremidiate: intremidiate ?? this.intremidiate,
-      graduation: graduation ?? this.graduation,
+      education: education ?? this.education,
+      extraQualification: extraQualification ?? this.extraQualification,
     );
   }
 
   factory EducationProfile.empty() {
     return EducationProfile(
-      metriculation: Metriculation.empty(),
-      intremidiate: IntremidiateProfile.empty(),
-      graduation: Graduation.empty(),
+      education: Education.empty(),
+      extraQualification: ExtraQualification.empty(),
     );
   }
 }

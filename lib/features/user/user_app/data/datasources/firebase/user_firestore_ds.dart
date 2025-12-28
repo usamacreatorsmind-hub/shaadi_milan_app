@@ -78,4 +78,12 @@ class UserFirestoreDS {
       'wishlists': FieldValue.arrayRemove([profileId]),
     });
   }
+
+  Future<void> updateUserStatus(String uid, Map<String, dynamic> userStatus) async {
+    await _users.doc(uid).update({'userStatus': userStatus});
+  }
+  Future<void> updateRole(String uid, String role) async {
+    await _users.doc(uid).update({'role': role});
+  }
+  
 }

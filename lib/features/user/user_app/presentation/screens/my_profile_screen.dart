@@ -1,3 +1,9 @@
+import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../../../../app/app.dart';
 import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
 import '../../../../../app/custom/shimmer.dart';
@@ -10,20 +16,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final matrimonyProfileProvider =
-    FutureProvider.family<MatrimonyProfile, String>((ref, uid) async {
-      var profile = await ref
+    FutureProvider.family<MetrimonyProfileViewModel, String>((ref, uid) async {
+      final matrimonyProfile = await ref
           .read(matrimonyRepositoryProvider)
           .getMatrimonyProfile(uid);
 
-      if (profile.user == null) {
-        try {
-          final userDS = ref.read(userFirestoreDSProvider);
-          final userData = await userDS.fetchUser(uid);
-          profile = profile.copyWith(user: AppUser.fromMap(userData));
-        } catch (_) {}
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(matrimonyProfile.userId)
+          .get();
+      final user = userDoc.exists ? AppUser.fromMap(userDoc.data()!) : null;
+
+      AgentProfile? agent;
+      if (matrimonyProfile.agentId.isNotEmpty) {
+        agent = await ref
+            .read(agentFirestoreDsProvider)
+            .fetchAgentProfilebyAgentId(matrimonyProfile.agentId);
       }
 
-      return profile;
+      if (user == null) {
+        throw Exception("User profile not found");
+      }
+
+      return MetrimonyProfileViewModel(
+        metrimonyProfile: matrimonyProfile,
+        userProfile: user,
+        agentProfile: agent,
+      );
     });
 
 @RoutePage()
@@ -54,7 +73,25 @@ class MyProfileScreen extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
-                // build Image card that dispaly all images of user
+                // 📝 ABOUT ME
+                _DetailSection(
+                  title: "About Me",
+                  actionChip: AppChip(
+                    label: "Edit",
+                    icon: Icons.edit,
+                    onTap: () {},
+                  ),
+                  children: [
+                    Text(
+                      "No description available.",
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // build Image card that display all images of user
                 _DetailSection(
                   title: "Photos",
                   actionChip: AppChip(
@@ -63,21 +100,20 @@ class MyProfileScreen extends ConsumerWidget {
                     onTap: () {},
                   ),
                   children: [
-                    profile.images != null &&
-                            profile.images!.secondaryImageUrls.isNotEmpty
+                    profile.images.secondaryImageUrls.isNotEmpty
                         ? SizedBox(
                             height: 120,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount:
-                                  profile.images!.secondaryImageUrls.length,
+                                  profile.images.secondaryImageUrls.length,
                               itemBuilder: (context, index) {
                                 return Padding(
                                   padding: const EdgeInsets.only(right: 10),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: Image.network(
-                                      profile.images!.secondaryImageUrls[index],
+                                      profile.images.secondaryImageUrls[index],
                                       width: 100,
                                       height: 100,
                                       fit: BoxFit.cover,
@@ -231,7 +267,26 @@ class MyProfileScreen extends ConsumerWidget {
                   ],
                 ),
 
-                // 💖 PARTNER PREFERENCES
+                // 🕵️ AGENT DETAILS
+                if (profile.agent != null) ...[
+                  const SizedBox(height: 24),
+                  _DetailSection(
+                    title: "Agent Details",
+                    actionChip: AppChip(
+                      label: "Contact",
+                      icon: Icons.call,
+                      onTap: () {},
+                    ),
+                    children: [
+                      _DetailRow("Name", profile.agent!.agentName),
+                      _DetailRow("Mobile", profile.agent!.agentMobile),
+                      _DetailRow("Email", profile.agent!.email),
+                      _DetailRow("Agent ID", profile.agent!.agentId),
+                    ],
+                  ),
+                ],
+
+                // � PARTNER PREFERENCES
                 const SizedBox(height: 24),
               ],
             ),
@@ -243,7 +298,7 @@ class MyProfileScreen extends ConsumerWidget {
 }
 
 class _ProfileHeroCard extends StatelessWidget {
-  final MatrimonyProfile profile;
+  final MetrimonyProfileViewModel profile;
   const _ProfileHeroCard({required this.profile});
 
   @override
@@ -272,10 +327,10 @@ class _ProfileHeroCard extends StatelessWidget {
             radius: 48,
             backgroundColor: theme.primaryColor.withOpacity(0.15),
             backgroundImage:
-                (profile.images?.primaryImageUrl?.isNotEmpty ?? false)
-                ? NetworkImage(profile.images!.primaryImageUrl)
+                (profile.images.primaryImageUrl?.isNotEmpty ?? false)
+                ? NetworkImage(profile.images.primaryImageUrl!)
                 : null,
-            child: (profile.images?.primaryImageUrl?.isEmpty ?? true)
+            child: (profile.images.primaryImageUrl?.isEmpty ?? true)
                 ? Icon(Icons.person, size: 48, color: theme.primaryColor)
                 : null,
           ),

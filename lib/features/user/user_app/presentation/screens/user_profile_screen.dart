@@ -1,28 +1,43 @@
+import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
+
 import '../../../../../app/router/app_router.dart';
 import '../../data/datasources/firebase/user_firestore_ds.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/user_state.dart';
+import '../../domain/states/metrimony_profile_view_model.dart';
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final matrimonyProfileProvider =
-    FutureProvider.family<MatrimonyProfile, String>((ref, userId) async {
+final userProfileScreenProvider =
+    FutureProvider.family<MetrimonyProfileViewModel, String>((
+      ref,
+      userId,
+    ) async {
       final repository = ref.watch(matrimonyRepositoryProvider);
-      var profile = await repository.getMatrimonyProfile(userId);
+      final matrimonyProfile = await repository.getMatrimonyProfile(userId);
 
-      if (profile.user == null) {
-        try {
-          final userDS = ref.watch(userFirestoreDSProvider);
-          final userData = await userDS.fetchUser(userId);
-          profile = profile.copyWith(user: AppUser.fromMap(userData));
-        } catch (_) {}
+      final userDS = ref.watch(userFirestoreDSProvider);
+      final userData = await userDS.fetchUser(userId);
+      final user = AppUser.fromMap(userData);
+
+      // fetch agentprofile
+      AgentProfile? agent;
+      if (matrimonyProfile.agentId.isNotEmpty) {
+        final agentDS = ref.watch(agentFirestoreDsProvider);
+        agent = await agentDS.fetchAgentProfilebyAgentId(
+          matrimonyProfile.agentId,
+        );
       }
 
-      return profile;
+      return MetrimonyProfileViewModel(
+        metrimonyProfile: matrimonyProfile,
+        userProfile: user,
+        agentProfile: agent,
+      );
     });
 
 @RoutePage()
@@ -31,7 +46,7 @@ class UserProfileScreen extends ConsumerWidget {
   const UserProfileScreen({super.key, required this.userId});
 
   Widget build(BuildContext context, WidgetRef ref) {
-    final profileAsync = ref.watch(matrimonyProfileProvider(userId));
+    final profileAsync = ref.watch(userProfileScreenProvider(userId));
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -169,7 +184,7 @@ class UserProfileScreen extends ConsumerWidget {
 }
 
 class _ProfileHeaderCard extends StatelessWidget {
-  final MatrimonyProfile profile;
+  final MetrimonyProfileViewModel profile;
 
   const _ProfileHeaderCard({required this.profile});
 
@@ -211,10 +226,10 @@ class _ProfileHeaderCard extends StatelessWidget {
                     radius: 40,
                     backgroundColor: theme.primaryColor.withOpacity(0.15),
                     backgroundImage:
-                        (profile.images?.primaryImageUrl?.isNotEmpty ?? false)
-                        ? NetworkImage(profile.images!.primaryImageUrl)
+                        (profile.images.primaryImageUrl?.isNotEmpty ?? false)
+                        ? NetworkImage(profile.images.primaryImageUrl!)
                         : null,
-                    child: (profile.images?.primaryImageUrl?.isEmpty ?? true)
+                    child: (profile.images.primaryImageUrl?.isEmpty ?? true)
                         ? Icon(
                             Icons.person,
                             size: 40,

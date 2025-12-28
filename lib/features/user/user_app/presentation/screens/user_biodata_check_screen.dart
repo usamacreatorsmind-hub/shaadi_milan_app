@@ -1,3 +1,5 @@
+import 'package:arvika_marriage_bureau/data_core/metrimony_profiles_data.dart';
+
 import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../domain/states/image_state.dart';
@@ -29,9 +31,7 @@ class _UserBiodataCheckScreenState
     final currentUser = authState.value;
 
     if (state.isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -46,117 +46,88 @@ class _UserBiodataCheckScreenState
           _warningCard(),
 
           _section('User Details', Icons.person, [
-            _infoRow('Full Name',
-                profile.user?.fullName ?? currentUser?.fullName),
-            _infoRow('Email', profile.user?.email ?? currentUser?.email),
-            _infoRow('Phone', profile.user?.phone ?? currentUser?.phone),
+            _infoRow('Full Name', currentUser?.fullName),
+            _infoRow('Email', currentUser?.email),
+            _infoRow('Phone', currentUser?.phone),
             _infoRow(
               'Verification',
-              (profile.user?.isVerified ?? currentUser?.isVerified) == true
-                  ? 'Verified'
-                  : 'Not Verified',
+              (currentUser?.isVerified) == true ? 'Verified' : 'Not Verified',
             ),
           ]),
 
           _section('Identity', Icons.badge, [
-            _infoRow('Gender', profile.identity?.gender),
+            _infoRow('Gender', profile.identity.gender),
             _infoRow(
               'Date of Birth',
-              profile.identity?.dob != null
-                  ? DateFormat('dd MMM yyyy')
-                      .format(profile.identity!.dob)
+              profile.identity.dob != null
+                  ? DateFormat('dd MMM yyyy').format(profile.identity.dob)
                   : null,
             ),
-            _infoRow('Age', profile.identity?.age != null
-                ? '${profile.identity?.age} Years'
-                : null),
-            _infoRow('Aadhar', profile.identity?.aadhar),
+            _infoRow(
+              'Age',
+              profile.identity.age != null
+                  ? '${profile.identity.age} Years'
+                  : null,
+            ),
+            _infoRow('Aadhar', profile.identity.aadhar),
           ]),
 
           _section('Physical', Icons.accessibility_new, [
-            _infoRow('Height', profile.physical?.height),
-            _infoRow('Weight', profile.physical?.weight),
-            _infoRow('Complexion', profile.physical?.complexion),
-            _infoRow('Body Type', profile.physical?.bodyType),
+            _infoRow('Height', profile.physical.height),
+            _infoRow('Weight', profile.physical.weight),
+            _infoRow('Complexion', profile.physical.complexion),
+            _infoRow('Body Type', profile.physical.bodyType),
           ]),
 
           _section('Cultural', Icons.temple_hindu, [
-            _infoRow('Religion', profile.cultural?.religion),
-            _infoRow('Caste', profile.cultural?.caste),
-            _infoRow('Sub Caste', profile.cultural?.subCaste),
-            _infoRow('Gothra', profile.cultural?.gothra),
-            _infoRow('Mother Tongue', profile.cultural?.motherTongue),
-            _chipWrap('Languages Known', profile.cultural?.languages),
+            _infoRow('Religion', profile.cultural.religion),
+            _infoRow('Caste', profile.cultural.caste),
+            _infoRow('Sub Caste', profile.cultural.subCaste),
+            _infoRow('Gothra', profile.cultural.gothra),
+            _infoRow('Mother Tongue', profile.cultural.motherTongue),
+            _chipWrap('Languages Known', profile.cultural.languages),
           ]),
 
           _section('Lifestyle', Icons.favorite, [
-            _infoRow('Diet', profile.lifestyle?.diet),
-            _chipWrap('Hobbies', profile.lifestyle?.hobbies),
-            _chipWrap('Interests', profile.lifestyle?.interests),
-            _chipWrap('Music', profile.lifestyle?.music),
-            _chipWrap('Movies', profile.lifestyle?.movies),
-            _chipWrap('Sports', profile.lifestyle?.sports),
+            _infoRow('Diet', profile.lifestyle.diet),
+            _chipWrap('Hobbies', profile.lifestyle.hobbies),
+            _chipWrap('Interests', profile.lifestyle.interests),
+            _chipWrap('Music', profile.lifestyle.music),
+            _chipWrap('Movies', profile.lifestyle.movies),
+            _chipWrap('Sports', profile.lifestyle.sports),
           ]),
 
           _section('Education', Icons.school, [
+            
             _infoRow(
-                'Metriculation School',
-                profile.education?.metriculation?.schoolName),
-            _infoRow(
-                'Metriculation Board',
-                profile.education?.metriculation?.board),
-            _infoRow(
-                'Metriculation %',
-                profile.education?.metriculation?.percentage),
-            _infoRow(
-                'Passing Year',
-                profile.education?.metriculation?.passingYear),
-            _infoRow(
-                'Intermediate College',
-                profile.education?.intremidiate?.collegeName),
-            _infoRow(
-                'Intermediate Board',
-                profile.education?.intremidiate?.board),
-            _infoRow(
-                'Intermediate %',
-                profile.education?.intremidiate?.percentage),
-            _infoRow(
-                'Passing Year',
-                profile.education?.intremidiate?.passingYear),
-            _infoRow(
-                'Graduation College',
-                profile.education?.graduation?.college),
-            _infoRow(
-                'Degree',
-                profile.education?.graduation?.degree),
-            _infoRow(
-                'Graduation %',
-                profile.education?.graduation?.percentage),
-            _infoRow(
-                'Passing Year',
-                profile.education?.graduation?.passingYear),
+              'Graduation College',
+              profile.education.education?.college,
+            ),
+            _infoRow('Degree', profile.education.education?.degree),
+            _infoRow('Graduation %', profile.education.education?.percentage),
+            _infoRow('Passing Year', profile.education.education?.passingYear),
           ]),
 
           _section('Employment', Icons.work, [
-            _infoRow('Company', profile.employment?.company),
-            _infoRow('Role', profile.employment?.designation),
-            _infoRow('Annual Income', profile.employment?.annualIncome),
+            _infoRow('Company', profile.employment.company),
+            _infoRow('Role', profile.employment.designation),
+            _infoRow('Annual Income', profile.employment.annualIncome),
           ]),
 
           _section('Family', Icons.family_restroom, [
-            _infoRow('Father Name', profile.family?.fatherName),
-            _infoRow('Mother Name', profile.family?.motherName),
-            _infoRow('Brothers', profile.family?.numberOfBrothers),
-            _infoRow('Sisters', profile.family?.numberOfSisters),
-            _infoRow('Family Type', profile.family?.familyType),
+            _infoRow('Father Name', profile.family.fatherName),
+            _infoRow('Mother Name', profile.family.motherName),
+            _infoRow('Brothers', profile.family.numberOfBrothers),
+            _infoRow('Sisters', profile.family.numberOfSisters),
+            _infoRow('Family Type', profile.family.familyType),
           ]),
 
           _section('Address', Icons.location_on, [
-            _infoRow('Address', profile.address?.addressLine1),
-            _infoRow('Post', profile.address?.post),
-            _infoRow('City', profile.address?.city),
-            _infoRow('State', profile.address?.state),
-            _infoRow('Pincode', profile.address?.pincode),
+            _infoRow('Address', profile.address.addressLine1),
+            _infoRow('Post', profile.address.post),
+            _infoRow('City', profile.address.city),
+            _infoRow('State', profile.address.state),
+            _infoRow('Pincode', profile.address.pincode),
           ]),
 
           _imageSection(profile.images),
@@ -299,8 +270,9 @@ class _UserBiodataCheckScreenState
                 .map(
                   (e) => Chip(
                     label: Text(e),
-                    backgroundColor:
-                        Theme.of(context).primaryColor.withOpacity(0.08),
+                    backgroundColor: Theme.of(
+                      context,
+                    ).primaryColor.withOpacity(0.08),
                   ),
                 )
                 .toList(),
@@ -320,16 +292,12 @@ class _UserBiodataCheckScreenState
       ),
       child: Row(
         children: const [
-          Icon(Icons.warning_amber_rounded,
-              color: Colors.red, size: 30),
+          Icon(Icons.warning_amber_rounded, color: Colors.red, size: 30),
           SizedBox(width: 12),
           Expanded(
             child: Text(
               'Please verify carefully.\nOnce submitted, profile cannot be edited.',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Colors.red,
-              ),
+              style: TextStyle(fontWeight: FontWeight.w600, color: Colors.red),
             ),
           ),
         ],
@@ -381,7 +349,7 @@ class _UserBiodataCheckScreenState
 
     await ref
         .read(metrimonyControllerProvider.notifier)
-        .submitProfile(ref, user.uid);
+        .submitProfile(uid: user.uid, agentId: user.agentId);
 
     if (context.mounted) {
       context.router.replaceAll([const UserMainShellRoute()]);

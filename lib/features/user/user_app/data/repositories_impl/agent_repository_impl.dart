@@ -29,4 +29,16 @@ class AgentRepositoryImpl implements AgentRepository {
     debugPrint(doc.docs.first.data().toString());
     return AgentProfile.fromMap(doc.docs.first.data());
   }
+
+  @override
+  Future<AgentProfile> fetchAgentProfilebyAgentId(String agentId) {
+    return AgentFirestoreDs(_firestore).fetchAgentProfilebyAgentId(agentId);
+  }
+
+  @override
+  Future<String> fetchAgentUidbyAgentId(String agentId) {
+    return AgentFirestoreDs(
+      _firestore,
+    ).fetchAgentDocIdByAgentId(agentId).then((value) => value ?? '');
+  }
 }

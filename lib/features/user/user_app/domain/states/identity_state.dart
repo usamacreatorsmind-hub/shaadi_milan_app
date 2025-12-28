@@ -56,8 +56,8 @@ class IdentityProfile {
     );
   }
 
-  static IdentityProfile empty() {
-    return IdentityProfile(
+  factory IdentityProfile.empty() {
+    return  IdentityProfile(
       profileId: '',
       gender: '',
       dob: DateTime(1900),

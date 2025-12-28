@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -32,15 +33,17 @@ class FirebaseAuthDS {
   Future<void> sendPasswordResetEmail(String email) =>
       _auth.sendPasswordResetEmail(email: email);
 
-  Future<UserCredential> signUpWithEmail(
-    String email,
-    String fullName,
-    String password,
-    String agentId,
-    String phone,
-    List<String> wishlists,
-  ) async {
+  Future<UserCredential> signUpWithEmail({
+    required String email,
+    required String fullName,
+    required String password,
+    required String agentId,
+    required String phone,
+    required List<String> wishlists,
+    required UserStatus userStatus,
+  }) async {
     try {
+      var agentUid = "";
       // 1️⃣ Validate Agent ID (if provided)
       if (agentId.isNotEmpty) {
         final querySnapshot = await _firestore
@@ -55,6 +58,7 @@ class FirebaseAuthDS {
             message: 'The provided Agent ID does not exist.',
           );
         }
+        agentUid = querySnapshot.docs.first.id;
       }
 
       // 2️⃣ Create Firebase Auth User
@@ -75,13 +79,16 @@ class FirebaseAuthDS {
         'email': email,
         'role': 'user',
         'phone': phone,
-        'profileId': '${phone}', // Initialize with an empty string
+        'profileId': phone,
         'isVerified': false,
         'wishlists': wishlists,
 
-        'agentId': agentId,
+        'agentId': agentUid,
 
         'createdAt': FieldValue.serverTimestamp(),
+        'userStatus': userStatus.toMap(),
+
+        'lastSeen': FieldValue.serverTimestamp(),
       });
 
       return userCredential;
@@ -113,8 +120,6 @@ class FirebaseAuthDS {
     final doc = await _firestore.collection('temp_users').doc(uid).get();
     return doc.data();
   }
-
-  //  register user status to fireastore define in userstatus datassource
 
   Future<void> signOut() => _auth.signOut();
 }

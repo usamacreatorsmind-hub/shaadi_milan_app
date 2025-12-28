@@ -10,7 +10,6 @@ import '../states/identity_state.dart';
 import '../states/lifestyle_state.dart';
 import '../states/metrimony_state.dart';
 import '../states/physical_state.dart';
-import '../states/user_status_state.dart';
 
 import '../../../../agent/domain/states/agent_entity.dart';
 
@@ -72,8 +71,6 @@ abstract class MatrimonyRepository {
   Future<EmploymentProfile> getEmploymentProfile(String uid);
   Future<FamilyProfile> getFamilyProfile(String uid);
   Future<AddressProfile> getAddressProfile(String uid);
-  Future<AgentProfile> getAgentProfile(String uid);
-
   // ─────────────────────────────────────────────
   // DELETE
   // ─────────────────────────────────────────────

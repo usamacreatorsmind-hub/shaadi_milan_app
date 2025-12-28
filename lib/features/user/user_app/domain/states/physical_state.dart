@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class PhysicalProfile {
   final String height;
   final int weight;
@@ -54,7 +56,7 @@ class PhysicalProfile {
     );
   }
 
-  static PhysicalProfile empty() {
+  factory PhysicalProfile.empty() {
     return PhysicalProfile(
       height: '',
       weight: 0,

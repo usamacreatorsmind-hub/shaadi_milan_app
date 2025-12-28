@@ -11,26 +11,15 @@ import '../../domain/states/cultural_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserEducationController extends StateNotifier<EducationState> {
-  final MatrimonyRepository _matrimonyRepository;
   final String _uid;
   final Ref _ref;
 
-  UserEducationController(this._matrimonyRepository, this._uid, this._ref)
-    : super(EducationState.initial);
+  UserEducationController(this._uid, this._ref) : super(EducationState.initial);
 
-  Future<void> saveEducation({
-    required Metriculation metriculation,
-    required IntremidiateProfile intremidiate,
-    required Graduation graduation,
-  }) async {
+  Future<void> saveEducation({required Education education}) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final educationProfile = EducationProfile(
-        metriculation: metriculation,
-        intremidiate: intremidiate,
-        graduation: graduation,
-      );
-      await _matrimonyRepository.updateEducationProfile(_uid, educationProfile);
+      final educationProfile = EducationProfile(education: education);
       state = state.copyWith(isLoading: false, education: educationProfile);
       _ref
           .read(metrimonyControllerProvider.notifier)
@@ -46,8 +35,7 @@ final userEducationControllerProvider =
     StateNotifierProvider.autoDispose<UserEducationController, EducationState>((
       ref,
     ) {
-      final matrimonyRepo = ref.watch(matrimonyRepositoryProvider);
       final uid = ref.watch(authStateProvider).value?.uid;
       if (uid == null) throw Exception('User not authenticated');
-      return UserEducationController(matrimonyRepo, uid, ref);
+      return UserEducationController(uid, ref);
     });

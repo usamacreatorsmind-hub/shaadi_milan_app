@@ -25,4 +25,10 @@ abstract class UserRepository {
 
   Future<void> addWishlist(String uid, String profileId);
   Future<void> removeWishlist(String uid, String profileId);
+
+  // implement  method for user status 
+  Future<void> updateUserStatus(String uid, UserStatus userStatus);
+  Future<UserStatus> fetchUserStatus(String uid);
+  Stream<UserStatus> watchUserStatus(String uid);
+  
 }

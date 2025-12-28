@@ -1,5 +1,4 @@
 import 'dart:async';
-import '../../../user_app/data/datasources/firebase/user_status_firestore.dart';
 import '../../../user_app/domain/states/user_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -9,6 +8,10 @@ import '../providers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AuthController extends StateNotifier<User?> {
+  bool isProfileCreated = false;
+  bool isApproved = false;
+  bool isRejected = false;
+
   final AuthRepository _authRepository;
   StreamSubscription? _authStateSubscription;
 
@@ -34,20 +37,14 @@ class AuthController extends StateNotifier<User?> {
     String phone,
   ) async {
     await _authRepository.signUpWithEmail(
-      fullName,
-      email,
-      password,
-      agentId,
-      phone,
-      [],
+      fullName: fullName,
+      email: email,
+      password: password,
+      agentId: agentId,
+      phone: phone,
+      userStatus: UserStatus.empty(),
     );
-
-    // create empyt user status
-
-    final user = _authRepository.currentUser;
-    if (user != null) {
-      await UserStatusFirestoreDS().createUserStatus(user.uid);
-    }
+ 
   }
 
   Future<void> signInWithEmail(String email, String password) async {

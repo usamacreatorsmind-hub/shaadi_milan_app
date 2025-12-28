@@ -38,13 +38,6 @@ class HomeController extends StateNotifier<HomeState> {
   Future<void> _fetchPorfiles() async {
     try {
       final profiles = await _repository.getAllMatrimonyProfiles();
-      // print data to terminal one by one
-
-      print(" Print fetched data to console");
-
-      for (var profile in profiles) {
-        print(profile.toString());
-      }
 
       state = state.copyWith(metrimonyProfiles: AsyncValue.data(profiles));
     } catch (e, st) {

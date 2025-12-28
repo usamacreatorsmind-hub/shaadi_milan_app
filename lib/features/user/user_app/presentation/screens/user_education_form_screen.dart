@@ -20,37 +20,14 @@ class _UserEducationFormScreenState
     extends ConsumerState<UserEducationFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // ================= Metriculation =================
-  final _schoolNameCtrl = TextEditingController();
-  final _schoolBoardCtrl = TextEditingController();
-  final _schoolPercentageCtrl = TextEditingController();
-  final _schoolPassingYearCtrl = TextEditingController();
-
-  // ================= Intermediate =================
-  final _collegeNameCtrl = TextEditingController();
-  final _collegeBoardCtrl = TextEditingController();
-  final _collegePercentageCtrl = TextEditingController();
-  final _collegePassingYearCtrl = TextEditingController();
-
   // ================= Graduation =================
   final _gradCollegeCtrl = TextEditingController();
   final _gradDegreeCtrl = TextEditingController();
   final _gradPercentageCtrl = TextEditingController();
   final _gradPassingYearCtrl = TextEditingController();
 
-
   @override
   void dispose() {
-    _schoolNameCtrl.dispose();
-    _schoolBoardCtrl.dispose();
-    _schoolPercentageCtrl.dispose();
-    _schoolPassingYearCtrl.dispose();
-
-    _collegeNameCtrl.dispose();
-    _collegeBoardCtrl.dispose();
-    _collegePercentageCtrl.dispose();
-    _collegePassingYearCtrl.dispose();
-
     _gradCollegeCtrl.dispose();
     _gradDegreeCtrl.dispose();
     _gradPercentageCtrl.dispose();
@@ -62,19 +39,7 @@ class _UserEducationFormScreenState
     if (!_formKey.currentState!.validate()) return;
 
     final educationProfile = EducationProfile(
-      metriculation: Metriculation(
-        schoolName: _schoolNameCtrl.text.trim(),
-        board: _schoolBoardCtrl.text.trim(),
-        percentage: double.parse(_schoolPercentageCtrl.text),
-        passingYear: int.parse(_schoolPassingYearCtrl.text),
-      ),
-      intremidiate: IntremidiateProfile(
-        collegeName: _collegeNameCtrl.text.trim(),
-        board: _collegeBoardCtrl.text.trim(),
-        percentage: double.parse(_collegePercentageCtrl.text),
-        passingYear: int.parse(_collegePassingYearCtrl.text),
-      ),
-      graduation: Graduation(
+      education: Education(
         college: _gradCollegeCtrl.text.trim(),
         degree: _gradDegreeCtrl.text.trim(),
         percentage: double.parse(_gradPercentageCtrl.text),
@@ -83,13 +48,8 @@ class _UserEducationFormScreenState
     );
 
     ref
-        .read(userEducationControllerProvider.notifier) 
-        
-.saveEducation(
-          metriculation: educationProfile.metriculation!,
-          intremidiate: educationProfile.intremidiate!,
-          graduation: educationProfile.graduation!,
-        );
+        .read(userEducationControllerProvider.notifier)
+        .saveEducation(education: educationProfile.education!);
   }
 
   @override
@@ -98,9 +58,9 @@ class _UserEducationFormScreenState
 
     ref.listen<EducationState>(userEducationControllerProvider, (prev, next) {
       if (next.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.error!)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.error!)));
       } else if (next.education != null && prev?.education == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Education details saved successfully')),
@@ -117,19 +77,7 @@ class _UserEducationFormScreenState
           key: _formKey,
           child: ListView(
             children: [
-              _sectionTitle('Metriculation'),
-              _textField(_schoolNameCtrl, 'School Name'),
-              _textField(_schoolBoardCtrl, 'Board'),
-              _numberField(_schoolPercentageCtrl, 'Percentage'),
-              _numberField(_schoolPassingYearCtrl, 'Passing Year'),
-
-              _sectionTitle('Intermediate'),
-              _textField(_collegeNameCtrl, 'College Name'),
-              _textField(_collegeBoardCtrl, 'Board'),
-              _numberField(_collegePercentageCtrl, 'Percentage'),
-              _numberField(_collegePassingYearCtrl, 'Passing Year'),
-
-              _sectionTitle('Graduation'),
+              _sectionTitle('Education'),
               _textField(_gradCollegeCtrl, 'College / University'),
               _textField(_gradDegreeCtrl, 'Degree'),
               _numberField(_gradPercentageCtrl, 'Percentage'),
@@ -138,10 +86,7 @@ class _UserEducationFormScreenState
               const SizedBox(height: 24),
               state.isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : AppButton(
-                      onPressed: _submitForm,
-                      text: 'Save Education',
-                    ),
+                  : AppButton(onPressed: _submitForm, text: 'Save Education'),
             ],
           ),
         ),
@@ -156,10 +101,7 @@ class _UserEducationFormScreenState
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Text(
         title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
     );
   }

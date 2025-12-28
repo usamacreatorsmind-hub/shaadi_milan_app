@@ -1,10 +1,11 @@
+import 'package:flutter_riverpod/legacy.dart';
+
 import '../../../../../app/router/app_router.dart';
 import '../../domain/states/state_city.dart';
 import '../controllers/home_controller.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'dart:ui';
 
 /// =======================
@@ -278,14 +279,14 @@ class UserHomeScreen extends ConsumerWidget {
                       horizontal: 16,
                       vertical: 8,
                     ),
-                    child: ProfileCard(
-                      uid: profile.user?.uid ?? "",
+                    // child: ProfileCard(
+                    //   uid: profile.user?.uid ?? "",
 
-                      name: profile.user?.fullName ?? "N/A",
-                      age: profile.identity?.age ?? 0,
-                      designation: profile.employment?.designation ?? "N/A",
-                      imageUrl: profile.images?.primaryImageUrl ?? "",
-                    ),
+                    //   name: profile.user?.fullName ?? "N/A",
+                    //   age: profile.identity?.age ?? 0,
+                    //   designation: profile.employment?.designation ?? "N/A",
+                    //   imageUrl: profile.images?.primaryImageUrl ?? "",
+                    // ),
                   );
                 }, childCount: filteredProfiles.length),
               );

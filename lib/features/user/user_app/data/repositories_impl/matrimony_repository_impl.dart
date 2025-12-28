@@ -15,8 +15,7 @@ import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/physical_state.dart';
 
 import '../../../../agent/domain/states/agent_entity.dart';
-import '../datasources/data_source/metrimony_data_source.dart';
-import '../../domain/states/user_status_state.dart';
+import '../datasources/data_source/metrimony_data_source.dart'; 
 import '../datasources/firebase/metrimony_firestore.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import 'package:hive/hive.dart';
@@ -113,10 +112,7 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   @override
   Future<AddressProfile> getAddressProfile(String uid) async =>
       (await getMatrimonyProfile(uid)).address!;
-
-  @override
-  Future<AgentProfile> getAgentProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).agent!;
+ 
 
   @override
   Future<CulturalProfile> getCulturalProfile(String uid) async =>

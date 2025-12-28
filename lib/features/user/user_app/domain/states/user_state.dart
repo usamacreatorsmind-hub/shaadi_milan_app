@@ -3,21 +3,24 @@ class AppUser {
   final String fullName;
   final String email;
   final String role;
-  final String? phone;
-  final String? agentId;
+  final String phone;
+  final String agentId;
   final String? profileId;
   final bool isVerified;
   final List<String>? wishlists;
+  final UserStatus? userStatus;
 
   AppUser({
     required this.uid,
     required this.fullName,
     required this.email,
     required this.role,
-    this.phone,
-    this.agentId,
+    required this.phone,
+    required this.agentId,
     this.profileId,
     this.isVerified = false,
+    this.userStatus,
+
     this.wishlists,
   });
 
@@ -31,6 +34,8 @@ class AppUser {
       'agentId': agentId,
       'profileId': profileId,
       'isVerified': isVerified,
+      'userStatus': userStatus?.toMap(),
+
       'wishlists': wishlists,
     };
   }
@@ -41,9 +46,12 @@ class AppUser {
       fullName: map['fullName'] as String,
       email: map['email'] as String,
       role: map['role'] as String,
-      phone: map['phone'] as String?,
-      agentId: map['agentId'] as String?,
+      phone: map['phone'] as String,
+      agentId: map['agentId'] as String,
       profileId: map['profileId'] as String?,
+      userStatus: map['userStatus'] != null
+          ? UserStatus.fromMap(map['userStatus'] as Map<String, dynamic>)
+          : null,
       isVerified: map['isVerified'] as bool,
 
       wishlists: (map['wishlists'] as List<dynamic>?)
@@ -54,11 +62,13 @@ class AppUser {
 
   @override
   String toString() {
-    return 'AppUser(uid: $uid, fullName: $fullName, wishlists: $wishlists, email: $email, role: $role, phone: $phone, agentId: $agentId, profileId: $profileId, isVerified: $isVerified)';
+    return 'AppUser(uid: $uid, fullName: $fullName, userStatus: $userStatus,wishlists: $wishlists, email: $email, role: $role, phone: $phone, agentId: $agentId, profileId: $profileId, isVerified: $isVerified)';
   }
 
   AppUser copyWith({
     String? uid,
+    UserStatus? userStatus,
+
     String? fullName,
     String? email,
     String? role,
@@ -73,6 +83,8 @@ class AppUser {
       uid: uid ?? this.uid,
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
+      userStatus: userStatus ?? this.userStatus,
+
       role: role ?? this.role,
 
       agentId: agentId ?? this.agentId,
@@ -87,6 +99,8 @@ class AppUser {
   static AppUser empty() {
     return AppUser(
       uid: '',
+      userStatus: UserStatus.empty(),
+
       fullName: '',
       email: '',
       role: '',
@@ -115,4 +129,91 @@ class UserState {
   }
 
   static const initial = UserState(user: null, isLoading: false, error: null);
+}
+
+class UserStatus {
+  final bool isProfileCreated;
+  final bool isApproved;
+  final bool isRejected;
+
+  const UserStatus({
+    this.isProfileCreated = false,
+    this.isApproved = false,
+    this.isRejected = false,
+  });
+
+  // ---------------- COPY WITH ----------------
+  UserStatus copyWith({
+    bool? isProfileCreated,
+    bool? isApproved,
+    bool? isRejected,
+  }) {
+    return UserStatus(
+      isProfileCreated: isProfileCreated ?? this.isProfileCreated,
+      isApproved: isApproved ?? this.isApproved,
+      isRejected: isRejected ?? this.isRejected,
+    );
+  }
+
+  // ---------------- NAMED CONSTRUCTORS ----------------
+
+  /// Profile created but pending approval
+  factory UserStatus.created() {
+    return const UserStatus(
+      isProfileCreated: true,
+      isApproved: false,
+      isRejected: false,
+    );
+  }
+
+  /// Approved profile
+  factory UserStatus.approved() {
+    return const UserStatus(
+      isProfileCreated: true,
+      isApproved: true,
+      isRejected: false,
+    );
+  }
+
+  /// Rejected profile
+  factory UserStatus.rejected() {
+    return const UserStatus(
+      isProfileCreated: true,
+      isApproved: false,
+      isRejected: true,
+    );
+  }
+
+  /// Initial empty status
+  factory UserStatus.empty() {
+    return const UserStatus(
+      isProfileCreated: false,
+      isApproved: false,
+      isRejected: false,
+    );
+  }
+
+  // ---------------- FIRESTORE ----------------
+
+  Map<String, dynamic> toMap() {
+    return {
+      'isProfileCreated': isProfileCreated,
+      'isApproved': isApproved,
+      'isRejected': isRejected,
+    };
+  }
+
+  factory UserStatus.fromMap(Map<String, dynamic> map) {
+    return UserStatus(
+      isProfileCreated: map['isProfileCreated'] as bool? ?? false,
+      isApproved: map['isApproved'] as bool? ?? false,
+      isRejected: map['isRejected'] as bool? ?? false,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'UserStatus(isProfileCreated: $isProfileCreated, '
+        'isApproved: $isApproved, isRejected: $isRejected)';
+  }
 }

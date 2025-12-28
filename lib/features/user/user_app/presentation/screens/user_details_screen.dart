@@ -1,9 +1,14 @@
+import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart'
+    show agentFirestoreDsProvider;
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
+import '../../domain/states/agent_state.dart';
 import '../../domain/states/metrimony_state.dart';
+import '../../domain/states/user_state.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,32 +17,59 @@ import 'package:intl/intl.dart';
 // read profile from firebase
 
 final matrimonyProfileProvider =
-    FutureProvider.family<MatrimonyProfile, String>((ref, uid) async {
-      return ref.read(matrimonyRepositoryProvider).getMatrimonyProfile(uid);
+    FutureProvider.family<MatrimonyProfileViewModel, String>((ref, uid) async {
+      final matrimonyProfile = await ref
+          .read(matrimonyRepositoryProvider)
+          .getMatrimonyProfile(uid);
+
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(matrimonyProfile.userId)
+          .get();
+      final user = userDoc.exists ? AppUser.fromMap(userDoc.data()!) : null;
+
+      AgentProfile? agent;
+      if (matrimonyProfile.agentId.isNotEmpty) {
+        agent = await ref
+            .read(agentFirestoreDsProvider)
+            .fetchAgentProfilebyAgentId(matrimonyProfile.agentId);
+      }
+
+      return MatrimonyProfileViewModel(
+        profile: matrimonyProfile,
+        user: user,
+        agent: agent,
+      );
     });
 
 @RoutePage()
-class UserDetailScreen extends ConsumerWidget {
+class UserDetailScreen extends ConsumerStatefulWidget {
   final String uid;
   const UserDetailScreen({super.key, required this.uid});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final profileAsync = ref.watch(matrimonyProfileProvider(uid));
+  ConsumerState<UserDetailScreen> createState() => _UserDetailScreenState();
+}
+
+class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final profileAsync = ref.watch(matrimonyProfileProvider(widget.uid));
 
     return Scaffold(
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
-        data: (profile) {
+        data: (viewModel) {
+          final profile = viewModel.profile;
           final List<String> images = [
-            if (profile.images?.primaryImageUrl != null &&
-                profile.images!.primaryImageUrl.isNotEmpty)
-              profile.images!.primaryImageUrl
+            if (profile.images.primaryImageUrl != null &&
+                profile.images.primaryImageUrl.isNotEmpty)
+              profile.images.primaryImageUrl
             else
               'https://via.placeholder.com/150',
 
-            ...(profile.images?.secondaryImageUrls ?? []),
+            ...(profile.images.secondaryImageUrls ?? []),
           ];
 
           return Stack(
@@ -75,7 +107,7 @@ class UserDetailScreen extends ConsumerWidget {
                         expandedHeight: 120,
 
                         titleSpacing: 0,
-                        title: ProfileHeaderCard(profile: profile),
+                        title: ProfileHeaderCard(viewModel: viewModel),
                       ),
 
                       SliverToBoxAdapter(
@@ -92,30 +124,32 @@ class UserDetailScreen extends ConsumerWidget {
                                   runSpacing: 8,
                                   children: [
                                     _infoChip(
-                                      "${profile.employment?.jobType}",
+                                      profile.employment.jobType ?? '',
                                       Icons.work_outline,
                                     ),
 
                                     _infoChip(
-                                      "${profile.identity?.age} yrs",
+                                      profile.identity.age != null
+                                          ? "${profile.identity.age} yrs"
+                                          : '',
                                       Icons.cake_outlined,
                                     ),
                                     _infoChip(
-                                      profile.identity?.gender ?? '',
+                                      profile.identity.gender ?? '',
                                       Icons.person_outline,
                                     ),
                                     _infoChip(
-                                      profile.address?.city ?? '',
+                                      profile.address.city ?? '',
                                       Icons.location_on_outlined,
                                     ),
 
                                     _infoChip(
-                                      profile.cultural?.religion ?? '',
+                                      profile.cultural.religion ?? '',
                                       Icons.temple_hindu,
                                     ),
 
                                     _infoChip(
-                                      "${profile.physical?.height} " ?? '',
+                                      profile.physical.height ?? '',
                                       Icons.height_outlined,
                                     ),
                                   ],
@@ -178,30 +212,29 @@ class UserDetailScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(bottom: 100),
                         child: Column(
                           children: [
-                            if (profile.identity != null)
-                              _InfoCard(
-                                title: 'Basic Information',
-                                icon: Icons.person,
-                                children: [
-                                  _InfoTile(
-                                    label: 'Gender',
-                                    icon: Icons.person_outline,
-                                    value: profile.identity!.gender,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Age',
-                                    icon: Icons.cake_outlined,
-                                    value: '${profile.identity!.age} years',
-                                  ),
-                                  _InfoTile(
-                                    label: 'Date of Birth',
-                                    icon: Icons.calendar_today_outlined,
-                                    value: DateFormat(
-                                      'dd-MM-yyyy',
-                                    ).format(profile.identity!.dob),
-                                  ),
-                                ],
-                              ),
+                            _InfoCard(
+                              title: 'Basic Information',
+                              icon: Icons.person,
+                              children: [
+                                _InfoTile(
+                                  label: 'Gender',
+                                  icon: Icons.person_outline,
+                                  value: profile.identity.gender,
+                                ),
+                                _InfoTile(
+                                  label: 'Age',
+                                  icon: Icons.cake_outlined,
+                                  value: '${profile.identity.age} years',
+                                ),
+                                _InfoTile(
+                                  label: 'Date of Birth',
+                                  icon: Icons.calendar_today_outlined,
+                                  value: DateFormat(
+                                    'dd-MM-yyyy',
+                                  ).format(profile.identity.dob),
+                                ),
+                              ],
+                            ),
 
                             _InfoCard(
                               title: 'About Me',
@@ -226,59 +259,56 @@ class UserDetailScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(bottom: 100),
                         child: Column(
                           children: [
-                            if (profile.physical != null)
-                              _InfoCard(
-                                title: 'Physical',
-                                icon: Icons.accessibility,
-                                children: [
-                                  _InfoTile(
-                                    label: 'Height',
-                                    icon: Icons.height,
-                                    value: profile.physical!.height,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Weight',
-                                    icon: Icons.scale,
-                                    value: profile.physical!.weight.toString(),
-                                  ),
-                                  _InfoTile(
-                                    label: 'Body Type',
-                                    icon: Icons.accessibility_new,
-                                    value: profile.physical!.bodyType,
-                                  ),
-                                ],
-                              ),
+                            _InfoCard(
+                              title: 'Physical',
+                              icon: Icons.accessibility,
+                              children: [
+                                _InfoTile(
+                                  label: 'Height',
+                                  icon: Icons.height,
+                                  value: profile.physical.height,
+                                ),
+                                _InfoTile(
+                                  label: 'Weight',
+                                  icon: Icons.scale,
+                                  value: profile.physical.weight.toString(),
+                                ),
+                                _InfoTile(
+                                  label: 'Body Type',
+                                  icon: Icons.accessibility_new,
+                                  value: profile.physical.bodyType,
+                                ),
+                              ],
+                            ),
 
-                            if (profile.lifestyle != null)
-                              _InfoCard(
-                                title: 'Lifestyle',
-                                icon: Icons.local_cafe,
-                                children: [
-                                  _InfoTile(
-                                    label: 'Diet',
-                                    icon: Icons.restaurant,
-                                    value: profile.lifestyle!.diet,
-                                  ),
-                                ],
-                              ),
+                            _InfoCard(
+                              title: 'Lifestyle',
+                              icon: Icons.local_cafe,
+                              children: [
+                                _InfoTile(
+                                  label: 'Diet',
+                                  icon: Icons.restaurant,
+                                  value: profile.lifestyle.diet,
+                                ),
+                              ],
+                            ),
 
-                            if (profile.address != null)
-                              _InfoCard(
-                                title: 'Address',
-                                icon: Icons.location_on,
-                                children: [
-                                  _InfoTile(
-                                    label: 'City',
-                                    icon: Icons.location_city,
-                                    value: profile.address!.city,
-                                  ),
-                                  _InfoTile(
-                                    label: 'State',
-                                    icon: Icons.location_on,
-                                    value: profile.address!.state,
-                                  ),
-                                ],
-                              ),
+                            _InfoCard(
+                              title: 'Address',
+                              icon: Icons.location_on,
+                              children: [
+                                _InfoTile(
+                                  label: 'City',
+                                  icon: Icons.location_city,
+                                  value: profile.address.city,
+                                ),
+                                _InfoTile(
+                                  label: 'State',
+                                  icon: Icons.location_on,
+                                  value: profile.address.state,
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -288,79 +318,28 @@ class UserDetailScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(bottom: 100),
                         child: Column(
                           children: [
-                            if (profile.education != null)
-                              // ================= EDUCATION SECTION =================
-                              if (profile.education?.graduation != null)
-                                _InfoCard(
-                                  title: 'Graduation',
-                                  icon: Icons.school_outlined,
-                                  children: [
-                                    _InfoTile(
-                                      label: 'College',
-                                      icon: Icons.account_balance,
-                                      value: profile
-                                          .education!
-                                          .graduation!
-                                          .college,
-                                    ),
-                                    _InfoTile(
-                                      label: 'Degree',
-                                      icon: Icons.menu_book,
-                                      value:
-                                          profile.education!.graduation!.degree,
-                                    ),
-                                    _InfoTile(
-                                      label: 'Percentage',
-                                      icon: Icons.percent,
-                                      value:
-                                          profile
-                                              .education!
-                                              .graduation!
-                                              .percentage
-                                              ?.toString() ??
-                                          'N/A',
-                                    ),
-                                    _InfoTile(
-                                      label: 'Passing Year',
-                                      icon: Icons.calendar_today,
-                                      value:
-                                          profile
-                                              .education!
-                                              .graduation!
-                                              .passingYear
-                                              ?.toString() ??
-                                          'N/A',
-                                    ),
-                                  ],
-                                ),
-
-                            if (profile.education?.intremidiate != null)
+                            // ================= EDUCATION SECTION =================
+                            if (profile.education.education != null)
                               _InfoCard(
-                                title: 'Intermediate (12th)',
-                                icon: Icons.school,
+                                title: 'Graduation',
+                                icon: Icons.school_outlined,
                                 children: [
                                   _InfoTile(
                                     label: 'College',
                                     icon: Icons.account_balance,
-                                    value: profile
-                                        .education!
-                                        .intremidiate!
-                                        .collegeName,
+                                    value:
+                                        profile.education.education!.college,
                                   ),
                                   _InfoTile(
-                                    label: 'Board',
-                                    icon: Icons.assignment,
-                                    value:
-                                        profile.education!.intremidiate!.board,
+                                    label: 'Degree',
+                                    icon: Icons.menu_book,
+                                    value: profile.education.education!.degree,
                                   ),
                                   _InfoTile(
                                     label: 'Percentage',
                                     icon: Icons.percent,
                                     value:
-                                        profile
-                                            .education!
-                                            .intremidiate!
-                                            .percentage
+                                        profile.education.education!.percentage
                                             ?.toString() ??
                                         'N/A',
                                   ),
@@ -369,8 +348,8 @@ class UserDetailScreen extends ConsumerWidget {
                                     icon: Icons.calendar_today,
                                     value:
                                         profile
+                                            .education
                                             .education!
-                                            .intremidiate!
                                             .passingYear
                                             ?.toString() ??
                                         'N/A',
@@ -378,51 +357,9 @@ class UserDetailScreen extends ConsumerWidget {
                                 ],
                               ),
 
-                            if (profile.education?.metriculation != null)
-                              _InfoCard(
-                                title: 'Metriculation (10th)',
-                                icon: Icons.school_rounded,
-                                children: [
-                                  _InfoTile(
-                                    label: 'School',
-                                    icon: Icons.school,
-                                    value: profile
-                                        .education!
-                                        .metriculation!
-                                        .schoolName,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Board',
-                                    icon: Icons.assignment,
-                                    value:
-                                        profile.education!.metriculation!.board,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Percentage',
-                                    icon: Icons.percent,
-                                    value:
-                                        profile
-                                            .education!
-                                            .metriculation!
-                                            .percentage
-                                            ?.toString() ??
-                                        'N/A',
-                                  ),
-                                  _InfoTile(
-                                    label: 'Passing Year',
-                                    icon: Icons.calendar_today,
-                                    value:
-                                        profile
-                                            .education!
-                                            .metriculation!
-                                            .passingYear
-                                            ?.toString() ??
-                                        'N/A',
-                                  ),
-                                ],
-                              ),
+                            
 
-                            if (profile.employment != null)
+                            if (profile.employment.jobType != null)
                               _InfoCard(
                                 title: 'Employment',
                                 icon: Icons.work,
@@ -430,22 +367,22 @@ class UserDetailScreen extends ConsumerWidget {
                                   _InfoTile(
                                     label: 'Job Type',
                                     icon: Icons.work_outline,
-                                    value: profile.employment!.jobType,
+                                    value: profile.employment.jobType,
                                   ),
                                   _InfoTile(
                                     label: 'Company',
                                     icon: Icons.business,
-                                    value: profile.employment!.company,
+                                    value: profile.employment.company,
                                   ),
                                   _InfoTile(
                                     label: 'Designation',
                                     icon: Icons.work_history,
-                                    value: profile.employment!.designation,
+                                    value: profile.employment.designation,
                                   ),
                                   _InfoTile(
                                     label: 'Income',
                                     icon: Icons.attach_money,
-                                    value: profile.employment!.annualIncome
+                                    value: profile.employment.annualIncome
                                         .toString(),
                                   ),
                                 ],
@@ -459,53 +396,49 @@ class UserDetailScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(bottom: 100),
                         child: Column(
                           children: [
-                            if (profile.family != null)
-                              _InfoCard(
-                                title: 'Family',
-                                icon: Icons.family_restroom,
-                                children: [
-                                  _InfoTile(
-                                    label: 'Father',
-                                    icon: Icons.person_outline,
-                                    value: profile.family!.fatherName,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Mother',
-                                    icon: Icons.person_outline,
-                                    value: profile.family!.motherName,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Family Type',
-                                    icon: Icons.family_restroom,
-                                    value: profile.family!.familyType,
-                                  ),
-                                ],
-                              ),
+                            _InfoCard(
+                              title: 'Family',
+                              icon: Icons.family_restroom,
+                              children: [
+                                _InfoTile(
+                                  label: 'Father',
+                                  icon: Icons.person_outline,
+                                  value: profile.family.fatherName,
+                                ),
+                                _InfoTile(
+                                  label: 'Mother',
+                                  icon: Icons.person_outline,
+                                  value: profile.family.motherName,
+                                ),
+                                _InfoTile(
+                                  label: 'Family Type',
+                                  icon: Icons.family_restroom,
+                                  value: profile.family.familyType,
+                                ),
+                              ],
+                            ),
 
-                            if (profile.cultural != null)
-                              _InfoCard(
-                                title: 'Cultural',
-                                icon: Icons.temple_hindu,
-                                children: [
-                                  _InfoTile(
-                                    label: 'Religion',
-                                    icon: Icons.temple_hindu,
-                                    value: profile.cultural!.religion,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Caste',
-                                    icon: Icons.group,
-                                    value: profile.cultural!.caste,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Languages',
-                                    icon: Icons.language,
-                                    value: profile.cultural!.languages.join(
-                                      ', ',
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            _InfoCard(
+                              title: 'Cultural',
+                              icon: Icons.temple_hindu,
+                              children: [
+                                _InfoTile(
+                                  label: 'Religion',
+                                  icon: Icons.temple_hindu,
+                                  value: profile.cultural.religion,
+                                ),
+                                _InfoTile(
+                                  label: 'Caste',
+                                  icon: Icons.group,
+                                  value: profile.cultural.caste,
+                                ),
+                                _InfoTile(
+                                  label: 'Languages',
+                                  icon: Icons.language,
+                                  value: profile.cultural.languages.join(', '),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -515,7 +448,7 @@ class UserDetailScreen extends ConsumerWidget {
                         padding: const EdgeInsets.only(bottom: 100),
                         child: Column(
                           children: [
-                            if (profile.agent != null)
+                            if (viewModel.agent != null)
                               _InfoCard(
                                 title: 'Agent Details',
                                 icon: Icons.support_agent,
@@ -523,23 +456,23 @@ class UserDetailScreen extends ConsumerWidget {
                                   _InfoTile(
                                     label: 'Name',
                                     icon: Icons.person_outline,
-                                    value: profile.agent!.agentName,
+                                    value: viewModel.agent!.agentName,
                                   ),
                                   _InfoTile(
                                     label: 'Mobile',
                                     icon: Icons.phone,
-                                    value: profile.agent!.agentMobile,
+                                    value: viewModel.agent!.agentMobile,
                                   ),
                                   _InfoTile(
                                     label: 'Email',
                                     icon: Icons.email_outlined,
-                                    value: profile.agent!.email,
+                                    value: viewModel.agent!.email,
                                   ),
 
                                   _InfoTile(
                                     label: 'Agent ID',
                                     icon: Icons.perm_identity,
-                                    value: profile.agent!.agentId,
+                                    value: viewModel.agent!.agentId,
                                   ),
 
                                   _InfoTile(
@@ -547,7 +480,7 @@ class UserDetailScreen extends ConsumerWidget {
                                     icon: Icons.calendar_today_outlined,
                                     value: DateFormat(
                                       'dd-MM-yyyy',
-                                    ).format(profile.agent!.registrationDate),
+                                    ).format(viewModel.agent!.registrationDate),
                                   ),
                                 ],
                               ),
@@ -593,7 +526,7 @@ class UserDetailScreen extends ConsumerWidget {
                                   .read(authRepositoryProvider)
                                   .currentUser
                                   ?.uid;
-                              final profileId = profile.user?.uid;
+                              final profileId = viewModel.user?.uid;
 
                               if (currentUserId != null && profileId != null) {
                                 // Add the profile's UID to the current user's wishlist
@@ -876,13 +809,14 @@ class _InfoTile extends StatelessWidget {
 }
 
 class ProfileHeaderCard extends StatelessWidget {
-  final MatrimonyProfile profile;
+  final MatrimonyProfileViewModel viewModel;
 
-  const ProfileHeaderCard({super.key, required this.profile});
+  const ProfileHeaderCard({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final profile = viewModel.profile;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -900,7 +834,7 @@ class ProfileHeaderCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  profile.user?.fullName ?? 'N/A',
+                  viewModel.user?.fullName ?? 'N/A',
                   style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
@@ -910,7 +844,7 @@ class ProfileHeaderCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (profile.user?.isVerified == true)
+              if (viewModel.user?.isVerified == true)
                 const Icon(Icons.verified, color: Colors.green, size: 22),
             ],
           ),
@@ -919,7 +853,7 @@ class ProfileHeaderCard extends StatelessWidget {
 
           // AGE + OCCUPATION
           Text(
-            '${profile.identity?.age ?? 'N/A'} yrs, ${profile.employment?.jobType ?? 'N/A'}',
+            '${profile.identity.age ?? 'N/A'} yrs, ${profile.employment.jobType ?? 'N/A'}',
             style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
           ),
 
@@ -936,7 +870,7 @@ class ProfileHeaderCard extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  '${profile.address?.city ?? 'N/A'}, ${profile.address?.state ?? 'N/A'}',
+                  '${profile.address.city ?? 'N/A'}, ${profile.address.state ?? 'N/A'}',
                   style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
                 ),
               ),

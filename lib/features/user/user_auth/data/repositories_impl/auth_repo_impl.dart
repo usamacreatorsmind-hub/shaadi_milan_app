@@ -29,6 +29,7 @@ class AuthRepositoryImpl implements AuthRepository {
             phone: data['phone'] ?? '',
             profileId: data['profileId'] ?? '',
             isVerified: data['isVerified'] ?? false,
+            agentId: data['agentId'],
           );
         } else {
           // User is authenticated but no document in 'users' collection yet.
@@ -57,21 +58,28 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> signUpWithEmail(
-    String fullName,
-    String email,
-    String password,
-    String agentId,
-    String phone,
-    List<String> wishlists,
-  ) async {
+  Future<void> signUpWithEmail({
+    required String fullName,
+    required String email,
+    required String password,
+    required String agentId,
+    required String phone,
+    required UserStatus userStatus,
+    List<String> wishlists = const [],
+  }) async {
+    // fetch agent id using agent_id field using agent repository
+
+   
+
     await ds.signUpWithEmail(
-      email,
-      fullName,
-      password,
-      agentId,
-      phone,
-      wishlists,
+      fullName: fullName,
+      email: email,
+      password: password,
+      agentId: agentId,
+      phone: phone,
+      wishlists: wishlists,
+
+      userStatus: userStatus,
     );
   }
 

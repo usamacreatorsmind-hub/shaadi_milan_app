@@ -93,6 +93,22 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> removeWishlist(String uid, String profileId) {
     return _ds.removeWishlist(uid, profileId);
   }
+
+  @override
+  Future<UserStatus> fetchUserStatus(String uid) async {
+    final data = await _ds.fetchUser(uid);
+    return AppUser.fromMap(data).userStatus?? UserStatus.empty();
+  }
+
+  @override
+  Future<void> updateUserStatus(String uid, UserStatus userStatus) {
+    return _ds.updateField(uid, 'userStatus', userStatus.toMap());
+  }
+
+  @override
+  Stream<UserStatus> watchUserStatus(String uid) {
+    return _ds.watchUser(uid).map((data) => AppUser.fromMap(data).userStatus!);
+  }
 }
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {

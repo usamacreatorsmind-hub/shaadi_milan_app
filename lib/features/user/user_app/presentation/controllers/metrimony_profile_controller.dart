@@ -1,14 +1,10 @@
 import '../../../../agent/domain/states/agent_entity.dart';
 import '../../data/datasources/firebase/agent_firestore_ds.dart';
 import '../../data/datasources/firebase/metrimony_firestore.dart';
-import '../../data/datasources/firebase/user_status_firestore.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
-import '../../data/repositories_impl/userstatus_repository.dart';
-import '../../domain/repositories/user_status_repository.dart';
 import '../../domain/states/agent_state.dart';
 import '../../domain/states/image_state.dart';
 import '../../domain/states/user_state.dart';
-import '../../domain/states/user_status_state.dart';
 import '../screens/metrimony_flow_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -27,11 +23,12 @@ import '../../domain/states/physical_state.dart';
 
 final metrimonyControllerProvider =
     StateNotifierProvider<MetrimonyController, MetrimonyState>(
-      (ref) => MetrimonyController(),
+      (ref) => MetrimonyController(ref),
     );
 
 class MetrimonyController extends StateNotifier<MetrimonyState> {
-  MetrimonyController() : super(MetrimonyState.initial());
+  final Ref ref;
+  MetrimonyController(this.ref) : super(MetrimonyState.initial());
 
   // ---------------- STEP NAVIGATION ----------------
   void nextStep() {
@@ -55,8 +52,8 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
   }
 
   // ---------------- SAVE METHODS ----------------
-  void saveUser(AppUser data) {
-    state = state.copyWith(metrimony: state.metrimony.copyWith(user: data));
+  void saveUser(String userId) {
+    state = state.copyWith(metrimony: state.metrimony.copyWith(userId: userId));
     nextStep();
   }
 
@@ -107,28 +104,33 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
   }
 
   // ---------------- SUBMIT METHODS ----------------
-  Future<void> submitProfile(WidgetRef ref, String uid) async {
-    // fetch current user data  from firestore
-    final userData = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get();
-    AppUser user = AppUser.fromMap(userData.data()!);
-
+  Future<void> submitProfile({
+    required String uid,
+    required String agentId,
+  }) async {
     // fetch agent id using agent_id field using agentfirestore ds
 
-    AgentProfile agentData = await AgentFirestoreDs(
-      FirebaseFirestore.instance,
-    ).fetchAgentbyAgentId(user.agentId!);
+    String agentUid = '';
+    if (agentId.isNotEmpty) {
+      final agentDS = ref.read(agentFirestoreDsProvider);
+      agentUid = await agentDS.fetchAgentDocIdByAgentId(agentId) ?? '';
 
-    var profile = ref.read(metrimonyControllerProvider).metrimony;
+      debugPrint(' fetch Agent UID at  submit profile method: $agentUid');
+    }
+    var profile = state.metrimony;
 
-    profile = profile.copyWith(user: user, agent: agentData);
+    profile = profile.copyWith(userId: uid, agentId: agentUid);
+    // print  profile
+    debugPrint('Profile to be submitted: ${profile.toMap()}');
 
-    await ref
-        .read(matrimonyRepositoryProvider)
-        .updateMatrimonyProfile(uid, profile);
-    await ref.read(userStatusRepositoryProvider).markProfileCreated(uid);
+    await FirebaseFirestore.instance
+        .collection('metrimony_profiles')
+        .doc(uid)
+        .update(profile.toMap());
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'userStatus.isProfileCreated': true,
+    });
   }
 
   void saveImages(ProfileImages profileImages) {
@@ -139,38 +141,19 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
   }
 
   Future<void> createEmptyMatrimonyProfile(String uid, String agentId) async {
-    debugPrint("Creating empty metrimony profile for $uid");
-    // fetch current user data  from firestore
-    final userData = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get();
-    AppUser user = AppUser.fromMap(userData.data()!);
-
     // fetch agent id using agent_id field using agentfirestore ds
+    String agentUid = '';
+    if (agentId.isNotEmpty) {
+      final agentDS = ref.read(agentFirestoreDsProvider);
+      agentUid = await agentDS.fetchAgentDocIdByAgentId(agentId) ?? '';
 
-    AgentProfile agentData = await AgentFirestoreDs(
-      FirebaseFirestore.instance,
-    ).fetchAgentbyAgentId(agentId);
+      debugPrint(' fetch Agent UID at  create empty profile method: $agentUid');
+    }
 
     // create empty metrimony profile
-
-    final matrimonyRepository = MatrimonyRepositoryImpl(
-      MatrimonyFirestoreDS(FirebaseFirestore.instance),
-    );
-    final userStatusRepository = UserStatusRepositoryImpl(
-      UserStatusFirestoreDS(),
-    );
-
-    debugPrint("this is user data ");
-    debugPrint(user.toString());
-    debugPrint("this is agent data ");
-    debugPrint(agentData.toString());
-
     final metrimonyProfile = MatrimonyProfile(
-      user: user,
-
-      agent: agentData,
+      userId: uid,
+      agentId: agentUid,
       identity: IdentityProfile.empty(),
       address: AddressProfile.empty(),
       cultural: CulturalProfile.empty(),
@@ -181,14 +164,10 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
       physical: PhysicalProfile.empty(),
       images: ProfileImages.empty(),
     );
-    debugPrint(metrimonyProfile.toString());
 
-    await matrimonyRepository.createMatrimonyProfile(
-      uid,
-      metrimonyProfile.toMap(),
-    );
-    await userStatusRepository.createUserStatus(uid);
+    await FirebaseFirestore.instance
+        .collection('metrimony_profiles')
+        .doc(uid)
+        .set(metrimonyProfile.toMap());
   }
-
-   
 }
