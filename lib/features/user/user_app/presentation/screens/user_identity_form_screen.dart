@@ -1,3 +1,6 @@
+import 'package:arvika_marriage_bureau/app/custom/image_picker/image_picker_widget.dart';
+import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../data/datasources/firebase/agent_firestore_ds.dart';
 import '../../../user_auth/presentation/controllers/auth_controller.dart';
@@ -160,6 +163,7 @@ class _UserIdentityFormScreenState
                 },
               ),
 
+              // add  widget for  aadhar upload
               const SizedBox(height: 12),
 
               // ----------------------------
@@ -233,10 +237,6 @@ class _UserIdentityFormScreenState
 
               const SizedBox(height: 16),
 
-
-
-
-
               // // elevated button to fetch agent data
               // ElevatedButton(
               //   onPressed: () async {
@@ -274,9 +274,47 @@ class _UserIdentityFormScreenState
               //   },
               //   child: const Text('Fetch Agent Data (Example)'),
               // ),
+
+              // navigate to cultural details
+              AppButton(
+                onPressed: () {
+                  context.navigateTo(const UserAddressFormRoute());
+                },
+                text: "Go to address Details",
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class AppImagePicker {
+  final String title;
+  final ValueChanged<String> onImagePicked;
+
+  const AppImagePicker({required this.title, required this.onImagePicked});
+
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.upload_file),
+            label: const Text('Select Image'),
+            onPressed: () async {
+              // TODO: Implement image picking logic
+              // For now, let's simulate a picked image path
+              const String dummyImagePath = 'path/to/your/image.jpg';
+              onImagePicked(dummyImagePath);
+            },
+          ),
+        ],
       ),
     );
   }

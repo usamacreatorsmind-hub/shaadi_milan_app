@@ -10,7 +10,6 @@ import 'education_state.dart';
 import 'employee_state.dart';
 import 'family_state.dart';
 import 'identity_state.dart';
-import 'lifestyle_state.dart';
 import 'physical_state.dart';
 
 /// ============================================================
@@ -27,7 +26,6 @@ class MatrimonyProfile {
   final EducationProfile education;
   final EmploymentProfile employment;
   final FamilyProfile family;
-  final LifestyleProfile lifestyle;
   final PhysicalProfile physical;
 
   final ProfileImages images;
@@ -41,7 +39,6 @@ class MatrimonyProfile {
     EducationProfile? education,
     EmploymentProfile? employment,
     FamilyProfile? family,
-    LifestyleProfile? lifestyle,
     PhysicalProfile? physical,
     ProfileImages? images,
   }) : identity = identity ?? IdentityProfile.empty(),
@@ -50,7 +47,6 @@ class MatrimonyProfile {
        education = education ?? EducationProfile.empty(),
        employment = employment ?? EmploymentProfile.empty(),
        family = family ?? FamilyProfile.empty(),
-       lifestyle = lifestyle ?? LifestyleProfile.empty(),
        physical = physical ?? PhysicalProfile.empty(),
        images = images ?? ProfileImages.empty();
 
@@ -67,7 +63,6 @@ class MatrimonyProfile {
     EducationProfile? education,
     EmploymentProfile? employment,
     FamilyProfile? family,
-    LifestyleProfile? lifestyle,
     PhysicalProfile? physical,
     ProfileImages? images,
   }) {
@@ -80,7 +75,6 @@ class MatrimonyProfile {
       education: education ?? this.education,
       employment: employment ?? this.employment,
       family: family ?? this.family,
-      lifestyle: lifestyle ?? this.lifestyle,
       physical: physical ?? this.physical,
       images: images ?? this.images,
     );
@@ -98,7 +92,6 @@ class MatrimonyProfile {
       'education': education.toMap(),
       'employment': employment.toMap(),
       'family': family.toMap(),
-      'lifestyle': lifestyle.toMap(),
       'physical': physical.toMap(),
       'images': images.toMap(),
     };
@@ -140,14 +133,6 @@ class MatrimonyProfile {
               )
             : EmploymentProfile.empty(),
 
-        /// 🔥 merge root-level hobbies safely
-        lifestyle: map['lifestyle'] != null
-            ? LifestyleProfile.fromMap({
-                ...Map<String, dynamic>.from(map['lifestyle'] ?? {}),
-                'hobbies': map['hobbies'] ?? [],
-              })
-            : LifestyleProfile.empty(),
-
         physical: map['physical'] != null
             ? PhysicalProfile.fromMap(
                 Map<String, dynamic>.from(map['physical']),
@@ -174,8 +159,7 @@ MatrimonyProfile(
   cultural: $cultural,
   education: $education,
   employment: $employment,
-  family: $family,
-  lifestyle: $lifestyle,
+  family: $family, 
   physical: $physical,
   images: $images
 )

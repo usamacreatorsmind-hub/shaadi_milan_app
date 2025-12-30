@@ -19,8 +19,7 @@ class UserCulturalController extends StateNotifier<CulturalState> {
   Future<void> saveCultural({
     required String religion,
     required String caste,
-    required String subCaste,
-    required String gothra,
+    required String subCaste, 
     required String motherTongue,
     required List<String> languages,
   }) async {
@@ -28,8 +27,7 @@ class UserCulturalController extends StateNotifier<CulturalState> {
     final culturalProfile = CulturalProfile(
       religion: religion,
       caste: caste,
-      subCaste: subCaste,
-      gothra: gothra,
+      subCaste: subCaste, 
       motherTongue: motherTongue,
       languages: languages,
     );

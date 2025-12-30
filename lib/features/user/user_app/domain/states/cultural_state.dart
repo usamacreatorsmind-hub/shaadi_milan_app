@@ -2,7 +2,6 @@ class CulturalProfile {
   final String religion;
   final String caste;
   final String subCaste;
-  final String gothra;
   final String motherTongue;
   final List<String> languages;
 
@@ -10,7 +9,6 @@ class CulturalProfile {
     required this.religion,
     required this.caste,
     required this.subCaste,
-    required this.gothra,
     required this.motherTongue,
     required this.languages,
   });
@@ -20,7 +18,6 @@ class CulturalProfile {
       'religion': religion,
       'caste': caste,
       'subCaste': subCaste,
-      'gothra': gothra,
       'motherTongue': motherTongue,
       'languages': languages,
     };
@@ -31,7 +28,6 @@ class CulturalProfile {
       religion: map['religion'] as String,
       caste: map['caste'] as String,
       subCaste: map['subCaste'] as String,
-      gothra: map['gothra'] as String,
       motherTongue: map['motherTongue'] as String,
       languages: List<String>.from(map['languages'] as List),
     );
@@ -39,7 +35,7 @@ class CulturalProfile {
 
   @override
   String toString() {
-    return 'CulturalProfile(religion: $religion, caste: $caste, subCaste: $subCaste, gothra: $gothra, motherTongue: $motherTongue, languages: $languages)';
+    return 'CulturalProfile(religion: $religion, caste: $caste, subCaste: $subCaste,  motherTongue: $motherTongue, languages: $languages)';
   }
 
   CulturalProfile copyWith({
@@ -53,8 +49,7 @@ class CulturalProfile {
     return CulturalProfile(
       religion: religion ?? this.religion,
       caste: caste ?? this.caste,
-      subCaste: subCaste ?? this.subCaste,
-      gothra: gothra ?? this.gothra,
+      subCaste: subCaste ?? this.subCaste, 
       motherTongue: motherTongue ?? this.motherTongue,
       languages: languages ?? this.languages,
     );
@@ -64,8 +59,7 @@ class CulturalProfile {
     return CulturalProfile(
       religion: '',
       caste: '',
-      subCaste: '',
-      gothra: '',
+      subCaste: '', 
       motherTongue: '',
       languages: [],
     );

@@ -3,14 +3,14 @@ class IdentityProfile {
   final String gender;
   final DateTime dob;
   final int age;
-  final String aadhar;
+  final String aadhar; 
 
   IdentityProfile({
     required this.profileId,
     required this.gender,
     required this.dob,
     required this.age,
-    required this.aadhar,
+    required this.aadhar, 
   });
 
   Map<String, dynamic> toMap() {
@@ -19,7 +19,7 @@ class IdentityProfile {
       'gender': gender,
       'dob': dob.toIso8601String(),
       'age': age,
-      'aadhar': aadhar,
+      'aadhar': aadhar, 
     };
   }
 
@@ -36,7 +36,7 @@ class IdentityProfile {
           ? DateTime.tryParse(map['dob'].toString()) ?? DateTime(1900)
           : DateTime(1900),
       age: map['age'] as int? ?? 0,
-      aadhar: map['aadhar'] as String? ?? '',
+      aadhar: map['aadhar'] as String? ?? '', 
     );
   }
 
@@ -47,17 +47,20 @@ class IdentityProfile {
     int? age,
     String? aadhar,
   }) {
-    return IdentityProfile(
+    return IdentityProfile( 
+
       profileId: profileId ?? this.profileId,
       gender: gender ?? this.gender,
       dob: dob ?? this.dob,
       age: age ?? this.age,
+
       aadhar: aadhar ?? this.aadhar,
     );
   }
 
   factory IdentityProfile.empty() {
-    return  IdentityProfile(
+    return IdentityProfile(
+    
       profileId: '',
       gender: '',
       dob: DateTime(1900),

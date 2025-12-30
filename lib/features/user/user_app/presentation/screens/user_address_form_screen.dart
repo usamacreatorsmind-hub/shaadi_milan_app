@@ -27,8 +27,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
 
   final _districtController = TextEditingController();
   final _stateController = TextEditingController();
-  final _pinController = TextEditingController(); 
-  
+  final _pinController = TextEditingController();
 
   @override
   void dispose() {
@@ -91,8 +90,8 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   controller: _atController,
                   prefixIcon: Icons.location_on,
                   iconColor: Theme.of(context).colorScheme.primary,
-                  label: "At",
-                  hint: "Enter your address (At)",
+                  label: "Place ",
+                  hint: "Enter your village, street, or locality",
                   obscureText: false,
                   keyboardType: TextInputType.streetAddress,
                   validator: (v) => v == null || v.isEmpty ? 'Required' : null,

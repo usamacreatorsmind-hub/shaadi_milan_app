@@ -281,17 +281,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               ],
                             ),
 
-                            _InfoCard(
-                              title: 'Lifestyle',
-                              icon: Icons.local_cafe,
-                              children: [
-                                _InfoTile(
-                                  label: 'Diet',
-                                  icon: Icons.restaurant,
-                                  value: profile.lifestyle.diet,
-                                ),
-                              ],
-                            ),
+                          
 
                             _InfoCard(
                               title: 'Address',

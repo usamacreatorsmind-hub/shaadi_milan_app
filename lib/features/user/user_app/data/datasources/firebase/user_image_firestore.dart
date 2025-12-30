@@ -69,6 +69,7 @@ class ImageUploadService {
 
     String primaryImageUrl = '';
     List<String> secondaryImageUrls = [];
+    String aadharCardUrl = '';
 
     for (final Reference ref in result.items) {
       final url = await ref.getDownloadURL();
@@ -76,12 +77,51 @@ class ImageUploadService {
         primaryImageUrl = url;
       } else if (ref.name.startsWith('gallery_')) {
         secondaryImageUrls.add(url);
+      } else if (ref.name == 'aadhar_card.pdf') {
+        aadharCardUrl = url;
       }
     }
     return {
       'primaryImageUrl': primaryImageUrl,
       'secondaryImageUrls': secondaryImageUrls,
+      'aadharCardUrl': aadharCardUrl,
     };
+  }
+
+  // 🔥 AADHAR CARD UPLOAD
+  Future<String> uploadAadharCard({
+    required String uid,
+    required String filePath,
+    void Function(double)? onProgress,
+  }) async {
+    final file = File(filePath);
+
+    final ref = _storage.ref().child('profile_images/$uid/aadhar_card.pdf');
+
+    final task = ref.putFile(file);
+
+    task.snapshotEvents.listen((event) {
+      if (onProgress != null && event.totalBytes > 0) {
+        onProgress(event.bytesTransferred / event.totalBytes);
+      }
+    });
+
+    await task;
+
+    return await ref.getDownloadURL();
+  }
+
+  // 🔥 FETCH AADHAR CARD IMAGE
+  Future<String?> getAadharCardUrl(String uid) async {
+    try {
+      final ref = _storage.ref().child('profile_images/$uid/aadhar_card.pdf');
+      return await ref.getDownloadURL();
+    } catch (e) {
+      if (e is FirebaseException && e.code == 'object-not-found') {
+        return null; // Aadhar card not found
+      }
+      rethrow;
+    }
   }
 
   // 🔥 WATCH PROFILE IMAGES (NOT DIRECTLY SUPPORTED BY FIREBASE STORAGE)

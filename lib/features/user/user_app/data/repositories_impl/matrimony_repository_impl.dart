@@ -9,8 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/states/education_state.dart';
 import '../../domain/states/employee_state.dart';
 import '../../domain/states/family_state.dart';
-import '../../domain/states/identity_state.dart';
-import '../../domain/states/lifestyle_state.dart';
+import '../../domain/states/identity_state.dart'; 
 import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/physical_state.dart';
 
@@ -87,10 +86,7 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
     return _remoteDS.updateIdentity(uid, identity);
   }
 
-  @override
-  Future<void> updateLifestyleProfile(String uid, LifestyleProfile lifestyle) {
-    return _remoteDS.updateLifestyle(uid, lifestyle);
-  }
+  
 
   @override
   Future<void> updatePhysicalProfile(String uid, PhysicalProfile physical) {
@@ -134,10 +130,7 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   Future<IdentityProfile> getIdentityProfile(String uid) async =>
       (await getMatrimonyProfile(uid)).identity!;
 
-  @override
-  Future<LifestyleProfile> getLifestyleProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).lifestyle!;
-
+   
   @override
   Future<PhysicalProfile> getPhysicalProfile(String uid) async =>
       (await getMatrimonyProfile(uid)).physical!;

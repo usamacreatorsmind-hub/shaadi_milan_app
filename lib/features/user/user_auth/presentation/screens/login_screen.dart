@@ -212,6 +212,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
+
+                    // navigate to education form screen
                   ],
                 ),
               ),

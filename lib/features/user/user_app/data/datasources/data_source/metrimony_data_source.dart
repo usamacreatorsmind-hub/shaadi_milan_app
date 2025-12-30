@@ -5,8 +5,7 @@ import '../../../domain/states/cultural_state.dart';
 import '../../../domain/states/education_state.dart';
 import '../../../domain/states/employee_state.dart';
 import '../../../domain/states/family_state.dart';
-import '../../../domain/states/identity_state.dart';
-import '../../../domain/states/lifestyle_state.dart';
+import '../../../domain/states/identity_state.dart'; 
 import '../../../domain/states/metrimony_state.dart';
 import '../../../domain/states/physical_state.dart';
 
@@ -25,8 +24,7 @@ abstract class MatrimonyDataSource {
   // ================= UPDATE (SECTION WISE) =================
   Future<void> updateIdentity(String uid, IdentityProfile identity);
   Future<void> updatePhysical(String uid, PhysicalProfile physical);
-  Future<void> updateCultural(String uid, CulturalProfile cultural);
-  Future<void> updateLifestyle(String uid, LifestyleProfile lifestyle);
+  Future<void> updateCultural(String uid, CulturalProfile cultural); 
   Future<void> updateEducation(String uid, EducationProfile education);
   Future<void> updateEmployment(String uid, EmploymentProfile employment);
   Future<void> updateFamily(String uid, FamilyProfile family);

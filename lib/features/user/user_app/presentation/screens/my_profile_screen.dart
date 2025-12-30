@@ -198,20 +198,7 @@ class MyProfileScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-
-                // 🌿 LIFESTYLE
-                _DetailSection(
-                  title: "Lifestyle",
-                  actionChip: AppChip(
-                    label: "Edit",
-                    icon: Icons.edit,
-                    onTap: () {},
-                  ),
-
-                  children: [
-                    _DetailRow("Diet", profile.lifestyle?.diet ?? "N/A"),
-                  ],
-                ),
+ 
 
                 // 🏠 ADDRESS
                 _DetailSection(

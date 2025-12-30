@@ -6,8 +6,7 @@ import '../states/cultural_state.dart';
 import '../states/education_state.dart';
 import '../states/employee_state.dart';
 import '../states/family_state.dart';
-import '../states/identity_state.dart';
-import '../states/lifestyle_state.dart';
+import '../states/identity_state.dart'; 
 import '../states/metrimony_state.dart';
 import '../states/physical_state.dart';
 
@@ -42,8 +41,7 @@ abstract class MatrimonyRepository {
   Future<void> updatePhysicalProfile(String uid, PhysicalProfile physical);
 
   Future<void> updateCulturalProfile(String uid, CulturalProfile cultural);
-
-  Future<void> updateLifestyleProfile(String uid, LifestyleProfile lifestyle);
+ 
 
   Future<void> updateEducationProfile(String uid, EducationProfile education);
 
@@ -65,8 +63,7 @@ abstract class MatrimonyRepository {
   // ─────────────────────────────────────────────
   Future<IdentityProfile> getIdentityProfile(String uid);
   Future<PhysicalProfile> getPhysicalProfile(String uid);
-  Future<CulturalProfile> getCulturalProfile(String uid);
-  Future<LifestyleProfile> getLifestyleProfile(String uid);
+  Future<CulturalProfile> getCulturalProfile(String uid); 
   Future<EducationProfile> getEducationProfile(String uid);
   Future<EmploymentProfile> getEmploymentProfile(String uid);
   Future<FamilyProfile> getFamilyProfile(String uid);

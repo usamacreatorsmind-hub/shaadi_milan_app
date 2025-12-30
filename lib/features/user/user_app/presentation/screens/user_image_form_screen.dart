@@ -34,6 +34,13 @@ class UserImageFormScreen extends ConsumerWidget {
                   return;
                 }
 
+                if (images.aadharPdfPath == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please select Aadhar PDF')),
+                  );
+                  return;
+                }
+
                 final user = ref.read(authStateProvider).value;
                 if (user == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -85,7 +92,12 @@ class UserImageFormScreen extends ConsumerWidget {
                     Navigator.pop(context); // Pop loading
                   }
                 } catch (e) {
-                  if (context.mounted) Navigator.pop(context); // Pop loading
+                  if (context.mounted) {
+                    Navigator.pop(context); // Pop loading
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Upload failed: $e")),
+                    );
+                  }
                   debugPrint("Upload failed: $e");
                 }
               },

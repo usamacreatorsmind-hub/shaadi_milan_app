@@ -15,6 +15,7 @@ class ImagePickerWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final imageState = ref.watch(imagePickerProvider);
+
     final controller = ref.read(imagePickerProvider.notifier);
     final isPicking = ref.watch(_imagePickingProvider);
 
@@ -94,6 +95,75 @@ class ImagePickerWidget extends ConsumerWidget {
         ),
 
         const SizedBox(height: 8),
+
+        // add for aadhar image also
+        const SizedBox(height: 16),
+
+        // ================= AADHAR IMAGE =================
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Aadhar Card (PDF)',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            AppChip(
+              label: 'Upload PDF',
+              onTap: () => safePick(controller.pickAadharPdf),
+              backgroundColor: colors.secondaryContainer,
+              textColor: colors.onSecondaryContainer,
+              icon: Icons.picture_as_pdf,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () => safePick(controller.pickAadharPdf),
+          child: Container(
+            height: 80,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: colors.outline),
+            ),
+            child: imageState.aadharPdfPath == null
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.picture_as_pdf,
+                        size: 30,
+                        color: colors.primary,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Select Aadhar PDF',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.check_circle, color: Colors.green),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          imageState.aadharPdfPath!.split('/').last,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+        const SizedBox(height: 16),
 
         // ================= EMPTY PLACEHOLDER =================
         if (imageState.secondaryImages.isEmpty)

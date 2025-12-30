@@ -82,21 +82,12 @@ class _UserBiodataCheckScreenState
           _section('Cultural', Icons.temple_hindu, [
             _infoRow('Religion', profile.cultural.religion),
             _infoRow('Caste', profile.cultural.caste),
-            _infoRow('Sub Caste', profile.cultural.subCaste),
-            _infoRow('Gothra', profile.cultural.gothra),
+            _infoRow('Sub Caste', profile.cultural.subCaste), 
             _infoRow('Mother Tongue', profile.cultural.motherTongue),
             _chipWrap('Languages Known', profile.cultural.languages),
           ]),
 
-          _section('Lifestyle', Icons.favorite, [
-            _infoRow('Diet', profile.lifestyle.diet),
-            _chipWrap('Hobbies', profile.lifestyle.hobbies),
-            _chipWrap('Interests', profile.lifestyle.interests),
-            _chipWrap('Music', profile.lifestyle.music),
-            _chipWrap('Movies', profile.lifestyle.movies),
-            _chipWrap('Sports', profile.lifestyle.sports),
-          ]),
-
+        
           _section('Education', Icons.school, [
             
             _infoRow(

@@ -6,8 +6,7 @@ import '../../../domain/states/cultural_state.dart';
 import '../../../domain/states/education_state.dart';
 import '../../../domain/states/employee_state.dart';
 import '../../../domain/states/family_state.dart';
-import '../../../domain/states/identity_state.dart';
-import '../../../domain/states/lifestyle_state.dart';
+import '../../../domain/states/identity_state.dart'; 
 import '../../../domain/states/metrimony_state.dart';
 import '../../../domain/states/physical_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -80,11 +79,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
     await _updateProfileSection(uid, 'cultural', cultural.toMap());
   }
 
-  @override
-  Future<void> updateLifestyle(String uid, LifestyleProfile lifestyle) async {
-    await _updateProfileSection(uid, 'lifestyle', lifestyle.toMap());
-  }
-
+ 
   @override
   Future<void> updateEducation(String uid, EducationProfile education) async {
     await _updateProfileSection(uid, 'education', education.toMap());

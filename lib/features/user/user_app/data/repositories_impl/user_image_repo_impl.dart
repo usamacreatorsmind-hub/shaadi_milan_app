@@ -34,6 +34,8 @@ class UserImageRepositoryImpl implements UserImageRepository {
     final imagesMap = await _imageUploadService.getProfileImages(uid);
     return ProfileImages(
       primaryImageUrl: imagesMap['primaryImageUrl'] as String,
+      aadharCardUrl: imagesMap['aadharCardUrl'] as String,
+
       secondaryImageUrls: imagesMap['secondaryImageUrls'] as List<String>,
     );
   }

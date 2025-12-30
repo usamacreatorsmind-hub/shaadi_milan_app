@@ -17,8 +17,7 @@ import '../../domain/states/address_state.dart';
 import '../../domain/states/education_state.dart';
 import '../../domain/states/employee_state.dart';
 import '../../domain/states/family_state.dart';
-import '../../domain/states/cultural_state.dart';
-import '../../domain/states/lifestyle_state.dart';
+import '../../domain/states/cultural_state.dart'; 
 import '../../domain/states/physical_state.dart';
 
 final metrimonyControllerProvider =
@@ -91,12 +90,7 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     nextStep();
   }
 
-  void saveLifestyle(LifestyleProfile data) {
-    state = state.copyWith(
-      metrimony: state.metrimony.copyWith(lifestyle: data),
-    );
-    nextStep();
-  }
+   
 
   void savePhysical(PhysicalProfile data) {
     state = state.copyWith(metrimony: state.metrimony.copyWith(physical: data));
@@ -159,8 +153,7 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
       cultural: CulturalProfile.empty(),
       education: EducationProfile.empty(),
       employment: EmploymentProfile.empty(),
-      family: FamilyProfile.empty(),
-      lifestyle: LifestyleProfile.empty(),
+      family: FamilyProfile.empty(), 
       physical: PhysicalProfile.empty(),
       images: ProfileImages.empty(),
     );

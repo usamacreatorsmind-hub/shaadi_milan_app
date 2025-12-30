@@ -5,8 +5,7 @@ import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/educ
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/employee_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/family_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/identity_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/lifestyle_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart'; 
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/physical_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
@@ -40,8 +39,7 @@ class MetrimonyProfileViewModel {
   CulturalProfile get cultural => metrimonyProfile.cultural;
   EducationProfile get education => metrimonyProfile.education;
   EmploymentProfile get employment => metrimonyProfile.employment;
-  FamilyProfile get family => metrimonyProfile.family;
-  LifestyleProfile get lifestyle => metrimonyProfile.lifestyle;
+  FamilyProfile get family => metrimonyProfile.family; 
   PhysicalProfile get physical => metrimonyProfile.physical;
   ProfileImages get images => metrimonyProfile.images;
   AppUser get user => userProfile;

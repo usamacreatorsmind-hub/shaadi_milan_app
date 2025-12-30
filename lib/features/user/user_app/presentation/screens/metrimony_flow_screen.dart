@@ -11,7 +11,6 @@ import 'user_family_form_screen.dart';
 import 'user_home_screen.dart';
 import 'user_identity_form_screen.dart';
 import 'user_image_form_screen.dart';
-import 'user_lifestyle_form_screen.dart';
 import 'user_physical_form_screen.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
@@ -62,12 +61,9 @@ class MatrimonyFormFlowScreen extends ConsumerWidget {
 
       case MatrimonyStep.family:
         return const UserFamilyFormScreen();
- 
 
       case MatrimonyStep.cultural:
         return const UserCultureFormScreen();
-      case MatrimonyStep.lifestyle:
-        return const UserLifestyleFormScreen();
       case MatrimonyStep.physical:
         return const UserPhysicalFormScreen();
       case MatrimonyStep.image:
@@ -84,9 +80,8 @@ enum MatrimonyStep {
   address,
   education,
   employment,
-  family, 
+  family,
   cultural,
-  lifestyle,
   physical,
   image,
   user,

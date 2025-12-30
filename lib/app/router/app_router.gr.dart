@@ -164,12 +164,7 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const UserImageFormScreen(),
       );
     },
-    UserLifestyleFormRoute.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const UserLifestyleFormScreen(),
-      );
-    },
+   
     UserMainShellRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,

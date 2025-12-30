@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import '../../data/repositories_impl/user_image_repo_impl.dart';
 import '../../domain/states/image_state.dart';
 import 'metrimony_profile_controller.dart';
@@ -16,6 +17,25 @@ class ImagePickerController extends StateNotifier<ImagesState> {
   static const int maxSecondaryImages = 3;
 
   bool _isPicking = false;
+
+  // 📄 Pick Aadhar PDF
+  Future<void> pickAadharPdf() async {
+    if (_isPicking) return;
+    _isPicking = true;
+
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+
+      if (result == null || result.files.single.path == null) return;
+
+      state = state.copyWith(aadharPdfPath: result.files.single.path);
+    } finally {
+      _isPicking = false;
+    }
+  }
 
   // 📸 Pick primary image
   Future<void> pickPrimaryImage() async {
@@ -86,6 +106,9 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     if (state.primaryImage == null) {
       throw Exception('Primary image is required');
     }
+    if (state.aadharPdfPath == null) {
+      throw Exception('Aadhar PDF is required');
+    }
 
     try {
       ref.read(uploadProgressProvider.notifier).state = 0.0;
@@ -93,25 +116,41 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       // Use service directly to access progress callbacks
       final service = ref.read(imageUploadServiceProvider);
 
-      void updateProgress(double p, {bool isSecondary = false}) {
-        // Weighted progress: 50% primary, 50% secondary (if exists)
-        double total = p;
-        if (state.secondaryImages.isNotEmpty) {
-          total = isSecondary ? 0.5 + (p * 0.5) : p * 0.5;
-        }
-        ref.read(uploadProgressProvider.notifier).state = total;
+      final hasSecondary = state.secondaryImages.isNotEmpty;
+      final steps = hasSecondary ? 3 : 2;
+      final stepWeight = 1.0 / steps;
+
+      void updateStepProgress(int stepIndex, double p) {
+        final base = stepIndex * stepWeight;
+        final current = p * stepWeight;
+        ref.read(uploadProgressProvider.notifier).state = base + current;
       }
 
+      // 1. Primary
       final primaryImageUrl = await service.uploadPrimaryImage(
         uid: uid,
         filePath: state.primaryImage!,
-        onProgress: (p) => updateProgress(p),
+        onProgress: (p) => updateStepProgress(0, p),
       );
 
-      final secondaryImageUrls = await service.uploadSecondaryImages(
+      // 2. Secondary (Optional)
+      List<String> secondaryImageUrls = [];
+      int nextStep = 1;
+
+      if (hasSecondary) {
+        secondaryImageUrls = await service.uploadSecondaryImages(
+          uid: uid,
+          filePaths: state.secondaryImages,
+          onProgress: (p) => updateStepProgress(1, p),
+        );
+        nextStep = 2;
+      }
+
+      // 3. Aadhar
+      final aadharCardUrl = await service.uploadAadharCard(
         uid: uid,
-        filePaths: state.secondaryImages,
-        onProgress: (p) => updateProgress(p, isSecondary: true),
+        filePath: state.aadharPdfPath!,
+        onProgress: (p) => updateStepProgress(nextStep, p),
       );
 
       ref
@@ -119,6 +158,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
           .saveImages(
             ProfileImages(
               primaryImageUrl: primaryImageUrl,
+              aadharCardUrl: aadharCardUrl,
               secondaryImageUrls: secondaryImageUrls,
             ),
           );

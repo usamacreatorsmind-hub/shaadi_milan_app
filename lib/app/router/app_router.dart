@@ -17,8 +17,7 @@ import '../../features/user/user_app/presentation/screens/user_employement_form_
 import '../../features/user/user_app/presentation/screens/user_family_form_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_home_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_identity_form_screen.dart';
-import '../../features/user/user_app/presentation/screens/user_image_form_screen.dart';
-import '../../features/user/user_app/presentation/screens/user_lifestyle_form_screen.dart';
+import '../../features/user/user_app/presentation/screens/user_image_form_screen.dart'; 
 import '../../features/user/user_app/presentation/screens/user_main_shell.dart';
 import '../../features/user/user_app/presentation/screens/user_wishlist_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_notification_screen.dart';
@@ -67,8 +66,7 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: UserCultureFormRoute.page),
     AutoRoute(page: UserEducationFormRoute.page),
     AutoRoute(page: UserEmploymentFormRoute.page),
-    AutoRoute(page: UserFamilyFormRoute.page),
-    AutoRoute(page: UserLifestyleFormRoute.page),
+    AutoRoute(page: UserFamilyFormRoute.page), 
     AutoRoute(page: UserAddressFormRoute.page),
     AutoRoute(page: UserBiodataCheckRoute.page),
     AutoRoute(page: UserDetailRoute.page),
