@@ -1,10 +1,12 @@
 import 'package:file_picker/file_picker.dart';
-import '../../data/repositories_impl/user_image_repo_impl.dart';
-import '../../domain/states/image_state.dart';
-import 'metrimony_profile_controller.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import '../../../features/user/user_app/data/repositories_impl/user_image_repo_impl.dart';
+import '../../../features/user/user_app/domain/states/image_state.dart';
+import '../../../features/user/user_app/presentation/controllers/metrimony_profile_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 final uploadProgressProvider = StateProvider<double>((ref) => 0.0);
 
@@ -17,6 +19,28 @@ class ImagePickerController extends StateNotifier<ImagesState> {
   static const int maxSecondaryImages = 3;
 
   bool _isPicking = false;
+
+  Future<String?> _cropImage(String path, {bool isPrimary = false}) async {
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: path,
+      maxWidth: isPrimary ? 500 : 800,
+      maxHeight: isPrimary ? 500 : 800,
+      compressQuality: isPrimary ? 70 : 80,
+      compressFormat: ImageCompressFormat.jpg,
+
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Colors.pink,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false,
+        ),
+        IOSUiSettings(title: 'Crop Image'),
+      ],
+    );
+    return croppedFile?.path;
+  }
 
   // 📄 Pick Aadhar PDF
   Future<void> pickAadharPdf() async {
@@ -50,7 +74,10 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (image == null) return;
 
-      state = state.copyWith(primaryImage: image.path);
+      final croppedPath = await _cropImage(image.path, isPrimary: true);
+      if (croppedPath != null) {
+        state = state.copyWith(primaryImage: croppedPath);
+      }
     } finally {
       _isPicking = false;
     }
@@ -69,8 +96,14 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (images.isEmpty) return;
 
-      final paths = images.map((e) => e.path).toList();
-      final updated = {...state.secondaryImages, ...paths}.toList();
+      final List<String> croppedPaths = [];
+      for (final img in images) {
+        final cropped = await _cropImage(img.path);
+        if (cropped != null) {
+          croppedPaths.add(cropped);
+        }
+      }
+      final updated = {...state.secondaryImages, ...croppedPaths}.toList();
 
       state = state.copyWith(
         secondaryImages: updated.take(maxSecondaryImages).toList(),

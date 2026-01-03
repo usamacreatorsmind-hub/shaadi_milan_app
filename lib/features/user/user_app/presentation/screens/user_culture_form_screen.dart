@@ -6,14 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../domain/states/cultural_state.dart';
 import '../controllers/user_cultural_controllers.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/religion_state.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../domain/states/cultural_state.dart';
-import '../controllers/user_cultural_controllers.dart';
 
 @RoutePage()
 class UserCultureFormScreen extends ConsumerStatefulWidget {
@@ -30,13 +22,13 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
   final List<String> languages = List.empty(growable: true);
 
   final _subCasteController = TextEditingController();
-  final _motherTongueController = TextEditingController();
+  // final _motherTongueController = TextEditingController();
   final _languagesController = TextEditingController();
 
   @override
   void dispose() {
     _subCasteController.dispose();
-    _motherTongueController.dispose();
+    // _motherTongueController.dispose();
     _languagesController.dispose();
     super.dispose();
   }
@@ -66,7 +58,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
     print('Religion: $religion');
     print('Caste: $caste');
     print('Sub-Caste: ${_subCasteController.text.trim()}');
-    print('Mother Tongue: ${_motherTongueController.text.trim()}');
+    // print('Mother Tongue: ${_motherTongueController.text.trim()}');
     print('Languages: $cleanedLanguages');
 
     ref
@@ -75,7 +67,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
           religion: religion,
           caste: caste,
           subCaste: _subCasteController.text.trim(),
-          motherTongue: _motherTongueController.text.trim(),
+          // motherTongue: _motherTongueController.text.trim(),
           languages: cleanedLanguages,
         );
   }
@@ -194,16 +186,15 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
             const SizedBox(height: 16),
 
             /// ================= Mother Tongue =================
-            AppTextField(
-              controller: _motherTongueController,
-              prefixIcon: Icons.language,
-              iconColor: primaryColor,
-              label: "Mother Tongue",
-              hint: "Enter your mother tongue",
-              keyboardType: TextInputType.text,
-              obscureText: false,
-            ),
-
+            // AppTextField(
+            //   controller: _motherTongueController,
+            //   prefixIcon: Icons.language,
+            //   iconColor: primaryColor,
+            //   label: "Mother Tongue",
+            //   hint: "Enter your mother tongue",
+            //   keyboardType: TextInputType.text,
+            //   obscureText: false,
+            // ),
             const SizedBox(height: 16),
 
             /// ================= Languages =================

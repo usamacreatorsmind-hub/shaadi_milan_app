@@ -15,7 +15,7 @@ class AgentFirestoreDs {
 
   final String _collection = 'agents';
 
-  Future<String?> fetchAgentDocIdByAgentId(String agentId) async {
+  Future<String?> fetchAgentDocIdByAgentId({required String agentId}) async {
     final querySnapshot = await _firestore
         .collection(_collection)
         .where('agentId', isEqualTo: agentId)
@@ -23,7 +23,7 @@ class AgentFirestoreDs {
         .get();
 
     if (querySnapshot.docs.isEmpty) {
-      debugPrint('❌ Agent with ID $agentId not found');
+      debugPrint('❌ Agents doc  ID $agentId not found');
       return null;
     }
 
@@ -34,8 +34,22 @@ class AgentFirestoreDs {
     return docId;
   }
 
+  // fetch agentprofile using agent id
+  Future<AgentProfile> fetchAgentByUid(String agentId) async {
+    final querySnapshot = await _firestore
+        .collection(_collection)
+        .where('agentId', isEqualTo: agentId)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isEmpty) {
+      throw Exception('Agent with UID $agentId not found');
+    }
+    return AgentProfile.fromMap(querySnapshot.docs.first.data());
+  }
+
   // fetch agent doumetn using agent id
-  Future<AgentProfile> fetchAgentProfilebyAgentId(String agentId) async {
+  Future<AgentProfile> fetchAgentbyAgentId(String agentId) async {
     final querySnapshot = await _firestore
         .collection(_collection)
         .where('agentId', isEqualTo: agentId)

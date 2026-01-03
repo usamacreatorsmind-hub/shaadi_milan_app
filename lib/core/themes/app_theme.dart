@@ -244,59 +244,109 @@ class AppTheme {
 
   // -------------------- DARK THEME --------------------
   static ThemeData get darkTheme {
+    const Color background = Color(0xFF0F0F0F);
+    const Color surface = Color(0xFF1A1A1A);
+    const Color card = Color(0xFF1F1F1F);
+
+    const Color primaryRed = Color(0xFFB71C1C); // deep red
+    const Color accentRed = Color(0xFFE53935); // soft red highlight
+
     return ThemeData(
       brightness: Brightness.dark,
-      primaryColor: primaryRed,
-      scaffoldBackgroundColor: const Color(0xFF121212),
       visualDensity: VisualDensity.adaptivePlatformDensity,
 
-      colorScheme: ColorScheme.dark(primary: primaryRed, secondary: accentRed),
+      scaffoldBackgroundColor: background,
+      primaryColor: primaryRed,
 
+      colorScheme: const ColorScheme.dark(
+        primary: primaryRed,
+        secondary: accentRed,
+        surface: surface,
+        background: background,
+        error: Color(0xFFEF5350),
+      ),
+
+      // ---------------- BUTTONS ----------------
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
           backgroundColor: accentRed,
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          foregroundColor: Colors.white,
+          elevation: 3,
+          shadowColor: accentRed.withOpacity(0.3),
+          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.4,
+          ),
         ),
       ),
 
+      // ---------------- INPUT FIELDS ----------------
       inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: surface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: accentRed),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: accentRed, width: 2),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: accentRed, width: 1.5),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey.shade700),
-        ),
-        labelStyle: const TextStyle(color: accentRed),
-        hintStyle: TextStyle(color: Colors.grey.shade400),
-        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelStyle: const TextStyle(color: Colors.white70),
+        hintStyle: TextStyle(color: Colors.grey.shade500),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
         contentPadding: const EdgeInsets.symmetric(
-          vertical: 15,
+          vertical: 16,
           horizontal: 20,
         ),
       ),
 
-      snackBarTheme: SnackBarThemeData(
-        backgroundColor: accentRed,
-        contentTextStyle: const TextStyle(color: Colors.white),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-
+      // ---------------- APP BAR ----------------
       appBarTheme: const AppBarTheme(
-        backgroundColor: primaryRed,
+        backgroundColor: surface,
         foregroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
+      ),
+
+      // ---------------- CARDS ----------------
+      cardTheme: CardThemeData(
+        color: card,
+        elevation: 4,
+        shadowColor: Colors.black.withOpacity(0.4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+
+      // ---------------- SNACKBAR ----------------
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: surface,
+        contentTextStyle: const TextStyle(color: Colors.white),
+        behavior: SnackBarBehavior.floating,
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+
+      // ---------------- TEXT ----------------
+      textTheme: const TextTheme(
+        bodyMedium: TextStyle(color: Colors.white),
+        bodySmall: TextStyle(color: Colors.white70),
+        titleMedium: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+
+      // ---------------- ICONS ----------------
+      iconTheme: const IconThemeData(color: Colors.white70),
+
+      dividerTheme: DividerThemeData(
+        color: Colors.white.withOpacity(0.08),
+        thickness: 1,
       ),
     );
   }

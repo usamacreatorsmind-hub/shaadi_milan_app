@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../../app/router/app_router.dart';
+import '../../domain/states/religion_state.dart';
 import '../../domain/states/state_city.dart';
 import '../controllers/home_controller.dart';
 import 'package:auto_route/auto_route.dart';
@@ -9,38 +10,70 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:ui';
 
 /// =======================
-/// LOCATION STATE
+/// FILTER STATE
 /// =======================
-class LocationState {
+class HomeFilterState {
   final String state;
   final String city;
+  final String religion;
+  final String caste;
 
-  const LocationState({required this.state, required this.city});
+  const HomeFilterState({
+    required this.state,
+    required this.city,
+    required this.religion,
+    required this.caste,
+  });
 
-  LocationState copyWith({String? state, String? city}) {
-    return LocationState(state: state ?? this.state, city: city ?? this.city);
+  HomeFilterState copyWith({
+    String? state,
+    String? city,
+    String? religion,
+    String? caste,
+  }) {
+    return HomeFilterState(
+      state: state ?? this.state,
+      city: city ?? this.city,
+      religion: religion ?? this.religion,
+      caste: caste ?? this.caste,
+    );
   }
 }
 
 /// =======================
-/// LOCATION PROVIDER
+/// FILTER PROVIDER
 /// =======================
-final locationProvider =
-    StateNotifierProvider<LocationController, LocationState>(
-      (ref) => LocationController(),
+final homeFilterProvider =
+    StateNotifierProvider<HomeFilterController, HomeFilterState>(
+      (ref) => HomeFilterController(),
     );
 
-class LocationController extends StateNotifier<LocationState> {
-  LocationController()
-    : super(const LocationState(state: 'Maharashtra', city: 'Mumbai'));
+class HomeFilterController extends StateNotifier<HomeFilterState> {
+  HomeFilterController()
+    : super(
+        const HomeFilterState(state: '', city: '', religion: '', caste: ''),
+      );
 
   void updateState(String value) {
     // reset city when state changes
     state = state.copyWith(state: value, city: '');
   }
 
+  void reset() {
+    state = const HomeFilterState(state: '', city: '', religion: '', caste: '');
+  }
+
   void updateCity(String value) {
     state = state.copyWith(city: value);
+  }
+
+  void updateReligion(String value) {
+    // reset caste when religion changes
+    state = state.copyWith(religion: value, caste: '');
+  }
+
+  void updateCaste(String value) {
+    state = state.copyWith(caste: value);
   }
 }
 
@@ -54,7 +87,22 @@ class UserHomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(userHomeControllerProvider);
-    final location = ref.watch(locationProvider);
+    final filter = ref.watch(homeFilterProvider);
+
+    String filterText = '';
+    if (filter.city.isNotEmpty) {
+      filterText = '${filter.city}, ${filter.state}';
+    } else if (filter.state.isNotEmpty) {
+      filterText = filter.state;
+    }
+
+    if (filter.religion.isNotEmpty) {
+      if (filterText.isNotEmpty) filterText += ' • ';
+      filterText += filter.religion;
+      if (filter.caste.isNotEmpty) {
+        filterText += ' (${filter.caste})';
+      }
+    }
 
     return Scaffold(
       body: CustomScrollView(
@@ -190,15 +238,15 @@ class UserHomeScreen extends ConsumerWidget {
                           ),
                           const SizedBox(width: 6),
                           Expanded(
-                            child: Text(
-                              location.city.isEmpty
-                                  ? location.state
-                                  : '${location.city}, ${location.state}',
+                            child: Marquee(
+                              pauseDuration: Duration(milliseconds: 500),
+                              velocity: 50,
+
+                              filterText.isEmpty ? 'All Profiles' : filterText,
                               style: const TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w600,
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -249,13 +297,24 @@ class UserHomeScreen extends ConsumerWidget {
               final filteredProfiles = profiles.where((profile) {
                 // If no state is selected, or if state matches
                 final stateMatch =
-                    location.state.isEmpty ||
-                    (profile.address?.state == location.state);
+                    filter.state.isEmpty ||
+                    (profile.address?.state == filter.state);
                 // If no city is selected, or if city matches
                 final cityMatch =
-                    location.city.isEmpty ||
-                    (profile.address?.city == location.city);
-                return stateMatch && cityMatch;
+                    filter.city.isEmpty ||
+                    (profile.address?.city == filter.city);
+
+                // If no religion is selected, or if religion matches
+                final religionMatch =
+                    filter.religion.isEmpty ||
+                    (profile.cultural?.religion == filter.religion);
+
+                // If no caste is selected, or if caste matches
+                final casteMatch =
+                    filter.caste.isEmpty ||
+                    (profile.cultural?.caste == filter.caste);
+
+                return stateMatch && cityMatch && religionMatch && casteMatch;
               }).toList();
 
               if (filteredProfiles.isEmpty) {
@@ -279,20 +338,125 @@ class UserHomeScreen extends ConsumerWidget {
                       horizontal: 16,
                       vertical: 8,
                     ),
-                    // child: ProfileCard(
-                    //   uid: profile.user?.uid ?? "",
+                    child: ProfileCard(
+                      uid: profile.userId ?? "",
+                      name: " profile.?.fullName ?? 'N/A',",
 
-                    //   name: profile.user?.fullName ?? "N/A",
-                    //   age: profile.identity?.age ?? 0,
-                    //   designation: profile.employment?.designation ?? "N/A",
-                    //   imageUrl: profile.images?.primaryImageUrl ?? "",
-                    // ),
+                      age: profile.identity?.age ?? 0,
+                      designation: profile.employment?.designation ?? "N/A",
+                      imageUrl: profile.images?.primaryImageUrl ?? "",
+                    ),
                   );
                 }, childCount: filteredProfiles.length),
               );
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// =======================
+/// MARQUEE WIDGET
+/// =======================
+class Marquee extends StatefulWidget {
+  final String text;
+  final TextStyle style;
+  final Duration pauseDuration;
+  final double velocity;
+
+  const Marquee(
+    this.text, {
+    super.key,
+    required this.style,
+    this.pauseDuration = const Duration(seconds: 2),
+    this.velocity = 30.0, // pixels per second
+  });
+
+  @override
+  State<Marquee> createState() => _MarqueeState();
+}
+
+class _MarqueeState extends State<Marquee> {
+  final ScrollController _scrollController = ScrollController();
+  bool _isDisposed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scroll());
+  }
+
+  @override
+  void didUpdateWidget(Marquee oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.text != oldWidget.text) {
+      // When text changes, reset and the loop will restart with new dimensions.
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(0);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scroll() async {
+    while (!_isDisposed) {
+      // Wait for controller to be attached
+      if (!_scrollController.hasClients) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        continue;
+      }
+
+      // Only scroll if there's overflow
+      if (_scrollController.position.maxScrollExtent > 0) {
+        final scrollDuration = Duration(
+          milliseconds:
+              (_scrollController.position.maxScrollExtent /
+                      widget.velocity *
+                      1000)
+                  .toInt(),
+        );
+
+        await Future.delayed(widget.pauseDuration);
+        if (_isDisposed) break;
+
+        await _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: scrollDuration,
+          curve: Curves.linear,
+        );
+        if (_isDisposed) break;
+
+        await Future.delayed(widget.pauseDuration);
+        if (_isDisposed) break;
+
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(0);
+        }
+      } else {
+        await Future.delayed(const Duration(seconds: 1));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      controller: _scrollController,
+      scrollDirection: Axis.horizontal,
+      physics: const NeverScrollableScrollPhysics(),
+      child: Text(
+        widget.text,
+        style: widget.style,
+        softWrap: false,
+        maxLines: 1,
       ),
     );
   }
@@ -306,40 +470,33 @@ class FilterRightSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final location = ref.watch(locationProvider);
+    final filter = ref.watch(homeFilterProvider);
     final locationAsync = ref.watch(locationJsonProvider);
+    final religionsAsync = ref.watch(religionsProvider);
 
     return Material(
       color: Colors.white,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: locationAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text(e.toString())),
-            data: (states) {
-              /// All state names from JSON
-              final stateNames = states.map((e) => e.name).toList();
-
-              /// Selected state object
-              final selectedState = states.firstWhere(
-                (s) => s.name == location.state,
-                orElse: () => StateCityModel(name: '', cities: []),
-              );
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  /// Header
+                  const Text(
+                    'Filter Profiles',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Filter Location',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      TextButton(
+                        onPressed: () {
+                          ref.read(homeFilterProvider.notifier).reset();
+                        },
+                        child: const Text('Reset'),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -347,46 +504,150 @@ class FilterRightSheet extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  const Divider(),
-
-                  /// ================= STATE DROPDOWN =================
-                  _buildDropdown(
-                    title: 'State',
-                    value: location.state,
-                    items: stateNames,
-                    onChanged: (val) {
-                      if (val != null) {
-                        ref.read(locationProvider.notifier).updateState(val);
-                      }
-                    },
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  /// ================= CITY DROPDOWN =================
-                  _buildDropdown(
-                    title: 'City',
-                    value: location.city.isEmpty ? null : location.city,
-                    items: selectedState.cities,
-                    onChanged: (val) {
-                      if (val != null) {
-                        ref.read(locationProvider.notifier).updateCity(val);
-                      }
-                    },
-                  ),
-
-                  const Spacer(),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Apply Filters'),
-                    ),
-                  ),
                 ],
-              );
-            },
+              ),
+              const Divider(),
+
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ================= LOCATION SECTION =================
+                      const Text(
+                        'Location',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      locationAsync.when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => Text('Error: $e'),
+                        data: (states) {
+                          /// All state names from JSON
+                          final stateNames = states.map((e) => e.name).toList();
+
+                          /// Selected state object
+                          final selectedState = states.firstWhere(
+                            (s) => s.name == filter.state,
+                            orElse: () => StateCityModel(name: '', cities: []),
+                          );
+
+                          return Column(
+                            children: [
+                              _buildDropdown(
+                                title: 'State',
+                                value: filter.state.isEmpty
+                                    ? null
+                                    : filter.state,
+                                items: stateNames,
+                                onChanged: (val) {
+                                  if (val != null) {
+                                    ref
+                                        .read(homeFilterProvider.notifier)
+                                        .updateState(val);
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildDropdown(
+                                title: 'City',
+                                value: filter.city.isEmpty ? null : filter.city,
+                                items: selectedState.cities,
+                                onChanged: (val) {
+                                  if (val != null) {
+                                    ref
+                                        .read(homeFilterProvider.notifier)
+                                        .updateCity(val);
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // ================= RELIGION SECTION =================
+                      const Text(
+                        'Cultural',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      religionsAsync.when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => Text('Error: $e'),
+                        data: (religions) {
+                          final religionNames = religions
+                              .map((r) => r.name)
+                              .toList();
+
+                          final selectedReligion = religions.firstWhere(
+                            (r) => r.name == filter.religion,
+                            orElse: () =>
+                                ReligionModel(id: '', name: '', castes: []),
+                          );
+
+                          return Column(
+                            children: [
+                              _buildDropdown(
+                                title: 'Religion',
+                                value: filter.religion.isEmpty
+                                    ? null
+                                    : filter.religion,
+                                items: religionNames,
+                                onChanged: (val) {
+                                  if (val != null) {
+                                    ref
+                                        .read(homeFilterProvider.notifier)
+                                        .updateReligion(val);
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildDropdown(
+                                title: 'Caste',
+                                value: filter.caste.isEmpty
+                                    ? null
+                                    : filter.caste,
+                                items: selectedReligion.castes,
+                                onChanged: (val) {
+                                  if (val != null) {
+                                    ref
+                                        .read(homeFilterProvider.notifier)
+                                        .updateCaste(val);
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Apply Filters'),
+                ),
+              ),
+            ],
           ),
         ),
       ),

@@ -7,38 +7,34 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final agentRepositoryProvider = Provider<AgentRepository>((ref) {
-  return AgentRepositoryImpl(FirebaseFirestore.instance);
+  return AgentRepositoryImpl(ref.read(agentFirestoreDsProvider));
 });
 
 class AgentRepositoryImpl implements AgentRepository {
-  final FirebaseFirestore _firestore;
+  AgentFirestoreDs _firestore;
+
   AgentRepositoryImpl(this._firestore);
 
   @override
   Future<AgentProfile> fetchAgent(String agentId) async {
-    final doc = await _firestore
-        .collection('agents')
-        .where('agentId', isEqualTo: agentId)
-        .limit(1)
-        .get();
+    final agentProfile = await _firestore.fetchAgentByUid(agentId);
+    return agentProfile;
+  }
 
-    if (doc.docs.isEmpty) {
+  @override
+  Future<AgentProfile> fetchAgentProfilebyAgentId(String agentId) async {
+    final agentProfile = await _firestore.fetchAgentbyAgentId(agentId);
+    return agentProfile;
+  }
+
+  @override
+  Future<String> fetchAgentUidbyAgentId(String agentId) async {
+    final agentUid = await _firestore.fetchAgentDocIdByAgentId(
+      agentId: agentId,
+    );
+    if (agentUid == null) {
       throw Exception('Agent with ID $agentId not found');
     }
-
-    debugPrint(doc.docs.first.data().toString());
-    return AgentProfile.fromMap(doc.docs.first.data());
-  }
-
-  @override
-  Future<AgentProfile> fetchAgentProfilebyAgentId(String agentId) {
-    return AgentFirestoreDs(_firestore).fetchAgentProfilebyAgentId(agentId);
-  }
-
-  @override
-  Future<String> fetchAgentUidbyAgentId(String agentId) {
-    return AgentFirestoreDs(
-      _firestore,
-    ).fetchAgentDocIdByAgentId(agentId).then((value) => value ?? '');
+    return agentUid;
   }
 }

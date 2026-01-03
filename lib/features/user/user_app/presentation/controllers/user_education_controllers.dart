@@ -16,11 +16,17 @@ class UserEducationController extends StateNotifier<EducationState> {
 
   UserEducationController(this._uid, this._ref) : super(EducationState.initial);
 
-  Future<void> saveEducation({required Education education}) async {
+  Future<void> saveEducation({
+    required EducationProfile educationProfile,
+  }) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final educationProfile = EducationProfile(education: education);
+      // final educationProfile = EducationProfile(education: education.education, extraQualification: education.extraQualification);
+
       state = state.copyWith(isLoading: false, education: educationProfile);
+      debugPrint('✅ Education Saved Successfully');
+      debugPrint(educationProfile.toString());
+
       _ref
           .read(metrimonyControllerProvider.notifier)
           .saveEducation(educationProfile);

@@ -31,7 +31,9 @@ final matrimonyProfileProvider =
       if (matrimonyProfile.agentId.isNotEmpty) {
         agent = await ref
             .read(agentFirestoreDsProvider)
-            .fetchAgentProfilebyAgentId(matrimonyProfile.agentId);
+            .fetchAgentByUid(matrimonyProfile.agentId);
+
+        print("this is agent profile data");
       }
 
       if (user == null) {
@@ -52,7 +54,6 @@ class MyProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final profileAsync = ref.watch(matrimonyProfileProvider(uid));
 
     return Scaffold(
@@ -198,7 +199,6 @@ class MyProfileScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
- 
 
                 // 🏠 ADDRESS
                 _DetailSection(

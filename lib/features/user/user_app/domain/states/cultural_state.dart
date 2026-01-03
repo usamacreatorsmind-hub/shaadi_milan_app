@@ -2,14 +2,14 @@ class CulturalProfile {
   final String religion;
   final String caste;
   final String subCaste;
-  final String motherTongue;
+  // final String motherTongue;
   final List<String> languages;
 
   CulturalProfile({
     required this.religion,
     required this.caste,
     required this.subCaste,
-    required this.motherTongue,
+    // required this.motherTongue,
     required this.languages,
   });
 
@@ -18,7 +18,7 @@ class CulturalProfile {
       'religion': religion,
       'caste': caste,
       'subCaste': subCaste,
-      'motherTongue': motherTongue,
+      // 'motherTongue': motherTongue,
       'languages': languages,
     };
   }
@@ -28,29 +28,28 @@ class CulturalProfile {
       religion: map['religion'] as String,
       caste: map['caste'] as String,
       subCaste: map['subCaste'] as String,
-      motherTongue: map['motherTongue'] as String,
+      // motherTongue: map['motherTongue'] as String,
       languages: List<String>.from(map['languages'] as List),
     );
   }
 
   @override
   String toString() {
-    return 'CulturalProfile(religion: $religion, caste: $caste, subCaste: $subCaste,  motherTongue: $motherTongue, languages: $languages)';
+    return 'CulturalProfile(religion: $religion, caste: $caste, subCaste: $subCaste,    languages: $languages)';
   }
 
   CulturalProfile copyWith({
     String? religion,
     String? caste,
     String? subCaste,
-    String? gothra,
-    String? motherTongue,
+    String? gothra, 
     List<String>? languages,
   }) {
     return CulturalProfile(
       religion: religion ?? this.religion,
       caste: caste ?? this.caste,
-      subCaste: subCaste ?? this.subCaste, 
-      motherTongue: motherTongue ?? this.motherTongue,
+      subCaste: subCaste ?? this.subCaste,
+      // motherTongue: motherTongue ?? this.motherTongue,
       languages: languages ?? this.languages,
     );
   }
@@ -59,8 +58,8 @@ class CulturalProfile {
     return CulturalProfile(
       religion: '',
       caste: '',
-      subCaste: '', 
-      motherTongue: '',
+      subCaste: '',
+      // motherTongue: '',
       languages: [],
     );
   }

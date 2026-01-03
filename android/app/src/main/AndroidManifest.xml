@@ -21,6 +21,11 @@
         android:label="arvika_marriage_bureau"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <activity
+    android:name="com.yalantis.ucrop.UCropActivity"
+    android:screenOrientation="portrait"
+    android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
  
              
         

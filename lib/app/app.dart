@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/core/themes/theme_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,11 +11,11 @@ class App extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appRouter = ref.watch(appRouterProvider);
+    // final themeMode = ref.watch(themeProvider);
     return MaterialApp.router(
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-
-      themeMode: ThemeMode.light,
+      // darkTheme: AppTheme.darkTheme,
+      // themeMode: themeMode,
       title: 'Arvika Marriage Bureau',
       routerConfig: appRouter.config(),
       debugShowCheckedModeBanner: false,

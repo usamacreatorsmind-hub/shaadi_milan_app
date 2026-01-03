@@ -40,6 +40,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _register(BuildContext context) async {
     if (!formKey.currentState!.validate()) return;
 
+    final agentId = agentIdCtrl.text.trim();
+    if (agentId.isNotEmpty) {
+      final confirmed = await context.router.push(
+        AgentProfileVerifyRoute(agentId: agentId),
+      );
+      if (confirmed != true) return;
+    }
+
     setState(() => isLoading = true);
 
     try {

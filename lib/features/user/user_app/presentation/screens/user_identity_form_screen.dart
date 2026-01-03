@@ -275,13 +275,14 @@ class _UserIdentityFormScreenState
               //   child: const Text('Fetch Agent Data (Example)'),
               // ),
 
-              // navigate to cultural details
-              AppButton(
-                onPressed: () {
-                  context.navigateTo(const UserAddressFormRoute());
-                },
-                text: "Go to address Details",
-              ),
+              //// navigate to cultural details
+
+              // AppButton(
+              //   onPressed: () {
+              //     context.navigateTo(const UserAddressFormRoute());
+              //   },
+              //   text: "Go to address Details",
+              // ),
             ],
           ),
         ),

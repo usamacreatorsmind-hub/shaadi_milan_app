@@ -32,7 +32,7 @@ final matrimonyProfileProvider =
       if (matrimonyProfile.agentId.isNotEmpty) {
         agent = await ref
             .read(agentFirestoreDsProvider)
-            .fetchAgentProfilebyAgentId(matrimonyProfile.agentId);
+            .fetchAgentByUid(matrimonyProfile.agentId);
       }
 
       return MatrimonyProfileViewModel(
@@ -281,8 +281,6 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               ],
                             ),
 
-                          
-
                             _InfoCard(
                               title: 'Address',
                               icon: Icons.location_on,
@@ -317,8 +315,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   _InfoTile(
                                     label: 'College',
                                     icon: Icons.account_balance,
-                                    value:
-                                        profile.education.education!.college,
+                                    value: profile.education.education!.college,
                                   ),
                                   _InfoTile(
                                     label: 'Degree',
@@ -337,17 +334,12 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                     label: 'Passing Year',
                                     icon: Icons.calendar_today,
                                     value:
-                                        profile
-                                            .education
-                                            .education!
-                                            .passingYear
+                                        profile.education.education!.passingYear
                                             ?.toString() ??
                                         'N/A',
                                   ),
                                 ],
                               ),
-
-                            
 
                             if (profile.employment.jobType != null)
                               _InfoCard(

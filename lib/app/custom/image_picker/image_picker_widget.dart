@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-import '../../../features/user/user_app/presentation/controllers/image_picker_controller.dart';
+import 'image_picker_controller.dart';
 import '../custom_widgets/chip_and_action_chip.dart';
 
 final _imagePickingProvider = StateProvider<bool>((ref) => false);
@@ -39,7 +39,8 @@ class ImagePickerWidget extends ConsumerWidget {
         GestureDetector(
           onTap: () => safePick(controller.pickPrimaryImage),
           child: Container(
-            height: 180,
+            height: 400,
+            margin: const EdgeInsets.only(bottom: 16),
             width: double.infinity,
             decoration: BoxDecoration(
               color: colors.surface,
@@ -98,6 +99,70 @@ class ImagePickerWidget extends ConsumerWidget {
 
         // add for aadhar image also
         const SizedBox(height: 16),
+
+        // ================= EMPTY PLACEHOLDER =================
+        if (imageState.secondaryImages.isEmpty)
+          SizedBox(
+            height: 90,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 3,
+              itemBuilder: (_, __) => Container(
+                margin: const EdgeInsets.all(6),
+                width: MediaQuery.of(context).size.width * 0.29,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: colors.surfaceVariant,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.camera_alt, color: colors.onSurfaceVariant),
+              ),
+            ),
+          ),
+
+        // ================= GALLERY IMAGES =================
+        if (imageState.secondaryImages.isNotEmpty)
+          SizedBox(
+            height: 90,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: imageState.secondaryImages.length,
+              itemBuilder: (context, index) {
+                final path = imageState.secondaryImages[index];
+                return Stack(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      width: MediaQuery.of(context).size.width * 0.29,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        image: DecorationImage(
+                          image: FileImage(File(path)),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 4,
+                      top: 4,
+                      child: GestureDetector(
+                        onTap: () => controller.removeSecondaryImage(path),
+                        child: CircleAvatar(
+                          radius: 12,
+                          backgroundColor: colors.scrim.withOpacity(0.6),
+                          child: const Icon(
+                            Icons.close,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
 
         // ================= AADHAR IMAGE =================
         Row(
@@ -164,70 +229,6 @@ class ImagePickerWidget extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-
-        // ================= EMPTY PLACEHOLDER =================
-        if (imageState.secondaryImages.isEmpty)
-          SizedBox(
-            height: 90,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: 3,
-              itemBuilder: (_, __) => Container(
-                margin: const EdgeInsets.all(6),
-                width: MediaQuery.of(context).size.width * 0.29,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: colors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(Icons.camera_alt, color: colors.onSurfaceVariant),
-              ),
-            ),
-          ),
-
-        // ================= GALLERY IMAGES =================
-        if (imageState.secondaryImages.isNotEmpty)
-          SizedBox(
-            height: 90,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: imageState.secondaryImages.length,
-              itemBuilder: (context, index) {
-                final path = imageState.secondaryImages[index];
-                return Stack(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      width: MediaQuery.of(context).size.width * 0.29,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        image: DecorationImage(
-                          image: FileImage(File(path)),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: 4,
-                      top: 4,
-                      child: GestureDetector(
-                        onTap: () => controller.removeSecondaryImage(path),
-                        child: CircleAvatar(
-                          radius: 12,
-                          backgroundColor: colors.scrim.withOpacity(0.6),
-                          child: const Icon(
-                            Icons.close,
-                            size: 14,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
       ],
     );
   }

@@ -1,8 +1,11 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/contact_us_screen.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/privacy_policy_route.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/terms_and_conditions_route.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/about_us_screen.dart';
 
 import '../../features/agent/presentation/screens/agent_dashboard_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
-import '../../features/user/user_app/presentation/screens/agent_profile_verify_screen.dart';
+import '../../features/user/user_auth/presentation/screens/agent_profile_verify_screen.dart';
 import '../../features/user/user_app/presentation/screens/metrimony_flow_screen.dart';
 import '../../features/user/user_app/presentation/screens/payment_option_screen.dart';
 import '../../features/user/user_app/presentation/screens/search_screen.dart';
@@ -17,7 +20,7 @@ import '../../features/user/user_app/presentation/screens/user_employement_form_
 import '../../features/user/user_app/presentation/screens/user_family_form_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_home_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_identity_form_screen.dart';
-import '../../features/user/user_app/presentation/screens/user_image_form_screen.dart'; 
+import '../../features/user/user_app/presentation/screens/user_image_form_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_main_shell.dart';
 import '../../features/user/user_app/presentation/screens/user_wishlist_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_notification_screen.dart';
@@ -45,6 +48,9 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: LoginRoute.page),
     AutoRoute(page: RegisterRoute.page),
 
+    AutoRoute(page: ContactUsRoute.page),
+    AutoRoute(page: PrivacyPolicyRoute.page),
+    AutoRoute(page: TermsAndConditionsRoute.page),
     // ================= USER MAIN SHELL (BOTTOM NAV) =================
     AutoRoute(
       page: UserMainShellRoute.page,
@@ -66,7 +72,7 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: UserCultureFormRoute.page),
     AutoRoute(page: UserEducationFormRoute.page),
     AutoRoute(page: UserEmploymentFormRoute.page),
-    AutoRoute(page: UserFamilyFormRoute.page), 
+    AutoRoute(page: UserFamilyFormRoute.page),
     AutoRoute(page: UserAddressFormRoute.page),
     AutoRoute(page: UserBiodataCheckRoute.page),
     AutoRoute(page: UserDetailRoute.page),
@@ -84,8 +90,7 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: AgentDashboardRoute.page),
     AutoRoute(page: AgentProfileVerifyRoute.page),
 
-// ================= ABOUT US =================
-
+    // ================= ABOUT US =================
     AutoRoute(page: AboutUsRoute.page),
   ];
 }

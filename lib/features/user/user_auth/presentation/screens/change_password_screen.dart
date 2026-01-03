@@ -1,3 +1,6 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/validators.dart';
+
+import '../../../../../app/router/app_router.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../providers/auth_providers.dart';
 import 'package:auto_route/annotations.dart';
@@ -39,12 +42,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
     if (user == null) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("You must be logged in to change your password."),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      context.router.replaceAll([const LoginRoute()]);
       return;
     }
 
@@ -174,16 +172,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       label: "New Password",
                       hint: "Enter your new password",
                       obscureText: true,
+
                       keyboardType: TextInputType.visiblePassword,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a new password';
-                        }
-                        if (value.length < 6) {
-                          return 'Password must be at least 6 characters long';
-                        }
-                        return null;
-                      },
+                      validator: (value) => Validators.validatePassword(value),
                     ),
                     const SizedBox(height: 16),
                     AppTextField(
@@ -194,15 +185,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       hint: "Confirm your new password",
                       obscureText: true,
                       keyboardType: TextInputType.visiblePassword,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please confirm your new password';
-                        }
-                        if (value != _newPasswordController.text) {
-                          return 'Passwords do not match';
-                        }
-                        return null;
-                      },
+                      validator: (value) => Validators.validateConfirmPassword(
+                        value,
+                        _newPasswordController.text,
+                      ),
                     ),
                   ],
                 ),

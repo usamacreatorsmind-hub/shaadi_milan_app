@@ -1,6 +1,6 @@
 import '../../../../../app/custom/shimmer.dart';
 import '../../../../../app/router/app_router.dart';
-import '../controllers/agent_profile_controller.dart';
+import '../../../user_app/presentation/controllers/agent_profile_controller.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -20,24 +20,16 @@ class AgentProfileVerifyScreen extends ConsumerWidget {
       backgroundColor: Colors.white,
       body: agentAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-
         error: (e, _) => Center(child: Text(e.toString())),
-
         data: (agent) => SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: BoxDecoration(color: Colors.white, boxShadow: [
-               
-                ],
-              ),
-
-              // color: Theme.of(context).primaryColor,
+              decoration: const BoxDecoration(color: Colors.white),
               child: Column(
                 children: [
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.4,
-
                     width: double.infinity,
                     child: agent.photoUrl != null && agent.photoUrl!.isNotEmpty
                         ? Image.network(
@@ -49,15 +41,12 @@ class AgentProfileVerifyScreen extends ConsumerWidget {
                               color: Colors.grey,
                             ),
                           )
-                        :
-                          // adds shimmer effect if profile not loaded  or thre is no link
-                          ShimmerProfileCard(
+                        : ShimmerProfileCard(
                             height: MediaQuery.of(context).size.height * 0.4,
                             width: double.infinity,
                           ),
                   ),
                   const SizedBox(height: 20),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
@@ -69,7 +58,6 @@ class AgentProfileVerifyScreen extends ConsumerWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
-
                   const SizedBox(height: 20),
                   _info('Agent ID', agent.agentId),
                   _info('Name', agent.agentName),
@@ -80,11 +68,8 @@ class AgentProfileVerifyScreen extends ConsumerWidget {
                     '${agent.registrationDate.day}/${agent.registrationDate.month}/${agent.registrationDate.year}',
                   ),
                   _info('Role', agent.role),
-
                   const Divider(height: 30),
-
                   const SizedBox(height: 30),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
@@ -102,57 +87,24 @@ class AgentProfileVerifyScreen extends ConsumerWidget {
                               ),
                             ),
                             onPressed: () {
-                              ref
-                                  .read(
-                                    agentProfileControllerProvider(
-                                      agentId,
-                                    ).notifier,
-                                  )
-                                  .approveAgent();
+                              context.router.pop(true);
                             },
-                            child: const Text('Verify Agent'),
+                            child: const Text('Yes, I agree'),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text('Decline Agent'),
-                                    content: const Text(
-                                      'Are you sure you want to decline this agent?',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text('Cancel'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          // navigate to splash onboarding screen
-                                          context.router.push(
-                                            OnboardingRoute(),
-                                          );
-
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text('Decline'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
+                              context.router.pop();
                             },
-                            child: const Text('Decline Agent'),
+                            child: const Text("No, I don\'t agree"),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -169,7 +121,7 @@ class AgentProfileVerifyScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 110, // fixed label width
+            width: 110,
             child: Text(
               label,
               style: const TextStyle(

@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:arvika_marriage_bureau/data_core/metrimony_profiles_data.dart';
 
+import '../../../../../app/custom/image_picker/image_picker_controller.dart';
 import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../domain/states/image_state.dart';
@@ -29,6 +31,7 @@ class _UserBiodataCheckScreenState
     final profile = state.metrimony;
     final authState = ref.watch(authStateProvider);
     final currentUser = authState.value;
+    final imageState = ref.watch(imagePickerProvider);
 
     if (state.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -82,14 +85,12 @@ class _UserBiodataCheckScreenState
           _section('Cultural', Icons.temple_hindu, [
             _infoRow('Religion', profile.cultural.religion),
             _infoRow('Caste', profile.cultural.caste),
-            _infoRow('Sub Caste', profile.cultural.subCaste), 
-            _infoRow('Mother Tongue', profile.cultural.motherTongue),
+            _infoRow('Sub Caste', profile.cultural.subCaste),
+            // _infoRow('Mother Tongue', profile.cultural.motherTongue),
             _chipWrap('Languages Known', profile.cultural.languages),
           ]),
 
-        
           _section('Education', Icons.school, [
-            
             _infoRow(
               'Graduation College',
               profile.education.education?.college,
@@ -97,12 +98,23 @@ class _UserBiodataCheckScreenState
             _infoRow('Degree', profile.education.education?.degree),
             _infoRow('Graduation %', profile.education.education?.percentage),
             _infoRow('Passing Year', profile.education.education?.passingYear),
+
+            // add additional courses
+            // Languages
+
+            // Additional Courses (Firebase)
+            _chipWrap(
+              'Additional Courses',
+              profile.education.extraQualification?.qualifications ?? [],
+            ),
           ]),
 
           _section('Employment', Icons.work, [
             _infoRow('Company', profile.employment.company),
             _infoRow('Role', profile.employment.designation),
             _infoRow('Annual Income', profile.employment.annualIncome),
+            _infoRow('Designation', profile.employment.designation),
+            _infoRow('Job Type', profile.employment.jobType),
           ]),
 
           _section('Family', Icons.family_restroom, [
@@ -111,6 +123,7 @@ class _UserBiodataCheckScreenState
             _infoRow('Brothers', profile.family.numberOfBrothers),
             _infoRow('Sisters', profile.family.numberOfSisters),
             _infoRow('Family Type', profile.family.familyType),
+            _infoRow('Family Status', profile.family.familyStatus),
           ]),
 
           _section('Address', Icons.location_on, [
@@ -121,7 +134,7 @@ class _UserBiodataCheckScreenState
             _infoRow('Pincode', profile.address.pincode),
           ]),
 
-          _imageSection(profile.images),
+          _imageSection(profile.images, imageState),
 
           CheckboxListTile(
             contentPadding: EdgeInsets.zero,
@@ -296,36 +309,65 @@ class _UserBiodataCheckScreenState
     );
   }
 
-  Widget _imageSection(ProfileImages? images) {
-    if (images == null) return const SizedBox();
+  Widget _imageSection(ProfileImages? images, ImagesState localImages) {
+    final hasLocalPrimary = localImages.primaryImage != null;
+    final hasLocalSecondary = localImages.secondaryImages.isNotEmpty;
+
+    if (images == null && !hasLocalPrimary) return const SizedBox();
 
     return _section('Profile Images', Icons.photo, [
-      if (images.primaryImageUrl != null)
+      if (hasLocalPrimary)
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Image.file(
+            File(localImages.primaryImage!),
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        )
+      else if (images?.primaryImageUrl != null)
         ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Image.network(
-            images.primaryImageUrl!,
+            images!.primaryImageUrl!,
             height: 200,
             width: double.infinity,
             fit: BoxFit.cover,
           ),
         ),
-      if (images.secondaryImageUrls.isNotEmpty) ...[
+
+      if (hasLocalSecondary ||
+          (images?.secondaryImageUrls.isNotEmpty ?? false)) ...[
         const SizedBox(height: 12),
         SizedBox(
           height: 90,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: images.secondaryImageUrls.length,
+            itemCount: hasLocalSecondary
+                ? localImages.secondaryImages.length
+                : (images?.secondaryImageUrls.length ?? 0),
             separatorBuilder: (_, __) => const SizedBox(width: 10),
-            itemBuilder: (_, i) => ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                images.secondaryImageUrls[i],
-                width: 90,
-                fit: BoxFit.cover,
-              ),
-            ),
+            itemBuilder: (_, i) {
+              if (hasLocalSecondary) {
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    File(localImages.secondaryImages[i]),
+                    width: 90,
+                    fit: BoxFit.cover,
+                  ),
+                );
+              }
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  images!.secondaryImageUrls[i],
+                  width: 90,
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -337,6 +379,45 @@ class _UserBiodataCheckScreenState
   Future<void> _confirmSubmit() async {
     final user = ref.read(authStateProvider).value;
     if (user == null) return;
+
+    // 1. Upload Images if local images exist
+    final imageState = ref.read(imagePickerProvider);
+    if (imageState.primaryImage != null) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Consumer(
+          builder: (context, ref, _) {
+            final progress = ref.watch(uploadProgressProvider);
+            return AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text("Uploading Images..."),
+                  const SizedBox(height: 20),
+                  LinearProgressIndicator(value: progress),
+                  const SizedBox(height: 10),
+                  Text("${(progress * 100).toInt()}%"),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      try {
+        await ref.read(imagePickerProvider.notifier).uploadImages(user.uid);
+        if (context.mounted) Navigator.pop(context); // Close dialog
+      } catch (e) {
+        if (context.mounted) {
+          Navigator.pop(context); // Close dialog
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+        }
+        return;
+      }
+    }
 
     await ref
         .read(metrimonyControllerProvider.notifier)

@@ -95,6 +95,8 @@ class AppTextField extends ConsumerStatefulWidget {
   final String hint;
   final bool obscureText;
   final TextInputType keyboardType;
+  final VoidCallback? ontap;
+
   final String? Function(String?)? validator;
 
   const AppTextField({
@@ -105,6 +107,8 @@ class AppTextField extends ConsumerStatefulWidget {
     required this.label,
     required this.hint,
     required this.obscureText,
+    this.ontap,
+
     required this.keyboardType,
     this.validator,
   });
@@ -121,6 +125,11 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
       child: SizedBox(
         width: MediaQuery.sizeOf(context).width * 0.8,
         child: TextFormField(
+          onTap: widget.ontap,
+
+          readOnly: widget.ontap != null,
+          cursorColor: Theme.of(context).colorScheme.primary,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           controller: widget.controller,
           obscureText: widget.obscureText,
           keyboardType: widget.keyboardType,
@@ -279,7 +288,7 @@ class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
 
       dropdownStyleData: DropdownStyleData(
         isOverButton: true,
-        maxHeight: 200, 
+        maxHeight: 200,
 
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
       ),

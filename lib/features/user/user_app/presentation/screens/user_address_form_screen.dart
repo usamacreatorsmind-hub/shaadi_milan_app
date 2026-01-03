@@ -59,7 +59,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
   Widget build(BuildContext context) {
     final addressState = ref.watch(addressControllerProvider);
 
-    final location = ref.watch(locationProvider);
+    final location = ref.watch(homeFilterProvider);
     final locationAsync = ref.watch(locationJsonProvider);
 
     ref.listen<AddressState>(addressControllerProvider, (previous, current) {
@@ -149,7 +149,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                           onChanged: (val) {
                             if (val != null) {
                               ref
-                                  .read(locationProvider.notifier)
+                                  .read(homeFilterProvider.notifier)
                                   .updateState(val);
                               _stateController.text = val;
                               _districtController.clear();
@@ -166,7 +166,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                           onChanged: (val) {
                             if (val != null) {
                               ref
-                                  .read(locationProvider.notifier)
+                                  .read(homeFilterProvider.notifier)
                                   .updateCity(val);
                               _districtController.text = val;
                             }

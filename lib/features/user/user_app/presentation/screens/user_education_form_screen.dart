@@ -57,7 +57,7 @@ class _UserEducationFormScreenState
     // ⚠️ Controller dependency NOT changed
     ref
         .read(userEducationControllerProvider.notifier)
-        .saveEducation(education: educationProfile.education!);
+        .saveEducation(educationProfile: educationProfile );
   }
 
   @override
@@ -233,7 +233,7 @@ class _UserEducationFormScreenState
       ),
     );
   }
- 
+
   Widget _courseInputRow() {
     return Row(
       children: [
@@ -307,6 +307,4 @@ class _UserEducationFormScreenState
       ),
     );
   }
-
-
 }

@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/legacy.dart';
+
 import '../../../../agent/domain/states/agent_entity.dart';
 import '../../data/datasources/firebase/agent_firestore_ds.dart';
 import '../../data/datasources/firebase/metrimony_firestore.dart';
@@ -10,14 +12,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/identity_state.dart';
 import '../../domain/states/address_state.dart';
 import '../../domain/states/education_state.dart';
 import '../../domain/states/employee_state.dart';
 import '../../domain/states/family_state.dart';
-import '../../domain/states/cultural_state.dart'; 
+import '../../domain/states/cultural_state.dart';
 import '../../domain/states/physical_state.dart';
 
 final metrimonyControllerProvider =
@@ -90,8 +91,6 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     nextStep();
   }
 
-   
-
   void savePhysical(PhysicalProfile data) {
     state = state.copyWith(metrimony: state.metrimony.copyWith(physical: data));
     nextStep();
@@ -107,20 +106,29 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     String agentUid = '';
     if (agentId.isNotEmpty) {
       final agentDS = ref.read(agentFirestoreDsProvider);
-      agentUid = await agentDS.fetchAgentDocIdByAgentId(agentId) ?? '';
+      agentUid = await agentDS.fetchAgentDocIdByAgentId(agentId:agentId) ?? '';
 
       debugPrint(' fetch Agent UID at  submit profile method: $agentUid');
     }
     var profile = state.metrimony;
 
-    profile = profile.copyWith(userId: uid, agentId: agentUid);
-    // print  profile
-    debugPrint('Profile to be submitted: ${profile.toMap()}');
+    if (agentUid.isNotEmpty) {
+      profile = profile.copyWith(userId: uid, agentId: agentUid);
+    } else {
+      profile = profile.copyWith(userId: uid);
+    }
+
+    final data = profile.toMap();
+    if (profile.agentId.isEmpty) {
+      data.remove('agentId');
+    }
+
+    debugPrint('Profile to be submitted: $data');
 
     await FirebaseFirestore.instance
         .collection('metrimony_profiles')
         .doc(uid)
-        .update(profile.toMap());
+        .update(data);
 
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
       'userStatus.isProfileCreated': true,
@@ -139,7 +147,7 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     String agentUid = '';
     if (agentId.isNotEmpty) {
       final agentDS = ref.read(agentFirestoreDsProvider);
-      agentUid = await agentDS.fetchAgentDocIdByAgentId(agentId) ?? '';
+      agentUid = await agentDS.fetchAgentDocIdByAgentId(agentId:agentId) ?? '';
 
       debugPrint(' fetch Agent UID at  create empty profile method: $agentUid');
     }
@@ -153,7 +161,7 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
       cultural: CulturalProfile.empty(),
       education: EducationProfile.empty(),
       employment: EmploymentProfile.empty(),
-      family: FamilyProfile.empty(), 
+      family: FamilyProfile.empty(),
       physical: PhysicalProfile.empty(),
       images: ProfileImages.empty(),
     );

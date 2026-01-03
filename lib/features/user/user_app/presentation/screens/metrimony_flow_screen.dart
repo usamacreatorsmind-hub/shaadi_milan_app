@@ -1,7 +1,7 @@
 import '../../../../../app/router/app_router.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../controllers/metrimony_profile_controller.dart';
-import 'agent_profile_verify_screen.dart';
+import '../../../user_auth/presentation/screens/agent_profile_verify_screen.dart';
 import 'user_address_form_screen.dart';
 import 'user_culture_form_screen.dart';
 import 'user_biodata_check_screen.dart';

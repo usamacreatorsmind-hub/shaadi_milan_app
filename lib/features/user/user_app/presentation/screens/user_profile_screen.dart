@@ -1,8 +1,10 @@
+import 'package:arvika_marriage_bureau/core/themes/theme_notifier.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
 
 import '../../../../../app/router/app_router.dart';
-import '../../data/datasources/firebase/user_firestore_ds.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/user_state.dart';
@@ -20,17 +22,14 @@ final userProfileScreenProvider =
       final repository = ref.watch(matrimonyRepositoryProvider);
       final matrimonyProfile = await repository.getMatrimonyProfile(userId);
 
-      final userDS = ref.watch(userFirestoreDSProvider);
-      final userData = await userDS.fetchUser(userId);
-      final user = AppUser.fromMap(userData);
+      final userRepo = ref.watch(userRepositoryProvider);
+      final user = await userRepo.fetchUser(userId);
 
       // fetch agentprofile
       AgentProfile? agent;
       if (matrimonyProfile.agentId.isNotEmpty) {
-        final agentDS = ref.watch(agentFirestoreDsProvider);
-        agent = await agentDS.fetchAgentProfilebyAgentId(
-          matrimonyProfile.agentId,
-        );
+        final agentRepo = ref.watch(agentRepositoryProvider);
+        agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
       }
 
       return MetrimonyProfileViewModel(
@@ -95,10 +94,29 @@ class UserProfileScreen extends ConsumerWidget {
                     AutoRouter.of(context).push(const ChangePasswordRoute());
                   },
                 ),
+                // this is for user data access can be implemented in future
                 _SettingsTile(
                   icon: Icons.privacy_tip_outlined,
                   title: "Privacy Settings",
                   onTap: () {},
+                ),
+                // Terms & Conditions
+                _SettingsTile(
+                  icon: Icons.description_outlined,
+                  title: "Terms & Conditions",
+                  onTap: () {
+                    AutoRouter.of(
+                      context,
+                    ).push(const TermsAndConditionsRoute());
+                  },
+                ),
+                // Privacy Policy
+                _SettingsTile(
+                  icon: Icons.policy_outlined,
+                  title: "Privacy Policy",
+                  onTap: () {
+                    AutoRouter.of(context).push(const PrivacyPolicyRoute());
+                  },
                 ),
 
                 // help and support
@@ -115,6 +133,16 @@ class UserProfileScreen extends ConsumerWidget {
                   },
                 ),
 
+                // Contact Support
+                // stting tile
+                _SettingsTile(
+                  icon: Icons.contact_support_outlined,
+                  title: "Contact Support",
+                  onTap: () {
+                    AutoRouter.of(context).push(const ContactUsRoute());
+                  },
+                ),
+
                 // 🔹 ACCOUNT SETTINGS SECTION
                 _SectionTitle(title: "Account Settings"),
                 _SettingsTile(
@@ -127,9 +155,8 @@ class UserProfileScreen extends ConsumerWidget {
                   title: "Manage Photos",
                   onTap: () {},
                 ),
-
-                // 🔹 NOTIFICATIONS SECTION
-                _SectionTitle(title: "Notifications"),
+                // 🔹 APP PREFERENCES SECTION
+                _SectionTitle(title: "App Preferences"),
                 _SettingsTile(
                   icon: Icons.notifications_active_outlined,
                   title: "Push Notifications",
@@ -140,6 +167,21 @@ class UserProfileScreen extends ConsumerWidget {
                   title: "Email Notifications",
                   trailing: Switch(value: false, onChanged: (v) {}),
                 ),
+                // _SettingsTile(
+                //   icon: Icons.dark_mode_outlined,
+                //   title: "Dark Mode",
+                //   trailing: Switch(
+                //     value: ref.watch(themeProvider) == ThemeMode.dark,
+                //     onChanged: (value) {
+                //       ref
+                //           .read(themeProvider.notifier)
+                //           .setTheme(value ? ThemeMode.dark : ThemeMode.light);
+
+                //       // print selected theme
+                //       print('Selected theme: ${value ? 'Dark' : 'Light'}');
+                //     },
+                //   ),
+                // ),
 
                 // 🔹 LOGOUT
                 Container(
