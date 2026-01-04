@@ -15,7 +15,9 @@ class AgentProfileController extends StateNotifier<AsyncValue<AgentProfile>> {
 
   Future<void> _fetchAgentProfile() async {
     try {
-      final agentProfile = await _agentRepository.fetchAgent(_agentId);
+      final agentProfile = await _agentRepository.fetchAgentProfilebyAgentId(
+        _agentId,
+      );
       state = AsyncValue.data(agentProfile);
     } catch (e, st) {
       state = AsyncValue.error(e, st);

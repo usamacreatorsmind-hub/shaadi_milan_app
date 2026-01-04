@@ -45,7 +45,7 @@ class _UserEducationFormScreenState
     final educationProfile = EducationProfile(
       education: Education(
         college: _gradCollegeCtrl.text.trim(),
-        degree: _gradDegreeCtrl.text.trim(),
+        course: _gradDegreeCtrl.text.trim(),
         percentage: double.parse(_gradPercentageCtrl.text),
         passingYear: int.parse(_gradPassingYearCtrl.text),
       ),
@@ -57,7 +57,7 @@ class _UserEducationFormScreenState
     // ⚠️ Controller dependency NOT changed
     ref
         .read(userEducationControllerProvider.notifier)
-        .saveEducation(educationProfile: educationProfile );
+        .saveEducation(educationProfile: educationProfile);
   }
 
   @override

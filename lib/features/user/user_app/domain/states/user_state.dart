@@ -1,4 +1,5 @@
 class AppUser {
+  final String metrimonyId;
   final String uid;
   final String fullName;
   final String email;
@@ -11,6 +12,8 @@ class AppUser {
   final UserStatus? userStatus;
 
   AppUser({
+    required this.metrimonyId,
+
     required this.uid,
     required this.fullName,
     required this.email,
@@ -26,6 +29,8 @@ class AppUser {
 
   Map<String, dynamic> toMap() {
     return {
+      'metrimonyId': metrimonyId,
+
       'uid': uid,
       'fullName': fullName,
       'email': email,
@@ -42,32 +47,35 @@ class AppUser {
 
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
-      uid: map['uid'] as String,
-      fullName: map['fullName'] as String,
-      email: map['email'] as String,
-      role: map['role'] as String,
-      phone: map['phone'] as String,
-      agentId: map['agentId'] as String,
-      profileId: map['profileId'] as String?,
+      metrimonyId: map['metrimonyId'] as String? ?? '',
+
+      uid: map['uid'] as String? ?? '',
+      fullName: map['fullName'] as String? ?? '',
+      email: map['email'] as String? ?? '',
+      role: map['role'] as String? ?? '',
+      phone: map['phone'] as String? ?? '',
+      agentId: map['agentId'] as String? ?? '',
+      profileId: map['profileId'] as String? ?? '',
       userStatus: map['userStatus'] != null
-          ? UserStatus.fromMap(map['userStatus'] as Map<String, dynamic>)
+          ? UserStatus.fromMap(Map<String, dynamic>.from(map['userStatus']))
           : null,
-      isVerified: map['isVerified'] as bool,
+      isVerified: map['isVerified'] as bool? ?? false,
 
       wishlists: (map['wishlists'] as List<dynamic>?)
-          ?.map((e) => e as String)
+          ?.map((e) => e.toString())
           .toList(),
     );
   }
 
   @override
   String toString() {
-    return 'AppUser(uid: $uid, fullName: $fullName, userStatus: $userStatus,wishlists: $wishlists, email: $email, role: $role, phone: $phone, agentId: $agentId, profileId: $profileId, isVerified: $isVerified)';
+    return 'AppUser(uid: $uid, metrimonyId: $metrimonyId,  fullName: $fullName, userStatus: $userStatus,wishlists: $wishlists, email: $email, role: $role, phone: $phone, agentId: $agentId, profileId: $profileId, isVerified: $isVerified)';
   }
 
   AppUser copyWith({
     String? uid,
     UserStatus? userStatus,
+    String? metrimonyId,
 
     String? fullName,
     String? email,
@@ -80,6 +88,8 @@ class AppUser {
     bool? isVerified,
   }) {
     return AppUser(
+      metrimonyId: metrimonyId ?? this.metrimonyId,
+
       uid: uid ?? this.uid,
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
@@ -98,6 +108,8 @@ class AppUser {
 
   static AppUser empty() {
     return AppUser(
+      metrimonyId: '',
+
       uid: '',
       userStatus: UserStatus.empty(),
 

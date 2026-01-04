@@ -1,25 +1,21 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../agent/domain/states/agent_entity.dart';
 import '../../data/datasources/firebase/agent_firestore_ds.dart';
-import '../../data/datasources/firebase/metrimony_firestore.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
-import '../../domain/states/agent_state.dart';
-import '../../domain/states/image_state.dart';
-import '../../domain/states/user_state.dart';
-import '../screens/metrimony_flow_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/states/metrimony_state.dart';
-import '../../domain/states/identity_state.dart';
 import '../../domain/states/address_state.dart';
+import '../../domain/states/cultural_state.dart';
 import '../../domain/states/education_state.dart';
 import '../../domain/states/employee_state.dart';
 import '../../domain/states/family_state.dart';
-import '../../domain/states/cultural_state.dart';
+import '../../domain/states/identity_state.dart';
+import '../../domain/states/image_state.dart';
+import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/physical_state.dart';
+import '../screens/metrimony_flow_screen.dart';
 
 final metrimonyControllerProvider =
     StateNotifierProvider<MetrimonyController, MetrimonyState>(
@@ -28,19 +24,19 @@ final metrimonyControllerProvider =
 
 class MetrimonyController extends StateNotifier<MetrimonyState> {
   final Ref ref;
+
   MetrimonyController(this.ref) : super(MetrimonyState.initial());
 
-  // ---------------- STEP NAVIGATION ----------------
+  // ================= STEP NAVIGATION =================
+
   void nextStep() {
     final index = MatrimonyStep.values.indexOf(state.step);
 
-    // ✅ LAST STEP COMPLETED
     if (index == MatrimonyStep.values.length - 1) {
       state = state.copyWith(isCompleted: true);
       return;
     }
 
-    // ✅ MOVE TO NEXT STEP
     state = state.copyWith(step: MatrimonyStep.values[index + 1]);
   }
 
@@ -51,7 +47,8 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     }
   }
 
-  // ---------------- SAVE METHODS ----------------
+  // ================= SAVE STEP DATA =================
+
   void saveUser(String userId) {
     state = state.copyWith(metrimony: state.metrimony.copyWith(userId: userId));
     nextStep();
@@ -96,45 +93,6 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     nextStep();
   }
 
-  // ---------------- SUBMIT METHODS ----------------
-  Future<void> submitProfile({
-    required String uid,
-    required String agentId,
-  }) async {
-    // fetch agent id using agent_id field using agentfirestore ds
-
-    String agentUid = '';
-    if (agentId.isNotEmpty) {
-      final agentDS = ref.read(agentFirestoreDsProvider);
-      agentUid = await agentDS.fetchAgentDocIdByAgentId(agentId:agentId) ?? '';
-
-      debugPrint(' fetch Agent UID at  submit profile method: $agentUid');
-    }
-    var profile = state.metrimony;
-
-    if (agentUid.isNotEmpty) {
-      profile = profile.copyWith(userId: uid, agentId: agentUid);
-    } else {
-      profile = profile.copyWith(userId: uid);
-    }
-
-    final data = profile.toMap();
-    if (profile.agentId.isEmpty) {
-      data.remove('agentId');
-    }
-
-    debugPrint('Profile to be submitted: $data');
-
-    await FirebaseFirestore.instance
-        .collection('metrimony_profiles')
-        .doc(uid)
-        .update(data);
-
-    await FirebaseFirestore.instance.collection('users').doc(uid).update({
-      'userStatus.isProfileCreated': true,
-    });
-  }
-
   void saveImages(ProfileImages profileImages) {
     state = state.copyWith(
       metrimony: state.metrimony.copyWith(images: profileImages),
@@ -142,20 +100,34 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     nextStep();
   }
 
+  // ================= CREATE EMPTY PROFILE =================
+  // 🔥 UID IS USED AS DOCUMENT ID (IMPORTANT)
+
   Future<void> createEmptyMatrimonyProfile(String uid, String agentId) async {
-    // fetch agent id using agent_id field using agentfirestore ds
     String agentUid = '';
+
     if (agentId.isNotEmpty) {
       final agentDS = ref.read(agentFirestoreDsProvider);
-      agentUid = await agentDS.fetchAgentDocIdByAgentId(agentId:agentId) ?? '';
+      agentUid = await agentDS.fetchAgentDocIdByAgentId(agentId: agentId) ?? '';
 
-      debugPrint(' fetch Agent UID at  create empty profile method: $agentUid');
+      debugPrint('Fetched Agent UID at createEmptyMatrimonyProfile: $agentUid');
     }
 
-    // create empty metrimony profile
+    // fetch full name of user
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+    final fullName = userDoc.data()?['fullName'] ?? '';
+
+    debugPrint('Fetched User Full Name: $fullName');
+
     final metrimonyProfile = MatrimonyProfile(
       userId: uid,
+      metrimonyId: uid, // ✅ SAME AS UID
       agentId: agentUid,
+    
+
       identity: IdentityProfile.empty(),
       address: AddressProfile.empty(),
       cultural: CulturalProfile.empty(),
@@ -170,5 +142,39 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
         .collection('metrimony_profiles')
         .doc(uid)
         .set(metrimonyProfile.toMap());
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'userStatus.isProfileCreated': false,
+    });
+  }
+
+  // ================= SUBMIT PROFILE =================
+
+  Future<void> submitProfile({
+    required String uid,
+    required String agentId,
+  }) async {
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+    final fullName = userDoc.data()?['fullName'] ?? '';
+    debugPrint('Fetched User Full Name: $fullName');
+
+    var profile = state.metrimony.copyWith(
+      userId: uid,
+      agentId: agentId,
+      metrimonyId: uid,
+    );
+
+    debugPrint('Profile submitted: ${profile.toMap()}');
+
+    await ref
+        .read(matrimonyRepositoryProvider)
+        .updateMatrimonyProfile(uid, profile);
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'userStatus.isProfileCreated': true,
+    });
   }
 }

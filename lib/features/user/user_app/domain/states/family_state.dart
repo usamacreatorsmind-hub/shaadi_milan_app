@@ -18,6 +18,7 @@ class FamilyProfile {
   Map<String, dynamic> toMap() {
     return {
       'fatherName': fatherName,
+      'motherName': motherName,
       'numberOfBrothers': numberOfBrothers,
       'numberOfSisters': numberOfSisters,
 
@@ -47,15 +48,10 @@ class FamilyProfile {
   FamilyProfile copyWith({
     String? fatherName,
     String? motherName,
-    String? fatherOccupation,
-    String? motherOccupation,
     int? numberOfBrothers,
     int? numberOfSisters,
-    int? brothersMarried,
-    int? sistersMarried,
     String? familyType,
     String? familyStatus,
-    String? familyValues,
   }) {
     return FamilyProfile(
       fatherName: fatherName ?? this.fatherName,

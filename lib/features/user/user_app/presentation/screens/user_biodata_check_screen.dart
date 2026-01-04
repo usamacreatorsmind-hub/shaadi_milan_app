@@ -50,6 +50,9 @@ class _UserBiodataCheckScreenState
 
           _section('User Details', Icons.person, [
             _infoRow('Full Name', currentUser?.fullName),
+            _infoRow('agent id', currentUser?.agentId),
+            _infoRow('uid  id ', currentUser?.uid),
+
             _infoRow('Email', currentUser?.email),
             _infoRow('Phone', currentUser?.phone),
             _infoRow(
@@ -92,11 +95,11 @@ class _UserBiodataCheckScreenState
 
           _section('Education', Icons.school, [
             _infoRow(
-              'Graduation College',
+              'College',
               profile.education.education?.college,
             ),
-            _infoRow('Degree', profile.education.education?.degree),
-            _infoRow('Graduation %', profile.education.education?.percentage),
+            _infoRow('course', profile.education.education?.course),
+            _infoRow('Percentage ', profile.education.education?.percentage),
             _infoRow('Passing Year', profile.education.education?.passingYear),
 
             // add additional courses

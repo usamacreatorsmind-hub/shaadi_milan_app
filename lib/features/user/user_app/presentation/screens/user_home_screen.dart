@@ -86,7 +86,7 @@ class UserHomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final homeState = ref.watch(userHomeControllerProvider);
+    final homeState = ref.watch(homeControllerProvider);
     final filter = ref.watch(homeFilterProvider);
 
     String filterText = '';
@@ -294,25 +294,27 @@ class UserHomeScreen extends ConsumerWidget {
               );
             },
             data: (profiles) {
-              final filteredProfiles = profiles.where((profile) {
+              final filteredProfiles = profiles.where((viewModel) {
+                final profile = viewModel.profile;
+
                 // If no state is selected, or if state matches
                 final stateMatch =
                     filter.state.isEmpty ||
-                    (profile.address?.state == filter.state);
+                    (profile.address.state == filter.state);
                 // If no city is selected, or if city matches
                 final cityMatch =
                     filter.city.isEmpty ||
-                    (profile.address?.city == filter.city);
+                    (profile.address.city == filter.city);
 
                 // If no religion is selected, or if religion matches
                 final religionMatch =
                     filter.religion.isEmpty ||
-                    (profile.cultural?.religion == filter.religion);
+                    (profile.cultural.religion == filter.religion);
 
                 // If no caste is selected, or if caste matches
                 final casteMatch =
                     filter.caste.isEmpty ||
-                    (profile.cultural?.caste == filter.caste);
+                    (profile.cultural.caste == filter.caste);
 
                 return stateMatch && cityMatch && religionMatch && casteMatch;
               }).toList();
@@ -330,21 +332,23 @@ class UserHomeScreen extends ConsumerWidget {
 
               return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
-                  final profile = filteredProfiles[index];
-                  debugPrint(profile.images?.secondaryImageUrls.toString());
-                  debugPrint(profile.images?.primaryImageUrl.toString());
+                  final viewModel = filteredProfiles[index];
+                  final profile = viewModel.profile;
+                  final user = viewModel.user;
+
+                  debugPrint(profile.images.secondaryImageUrls.toString());
+                  debugPrint(profile.images.primaryImageUrl.toString());
                   return Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,
                     ),
                     child: ProfileCard(
-                      uid: profile.userId ?? "",
-                      name: " profile.?.fullName ?? 'N/A',",
-
-                      age: profile.identity?.age ?? 0,
-                      designation: profile.employment?.designation ?? "N/A",
-                      imageUrl: profile.images?.primaryImageUrl ?? "",
+                      uid: profile.userId,
+                      name: user?.fullName ?? 'N/A',
+                      age: profile.identity.age ?? 0,
+                      designation: profile.employment.designation ?? "N/A",
+                      imageUrl: profile.images.primaryImageUrl ?? "",
                     ),
                   );
                 }, childCount: filteredProfiles.length),

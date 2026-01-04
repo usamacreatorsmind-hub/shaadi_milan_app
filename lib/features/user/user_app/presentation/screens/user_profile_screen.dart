@@ -3,6 +3,7 @@ import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/f
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
 
 import '../../../../../app/router/app_router.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
@@ -52,7 +53,11 @@ class UserProfileScreen extends ConsumerWidget {
       backgroundColor: Colors.grey[100],
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: $err')),
+        error: (err, stackTrace) {
+          debugPrint(stackTrace.toString());
+
+          return Center(child: Text('Error: $err'));
+        },
         data: (profile) {
           return SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 30),
@@ -85,6 +90,32 @@ class UserProfileScreen extends ConsumerWidget {
 
                 // 🔹 GENERAL SECTION
                 _SectionTitle(title: "General"),
+                _SettingsTile(
+                  icon: Icons.person_search_outlined,
+                  title: "My Profile",
+                  onTap: () {
+                    AutoRouter.of(context).push(MyProfileRoute(uid: userId));
+                  },
+                ),
+                _SettingsTile(
+                  icon: Icons.support_agent_outlined,
+                  title: "Agent Details",
+                  onTap: () {
+                    if (profile.agentProfile != null) {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) =>
+                            AgentBottomSheet(agent: profile.agentProfile!),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("No agent assigned yet.")),
+                      );
+                    }
+                  },
+                ),
 
                 _SettingsTile(
                   icon: Icons.lock_outline,
@@ -120,11 +151,6 @@ class UserProfileScreen extends ConsumerWidget {
                 ),
 
                 // help and support
-                _SettingsTile(
-                  icon: Icons.help_outline,
-                  title: "Help & Support",
-                  onTap: () {},
-                ),
                 _SettingsTile(
                   icon: Icons.info_outline,
                   title: "About Us",
@@ -234,191 +260,43 @@ class _ProfileHeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: () {
-        AutoRouter.of(
-          context,
-        ).push(MyProfileRoute(uid: profile.user?.uid ?? ''));
-      },
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
+      child: Center(
+        child: Column(
+          children: [
+            // 👤 Avatar
+            CircleAvatar(
+              radius: MediaQuery.of(context).size.width * 0.30,
+              backgroundColor: theme.primaryColor.withOpacity(0.15),
+              backgroundImage:
+                  (profile.images.primaryImageUrl?.isNotEmpty ?? false)
+                  ? NetworkImage(profile.images.primaryImageUrl!)
+                  : null,
+              child: (profile.images.primaryImageUrl?.isEmpty ?? true)
+                  ? Icon(Icons.person, size: 50, color: theme.primaryColor)
+                  : null,
+            ),
 
-      child: Container(
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            colors: [theme.primaryColor.withOpacity(0.08), Colors.white],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
+            // 📝 Name (unchanged data)
+            Text(
+              profile.user?.fullName ?? 'N/A',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+
+              style: TextStyle(
+                fontSize: 40,
+ 
+
+
+                color: Theme.of(context).primaryColor,
+
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 👤 Avatar + Verified badge
-              Column(
-                children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundColor: theme.primaryColor.withOpacity(0.15),
-                    backgroundImage:
-                        (profile.images.primaryImageUrl?.isNotEmpty ?? false)
-                        ? NetworkImage(profile.images.primaryImageUrl!)
-                        : null,
-                    child: (profile.images.primaryImageUrl?.isEmpty ?? true)
-                        ? Icon(
-                            Icons.person,
-                            size: 40,
-                            color: theme.primaryColor,
-                          )
-                        : null,
-                  ),
-                ],
-              ),
-
-              const SizedBox(width: 18),
-
-              // 📝 Details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 🔹 Name
-                    Text(
-                      profile.user?.fullName ?? 'N/A',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // 🔹 Verified + Edit (SAME ROW ✅)
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border.all(
-                              color: profile.user?.isVerified == true
-                                  ? theme.primaryColor
-                                  : Colors.red,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                profile.user?.isVerified == true
-                                    ? Icons.verified
-                                    : Icons.cancel,
-                                size: 16,
-                                color: profile.user?.isVerified == true
-                                    ? theme.primaryColor
-                                    : Colors.red,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                profile.user?.isVerified == true
-                                    ? "Verified"
-                                    : "Not Verified",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: profile.user?.isVerified == true
-                                      ? theme.primaryColor
-                                      : Colors.red,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(width: 12),
-
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border.all(
-                              color: profile.user?.isVerified == true
-                                  ? theme.primaryColor
-                                  : Colors.red,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.edit,
-                                size: 16,
-                                color: profile.user?.isVerified == true
-                                    ? theme.primaryColor
-                                    : Colors.red,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                "Edit Profile",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: profile.user?.isVerified == true
-                                      ? theme.primaryColor
-                                      : Colors.red,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // 🔹 Age & Occupation
-                    Text(
-                      '${profile.identity?.age ?? 'N/A'} yrs • ${profile.employment?.jobType ?? 'N/A'}',
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // 📍 Location
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on_outlined,
-                          size: 16,
-                          color: theme.primaryColor,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            '${profile.address?.city ?? 'N/A'}, ${profile.address?.state ?? 'N/A'}',
-                            style: TextStyle(color: Colors.grey[700]),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

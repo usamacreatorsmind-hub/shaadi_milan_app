@@ -1,19 +1,19 @@
 class Education {
   final String college;
-  final String degree;
+  final String course;
   final int passingYear;
   final double percentage;
 
   Education({
     required this.college,
-    required this.degree,
+    required this.course,
     required this.passingYear,
     required this.percentage,
   });
   Map<String, dynamic> toMap() {
     return {
       'college': college,
-      'degree': degree,
+      'course': course,
       'percentage': percentage,
       'passingYear': passingYear,
     };
@@ -22,7 +22,7 @@ class Education {
   factory Education.fromMap(Map<String, dynamic> map) {
     return Education(
       college: map['college'] as String,
-      degree: map['degree'] as String,
+      course: map['course'] as String,
       passingYear: map['passingYear'] as int,
       percentage: map['percentage'] as double,
     );
@@ -30,7 +30,7 @@ class Education {
 
   @override
   String toString() {
-    return 'GraduationProfile(college: $college, degree: $degree, passingYear: $passingYear, percentage: $percentage)';
+    return 'EducationProfile(college: $college, course: $course, passingYear: $passingYear, percentage: $percentage)';
   }
 
   Education copyWith({
@@ -41,14 +41,14 @@ class Education {
   }) {
     return Education(
       college: college ?? this.college,
-      degree: degree ?? this.degree,
+      course: degree ?? this.course,
       passingYear: passingYear ?? this.passingYear,
       percentage: percentage ?? this.percentage,
     );
   }
 
   factory Education.empty() {
-    return Education(college: '', degree: '', passingYear: 0, percentage: 0.0);
+    return Education(college: '', course: '', passingYear: 0, percentage: 0.0);
   }
 }
 
@@ -91,7 +91,7 @@ class EducationProfile {
 
   Map<String, dynamic> toMap() {
     return {
-      'graduation': education?.toMap(),
+      'education': education?.toMap(),
       'extraQualification': extraQualification?.toMap(),
     };
   }

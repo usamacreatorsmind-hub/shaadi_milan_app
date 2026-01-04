@@ -21,6 +21,16 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const AboutUsScreen(),
       );
     },
+    AgentContactRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentContactRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentContactScreen(
+          key: args.key,
+          agentId: args.agentId,
+        ),
+      );
+    },
     AgentDashboardRoute.name: (routeData) {
       final args = routeData.argsAs<AgentDashboardRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -69,6 +79,16 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const MatrimonyFormFlowScreen(),
+      );
+    },
+    MyProfileDetailRoute.name: (routeData) {
+      final args = routeData.argsAs<MyProfileDetailRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: MyProfileDetailScreen(
+          key: args.key,
+          user: args.user,
+        ),
       );
     },
     MyProfileRoute.name: (routeData) {
@@ -259,6 +279,44 @@ class AboutUsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [AgentContactScreen]
+class AgentContactRoute extends PageRouteInfo<AgentContactRouteArgs> {
+  AgentContactRoute({
+    Key? key,
+    required String agentId,
+    List<PageRouteInfo>? children,
+  }) : super(
+          AgentContactRoute.name,
+          args: AgentContactRouteArgs(
+            key: key,
+            agentId: agentId,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'AgentContactRoute';
+
+  static const PageInfo<AgentContactRouteArgs> page =
+      PageInfo<AgentContactRouteArgs>(name);
+}
+
+class AgentContactRouteArgs {
+  const AgentContactRouteArgs({
+    this.key,
+    required this.agentId,
+  });
+
+  final Key? key;
+
+  final String agentId;
+
+  @override
+  String toString() {
+    return 'AgentContactRouteArgs{key: $key, agentId: $agentId}';
+  }
+}
+
+/// generated route for
 /// [AgentDashboardScreen]
 class AgentDashboardRoute extends PageRouteInfo<AgentDashboardRouteArgs> {
   AgentDashboardRoute({
@@ -403,6 +461,44 @@ class MatrimonyFormFlowRoute extends PageRouteInfo<void> {
   static const String name = 'MatrimonyFormFlowRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [MyProfileDetailScreen]
+class MyProfileDetailRoute extends PageRouteInfo<MyProfileDetailRouteArgs> {
+  MyProfileDetailRoute({
+    Key? key,
+    required AppUser user,
+    List<PageRouteInfo>? children,
+  }) : super(
+          MyProfileDetailRoute.name,
+          args: MyProfileDetailRouteArgs(
+            key: key,
+            user: user,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'MyProfileDetailRoute';
+
+  static const PageInfo<MyProfileDetailRouteArgs> page =
+      PageInfo<MyProfileDetailRouteArgs>(name);
+}
+
+class MyProfileDetailRouteArgs {
+  const MyProfileDetailRouteArgs({
+    this.key,
+    required this.user,
+  });
+
+  final Key? key;
+
+  final AppUser user;
+
+  @override
+  String toString() {
+    return 'MyProfileDetailRouteArgs{key: $key, user: $user}';
+  }
 }
 
 /// generated route for

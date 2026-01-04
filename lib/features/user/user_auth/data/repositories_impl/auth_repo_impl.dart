@@ -14,38 +14,50 @@ class AuthRepositoryImpl implements AuthRepository {
   User? get currentUser => ds.currentUser;
 
   @override
-  Stream<AppUser?> authStateChanges() =>
-      ds.authStateChanges().asyncMap((user) async {
-        if (user == null) return null;
-        final doc = await firestore.collection('users').doc(user.uid).get();
-        if (doc.exists) {
-          final data = doc.data()!;
-          return AppUser(
-            uid: user.uid,
-            fullName: data['fullName'] ?? user.displayName ?? '',
-            email: user.email ?? '',
-            role: data['role'] ?? 'user',
+  Stream<AppUser?> authStateChanges() => ds.authStateChanges().asyncMap((
+    user,
+  ) async {
+    if (user == null) return null;
+    final doc = await firestore.collection('users').doc(user.uid).get();
+    if (doc.exists) {
+      final data = doc.data()!;
+      return AppUser(
+        metrimonyId: data['metrimonyId'] ?? '',
+        userStatus: data['userStatus'] != null
+            ? UserStatus.fromMap(Map<String, dynamic>.from(data['userStatus']))
+            : UserStatus.empty(),
+        wishlists: (data['wishlists'] as List<dynamic>?)
+            ?.map((e) => e as String)
+            .toList(),
 
-            phone: data['phone'] ?? '',
-            profileId: data['profileId'] ?? '',
-            isVerified: data['isVerified'] ?? false,
-            agentId: data['agentId'],
-          );
-        } else {
-          // User is authenticated but no document in 'users' collection yet.
-          // This can happen right after signup.
-          return AppUser(
-            uid: user.uid,
-            fullName: user.displayName ?? '',
-            email: user.email ?? '',
-            role: 'user',
-            phone: '',
-            profileId: '',
-            isVerified: false,
-            agentId: '',
-          );
-        }
-      });
+        uid: user.uid,
+        fullName: data['fullName'] ?? user.displayName ?? '',
+        email: user.email ?? '',
+        role: data['role'] ?? 'user',
+
+        phone: data['phone'] ?? '',
+        profileId: data['profileId'] ?? '',
+        isVerified: data['isVerified'] ?? false,
+        agentId: data['agentId'],
+      );
+    } else {
+      // User is authenticated but no document in 'users' collection yet.
+      // This can happen right after signup.
+      return AppUser(
+        metrimonyId: '',
+        userStatus: UserStatus.empty(),
+
+        uid: user.uid,
+        fullName: user.displayName ?? '',
+        email: user.email ?? '',
+        role: 'user',
+        phone: '',
+        profileId: '',
+        isVerified: false,
+        agentId: '',
+      );
+    }
+  });
 
   @override
   Future<void> signInWithEmail(String email, String password) async {
@@ -68,8 +80,6 @@ class AuthRepositoryImpl implements AuthRepository {
     List<String> wishlists = const [],
   }) async {
     // fetch agent id using agent_id field using agent repository
-
-   
 
     await ds.signUpWithEmail(
       fullName: fullName,

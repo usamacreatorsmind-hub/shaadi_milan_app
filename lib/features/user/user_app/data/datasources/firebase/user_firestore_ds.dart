@@ -13,6 +13,12 @@ class UserFirestoreDS {
   CollectionReference<Map<String, dynamic>> get _users =>
       _firestore.collection('users');
 
+
+  Future<List<Map<String, dynamic>>> fetchUsers() async {
+    final querySnapshot = await _users.get();
+    return querySnapshot.docs.map((doc) => doc.data()).toList();
+  }
+
   Future<Map<String, dynamic>> fetchUser(String uid) async {
     final doc = await _users.doc(uid).get();
     if (!doc.exists) throw Exception('User not found');
@@ -25,6 +31,9 @@ class UserFirestoreDS {
       return doc.data()!;
     });
   }
+
+
+
 
   Future<void> updateUser(String uid, Map<String, dynamic> updates) async {
     await _users.doc(uid).update(updates);

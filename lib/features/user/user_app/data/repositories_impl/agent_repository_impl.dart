@@ -16,7 +16,7 @@ class AgentRepositoryImpl implements AgentRepository {
   AgentRepositoryImpl(this._firestore);
 
   @override
-  Future<AgentProfile> fetchAgent(String agentId) async {
+  Future<AgentProfile> getAgentProfile(String agentId) async {
     final agentProfile = await _firestore.fetchAgentByUid(agentId);
     return agentProfile;
   }
@@ -36,5 +36,21 @@ class AgentRepositoryImpl implements AgentRepository {
       throw Exception('Agent with ID $agentId not found');
     }
     return agentUid;
+  }
+
+  @override
+  Future<void> updateProfile(AgentProfile agent) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<AgentProfile> watchAgent(String uid) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<AgentProfile> fetchAgent(String uid) {
+    final agentProfile = _firestore.fetchAgentByUid(uid);
+    return agentProfile;
   }
 }

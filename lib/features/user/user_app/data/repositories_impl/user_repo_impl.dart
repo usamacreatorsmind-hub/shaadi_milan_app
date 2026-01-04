@@ -10,6 +10,12 @@ class UserRepositoryImpl implements UserRepository {
   final UserFirestoreDS _ds;
 
   UserRepositoryImpl(this._ds);
+  @override
+  Future<List<AppUser>> fetchUsers() async {
+    final data = await _ds.fetchUsers();
+    return data.map((e) => AppUser.fromMap(e)).toList();
+  }
+
 
   @override
   Stream<AppUser> watchUser(String uid) {

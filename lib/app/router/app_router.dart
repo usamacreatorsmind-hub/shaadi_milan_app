@@ -1,7 +1,10 @@
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/contact_us_screen.dart';
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/privacy_policy_route.dart';
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/terms_and_conditions_route.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/about_us_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_contact_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/widgets/MyProfileDetailScreen.dart';
 
 import '../../features/agent/presentation/screens/agent_dashboard_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
@@ -79,6 +82,7 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: UserImageFormRoute.page),
     AutoRoute(page: SearchRoute.page),
     AutoRoute(page: UserNotificationRoute.page),
+    AutoRoute(page: MyProfileDetailRoute.page),
 
     AutoRoute(page: MyProfileRoute.page),
     AutoRoute(page: UserPaymentRoute.page),
@@ -89,6 +93,7 @@ class AppRouter extends _$AppRouter {
     // ================= AGENT =================
     AutoRoute(page: AgentDashboardRoute.page),
     AutoRoute(page: AgentProfileVerifyRoute.page),
+    AutoRoute(page: AgentContactRoute.page),
 
     // ================= ABOUT US =================
     AutoRoute(page: AboutUsRoute.page),

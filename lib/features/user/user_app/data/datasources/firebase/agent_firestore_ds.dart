@@ -38,14 +38,14 @@ class AgentFirestoreDs {
   Future<AgentProfile> fetchAgentByUid(String agentId) async {
     final querySnapshot = await _firestore
         .collection(_collection)
-        .where('agentId', isEqualTo: agentId)
-        .limit(1)
+        .doc(agentId)
         .get();
 
-    if (querySnapshot.docs.isEmpty) {
+    if (!querySnapshot.exists) {
       throw Exception('Agent with UID $agentId not found');
     }
-    return AgentProfile.fromMap(querySnapshot.docs.first.data());
+
+    return AgentProfile.fromMap(querySnapshot.data()!);
   }
 
   // fetch agent doumetn using agent id

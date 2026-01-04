@@ -1,4 +1,3 @@
-  
 class AgentProfile {
   final String role;
   final String uid;
@@ -11,14 +10,18 @@ class AgentProfile {
   final String agentMobile;
   final DateTime registrationDate;
 
+  final String address;
+
   AgentProfile({
+    required this.address,
+
     required this.agentId,
     required this.agentName,
     required this.agentMobile,
     required this.registrationDate,
     required this.role,
     required this.agentAadhar,
-    
+
     required this.uid,
     required this.email,
     this.photoUrl,
@@ -26,6 +29,8 @@ class AgentProfile {
 
   Map<String, dynamic> toMap() => {
     'agentId': agentId,
+    'address': address,
+    'agentAadhar': agentAadhar,
     'agentName': agentName,
     'agentMobile': agentMobile,
     'registrationDate': registrationDate.toIso8601String(),
@@ -50,8 +55,10 @@ class AgentProfile {
     }
 
     return AgentProfile(
+      address: map['address'] ?? '',
+
       agentId: map['agentId'] ?? '',
-      agentAadhar: map['agentAadhar'] ?? '',  
+      agentAadhar: map['agentAadhar'] ?? '',
       agentName: map['agentName'] ?? '',
       agentMobile: map['agentMobile'] ?? '',
       registrationDate: parseDate(map['registrationDate']),
@@ -61,15 +68,14 @@ class AgentProfile {
       photoUrl: map['photoUrl'],
     );
   }
- 
-
 
   @override
   String toString() {
-    return 'AgentProfile(agentId: $agentId, agentName: $agentName, agentMobile: $agentMobile, registrationDate: $registrationDate, role: $role, uid: $uid, email: $email, photoUrl: $photoUrl)';
+    return 'AgentProfile(agentId: $agentId, agentAadhar: $agentAadhar, address: $address, agentName: $agentName, agentMobile: $agentMobile, registrationDate: $registrationDate, role: $role, uid: $uid, email: $email, photoUrl: $photoUrl)';
   }
 
   AgentProfile copyWith({
+    String? address,
     String? agentId,
     String? agentName,
     String? agentMobile,
@@ -77,13 +83,16 @@ class AgentProfile {
     String? role,
     String? uid,
     String? agentAadhar,
-    
+
     String? email,
     String? photoUrl,
   }) {
     return AgentProfile(
+      address: address ?? this.address,
+
       agentId: agentId ?? this.agentId,
-      agentName: agentName ?? this.agentName,      agentAadhar: agentAadhar ?? this.agentAadhar,  
+      agentName: agentName ?? this.agentName,
+      agentAadhar: agentAadhar ?? this.agentAadhar,
       agentMobile: agentMobile ?? this.agentMobile,
       registrationDate: registrationDate ?? this.registrationDate,
       role: role ?? this.role,
@@ -95,11 +104,13 @@ class AgentProfile {
 
   factory AgentProfile.empty() {
     return AgentProfile(
+      address: '',
+
       agentId: '',
       agentName: '',
       agentMobile: '',
       agentAadhar: '',
-      
+
       registrationDate: DateTime.now(),
       role: '',
       uid: '',
@@ -107,6 +118,4 @@ class AgentProfile {
       photoUrl: null,
     );
   }
-
-   
 }

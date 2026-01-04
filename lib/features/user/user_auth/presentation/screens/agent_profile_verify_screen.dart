@@ -1,7 +1,7 @@
 import '../../../../../app/custom/shimmer.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../../user_app/presentation/controllers/agent_profile_controller.dart';
-import 'package:auto_route/annotations.dart';
+ 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

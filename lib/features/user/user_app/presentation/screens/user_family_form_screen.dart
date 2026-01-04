@@ -28,14 +28,7 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
 
   String? _familyType;
 
-  @override
-  void dispose() {
-    _fatherNameController.dispose();
-    _motherNameController.dispose();
-    _brothersController.dispose();
-    _sistersController.dispose();
-    super.dispose();
-  }
+ 
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
@@ -54,6 +47,7 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
             brothers: int.parse(_brothersController.text),
             sisters: int.parse(_sistersController.text),
             familyType: _familyType!,
+            familyStatus: _familyStatusController.text,
           );
     }
   }

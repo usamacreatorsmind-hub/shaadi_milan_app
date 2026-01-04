@@ -1,5 +1,4 @@
-import 'agent_state.dart';
-import 'home_state.dart';
+import 'agent_state.dart'; 
 import 'image_state.dart';
 import 'user_state.dart';
 import '../../presentation/screens/metrimony_flow_screen.dart';
@@ -19,7 +18,7 @@ import 'physical_state.dart';
 class MatrimonyProfile {
   final String userId;
   final String agentId;
-
+  final String metrimonyId;
   final IdentityProfile identity;
   final AddressProfile address;
   final CulturalProfile cultural;
@@ -31,8 +30,10 @@ class MatrimonyProfile {
   final ProfileImages images;
 
   MatrimonyProfile({
+    this.metrimonyId = "",
     this.userId = '',
     this.agentId = '',
+
     IdentityProfile? identity,
     AddressProfile? address,
     CulturalProfile? cultural,
@@ -55,6 +56,8 @@ class MatrimonyProfile {
   /// ---------------- COPY WITH ----------------
 
   MatrimonyProfile copyWith({
+    String? metrimonyId,
+
     String? userId,
     String? agentId,
     IdentityProfile? identity,
@@ -67,6 +70,8 @@ class MatrimonyProfile {
     ProfileImages? images,
   }) {
     return MatrimonyProfile(
+      metrimonyId: metrimonyId ?? this.metrimonyId,
+
       userId: userId ?? this.userId,
       agentId: agentId ?? this.agentId,
       identity: identity ?? this.identity,
@@ -84,6 +89,8 @@ class MatrimonyProfile {
 
   Map<String, dynamic> toMap() {
     return {
+      "metrimonyId": metrimonyId,
+
       'userId': userId,
       'agentId': agentId,
       'identity': identity.toMap(),
@@ -102,6 +109,8 @@ class MatrimonyProfile {
   factory MatrimonyProfile.fromMap(Map<String, dynamic> map) {
     try {
       return MatrimonyProfile(
+        metrimonyId: map['metrimonyId'] ?? '',
+
         userId: map['userId'] ?? '',
         agentId: map['agentId'] ?? '',
 
@@ -133,6 +142,10 @@ class MatrimonyProfile {
               )
             : EmploymentProfile.empty(),
 
+        family: map['family'] != null
+            ? FamilyProfile.fromMap(Map<String, dynamic>.from(map['family']))
+            : FamilyProfile.empty(),
+
         physical: map['physical'] != null
             ? PhysicalProfile.fromMap(
                 Map<String, dynamic>.from(map['physical']),
@@ -152,6 +165,8 @@ class MatrimonyProfile {
   String toString() {
     return '''
 MatrimonyProfile(
+ 
+  metrimonyId: $metrimonyId,
   userId: $userId,
   agentId: $agentId,
   identity: $identity,
@@ -178,12 +193,28 @@ class MatrimonyProfileViewModel {
 
   const MatrimonyProfileViewModel({
     required this.profile,
-    this.user,
-    this.agent,
+    required this.user,
+    required this.agent,
   });
 
-  factory MatrimonyProfileViewModel.empty() =>
-      MatrimonyProfileViewModel(profile: MatrimonyProfile.empty());
+  // copy with
+  MatrimonyProfileViewModel copyWith({
+    MatrimonyProfile? profile,
+    AppUser? user,
+    AgentProfile? agent,
+  }) {
+    return MatrimonyProfileViewModel(
+      profile: profile ?? this.profile,
+      user: user ?? this.user,
+      agent: agent ?? this.agent,
+    );
+  }
+
+  factory MatrimonyProfileViewModel.empty() => MatrimonyProfileViewModel(
+    profile: MatrimonyProfile.empty(),
+    user: AppUser.empty(),
+    agent: AgentProfile.empty(),
+  );
 }
 
 /// ============================================================

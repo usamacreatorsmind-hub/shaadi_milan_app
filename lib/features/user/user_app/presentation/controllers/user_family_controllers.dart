@@ -34,6 +34,7 @@ class UserFamilyController extends StateNotifier<FamilyState> {
     required int brothers,
     required int sisters,
     required String familyType,
+    required String familyStatus,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     final familyProfile = FamilyProfile(
@@ -44,7 +45,7 @@ class UserFamilyController extends StateNotifier<FamilyState> {
       numberOfSisters: sisters,
 
       familyType: familyType,
-      familyStatus: '',
+      familyStatus: familyStatus,
     );
 
     try {

@@ -1,7 +1,11 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
+import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart'
     show agentFirestoreDsProvider;
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
@@ -13,6 +17,7 @@ import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // read profile from firebase
 
@@ -22,11 +27,12 @@ final matrimonyProfileProvider =
           .read(matrimonyRepositoryProvider)
           .getMatrimonyProfile(uid);
 
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(matrimonyProfile.userId)
-          .get();
-      final user = userDoc.exists ? AppUser.fromMap(userDoc.data()!) : null;
+      //  get user data using repository
+
+      final userRepo = ref.watch(userRepositoryProvider);
+      final user = await userRepo.fetchUser(uid);
+      print("user");
+      print(user.toString());
 
       AgentProfile? agent;
       if (matrimonyProfile.agentId.isNotEmpty) {
@@ -34,7 +40,8 @@ final matrimonyProfileProvider =
             .read(agentFirestoreDsProvider)
             .fetchAgentByUid(matrimonyProfile.agentId);
       }
-
+      print(agent);
+      print(agent);
       return MatrimonyProfileViewModel(
         profile: matrimonyProfile,
         user: user,
@@ -52,15 +59,56 @@ class UserDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
+  Future<void> _sendEmail(String email) async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: email,
+      query: Uri.encodeFull(
+        'subject=Regarding Matrimony Profile&body=Hello Agent,',
+      ),
+    );
+
+    try {
+      await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No email app found')));
+    }
+  }
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not launch $phoneNumber')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(matrimonyProfileProvider(widget.uid));
 
     return Scaffold(
       body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: $err')),
+        loading: () {
+          print(" this is error");
+          return const Center(child: CircularProgressIndicator());
+        },
+        error: (err, stackTrace) {
+          print(" this is error");
+          return Center(child: Text('Error: $err'));
+        },
         data: (viewModel) {
+          print(" this is use data");
+          print(viewModel);
+
           final profile = viewModel.profile;
           final List<String> images = [
             if (profile.images.primaryImageUrl != null &&
@@ -75,7 +123,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
           return Stack(
             children: [
               DefaultTabController(
-                length: 5,
+                length: 4,
                 child: NestedScrollView(
                   floatHeaderSlivers: true,
 
@@ -149,7 +197,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                     ),
 
                                     _infoChip(
-                                      profile.physical.height ?? '',
+                                      "${profile.physical.height} cm" ?? '',
                                       Icons.height_outlined,
                                     ),
                                   ],
@@ -194,10 +242,10 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 label: 'Family & Culture',
                                 icon: Icons.family_restroom,
                               ),
-                              TabWidget(
-                                label: 'Agent Details',
-                                icon: Icons.support_agent,
-                              ),
+                              // TabWidget(
+                              //   label: 'Agent Details',
+                              //   icon: Icons.support_agent,
+                              // ),
                             ],
                           ),
                         ),
@@ -285,15 +333,43 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               title: 'Address',
                               icon: Icons.location_on,
                               children: [
+                                // show addrress tile wise
+                                _InfoTile(
+                                  label: 'Place of residence',
+                                  icon: Icons.location_on_outlined,
+                                  value: profile.address.addressLine1,
+                                ),
+                                _InfoTile(
+                                  label: 'Post Office',
+
+                                  icon: Icons.local_post_office_outlined,
+
+                                  value: profile.address.post,
+                                ),
+
                                 _InfoTile(
                                   label: 'City',
-                                  icon: Icons.location_city,
+                                  icon: Icons.location_city_outlined,
                                   value: profile.address.city,
                                 ),
                                 _InfoTile(
+                                  label: 'Police Station',
+
+                                  icon: Icons.local_police_outlined,
+
+                                  value: profile.address.policeStation,
+                                ),
+
+                                _InfoTile(
                                   label: 'State',
-                                  icon: Icons.location_on,
+                                  icon: Icons.map_outlined,
                                   value: profile.address.state,
+                                ),
+
+                                _InfoTile(
+                                  label: 'Pin Code',
+                                  icon: Icons.local_post_office_outlined,
+                                  value: profile.address.pincode,
                                 ),
                               ],
                             ),
@@ -306,67 +382,122 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                         padding: const EdgeInsets.only(bottom: 100),
                         child: Column(
                           children: [
+                            _InfoCard(
+                              title: 'Employment',
+                              icon: Icons.work,
+                              children: [
+                                _InfoTile(
+                                  label: 'Job Type',
+                                  icon: Icons.work_outline,
+                                  value: profile.employment.jobType,
+                                ),
+                                _InfoTile(
+                                  label: 'Company',
+                                  icon: Icons.business,
+                                  value: profile.employment.company,
+                                ),
+                                _InfoTile(
+                                  label: 'Designation',
+                                  icon: Icons.work_history,
+                                  value: profile.employment.designation,
+                                ),
+                                _InfoTile(
+                                  label: 'Income',
+                                  icon: Icons.attach_money,
+                                  value: profile.employment.annualIncome
+                                      .toString(),
+                                ),
+
+                                _InfoTile(
+                                  label: 'Work Location',
+                                  icon: Icons.location_city_outlined,
+                                  value: profile.employment.workLocation
+                                      .toString(),
+                                ),
+                              ],
+                            ),
+
                             // ================= EDUCATION SECTION =================
-                            if (profile.education.education != null)
+                            if (profile.education.education != null ||
+                                (profile
+                                        .education
+                                        .extraQualification
+                                        ?.qualifications
+                                        .isNotEmpty ??
+                                    false))
                               _InfoCard(
-                                title: 'Graduation',
+                                title: 'Education',
                                 icon: Icons.school_outlined,
                                 children: [
-                                  _InfoTile(
-                                    label: 'College',
-                                    icon: Icons.account_balance,
-                                    value: profile.education.education!.college,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Degree',
-                                    icon: Icons.menu_book,
-                                    value: profile.education.education!.degree,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Percentage',
-                                    icon: Icons.percent,
-                                    value:
-                                        profile.education.education!.percentage
-                                            ?.toString() ??
-                                        'N/A',
-                                  ),
-                                  _InfoTile(
-                                    label: 'Passing Year',
-                                    icon: Icons.calendar_today,
-                                    value:
-                                        profile.education.education!.passingYear
-                                            ?.toString() ??
-                                        'N/A',
-                                  ),
-                                ],
-                              ),
-
-                            if (profile.employment.jobType != null)
-                              _InfoCard(
-                                title: 'Employment',
-                                icon: Icons.work,
-                                children: [
-                                  _InfoTile(
-                                    label: 'Job Type',
-                                    icon: Icons.work_outline,
-                                    value: profile.employment.jobType,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Company',
-                                    icon: Icons.business,
-                                    value: profile.employment.company,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Designation',
-                                    icon: Icons.work_history,
-                                    value: profile.employment.designation,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Income',
-                                    icon: Icons.attach_money,
-                                    value: profile.employment.annualIncome
-                                        .toString(),
-                                  ),
+                                  if (profile.education.education != null) ...[
+                                    _InfoTile(
+                                      label: 'College',
+                                      icon: Icons.account_balance,
+                                      value:
+                                          profile.education.education!.college,
+                                    ),
+                                    _InfoTile(
+                                      label: 'Course',
+                                      icon: Icons.menu_book,
+                                      value:
+                                          profile.education.education!.course,
+                                    ),
+                                    _InfoTile(
+                                      label: 'Percentage',
+                                      icon: Icons.percent,
+                                      value: profile
+                                          .education
+                                          .education!
+                                          .percentage
+                                          .toString(),
+                                    ),
+                                    _InfoTile(
+                                      label: 'Passing Year',
+                                      icon: Icons.calendar_today,
+                                      value: profile
+                                          .education
+                                          .education!
+                                          .passingYear
+                                          .toString(),
+                                    ),
+                                  ],
+                                  if (profile
+                                          .education
+                                          .extraQualification
+                                          ?.qualifications
+                                          .isNotEmpty ??
+                                      false)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 12),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Additional Courses',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500,
+                                              color: const Color.fromARGB(255, 24, 22, 22),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Wrap(
+                                            spacing: 8.0,
+                                            runSpacing: 4.0,
+                                            children: profile
+                                                .education
+                                                .extraQualification!
+                                                .qualifications
+                                                .map(
+                                                  (course) =>
+                                                      Chip(label: Text(course)),
+                                                )
+                                                .toList(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                 ],
                               ),
                           ],
@@ -397,6 +528,19 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   icon: Icons.family_restroom,
                                   value: profile.family.familyType,
                                 ),
+                                _InfoTile(
+                                  label: 'No. of Brother',
+                                  icon: Icons.people_outline,
+                                  value: profile.family.numberOfBrothers
+                                      .toString(),
+                                ),
+
+                                _InfoTile(
+                                  label: 'No. of Sister',
+                                  icon: Icons.people_outline,
+                                  value: profile.family.numberOfSisters
+                                      .toString(),
+                                ),
                               ],
                             ),
 
@@ -414,6 +558,13 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   icon: Icons.group,
                                   value: profile.cultural.caste,
                                 ),
+
+                                _InfoTile(
+                                  label: 'Caste',
+                                  icon: Icons.group,
+                                  value: profile.cultural.subCaste,
+                                ),
+
                                 _InfoTile(
                                   label: 'Languages',
                                   icon: Icons.language,
@@ -426,49 +577,49 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                       ),
 
                       // 5️⃣ AGENT / VERIFICATION
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 100),
-                        child: Column(
-                          children: [
-                            if (viewModel.agent != null)
-                              _InfoCard(
-                                title: 'Agent Details',
-                                icon: Icons.support_agent,
-                                children: [
-                                  _InfoTile(
-                                    label: 'Name',
-                                    icon: Icons.person_outline,
-                                    value: viewModel.agent!.agentName,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Mobile',
-                                    icon: Icons.phone,
-                                    value: viewModel.agent!.agentMobile,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Email',
-                                    icon: Icons.email_outlined,
-                                    value: viewModel.agent!.email,
-                                  ),
+                      // SingleChildScrollView(
+                      //   padding: const EdgeInsets.only(bottom: 100),
+                      //   child: Column(
+                      //     children: [
+                      //       if (viewModel.agent != null)
+                      //         _InfoCard(
+                      //           title: 'Agent Details',
+                      //           icon: Icons.support_agent,
+                      //           children: [
+                      //             _InfoTile(
+                      //               label: 'Name',
+                      //               icon: Icons.person_outline,
+                      //               value: viewModel.agent!.agentName,
+                      //             ),
+                      //             _InfoTile(
+                      //               label: 'Mobile',
+                      //               icon: Icons.phone,
+                      //               value: viewModel.agent!.agentMobile,
+                      //             ),
+                      //             _InfoTile(
+                      //               label: 'Email',
+                      //               icon: Icons.email_outlined,
+                      //               value: viewModel.agent!.email,
+                      //             ),
 
-                                  _InfoTile(
-                                    label: 'Agent ID',
-                                    icon: Icons.perm_identity,
-                                    value: viewModel.agent!.agentId,
-                                  ),
+                      //             _InfoTile(
+                      //               label: 'Agent ID',
+                      //               icon: Icons.perm_identity,
+                      //               value: viewModel.agent!.agentId,
+                      //             ),
 
-                                  _InfoTile(
-                                    label: 'Registered Date',
-                                    icon: Icons.calendar_today_outlined,
-                                    value: DateFormat(
-                                      'dd-MM-yyyy',
-                                    ).format(viewModel.agent!.registrationDate),
-                                  ),
-                                ],
-                              ),
-                          ],
-                        ),
-                      ),
+                      //             _InfoTile(
+                      //               label: 'Registered Date',
+                      //               icon: Icons.calendar_today_outlined,
+                      //               value: DateFormat(
+                      //                 'dd-MM-yyyy',
+                      //               ).format(viewModel.agent!.registrationDate),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -553,7 +704,11 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              // create botton sheet here
+
+                              showAgentBottomSheet(context, viewModel.agent!);
+                            },
                           ),
                         ),
                       ],
@@ -566,6 +721,55 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
         },
       ),
     );
+  }
+
+  void showAgentBottomSheet(BuildContext context, AgentProfile agent) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => AgentBottomSheet(agent: agent),
+    );
+  }
+
+  Widget _infoTile(IconData icon, String title, String? subtitle) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: Theme.of(context).primaryColor),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle ?? 'N/A',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return DateFormat('dd MMM yyyy').format(date);
   }
 }
 
@@ -818,7 +1022,7 @@ class ProfileHeaderCard extends StatelessWidget {
                 child: Text(
                   viewModel.user?.fullName ?? 'N/A',
                   style: const TextStyle(
-                    fontSize: 26,
+                    fontSize: 30,
                     fontWeight: FontWeight.w700,
                     color: Colors.black87,
 
@@ -835,7 +1039,7 @@ class ProfileHeaderCard extends StatelessWidget {
 
           // AGE + OCCUPATION
           Text(
-            '${profile.identity.age ?? 'N/A'} yrs, ${profile.employment.jobType ?? 'N/A'}',
+            '${profile.identity.age ?? 'N/A'} yrs, ${profile.employment.designation ?? 'N/A'}',
             style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
           ),
 

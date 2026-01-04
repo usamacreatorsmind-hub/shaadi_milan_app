@@ -4,6 +4,8 @@ import '../states/user_state.dart';
 abstract class UserRepository {
   Stream<AppUser> watchUser(String uid);
   Future<AppUser> fetchUser(String uid);
+  Future<List<AppUser>> fetchUsers();
+  
   Future<void> updateUser(String uid, AppUser user);
   Future<void> updateField(String uid, String fieldPath, dynamic value);
   Future<void> deleteUser(String uid);
