@@ -13,8 +13,7 @@ abstract class AuthRepository {
     required String email,
     required String password,
     required String agentId,
-    required String phone,
-    required UserStatus userStatus,
+    required String phone, 
   });
   Future<void> signInWithEmail(String email, String password);
   Future<void> signOut();

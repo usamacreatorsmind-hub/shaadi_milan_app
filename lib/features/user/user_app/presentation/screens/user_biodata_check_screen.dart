@@ -55,10 +55,7 @@ class _UserBiodataCheckScreenState
 
             _infoRow('Email', currentUser?.email),
             _infoRow('Phone', currentUser?.phone),
-            _infoRow(
-              'Verification',
-              (currentUser?.isVerified) == true ? 'Verified' : 'Not Verified',
-            ),
+          
           ]),
 
           _section('Identity', Icons.badge, [

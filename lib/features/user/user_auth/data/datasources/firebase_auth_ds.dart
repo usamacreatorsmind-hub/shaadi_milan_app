@@ -39,8 +39,7 @@ class FirebaseAuthDS {
     required String password,
     required String agentId,
     required String phone,
-    required List<String> wishlists,
-    required UserStatus userStatus,
+    required List<String> wishlists, 
   }) async {
     try {
       var agentUid = "";
@@ -85,8 +84,7 @@ class FirebaseAuthDS {
 
         'agentId': agentUid,
 
-        'createdAt': FieldValue.serverTimestamp(),
-        'userStatus': userStatus.toMap(),
+        'createdAt': FieldValue.serverTimestamp(), 
 
         'lastSeen': FieldValue.serverTimestamp(),
       });

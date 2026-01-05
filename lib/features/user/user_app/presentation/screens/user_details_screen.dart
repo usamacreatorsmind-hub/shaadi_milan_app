@@ -478,7 +478,12 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                             style: TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.w500,
-                                              color: const Color.fromARGB(255, 24, 22, 22),
+                                              color: const Color.fromARGB(
+                                                255,
+                                                24,
+                                                22,
+                                                22,
+                                              ),
                                             ),
                                           ),
                                           const SizedBox(height: 8),
@@ -1030,8 +1035,6 @@ class ProfileHeaderCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (viewModel.user?.isVerified == true)
-                const Icon(Icons.verified, color: Colors.green, size: 22),
             ],
           ),
 

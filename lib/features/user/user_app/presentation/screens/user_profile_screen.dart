@@ -86,7 +86,7 @@ class UserProfileScreen extends ConsumerWidget {
                 _ProfileHeaderCard(profile: profile),
 
                 // 🔹 PREMIUM CARD
-                _PremiumCard(),
+                _PremiumCard(appUser: profile.user),
 
                 // 🔹 GENERAL SECTION
                 _SectionTitle(title: "General"),
@@ -125,6 +125,25 @@ class UserProfileScreen extends ConsumerWidget {
                     AutoRouter.of(context).push(const ChangePasswordRoute());
                   },
                 ),
+
+                // payment route
+                _SettingsTile(
+                  icon: Icons.payment_outlined,
+                  title: "Payment History",
+                  onTap: () {
+                    AutoRouter.of(context).push(const PaymentHistoryRoute());
+                  },
+                ),
+                // user status
+                _SettingsTile(
+                  icon: Icons.verified_user_outlined,
+                  title: "User Status",
+                  onTap: () {
+                    // navigate to user status screen
+                    AutoRouter.of(context).push(const UserStatusRoute());
+                  },
+                ),
+
                 // this is for user data access can be implemented in future
                 _SettingsTile(
                   icon: Icons.privacy_tip_outlined,
@@ -288,8 +307,6 @@ class _ProfileHeaderCard extends StatelessWidget {
 
               style: TextStyle(
                 fontSize: 40,
- 
-
 
                 color: Theme.of(context).primaryColor,
 
@@ -304,12 +321,22 @@ class _ProfileHeaderCard extends StatelessWidget {
 }
 
 class _PremiumCard extends StatelessWidget {
+  final AppUser? appUser;
+  const _PremiumCard({this.appUser});
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return GestureDetector(
-      onTap: () => AutoRouter.of(context).push(const UserPaymentRoute()),
+      onTap: () {
+        if (appUser != null) {
+          AutoRouter.of(context).push(UserPaymentRoute(appUser: appUser!));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("User data not available.")),
+          );
+        }
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.all(16),

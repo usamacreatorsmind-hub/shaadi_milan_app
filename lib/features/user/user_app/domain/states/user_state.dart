@@ -6,10 +6,8 @@ class AppUser {
   final String role;
   final String phone;
   final String agentId;
-  final String? profileId;
-  final bool isVerified;
-  final List<String>? wishlists;
-  final UserStatus? userStatus;
+  final String? profileId; 
+  final List<String>? wishlists; 
 
   AppUser({
     required this.metrimonyId,
@@ -20,9 +18,7 @@ class AppUser {
     required this.role,
     required this.phone,
     required this.agentId,
-    this.profileId,
-    this.isVerified = false,
-    this.userStatus,
+    this.profileId, 
 
     this.wishlists,
   });
@@ -37,9 +33,7 @@ class AppUser {
       'role': role,
       'phone': phone,
       'agentId': agentId,
-      'profileId': profileId,
-      'isVerified': isVerified,
-      'userStatus': userStatus?.toMap(),
+      'profileId': profileId, 
 
       'wishlists': wishlists,
     };
@@ -56,10 +50,7 @@ class AppUser {
       phone: map['phone'] as String? ?? '',
       agentId: map['agentId'] as String? ?? '',
       profileId: map['profileId'] as String? ?? '',
-      userStatus: map['userStatus'] != null
-          ? UserStatus.fromMap(Map<String, dynamic>.from(map['userStatus']))
-          : null,
-      isVerified: map['isVerified'] as bool? ?? false,
+     
 
       wishlists: (map['wishlists'] as List<dynamic>?)
           ?.map((e) => e.toString())
@@ -69,12 +60,11 @@ class AppUser {
 
   @override
   String toString() {
-    return 'AppUser(uid: $uid, metrimonyId: $metrimonyId,  fullName: $fullName, userStatus: $userStatus,wishlists: $wishlists, email: $email, role: $role, phone: $phone, agentId: $agentId, profileId: $profileId, isVerified: $isVerified)';
+    return 'AppUser(uid: $uid, metrimonyId: $metrimonyId,  fullName: $fullName,  wishlists: $wishlists, email: $email, role: $role, phone: $phone, agentId: $agentId, profileId: $profileId,  )';
   }
 
   AppUser copyWith({
-    String? uid,
-    UserStatus? userStatus,
+    String? uid, 
     String? metrimonyId,
 
     String? fullName,
@@ -92,14 +82,12 @@ class AppUser {
 
       uid: uid ?? this.uid,
       fullName: fullName ?? this.fullName,
-      email: email ?? this.email,
-      userStatus: userStatus ?? this.userStatus,
+      email: email ?? this.email, 
 
       role: role ?? this.role,
 
       agentId: agentId ?? this.agentId,
-      profileId: profileId ?? this.profileId,
-      isVerified: isVerified ?? this.isVerified,
+      profileId: profileId ?? this.profileId, 
       wishlists: wishlists ?? this.wishlists,
 
       phone: phone ?? this.phone,
@@ -110,8 +98,7 @@ class AppUser {
     return AppUser(
       metrimonyId: '',
 
-      uid: '',
-      userStatus: UserStatus.empty(),
+      uid: '', 
 
       fullName: '',
       email: '',
@@ -119,8 +106,7 @@ class AppUser {
       phone: '',
       agentId: '',
       wishlists: [],
-      profileId: '',
-      isVerified: false,
+      profileId: '', 
     );
   }
 }
@@ -143,89 +129,5 @@ class UserState {
   static const initial = UserState(user: null, isLoading: false, error: null);
 }
 
-class UserStatus {
-  final bool isProfileCreated;
-  final bool isApproved;
-  final bool isRejected;
 
-  const UserStatus({
-    this.isProfileCreated = false,
-    this.isApproved = false,
-    this.isRejected = false,
-  });
 
-  // ---------------- COPY WITH ----------------
-  UserStatus copyWith({
-    bool? isProfileCreated,
-    bool? isApproved,
-    bool? isRejected,
-  }) {
-    return UserStatus(
-      isProfileCreated: isProfileCreated ?? this.isProfileCreated,
-      isApproved: isApproved ?? this.isApproved,
-      isRejected: isRejected ?? this.isRejected,
-    );
-  }
-
-  // ---------------- NAMED CONSTRUCTORS ----------------
-
-  /// Profile created but pending approval
-  factory UserStatus.created() {
-    return const UserStatus(
-      isProfileCreated: true,
-      isApproved: false,
-      isRejected: false,
-    );
-  }
-
-  /// Approved profile
-  factory UserStatus.approved() {
-    return const UserStatus(
-      isProfileCreated: true,
-      isApproved: true,
-      isRejected: false,
-    );
-  }
-
-  /// Rejected profile
-  factory UserStatus.rejected() {
-    return const UserStatus(
-      isProfileCreated: true,
-      isApproved: false,
-      isRejected: true,
-    );
-  }
-
-  /// Initial empty status
-  factory UserStatus.empty() {
-    return const UserStatus(
-      isProfileCreated: false,
-      isApproved: false,
-      isRejected: false,
-    );
-  }
-
-  // ---------------- FIRESTORE ----------------
-
-  Map<String, dynamic> toMap() {
-    return {
-      'isProfileCreated': isProfileCreated,
-      'isApproved': isApproved,
-      'isRejected': isRejected,
-    };
-  }
-
-  factory UserStatus.fromMap(Map<String, dynamic> map) {
-    return UserStatus(
-      isProfileCreated: map['isProfileCreated'] as bool? ?? false,
-      isApproved: map['isApproved'] as bool? ?? false,
-      isRejected: map['isRejected'] as bool? ?? false,
-    );
-  }
-
-  @override
-  String toString() {
-    return 'UserStatus(isProfileCreated: $isProfileCreated, '
-        'isApproved: $isApproved, isRejected: $isRejected)';
-  }
-}

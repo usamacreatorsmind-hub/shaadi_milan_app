@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_status_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../user_auth/presentation/providers/auth_providers.dart';
@@ -15,7 +16,6 @@ class UserRepositoryImpl implements UserRepository {
     final data = await _ds.fetchUsers();
     return data.map((e) => AppUser.fromMap(e)).toList();
   }
-
 
   @override
   Stream<AppUser> watchUser(String uid) {
@@ -103,7 +103,7 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<UserStatus> fetchUserStatus(String uid) async {
     final data = await _ds.fetchUser(uid);
-    return AppUser.fromMap(data).userStatus?? UserStatus.empty();
+    return UserStatus.fromMap(data['userStatus']);
   }
 
   @override
@@ -113,7 +113,9 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Stream<UserStatus> watchUserStatus(String uid) {
-    return _ds.watchUser(uid).map((data) => AppUser.fromMap(data).userStatus!);
+    return _ds
+        .watchUser(uid)
+        .map((data) => UserStatus.fromMap(data['userStatus']));
   }
 }
 

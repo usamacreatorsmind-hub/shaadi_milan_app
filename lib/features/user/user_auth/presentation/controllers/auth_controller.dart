@@ -41,8 +41,7 @@ class AuthController extends StateNotifier<User?> {
       email: email,
       password: password,
       agentId: agentId,
-      phone: phone,
-      userStatus: UserStatus.empty(),
+      phone: phone, 
     );
  
   }

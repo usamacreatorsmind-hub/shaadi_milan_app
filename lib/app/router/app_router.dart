@@ -4,7 +4,7 @@ import 'package:arvika_marriage_bureau/app/custom/custom_widgets/terms_and_condi
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/about_us_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_contact_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/widgets/MyProfileDetailScreen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/widgets/MyProfileDetailScreen.dart'; 
 
 import '../../features/agent/presentation/screens/agent_dashboard_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
@@ -27,7 +27,7 @@ import '../../features/user/user_app/presentation/screens/user_image_form_screen
 import '../../features/user/user_app/presentation/screens/user_main_shell.dart';
 import '../../features/user/user_app/presentation/screens/user_wishlist_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_notification_screen.dart';
-import '../../features/user/user_app/presentation/screens/user_payment_screen.dart';
+import '../../features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_physical_form_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_profile_screen.dart';
 import '../../features/user/user_auth/presentation/screens/auth_wrapper.dart';
@@ -89,6 +89,7 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: ResetPasswordRoute.page),
     AutoRoute(page: ChangePasswordRoute.page),
     AutoRoute(page: PaymentOptionRoute.page),
+    AutoRoute(page: PaymentRoute.page),
 
     // ================= AGENT =================
     AutoRoute(page: AgentDashboardRoute.page),

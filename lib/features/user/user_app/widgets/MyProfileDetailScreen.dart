@@ -38,17 +38,9 @@ class _MyProfileCardState extends ConsumerState<MyProfileDetailScreen> {
                   ]),
 
                   _buildInfoCard(context, 'Verification Status', [
-                    _buildInfoRow(
-                      'Account Status',
-                      widget.user.isVerified ? 'Verified' : 'Not Verified',
-                    ),
+                   
 
-                    _buildInfoRow(
-                      'Profile Status',
-                      widget.user.userStatus!.isProfileCreated
-                          ? 'Complete'
-                          : 'Incomplete ',
-                    ),
+                    
                   ]),
 
                   const SizedBox(height: 16),
