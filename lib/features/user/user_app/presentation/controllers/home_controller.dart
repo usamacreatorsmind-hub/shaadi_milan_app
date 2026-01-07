@@ -27,9 +27,9 @@ class HomeState {
 
 final homeControllerProvider = StateNotifierProvider<HomeController, HomeState>(
   (ref) {
-    final matrimonyRepository = ref.watch(matrimonyRepositoryProvider);
-    final userRepository = ref.watch(userRepositoryProvider);
-    final agentRepository = ref.watch(agentRepositoryProvider);
+    final matrimonyRepository = ref.read(matrimonyRepositoryProvider);
+    final userRepository = ref.read(userRepositoryProvider);
+    final agentRepository = ref.read(agentRepositoryProvider);
 
     return HomeController(
       matrimonyRepository: matrimonyRepository,

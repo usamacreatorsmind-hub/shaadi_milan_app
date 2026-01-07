@@ -148,6 +148,6 @@ final matrimonyFirestoreDSProvider = Provider<MatrimonyFirestoreDS>((ref) {
 });
 
 final matrimonyRepositoryProvider = Provider<MatrimonyRepository>((ref) {
-  final remoteDS = ref.watch(matrimonyFirestoreDSProvider);
+  final remoteDS = ref.read(matrimonyFirestoreDSProvider);
   return MatrimonyRepositoryImpl(remoteDS);
 });

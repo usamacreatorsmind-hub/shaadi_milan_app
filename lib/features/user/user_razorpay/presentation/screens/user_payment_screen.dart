@@ -1,28 +1,37 @@
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/providers/payment_provider.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/home_controller.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/metrimony_profile_controller.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_api_notifier.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 
 import '../../../../../app/router/app_router.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../notifier/amount_notifier.dart'; 
+import '../notifier/amount_notifier.dart';
 
 @RoutePage()
 class UserPaymentScreen extends ConsumerStatefulWidget {
-  final AppUser appUser;
-  const UserPaymentScreen({super.key, required this.appUser});
+  final MetrimonyProfileViewModel metrimonyProfileViewModel;
+  const UserPaymentScreen({super.key, required this.metrimonyProfileViewModel});
 
   @override
   ConsumerState<UserPaymentScreen> createState() => _UserPaymentScreenState();
 }
 
 class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
+  int _currentIndex = 1; // Default Premium
+
   @override
   void initState() {
     super.initState();
-    ref.read(paymentProvider.notifier).init();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(paymentNotifierProvider(widget.metrimonyProfileViewModel.user.uid).notifier).fetchUserPayment();
+    });
   }
 
   @override
@@ -30,10 +39,11 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
     final theme = Theme.of(context);
     final amountState = ref.watch(amountNotifierProvider);
     final paymentState = ref.watch(paymentProvider);
+    // fetch metrimony profile also
 
     // Listen for payment success/failure to handle navigation/dialogs
     ref.listen<PaymentState>(paymentProvider, (previous, next) {
-      if (next.status == PaymentStatus.success) {
+      if (next.status == PayStatus.success) {
         // Show Success Dialog
         showDialog(
           context: context,
@@ -54,7 +64,7 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
             ],
           ),
         );
-      } else if (next.status == PaymentStatus.failure) {
+      } else if (next.status == PayStatus.failure) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.message ?? "Payment Failed"),
@@ -137,7 +147,7 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                     padding: EdgeInsets.all(32.0),
                     child: Center(child: CircularProgressIndicator()),
                   )
-                else if (paymentState.status == PaymentStatus.loading)
+                else if (paymentState.status == PayStatus.loading)
                   const Padding(
                     padding: EdgeInsets.all(32.0),
                     child: Center(child: CircularProgressIndicator()),
@@ -160,48 +170,94 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                     ),
                   )
                 else
-                  MatrimonySubscriptionCard(
-                    planName: "Premium",
-                    amount: amountState.amount != null
-                        ? "₹${amountState.amount!.amount}"
-                        : "₹--",
-                    duration: "One Time",
-                    features: const [
-                      "Unlimited Matches",
-                      "Advanced Filters",
-                      "Profile Boosts",
-                      "Ad-Free Experience",
-                    ],
-                    onSubscribe: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Redirecting to secure payment…"),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
+                  SizedBox(
+                    height: 420,
+                    child: PageView.builder(
+                      controller: PageController(viewportFraction: 0.88),
+                      itemCount: plans.length,
+                      onPageChanged: (index) {
+                        setState(() => _currentIndex = index);
+                      },
+                      itemBuilder: (context, index) {
+                        final plan = plans[index];
+                        final isSelected = index == _currentIndex;
 
-                      // print all data here
-                      debugPrint("User ID: ${widget.appUser.uid}");
-                      debugPrint("User Email: ${widget.appUser.email}");
-                      debugPrint("User Full Name: ${widget.appUser.fullName}");
-                      debugPrint("User Phone: ${widget.appUser.phone}");
-                      debugPrint(
-                        "Amount: ${amountState.amount!.amount.toDouble()}",
-                      );
-
-                      ref
-                          .read(paymentProvider.notifier)
-                          .startOneTimePayment(
-                            amount: amountState.amount!.amount.toDouble(),
-                            uid: widget.appUser.uid,
-                            email: widget.appUser.email,
-                            fullName: widget.appUser.fullName,
-                            phone: widget.appUser.phone,
-                          );
-                    },
+                        return AnimatedScale(
+                          scale: isSelected ? 1 : 0.94,
+                          duration: const Duration(milliseconds: 300),
+                          child: MatrimonySubscriptionCard(
+                            planName: plan.name,
+                            amount: "₹${amountState.amount!.amount}",
+                            duration: "One Time",
+                            features: plan.features,
+                            isPopular: plan.isPopular,
+                          ),
+                        );
+                      },
+                    ),
                   ),
 
                 const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onPressed: () {
+                        final selectedPlan = plans[_currentIndex];
+
+                        debugPrint("Selected Plan: ${selectedPlan.name}");
+
+                        ref
+                            .read(paymentProvider.notifier)
+                            .startOneTimePayment(
+                              amount: amountState.amount!.amount.toDouble(),
+                              uid: widget.metrimonyProfileViewModel.user.uid,
+                              email:
+                                  widget.metrimonyProfileViewModel.user.email,
+                              fullName: widget
+                                  .metrimonyProfileViewModel
+                                  .user
+                                  .fullName,
+                              phone:
+                                  widget.metrimonyProfileViewModel.user.phone,
+                              agentId:
+                                  widget.metrimonyProfileViewModel.user.agentId,
+                              region: widget
+                                  .metrimonyProfileViewModel
+                                  .metrimonyProfile
+                                  .address
+                                  .state,
+                              district: widget
+                                  .metrimonyProfileViewModel
+                                  .metrimonyProfile
+                                  .address
+                                  .city,
+                              gender: widget
+                                  .metrimonyProfileViewModel
+                                  .metrimonyProfile
+                                  .identity
+                                  .gender,
+                            );
+                      },
+                      child: const Text("Pay Once & Unlock Premium"),
+                    ),
+                  ),
+                ),
 
                 // 🔒 Footer Note
                 Padding(
@@ -224,9 +280,9 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
 class MatrimonySubscriptionCard extends StatelessWidget {
   final String planName;
   final String amount;
-  final String duration; // "One Time"
+  final String duration;
   final List<String> features;
-  final VoidCallback onSubscribe;
+  final bool isPopular;
 
   const MatrimonySubscriptionCard({
     super.key,
@@ -234,7 +290,7 @@ class MatrimonySubscriptionCard extends StatelessWidget {
     required this.amount,
     required this.duration,
     required this.features,
-    required this.onSubscribe,
+    this.isPopular = false,
   });
 
   @override
@@ -242,18 +298,16 @@ class MatrimonySubscriptionCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
         gradient: LinearGradient(
-          colors: [theme.primaryColor, theme.primaryColor.withOpacity(0.92)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          colors: [theme.primaryColor, theme.primaryColor.withOpacity(0.9)],
         ),
         boxShadow: [
           BoxShadow(
             color: theme.primaryColor.withOpacity(0.35),
-            blurRadius: 28,
+            blurRadius: 26,
             offset: const Offset(0, 14),
           ),
         ],
@@ -263,22 +317,15 @@ class MatrimonySubscriptionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 👑 Header + One Time Badge
+            // Header
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.workspace_premium,
-                    color: Colors.white,
-                    size: 28,
-                  ),
+                const Icon(
+                  Icons.workspace_premium,
+                  color: Colors.white,
+                  size: 28,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Text(
                   planName,
                   style: const TextStyle(
@@ -288,33 +335,30 @@ class MatrimonySubscriptionCard extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-
-                // 🔥 ONE TIME BADGE
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    "ONE-TIME",
-                    style: TextStyle(
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      letterSpacing: 0.8,
+                if (isPopular)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      "MOST POPULAR",
+                      style: TextStyle(
+                        color: theme.primaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
 
             const SizedBox(height: 20),
 
-            // 💰 Price (No /month)
             Text(
               amount,
               style: const TextStyle(
@@ -325,8 +369,6 @@ class MatrimonySubscriptionCard extends StatelessWidget {
             ),
 
             const SizedBox(height: 4),
-
-            // 🔁 Lifetime Text
             Text(
               "Pay once • Lifetime access",
               style: TextStyle(
@@ -337,28 +379,20 @@ class MatrimonySubscriptionCard extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // ✨ Features
             ...features.map(
-              (feature) => Padding(
+              (f) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.25),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 18,
-                      ),
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.white,
+                      size: 18,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        feature,
+                        f,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -369,33 +403,48 @@ class MatrimonySubscriptionCard extends StatelessWidget {
                 ),
               ),
             ),
-
-            const SizedBox(height: 26),
-
-            // 🚀 CTA
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: theme.primaryColor,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                onPressed: onSubscribe,
-                child: const Text("Pay Once & Unlock Premium"),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 }
+
+class SubscriptionPlan {
+  final String name;
+  final List<String> features;
+  final bool isPopular;
+
+  const SubscriptionPlan({
+    required this.name,
+    required this.features,
+    this.isPopular = false,
+  });
+}
+
+final List<SubscriptionPlan> plans = const [
+  SubscriptionPlan(
+    name: "Basic",
+    features: ["Unlimited Matches", "Profile Viewing", "Interest Sending"],
+  ),
+  SubscriptionPlan(
+    name: "Premium",
+    isPopular: true,
+    features: [
+      "Unlimited Matches",
+      "Advanced Filters",
+      "Profile Boost",
+      "Direct Chat Access",
+      "Ad-Free Experience",
+    ],
+  ),
+  SubscriptionPlan(
+    name: "Elite",
+    features: [
+      "Everything in Premium",
+      "Priority Profile Listing",
+      "Personal Matchmaker Support",
+      "Exclusive Elite Profiles",
+    ],
+  ),
+];

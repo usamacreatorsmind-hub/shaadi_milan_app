@@ -84,15 +84,21 @@ class ExtraQualification {
 }
 
 class EducationProfile {
+  final bool isIlletrate;
   final Education? education;
   final ExtraQualification? extraQualification;
 
-  EducationProfile({this.education, this.extraQualification});
+  EducationProfile({
+    this.education,
+    required this.isIlletrate,
+    this.extraQualification,
+  });
 
   Map<String, dynamic> toMap() {
     return {
       'education': education?.toMap(),
       'extraQualification': extraQualification?.toMap(),
+      'isIlletrate': isIlletrate,
     };
   }
 
@@ -106,26 +112,33 @@ class EducationProfile {
               map['extraQualification'] as Map<String, dynamic>,
             )
           : null,
+
+      isIlletrate: map['isIlletrate'] as bool,
     );
   }
 
   @override
   String toString() {
-    return 'EducationProfile(education: $education, extraQualification: $extraQualification)';
+    return 'EducationProfile(education: $education, isIlletrate: $isIlletrate'
+        '  extraQualification: $extraQualification)';
   }
 
   EducationProfile copyWith({
     Education? education,
     ExtraQualification? extraQualification,
+    bool? isIlletrate,
   }) {
     return EducationProfile(
       education: education ?? this.education,
+      isIlletrate: isIlletrate ?? this.isIlletrate,
       extraQualification: extraQualification ?? this.extraQualification,
     );
   }
 
   factory EducationProfile.empty() {
     return EducationProfile(
+      isIlletrate: false,
+
       education: Education.empty(),
       extraQualification: ExtraQualification.empty(),
     );

@@ -11,7 +11,7 @@ class UserStatusRepositoryImpl implements UserStatusRepository {
 
   @override
   Future<void> createUserStatus(String uid) {
-    return _userStatusFirestore.updateUserStatus(uid, const UserStatus());
+    return _userStatusFirestore.updateUserStatus(uid, const UserStatus.empty());
   }
 
   @override
@@ -35,5 +35,5 @@ final userStatusFirestoreProvider = Provider<UserStatusFirestore>((ref) {
 });
 
 final userStatusRepositoryProvider = Provider<UserStatusRepository>((ref) {
-  return UserStatusRepositoryImpl(ref.read(userStatusFirestoreProvider));
+  return UserStatusRepositoryImpl(ref.watch(userStatusFirestoreProvider));
 });

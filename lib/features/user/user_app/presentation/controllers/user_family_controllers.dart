@@ -61,12 +61,45 @@ class UserFamilyController extends StateNotifier<FamilyState> {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
+
+  void updateFamily({
+    required String fatherName,
+    required String motherName,
+    required int brothers,
+    required int sisters,
+    required String familyType,
+    required String familyStatus,
+  }) {
+    state = state.copyWith(isLoading: true, error: null);
+    final familyProfile = FamilyProfile(
+      fatherName: fatherName,
+      motherName: motherName,
+      numberOfBrothers: brothers,
+      numberOfSisters: sisters,
+      familyType: familyType,
+      familyStatus: familyStatus,
+    );
+
+    try {
+      _ref
+          .read(matrimonyRepositoryProvider)
+          .updateFamilyProfile(_uid, familyProfile);
+
+      state = state.copyWith(family: familyProfile, isLoading: false);
+      debugPrint('✅ Family Updated Successfully');
+      debugPrint(familyProfile.toString());
+      _ref.read(metrimonyControllerProvider.notifier).saveFamily(familyProfile);
+    } catch (e) {
+      debugPrint('❌ Family Update Failed: $e');
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
 }
 
 final userFamilyControllerProvider =
     StateNotifierProvider.autoDispose<UserFamilyController, FamilyState>((ref) {
-      final matrimonyRepo = ref.watch(matrimonyRepositoryProvider);
-      final uid = ref.watch(authStateProvider).value?.uid;
+      final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
+      final uid = ref.read(authStateProvider).value?.uid;
       if (uid == null) throw Exception('User not authenticated');
       return UserFamilyController(matrimonyRepo, uid, ref);
     });

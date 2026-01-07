@@ -90,7 +90,7 @@ final religionDataLoaderProvider = Provider<ReligionDataLoader>(
 
 // All religions provider
 final religionsProvider = FutureProvider<List<ReligionModel>>((ref) async {
-  return ref.read(religionDataLoaderProvider).loadReligions();
+  return ref.watch(religionDataLoaderProvider).loadReligions();
 });
 
 // Castes by selected religion provider
@@ -98,7 +98,7 @@ final castesByReligionProvider = FutureProvider.family<List<String>, String>((
   ref,
   religionName,
 ) async {
-  final religions = await ref.read(religionDataLoaderProvider).loadReligions();
+  final religions = await ref.watch(religionDataLoaderProvider).loadReligions();
 
   final religion = religions.firstWhere(
     (r) => r.name == religionName,

@@ -21,6 +21,8 @@ class AuthRepositoryImpl implements AuthRepository {
         if (doc.exists) {
           final data = doc.data()!;
           return AppUser(
+            isProfileCreated: data['isProfileCreated'] ?? false,
+
             metrimonyId: data['metrimonyId'] ?? '',
 
             wishlists: (data['wishlists'] as List<dynamic>?)
@@ -40,6 +42,8 @@ class AuthRepositoryImpl implements AuthRepository {
           // User is authenticated but no document in 'users' collection yet.
           // This can happen right after signup.
           return AppUser(
+            isProfileCreated: false,
+
             metrimonyId: '',
 
             uid: user.uid,

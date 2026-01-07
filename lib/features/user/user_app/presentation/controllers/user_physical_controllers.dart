@@ -47,14 +47,48 @@ class UserPhysicalController extends StateNotifier<PhysicalState> {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
+
+  void updatePhysicals({required double height, required double weight, required String bodyType, required String complexion, required bool physicallyChallenged}) {
+
+    state = state.copyWith(isLoading: true, error: null);
+    final physicalProfile = PhysicalProfile(
+      height: height.toString(),
+      weight: weight.toInt(),
+      bodyType: bodyType,
+      complexion: complexion,
+      physicallyChallenged: physicallyChallenged,
+    );
+
+    try {
+      _ref
+          .read(matrimonyRepositoryProvider)
+          .updatePhysicalProfile(_uid, physicalProfile);
+
+      state = state.copyWith(physical: physicalProfile, isLoading: false);
+      debugPrint('✅ Physical Updated Successfully');
+      debugPrint(physicalProfile.toString());
+      _ref
+          .read(metrimonyControllerProvider.notifier)
+          .savePhysical(physicalProfile);
+    } catch (e) {
+      debugPrint('❌ Physical Update Failed: $e');
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+
+
+
+
+
+
+  }
 }
 
 final userPhysicalControllerProvider =
     StateNotifierProvider.autoDispose<UserPhysicalController, PhysicalState>((
       ref,
     ) {
-      final matrimonyRepo = ref.watch(matrimonyRepositoryProvider);
-      final uid = ref.watch(authStateProvider).value?.uid;
+      final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
+      final uid = ref.read(authStateProvider).value?.uid;
       if (uid == null) throw Exception('User not authenticated');
       return UserPhysicalController(matrimonyRepo, uid, ref);
     });

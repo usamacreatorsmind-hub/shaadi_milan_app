@@ -54,5 +54,5 @@ final imageUploadServiceProvider = Provider<ImageUploadService>((ref) {
 });
 
 final userImageRepositoryProvider = Provider<UserImageRepository>((ref) {
-  return UserImageRepositoryImpl(ref.read(imageUploadServiceProvider));
+  return UserImageRepositoryImpl(ref.watch(imageUploadServiceProvider));
 });

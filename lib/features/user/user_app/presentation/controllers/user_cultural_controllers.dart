@@ -46,14 +46,45 @@ class UserCulturalController extends StateNotifier<CulturalState> {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
+
+  void updateCultural({
+    required String religion,
+    required String caste,
+    required String subCaste,
+    required List<String> languages,
+  }) {
+    state = state.copyWith(isLoading: true, error: null);
+    final culturalProfile = CulturalProfile(
+      religion: religion,
+      caste: caste,
+      subCaste: subCaste,
+      languages: languages,
+    );
+
+    try {
+      _ref
+          .read(matrimonyRepositoryProvider)
+          .updateCulturalProfile(_uid, culturalProfile);
+
+      state = state.copyWith(cultural: culturalProfile, isLoading: false);
+      debugPrint('✅ Cultural Updated Successfully');
+      debugPrint(culturalProfile.toString());
+      _ref
+          .read(metrimonyControllerProvider.notifier)
+          .saveCultural(culturalProfile);
+    } catch (e) {
+      debugPrint('❌ Cultural Update Failed: $e');
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
 }
 
-final userCulturalControllerProvider =
+final cultureControllerProvider =
     StateNotifierProvider.autoDispose<UserCulturalController, CulturalState>((
       ref,
     ) {
-      final matrimonyRepo = ref.watch(matrimonyRepositoryProvider);
-      final uid = ref.watch(authStateProvider).value?.uid;
+      final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
+      final uid = ref.read(authStateProvider).value?.uid;
       if (uid == null) throw Exception('User not authenticated');
       return UserCulturalController(matrimonyRepo, uid, ref);
     });

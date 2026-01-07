@@ -13,9 +13,14 @@ class PaymentApi {
   Future<Map<String, dynamic>> createOrder({
     required double amount,
     required String uid,
+    required String agentId,
     required String email,
     required String fullName,
-    required String phone, 
+
+    required String phone,
+    required String region,
+    required String district,
+    required String gender,
   }) async {
     try {
       final response = await _dio.post(
@@ -24,8 +29,12 @@ class PaymentApi {
           "amount": amount, // Razorpay expects amount in paisa
           "uid": uid,
           "email": email,
+          "agentId": agentId,
           "fullName": fullName,
-          "phone": phone, 
+          "phone": phone,
+          "region": region,
+          "district": district,
+          "gender": gender,
         },
       );
       return response.data;
@@ -33,5 +42,4 @@ class PaymentApi {
       throw Exception("Failed to create order: ${e.message}");
     }
   }
- 
 }

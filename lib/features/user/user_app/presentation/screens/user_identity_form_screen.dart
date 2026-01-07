@@ -1,5 +1,6 @@
 import 'package:arvika_marriage_bureau/app/custom/image_picker/image_picker_widget.dart';
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:arvika_marriage_bureau/core/enums/enum.dart';
 
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../data/datasources/firebase/agent_firestore_ds.dart';
@@ -13,7 +14,13 @@ import 'package:auto_route/auto_route.dart';
 
 @RoutePage()
 class UserIdentityFormScreen extends ConsumerStatefulWidget {
-  const UserIdentityFormScreen({super.key});
+  final FormMode mode;
+  final IdentityProfile? existingIdentityProfile;
+  const UserIdentityFormScreen({
+    super.key,
+    required this.mode,
+    this.existingIdentityProfile,
+  });
 
   @override
   ConsumerState<UserIdentityFormScreen> createState() =>
@@ -25,8 +32,21 @@ class _UserIdentityFormScreenState
   final _formKey = GlobalKey<FormState>();
   final _aadharController = TextEditingController();
 
+  // prefile controlles
+
   String? _gender;
   DateTime? _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.mode == FormMode.edit &&
+        widget.existingIdentityProfile != null) {
+      _aadharController.text = widget.existingIdentityProfile!.aadhar;
+      _gender = widget.existingIdentityProfile!.gender;
+      _selectedDate = widget.existingIdentityProfile!.dob;
+    }
+  }
 
   @override
   void dispose() {
@@ -108,6 +128,26 @@ class _UserIdentityFormScreenState
           age: _age!,
           aadhar: _aadharController.text.trim(),
         );
+
+        
+    final notifier = ref.read(identityControllerProvider.notifier);
+
+    if (widget.mode == FormMode.create) {
+      notifier.saveIdentity(
+        gender: _gender!,
+        dob: _selectedDate!,
+        age: _age!,
+        aadhar: _aadharController.text.trim(),
+      );
+    } else {
+      // Update logic (using saveIdentity as upsert)
+      notifier.updateIdentity(
+        gender: _gender!,
+        dob: _selectedDate!,
+        age: _age!,
+        aadhar: _aadharController.text.trim(),
+      );
+    }
   }
 
   // ----------------------------
@@ -132,7 +172,11 @@ class _UserIdentityFormScreenState
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Identity Details')),
+      appBar: AppBar(
+        title: Text(
+          widget.mode == FormMode.create ? 'Create Identity' : 'Edit Identity',
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -227,7 +271,12 @@ class _UserIdentityFormScreenState
               else if (_age! >= 18)
                 identityState.isLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : AppButton(onPressed: _submitForm, text: 'Save Identity')
+                    : AppButton(
+                        onPressed: _submitForm,
+                        text: widget.mode == FormMode.create
+                            ? 'Save Identity'
+                            : 'Update Identity',
+                      )
               else
                 const Text(
                   "You are not eligible to create a profile as you are under 18 years old.",
@@ -236,86 +285,9 @@ class _UserIdentityFormScreenState
                 ),
 
               const SizedBox(height: 16),
-
-              // // elevated button to fetch agent data
-              // ElevatedButton(
-              //   onPressed: () async {
-              //     // Example: Fetch agent data using agentId from a text field
-              //     // For demonstration, let's assume agentId is hardcoded or comes from another input
-              //     final agentId = _aadharController.text
-              //         .trim(); // Using aadhar field for agentId for example
-              //     if (agentId.isEmpty) {
-              //       ScaffoldMessenger.of(context).showSnackBar(
-              //         const SnackBar(
-              //           content: Text('Please enter an Agent ID to fetch data'),
-              //         ),
-              //       );
-              //       return;
-              //     }
-
-              //     try {
-              //       final agentData = await ref
-              //           .read(agentFirestoreDsProvider)
-              //           .fetchAgentbyAgentId(agentId);
-              //       ScaffoldMessenger.of(context).showSnackBar(
-              //         SnackBar(
-              //           content: Text('Agent Name: ${agentData}'),
-              //           behavior: SnackBarBehavior.floating,
-              //         ),
-              //       );
-              //     } catch (e) {
-              //       ScaffoldMessenger.of(context).showSnackBar(
-              //         SnackBar(
-              //           content: Text('Error fetching agent data: $e'),
-              //           behavior: SnackBarBehavior.floating,
-              //         ),
-              //       );
-              //     }
-              //   },
-              //   child: const Text('Fetch Agent Data (Example)'),
-              // ),
-
-              //// navigate to cultural details
-
-              // AppButton(
-              //   onPressed: () {
-              //     context.navigateTo(const UserAddressFormRoute());
-              //   },
-              //   text: "Go to address Details",
-              // ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class AppImagePicker {
-  final String title;
-  final ValueChanged<String> onImagePicked;
-
-  const AppImagePicker({required this.title, required this.onImagePicked});
-
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            icon: const Icon(Icons.upload_file),
-            label: const Text('Select Image'),
-            onPressed: () async {
-              // TODO: Implement image picking logic
-              // For now, let's simulate a picked image path
-              const String dummyImagePath = 'path/to/your/image.jpg';
-              onImagePicked(dummyImagePath);
-            },
-          ),
-        ],
       ),
     );
   }

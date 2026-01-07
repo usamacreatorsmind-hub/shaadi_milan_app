@@ -41,7 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     setState(() => isLoading = true);
 
-    final authRepo = ref.read(authRepositoryProvider);
+    final authRepo = ref.watch(authRepositoryProvider);
 
     try {
       await authRepo.signInWithEmail(emailCtrl.text.trim(), pwCtrl.text.trim());

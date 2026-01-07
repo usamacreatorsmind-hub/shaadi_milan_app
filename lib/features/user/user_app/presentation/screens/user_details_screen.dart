@@ -24,7 +24,7 @@ import 'package:url_launcher/url_launcher.dart';
 final matrimonyProfileProvider =
     FutureProvider.family<MatrimonyProfileViewModel, String>((ref, uid) async {
       final matrimonyProfile = await ref
-          .read(matrimonyRepositoryProvider)
+          .watch(matrimonyRepositoryProvider)
           .getMatrimonyProfile(uid);
 
       //  get user data using repository
@@ -37,7 +37,7 @@ final matrimonyProfileProvider =
       AgentProfile? agent;
       if (matrimonyProfile.agentId.isNotEmpty) {
         agent = await ref
-            .read(agentFirestoreDsProvider)
+            .watch(agentFirestoreDsProvider)
             .fetchAgentByUid(matrimonyProfile.agentId);
       }
       print(agent);

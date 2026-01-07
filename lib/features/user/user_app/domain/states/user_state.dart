@@ -6,11 +6,14 @@ class AppUser {
   final String role;
   final String phone;
   final String agentId;
-  final String? profileId; 
-  final List<String>? wishlists; 
+  final String? profileId;
+  final List<String>? wishlists;
+
+  final bool isProfileCreated;
 
   AppUser({
     required this.metrimonyId,
+    required this.isProfileCreated,
 
     required this.uid,
     required this.fullName,
@@ -18,7 +21,7 @@ class AppUser {
     required this.role,
     required this.phone,
     required this.agentId,
-    this.profileId, 
+    this.profileId,
 
     this.wishlists,
   });
@@ -26,6 +29,7 @@ class AppUser {
   Map<String, dynamic> toMap() {
     return {
       'metrimonyId': metrimonyId,
+      'isProfileCreated': isProfileCreated,
 
       'uid': uid,
       'fullName': fullName,
@@ -33,7 +37,7 @@ class AppUser {
       'role': role,
       'phone': phone,
       'agentId': agentId,
-      'profileId': profileId, 
+      'profileId': profileId,
 
       'wishlists': wishlists,
     };
@@ -42,6 +46,7 @@ class AppUser {
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
       metrimonyId: map['metrimonyId'] as String? ?? '',
+      isProfileCreated: map['isProfileCreated'] as bool? ?? false,
 
       uid: map['uid'] as String? ?? '',
       fullName: map['fullName'] as String? ?? '',
@@ -50,7 +55,6 @@ class AppUser {
       phone: map['phone'] as String? ?? '',
       agentId: map['agentId'] as String? ?? '',
       profileId: map['profileId'] as String? ?? '',
-     
 
       wishlists: (map['wishlists'] as List<dynamic>?)
           ?.map((e) => e.toString())
@@ -60,11 +64,11 @@ class AppUser {
 
   @override
   String toString() {
-    return 'AppUser(uid: $uid, metrimonyId: $metrimonyId,  fullName: $fullName,  wishlists: $wishlists, email: $email, role: $role, phone: $phone, agentId: $agentId, profileId: $profileId,  )';
+    return 'AppUser(uid: $uid, metrimonyId: $metrimonyId, isProfileCreated: $isProfileCreated, fullName: $fullName,  wishlists: $wishlists, email: $email, role: $role, phone: $phone, agentId: $agentId, profileId: $profileId,  )';
   }
 
   AppUser copyWith({
-    String? uid, 
+    String? uid,
     String? metrimonyId,
 
     String? fullName,
@@ -74,20 +78,22 @@ class AppUser {
     String? agentId,
     String? profileId,
     List<String>? wishlists,
+    bool? isProfileCreated,
 
     bool? isVerified,
   }) {
     return AppUser(
+      isProfileCreated: isProfileCreated ?? this.isProfileCreated,
       metrimonyId: metrimonyId ?? this.metrimonyId,
 
       uid: uid ?? this.uid,
       fullName: fullName ?? this.fullName,
-      email: email ?? this.email, 
+      email: email ?? this.email,
 
       role: role ?? this.role,
 
       agentId: agentId ?? this.agentId,
-      profileId: profileId ?? this.profileId, 
+      profileId: profileId ?? this.profileId,
       wishlists: wishlists ?? this.wishlists,
 
       phone: phone ?? this.phone,
@@ -96,9 +102,10 @@ class AppUser {
 
   static AppUser empty() {
     return AppUser(
+      isProfileCreated: false,
       metrimonyId: '',
 
-      uid: '', 
+      uid: '',
 
       fullName: '',
       email: '',
@@ -106,7 +113,7 @@ class AppUser {
       phone: '',
       agentId: '',
       wishlists: [],
-      profileId: '', 
+      profileId: '',
     );
   }
 }
@@ -128,6 +135,3 @@ class UserState {
 
   static const initial = UserState(user: null, isLoading: false, error: null);
 }
-
-
-

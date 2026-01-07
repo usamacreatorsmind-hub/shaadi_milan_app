@@ -1,26 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserStatus {
-  final bool isProfileCreated;
   final bool isPaymentDone;
   final bool subscriptionActive;
-
+  final String uid;
   final String? paymentId;
   final DateTime? paymentAt;
 
   const UserStatus({
-    this.isProfileCreated = false,
-    this.isPaymentDone = false,
-    this.subscriptionActive = false,
-    this.paymentId,
-    this.paymentAt,
+    required this.uid,
+
+    required this.isPaymentDone,
+    required this.subscriptionActive,
+    required this.paymentId,
+    required this.paymentAt,
   });
 
   // ---------------- FIRESTORE ----------------
 
   factory UserStatus.fromMap(Map<String, dynamic> map) {
     return UserStatus(
-      isProfileCreated: map['isProfileCreated'] as bool? ?? false,
+      uid: map['uid'] as String? ?? '',
+
       isPaymentDone: map['isPaymentDone'] as bool? ?? false,
       subscriptionActive: map['subscriptionActive'] as bool? ?? false,
       paymentId: map['paymentId'] as String?,
@@ -32,24 +33,46 @@ class UserStatus {
 
   Map<String, dynamic> toMap() {
     return {
-      'isProfileCreated': isProfileCreated,
+      'uid': uid,
+
       'isPaymentDone': isPaymentDone,
       'subscriptionActive': subscriptionActive,
       'paymentId': paymentId,
-      'paymentAt': paymentAt != null
-          ? Timestamp.fromDate(paymentAt!)
-          : null,
+      'paymentAt': paymentAt != null ? Timestamp.fromDate(paymentAt!) : null,
     };
   }
 
   @override
   String toString() {
-    return 'UserStatus(profileCreated: $isProfileCreated, '
-        'paymentDone: $isPaymentDone, '
+    return 'UserStatus(paymentDone: $isPaymentDone, uid: $uid, paymentId: $paymentId, paymentAt: $paymentAt, '
         'subscriptionActive: $subscriptionActive)';
   }
-}
 
+  UserStatus copyWith({
+    bool? isPaymentDone,
+    String? uid,
+
+    bool? subscriptionActive,
+    String? paymentId,
+    DateTime? paymentAt,
+  }) {
+    return UserStatus(
+      uid: uid ?? this.uid,
+
+      isPaymentDone: isPaymentDone ?? this.isPaymentDone,
+      subscriptionActive: subscriptionActive ?? this.subscriptionActive,
+      paymentId: paymentId ?? this.paymentId,
+      paymentAt: paymentAt ?? this.paymentAt,
+    );
+  }
+
+  const UserStatus.empty()
+    : isPaymentDone = false,
+      subscriptionActive = false,
+      uid = '',
+      paymentId = null,
+      paymentAt = null;
+}
 
 class UserStatusState {
   final UserStatus userStatus;
@@ -57,7 +80,7 @@ class UserStatusState {
   final String? error;
 
   const UserStatusState({
-    this.userStatus = const UserStatus(),
+    this.userStatus = const UserStatus.empty(),
     this.isLoading = false,
     this.error,
   });

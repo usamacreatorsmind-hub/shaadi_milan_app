@@ -1,4 +1,3 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,36 +49,14 @@ class _AuthWrapperScreenState extends ConsumerState<AuthWrapperScreen> {
           }
 
           // 🔹 User flow
-          try {
-            final status = await ref
-                .read(userRepositoryProvider)
-                .fetchUserStatus(user.uid);
-            print("this is status");
-            print(status);
+          if (!mounted || _hasNavigated) return;
+          _hasNavigated = true;
 
-            if (!mounted || _hasNavigated) return;
-
-            _hasNavigated = true;
-
-            if (status.isProfileCreated) {
-              debugPrint('✅ Profile created');
-              router.replaceAll([const UserMainShellRoute()]);
-            } else {
-              debugPrint('📝 Profile not created');
-              router.replaceAll([const MatrimonyFormFlowRoute()]);
-            }
-          } catch (e, st) {
-            print("this is error");
-            print(st);
-            print(e.toString());
-            debugPrint('❌ Status fetch failed: $e');
-            debugPrintStack(stackTrace: st);
-
-            if (!mounted || _hasNavigated) return;
-
-            // Fallback: If status fetch fails (e.g. missing fields in Firestore),
-            // assume profile is incomplete and navigate to form flow.
-            _hasNavigated = true;
+          if (user.isProfileCreated) {
+            debugPrint('✅ Profile created');
+            router.replaceAll([const UserMainShellRoute()]);
+          } else {
+            debugPrint('📝 Profile not created');
             router.replaceAll([const MatrimonyFormFlowRoute()]);
           }
         },

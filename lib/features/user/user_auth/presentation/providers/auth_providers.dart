@@ -7,14 +7,14 @@ import '../../data/repositories_impl/auth_repo_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 final firebaseAuthDSProvider = Provider<FirebaseAuthDS>((ref) {
-  final firebaseAuth = ref.read(firebaseAuthProvider);
-  final firestore = ref.read(firestoreProvider);
+  final firebaseAuth = ref.watch(firebaseAuthProvider);
+  final firestore = ref.watch(firestoreProvider);
   return FirebaseAuthDS(auth: firebaseAuth, firestore: firestore);
 });
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  final ds = ref.read(firebaseAuthDSProvider);
-  final firestore = ref.read(firestoreProvider);
+  final ds = ref.watch(firebaseAuthDSProvider);
+  final firestore = ref.watch(firestoreProvider);
   return AuthRepositoryImpl(ds, firestore);
 });
 

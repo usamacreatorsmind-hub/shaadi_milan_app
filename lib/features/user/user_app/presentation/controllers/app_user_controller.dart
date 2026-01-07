@@ -89,6 +89,7 @@ final appUserControllerProvider =
       AsyncValue<AppUser?>,
       String
     >((ref, uid) {
-      final userRepository = ref.watch(userRepositoryProvider);
+      final userRepository = ref.read
+      (userRepositoryProvider);
       return AppUserController(userRepository, uid);
     });

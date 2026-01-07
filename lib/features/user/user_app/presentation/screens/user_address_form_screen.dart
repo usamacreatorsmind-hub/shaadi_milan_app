@@ -1,4 +1,5 @@
 import '../../../../../app/custom/custom_widgets/widgets.dart';
+import 'package:arvika_marriage_bureau/core/enums/enum.dart';
 import '../../domain/states/state_city.dart';
 import 'user_home_screen.dart';
 import '../../domain/states/address_state.dart';
@@ -11,7 +12,13 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 
 @RoutePage()
 class UserAddressFormScreen extends ConsumerStatefulWidget {
-  const UserAddressFormScreen({super.key});
+  final FormMode mode;
+  final AddressProfile? existingAddressProfile;
+  const UserAddressFormScreen({
+    super.key,
+    required this.mode,
+    required this.existingAddressProfile,
+  });
 
   @override
   ConsumerState<UserAddressFormScreen> createState() =>
@@ -30,6 +37,25 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
   final _pinController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.mode == FormMode.edit && widget.existingAddressProfile != null) {
+      final profile = widget.existingAddressProfile!;
+      _atController.text = profile.addressLine1;
+      _postController.text = profile.post;
+      _policeStationController.text = profile.policeStation;
+      _stateController.text = profile.state;
+      _districtController.text = profile.city;
+      _pinController.text = profile.pincode;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(homeFilterProvider.notifier).updateState(profile.state);
+        ref.read(homeFilterProvider.notifier).updateCity(profile.city);
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _atController.dispose();
     _postController.dispose();
@@ -42,6 +68,8 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
   void _submitForm() {
     if (!_formKey.currentState!.validate()) return;
 
+
+
     ref
         .read(addressControllerProvider.notifier)
         .saveAddress(
@@ -53,6 +81,31 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
           stateName: _stateController.text.trim(),
           pin: _pinController.text.trim(),
         );
+  
+  final notifier = ref.read(addressControllerProvider.notifier);
+
+    if (widget.mode == FormMode.create) {
+      notifier.saveAddress(
+        at: _atController.text.trim(),
+        post: _postController.text.trim(),
+        policeStation: _policeStationController.text.trim(),
+        district: _districtController.text.trim(),
+        stateName: _stateController.text.trim(),
+        pin: _pinController.text.trim(),
+        
+       );
+    } else {
+      // Update logic (using saveIdentity as upsert)
+      notifier.updateAddress(
+         at: _atController.text.trim(),
+        post: _postController.text.trim(),
+        policeStation: _policeStationController.text.trim(),
+        district: _districtController.text.trim(),
+        stateName: _stateController.text.trim(),
+        pin: _pinController.text.trim(),
+      );
+    }
+  
   }
 
   @override

@@ -3,6 +3,7 @@ import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/f
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
 
 import '../../../../../app/router/app_router.dart';
@@ -16,28 +17,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final userProfileScreenProvider =
-    FutureProvider.family<MetrimonyProfileViewModel, String>((
-      ref,
-      userId,
-    ) async {
+    StreamProvider.family<MetrimonyProfileViewModel, String>((ref, userId) {
       final repository = ref.watch(matrimonyRepositoryProvider);
-      final matrimonyProfile = await repository.getMatrimonyProfile(userId);
-
       final userRepo = ref.watch(userRepositoryProvider);
-      final user = await userRepo.fetchUser(userId);
+      final agentRepo = ref.watch(agentRepositoryProvider);
 
-      // fetch agentprofile
-      AgentProfile? agent;
-      if (matrimonyProfile.agentId.isNotEmpty) {
-        final agentRepo = ref.watch(agentRepositoryProvider);
-        agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
-      }
+      return repository.watchMatrimonyProfile(userId).asyncMap((
+        matrimonyProfile,
+      ) async {
+        final user = await userRepo.fetchUser(userId);
 
-      return MetrimonyProfileViewModel(
-        metrimonyProfile: matrimonyProfile,
-        userProfile: user,
-        agentProfile: agent,
-      );
+        // fetch agentprofile
+        AgentProfile? agent;
+        if (matrimonyProfile.agentId.isNotEmpty) {
+          agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
+        }
+
+        return MetrimonyProfileViewModel(
+          metrimonyProfile: matrimonyProfile,
+          userProfile: user,
+          agentProfile: agent,
+        );
+      });
     });
 
 @RoutePage()
@@ -86,7 +87,92 @@ class UserProfileScreen extends ConsumerWidget {
                 _ProfileHeaderCard(profile: profile),
 
                 // 🔹 PREMIUM CARD
-                _PremiumCard(appUser: profile.user),
+
+                //  check for payments collection if status is success then show premium card
+                Consumer(
+                  builder: (context, ref, child) {
+                    final userStatusState = ref.watch(
+                      userStatusControllerProvider,
+                    );
+                    if (userStatusState.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (userStatusState.userStatus.subscriptionActive) {
+                      return GestureDetector(
+                        onTap: () => AutoRouter.of(
+                          context,
+                        ).push(UserPaymentSuccessRoute(user: profile.user!)),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 18,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade50,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.green.shade200,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              // Custom Icon Container
+                              Container(
+                                height: 45,
+                                width: 45,
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade500,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(
+                                  Icons.verified_user_rounded,
+                                  color: Colors.white,
+                                  size: 26,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Premium Active",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.green.shade800,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.1,
+                                      ),
+                                    ),
+                                    const Text(
+                                      "You are a Premium Member!",
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        color: Colors.black87,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                size: 14,
+                                color: Colors.green.shade300,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                    return _PremiumCard(profile: profile);
+                  },
+                ),
 
                 // 🔹 GENERAL SECTION
                 _SectionTitle(title: "General"),
@@ -131,7 +217,9 @@ class UserProfileScreen extends ConsumerWidget {
                   icon: Icons.payment_outlined,
                   title: "Payment History",
                   onTap: () {
-                    AutoRouter.of(context).push(const PaymentHistoryRoute());
+                    AutoRouter.of(
+                      context,
+                    ).push(const UserPaymentOrderHistoryRoute());
                   },
                 ),
                 // user status
@@ -252,7 +340,7 @@ class UserProfileScreen extends ConsumerWidget {
                     onPressed: () {
                       //LOGOUT HERE
 
-                      ref.read(authRepositoryProvider).signOut();
+                      ref.watch(authRepositoryProvider).signOut();
 
                       AutoRouter.of(context).replace(const LoginRoute());
 
@@ -321,16 +409,18 @@ class _ProfileHeaderCard extends StatelessWidget {
 }
 
 class _PremiumCard extends StatelessWidget {
-  final AppUser? appUser;
-  const _PremiumCard({this.appUser});
+  final MetrimonyProfileViewModel? profile;
+  const _PremiumCard({this.profile});
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
-        if (appUser != null) {
-          AutoRouter.of(context).push(UserPaymentRoute(appUser: appUser!));
+        if (profile != null) {
+          AutoRouter.of(
+            context,
+          ).push(UserPaymentRoute(metrimonyProfileViewModel: profile!));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("User data not available.")),

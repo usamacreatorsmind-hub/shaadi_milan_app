@@ -5,10 +5,10 @@
       "name": "Buddhist",
       "castes": [
         "Mahayana",
-        "Navayana",
-        "Other",
+        "Navayana",       
         "Theravada",
-        "Tibetan Buddhist"
+        "Tibetan Buddhist",
+        "Other"
       ]
     },
     {
@@ -25,12 +25,12 @@
         "Latin Catholic",
         "Malankara Orthodox",
         "Marthoma",
-        "Other",
         "Pentecostal",
         "Protestant",
         "Roman Catholic",
         "Syrian Catholic",
-        "Syrian Orthodox"
+        "Syrian Orthodox",
+        "Other"
       ]
     },
     {
@@ -84,7 +84,6 @@
         "Nadar",
         "Nair",
         "Namboodiri",
-        "Other",
         "Other Backward Class (OBC)",
         "Padmashali",
         "Patel",
@@ -109,7 +108,8 @@
         "Vanniyar",
         "Vishwakarma",
         "Vokkaliga",
-        "Yadav"
+        "Yadav",
+        "Other"
       ]
     },
     {
@@ -119,12 +119,12 @@
         "Digambar",
         "Khandelwal Jain",
         "Oswal",
-        "Other",
         "Porwal",
         "Shrimal",
         "Shwetambar",
         "Sthanakvasi",
-        "Terapanthi"
+        "Terapanthi",
+        "Other"
       ]
     },
     {
@@ -158,7 +158,6 @@
         "Meman",
         "Mughal",
         "Nai",
-        "Other",
         "Pathan",
         "Qureshi",
         "Rangrez",
@@ -168,7 +167,8 @@
         "Shia",
         "Sunni",
         "Syed",
-        "Usmani"
+        "Usmani",
+        "Other"
       ]
     },
     {
@@ -176,8 +176,8 @@
       "name": "Parsi",
       "castes": [
         "Irani",
-        "Other",
-        "Zoroastrian"
+        "Zoroastrian",
+        "Other"
       ]
     },
     {
@@ -190,9 +190,9 @@
         "Mazhabhi",
         "Namdhari",
         "Nai",
-        "Other",
         "Ramgarhia",
-        "Ravidasia"
+        "Ravidasia",
+        "Other"
       ]
     },
     {
@@ -208,14 +208,7 @@
         "Munda",
         "Naga",
         "Oraon",
-        "Other",
-        "Santhal"
-      ]
-    },
-    {
-      "id": "other",
-      "name": "Other",
-      "castes": [
+        "Santhal",
         "Other"
       ]
     }

@@ -96,6 +96,56 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> {
                                 ),
                                 data: (wishlistedProfile) {
                                   return UserCard(
+                                    onLongPress: () async {
+                                      // show dialog box
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text(
+                                              "Remove from Wishlist?",
+                                            ),
+                                            content: const Text(
+                                              "Are you sure you want to remove this profile from your wishlist?",
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: const Text("Cancel"),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: const Text("Remove"),
+                                                onPressed: () async {
+                                                  await ref
+                                                      .read(
+                                                        userRepositoryProvider,
+                                                      )
+                                                      .removeWishlist(
+                                                        uid: widget.userId,
+                                                        profileId:
+                                                            wishlistedProfileId,
+                                                      );
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            "Profile removed from wishlist",
+                                          ),
+                                        ),
+                                      );
+                                    },
+
                                     uid: wishlistedProfile.user?.uid ?? '',
                                     name:
                                         wishlistedProfile.user?.fullName ??
@@ -166,6 +216,7 @@ class UserCard extends StatelessWidget {
   final String occupation;
   final String location;
   final String imageUrl;
+  final VoidCallback onLongPress;
 
   const UserCard({
     super.key,
@@ -175,100 +226,123 @@ class UserCard extends StatelessWidget {
     required this.occupation,
     required this.location,
     required this.imageUrl,
+    required this.onLongPress,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => context.router.push(UserDetailRoute(uid: uid)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: imageUrl.isEmpty
-                  ? Container(
-                      color: Colors.grey.shade200,
-                      child: Center(
-                        child: Icon(
-                          Icons.person,
-                          size: 50,
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
-                    )
-                  : Image.network(
-                      imageUrl,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: Colors.grey.shade200,
-                        child: Center(
-                          child: Icon(
-                            Icons.broken_image,
-                            size: 50,
-                            color: Colors.grey.shade400,
+  Widget build(context) {
+    return Stack(
+      children: [
+        Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => context.router.push(UserDetailRoute(uid: uid)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: imageUrl.isEmpty
+                      ? Container(
+                          color: Colors.grey.shade200,
+                          child: Center(
+                            child: Icon(
+                              Icons.person,
+                              size: 50,
+                              color: Colors.grey.shade400,
+                            ),
                           ),
+                        )
+                      : Image.network(
+                          imageUrl,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: Colors.grey.shade200,
+                            child: Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                size: 50,
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                          ),
+                          loadingBuilder: (context, child, progress) {
+                            if (progress == null) return child;
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
                         ),
-                      ),
-                      loadingBuilder: (context, child, progress) {
-                        if (progress == null) return child;
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                    ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$age Yrs, $occupation',
-                    style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.location_on,
-                        color: Colors.grey[600],
-                        size: 14,
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          location,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$age Yrs, $occupation',
+                        style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on,
+                            color: Colors.grey[600],
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              location,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+        Positioned(
+          top: 10,
+          right: 10,
+          child: GestureDetector(
+            onTap: () {
+              onLongPress();
+            },
+            child: Icon(
+              Icons.cancel_outlined,
+              size: 40,
+              color: Theme.of(context).canvasColor,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

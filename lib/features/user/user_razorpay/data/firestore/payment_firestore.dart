@@ -1,24 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../domain/states/payment.dart';
 
 class PaymentFirestore {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // read  payment for current user which only one payment
-  Future<Map<String, dynamic>?> getUserPayment(String uid) async {
-    try {
-      final querySnapshot = await _firestore
-          .collection('payments')
-          .where('uid', isEqualTo: uid)
-          .limit(1)
-          .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        return querySnapshot.docs.first.data();
-      }
-      return null;
+  Future<Payment?> getUserPayment(String uid) async {
+    try {
+      final doc = await _firestore.collection('payments').doc(uid).get();
+
+      if (!doc.exists) return null;
+
+      return Payment.fromMap(doc.data()!);
     } catch (e) {
+      print(e);                                                             
       throw Exception('Failed to get user payment: $e');
     }
   }
-
-   
 }

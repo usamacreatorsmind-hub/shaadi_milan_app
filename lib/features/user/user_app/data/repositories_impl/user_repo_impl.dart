@@ -96,7 +96,10 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<void> removeWishlist(String uid, String profileId) {
+  Future<void> removeWishlist({
+    required String uid,
+    required String profileId,
+  }) {
     return _ds.removeWishlist(uid, profileId);
   }
 
@@ -125,7 +128,7 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
 });
 
 final currentUserProvider = StreamProvider<AppUser?>((ref) {
-  final authState = ref.watch(authStateProvider);
+  final authState = ref.read(authStateProvider);
 
   return authState.when(
     data: (user) {
@@ -142,8 +145,8 @@ final currentUserProvider = StreamProvider<AppUser?>((ref) {
 });
 
 final currentUserProfileProvider = StreamProvider<AppUser?>((ref) {
-  final authState = ref.watch(authStateProvider);
-  final userRepository = ref.watch(userRepositoryProvider);
+  final authState = ref.read(authStateProvider);
+  final userRepository = ref.read(userRepositoryProvider);
 
   return authState.when(
     data: (user) {

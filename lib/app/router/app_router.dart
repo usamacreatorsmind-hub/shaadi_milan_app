@@ -1,10 +1,24 @@
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/contact_us_screen.dart';
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/privacy_policy_route.dart';
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/terms_and_conditions_route.dart';
+import 'package:arvika_marriage_bureau/core/enums/enum.dart';
+import 'package:arvika_marriage_bureau/features/onboarding/presentation/screens/splash_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/address_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/cultural_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/education_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/employee_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/family_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/identity_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/physical_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/about_us_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_status_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_contact_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/widgets/MyProfileDetailScreen.dart'; 
+import 'package:arvika_marriage_bureau/features/user/user_app/widgets/MyProfileDetailScreen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_order_history_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_success_screen.dart';
 
 import '../../features/agent/presentation/screens/agent_dashboard_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
@@ -45,7 +59,9 @@ class AppRouter extends _$AppRouter {
   @override
   List<AutoRoute> get routes => [
     // ================= ROOT =================
-    AutoRoute(page: AuthWrapperRoute.page, initial: true),
+    AutoRoute(page: SplashRoute.page, initial: true),
+
+    AutoRoute(page: AuthWrapperRoute.page),
 
     AutoRoute(page: OnboardingRoute.page),
     AutoRoute(page: LoginRoute.page),
@@ -69,7 +85,6 @@ class AppRouter extends _$AppRouter {
 
     // ================= USER FLOW =================
     AutoRoute(page: MatrimonyFormFlowRoute.page),
-
     AutoRoute(page: UserIdentityFormRoute.page),
     AutoRoute(page: UserPhysicalFormRoute.page),
     AutoRoute(page: UserCultureFormRoute.page),
@@ -83,13 +98,13 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: SearchRoute.page),
     AutoRoute(page: UserNotificationRoute.page),
     AutoRoute(page: MyProfileDetailRoute.page),
-
     AutoRoute(page: MyProfileRoute.page),
     AutoRoute(page: UserPaymentRoute.page),
     AutoRoute(page: ResetPasswordRoute.page),
     AutoRoute(page: ChangePasswordRoute.page),
-    AutoRoute(page: PaymentOptionRoute.page),
-    AutoRoute(page: PaymentRoute.page),
+    AutoRoute(page: UserStatusRoute.page),
+    AutoRoute(page: UserPaymentOrderHistoryRoute.page),
+    AutoRoute(page: UserPaymentSuccessRoute.page),
 
     // ================= AGENT =================
     AutoRoute(page: AgentDashboardRoute.page),

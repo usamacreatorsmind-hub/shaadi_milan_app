@@ -1,4 +1,5 @@
 import '../../../../../app/custom/custom_widgets/widgets.dart';
+import 'package:arvika_marriage_bureau/core/enums/enum.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +9,13 @@ import '../../domain/states/employee_state.dart';
 
 @RoutePage()
 class UserEmploymentFormScreen extends ConsumerStatefulWidget {
-  const UserEmploymentFormScreen({super.key});
+  final FormMode mode;
+  final EmploymentProfile? existingEmploymentProfile;
+  const UserEmploymentFormScreen({
+    super.key,
+    required this.mode,
+    required this.existingEmploymentProfile,
+  });
 
   @override
   ConsumerState<UserEmploymentFormScreen> createState() =>
@@ -25,6 +32,20 @@ class _UserEmploymentFormScreenState
   final _workLocationController = TextEditingController();
 
   String? _jobType;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.mode == FormMode.edit &&
+        widget.existingEmploymentProfile != null) {
+      final profile = widget.existingEmploymentProfile!;
+      _companyController.text = profile.company;
+      _designationController.text = profile.designation;
+      _annualIncomeController.text = profile.annualIncome.toString();
+      _workLocationController.text = profile.workLocation;
+      _jobType = profile.jobType;
+    }
+  }
 
   @override
   void dispose() {
@@ -50,6 +71,28 @@ class _UserEmploymentFormScreenState
             annualIncome: int.tryParse(_annualIncomeController.text) ?? 0,
             workLocation: _workLocationController.text,
           );
+
+    final notifier = ref.read(userEmploymentControllerProvider.notifier);
+
+    if (widget.mode == FormMode.create) {
+      notifier.saveEmployment(
+        jobType: _jobType!,
+        company: _companyController.text,
+        designation: _designationController.text,
+        annualIncome: int.tryParse(_annualIncomeController.text) ?? 0,
+        workLocation: _workLocationController.text,
+      );
+    } else {
+      // Update logic (using saveEmployment as upsert)
+      notifier.updateEmployment(
+        jobType: _jobType!,
+        company: _companyController.text,
+        designation: _designationController.text,
+        annualIncome: int.tryParse(_annualIncomeController.text) ?? 0,
+        workLocation: _workLocationController.text,
+      );
+    }
+
     }
   }
 

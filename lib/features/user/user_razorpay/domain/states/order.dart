@@ -1,34 +1,44 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Order {
-  final String orderId;            // internal order id
-  final String razorpayOrderId;    // Razorpay order id
-  final String? paymentId;
+  final String orderId; // internal order id
+  final String razorpayOrderId; // Razorpay order id
 
-  final String uid;
+  final String userId;
   final String email;
   final String phone;
   final String fullName;
+  final String razorpayPaymentId;
+  final String? razorpaySignature;
+  final String? agentId;
+  final String? region;
+  final String? district;
+  final String? gender;
 
   final int amount;
-  final String currency;
   final String status; // PENDING | SUCCESS | FAILED
-  final String paymentGateway;
+  final String gateway;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
   Order({
     required this.orderId,
     required this.razorpayOrderId,
-    this.paymentId,
-    required this.uid,
+
+    required this.userId,
+    required this.razorpayPaymentId,
+    this.razorpaySignature,
+    this.agentId,
+    this.region,
+    this.district,
+    this.gender,
+
     required this.email,
     required this.phone,
     required this.fullName,
     required this.amount,
-    this.currency = 'INR',
     required this.status,
-    this.paymentGateway = 'razorpay',
+    this.gateway = 'razorpay',
     required this.createdAt,
     this.updatedAt,
   });
@@ -36,19 +46,28 @@ class Order {
   // ---------------- FIRESTORE ----------------
   factory Order.fromMap(Map<String, dynamic> map) {
     return Order(
-      orderId: map['orderId'],
-      razorpayOrderId: map['razorpayOrderId'],
-      paymentId: map['paymentId'],
-      uid: map['uid'],
-      email: map['email'],
-      phone: map['phone'],
-      fullName: map['fullName'],
-      amount: (map['amount'] as num).toInt(),
-      currency: map['currency'] ?? 'INR',
-      status: map['status'],
-      paymentGateway: map['paymentGateway'] ?? 'razorpay',
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
-      updatedAt: map['updatedAt'] != null
+      userId: map['userId'] ?? '',
+      razorpayPaymentId: map['razorpayPaymentId'] ?? '',
+      razorpaySignature: map['razorpaySignature'],
+      agentId: map['agentId'],
+      region: map['region'],
+      district: map['district'],
+      gender: map['gender'],
+
+      orderId: map['orderId'] ?? '',
+      razorpayOrderId: map['razorpayOrderId'] ?? '',
+
+      email: map['email'] ?? '',
+      phone: map['phone'] ?? '',
+      fullName: map['fullName'] ?? '',
+      amount: (map['amount'] as num?)?.toInt() ?? 0,
+
+      status: map['status'] ?? '',
+      gateway: map['gateway'] ?? 'razorpay',
+      createdAt: map['createdAt'] is Timestamp
+          ? (map['createdAt'] as Timestamp).toDate()
+          : DateTime.now(),
+      updatedAt: map['updatedAt'] is Timestamp
           ? (map['updatedAt'] as Timestamp).toDate()
           : null,
     );
@@ -58,17 +77,45 @@ class Order {
     return {
       'orderId': orderId,
       'razorpayOrderId': razorpayOrderId,
-      'paymentId': paymentId,
-      'uid': uid,
+      'userId': userId,
+      'razorpayPaymentId': razorpayPaymentId,
+      'razorpaySignature': razorpaySignature,
+      'agentId': agentId,
+      'region': region,
+      'district': district,
+      'gender': gender,
+
       'email': email,
       'phone': phone,
       'fullName': fullName,
       'amount': amount,
-      'currency': currency,
+
       'status': status,
-      'paymentGateway': paymentGateway,
+      'gateway': gateway,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
   }
+}
+
+class OrderState {
+  final List<Order> orders;
+  final bool isLoading;
+  final String? error;
+
+  const OrderState({
+    this.orders = const [],
+    this.isLoading = false,
+    this.error,
+  });
+
+  OrderState copyWith({List<Order>? orders, bool? isLoading, String? error}) {
+    return OrderState(
+      orders: orders ?? this.orders,
+      isLoading: isLoading ?? this.isLoading,
+      error: error ?? this.error,
+    );
+  }
+
+  static const initial = OrderState();
 }

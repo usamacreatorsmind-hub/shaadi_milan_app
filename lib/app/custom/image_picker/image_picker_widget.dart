@@ -16,7 +16,7 @@ class ImagePickerWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final imageState = ref.watch(imagePickerProvider);
 
-    final controller = ref.read(imagePickerProvider.notifier);
+    final controller = ref.watch(imagePickerProvider.notifier);
     final isPicking = ref.watch(_imagePickingProvider);
 
     final theme = Theme.of(context);
@@ -176,7 +176,7 @@ class ImagePickerWidget extends ConsumerWidget {
             ),
             AppChip(
               label: 'Upload PDF',
-              onTap: () => safePick(controller.pickAadharPdf),
+              onTap: () => safePick(controller.pickAadharImages),
               backgroundColor: colors.secondaryContainer,
               textColor: colors.onSecondaryContainer,
               icon: Icons.picture_as_pdf,
@@ -185,7 +185,7 @@ class ImagePickerWidget extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         GestureDetector(
-          onTap: () => safePick(controller.pickAadharPdf),
+          onTap: () => safePick(controller.pickAadharImages),
           child: Container(
             height: 80,
             width: double.infinity,

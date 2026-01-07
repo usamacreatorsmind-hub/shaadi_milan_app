@@ -14,7 +14,7 @@ class UserStatusFirestore {
       final doc = await _firestore.collection('userStatus').doc(uid).get();
 
       if (!doc.exists) {
-        return const UserStatus(); // default empty status
+        return const UserStatus.empty(); // default empty status
       }
 
       return UserStatus.fromMap(doc.data()!);
@@ -29,7 +29,7 @@ class UserStatusFirestore {
       snapshot,
     ) {
       if (!snapshot.exists) {
-        return const UserStatus();
+        return const UserStatus.empty();
       }
       return UserStatus.fromMap(snapshot.data()!);
     });

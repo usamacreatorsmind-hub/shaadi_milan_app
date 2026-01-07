@@ -7,7 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final agentRepositoryProvider = Provider<AgentRepository>((ref) {
-  return AgentRepositoryImpl(ref.read(agentFirestoreDsProvider));
+  return AgentRepositoryImpl(ref.watch(agentFirestoreDsProvider));
 });
 
 class AgentRepositoryImpl implements AgentRepository {

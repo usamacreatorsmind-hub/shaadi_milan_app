@@ -1,28 +1,29 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-import '../data/api/payment_api.dart';
-import '../data/api/razorpay_service.dart';
-import '../domain/states/payment_state.dart';
+import '../../data/api/payment_api.dart';
+import '../../data/api/razorpay_service.dart';
+import '../../domain/states/payment.dart';
 
 final paymentApiProvider = Provider<PaymentApi>((ref) => PaymentApi());
 
 // We use autoDispose to ensure the notifier (and the Razorpay instance inside it)
 // is disposed when the user leaves the payment screen.
 final paymentProvider =
-    StateNotifierProvider.autoDispose<PaymentNotifier, PaymentState>(
-      (ref) => PaymentNotifier(
+    StateNotifierProvider.autoDispose<PaymentApiNotifier, PaymentState>(
+      (ref) => PaymentApiNotifier(
         ref.watch(paymentApiProvider),
         RazorpayService(), // Create a fresh service instance for this session
       ),
     );
 
-class PaymentNotifier extends StateNotifier<PaymentState> {
+class PaymentApiNotifier extends StateNotifier<PaymentState> {
   final PaymentApi _api;
   final RazorpayService _razorpayService;
 
-  PaymentNotifier(this._api, this._razorpayService)
+  PaymentApiNotifier(this._api, this._razorpayService)
     : super(const PaymentState());
 
   void init() {
@@ -47,20 +48,40 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
     required String email,
     required String fullName,
     required String phone,
+    required String agentId,
+    required String region,
+    required String district,
+    required String gender,
   }) async {
     try {
-      state = state.copyWith(status: PaymentStatus.loading);
+      state = state.copyWith(status: PayStatus.loading);
+
+      // print all data here 
+      debugPrint("Amount: $amount");
+      debugPrint("UID: $uid");
+      debugPrint("Email: $email");
+      debugPrint("FullName: $fullName");
+      debugPrint("Phone: $phone");
+      debugPrint("AgentId: $agentId");
+      debugPrint("Region: $region");
+      debugPrint("District: $district");
+      debugPrint("Gender: $gender");          
+
 
       // Razorpay expects amount in paisa (multiply by 100)
       final amountInPaisa = (amount * 100).toInt();
 
       final data = await _api.createOrder(
         amount: amount, // API might expect INR or Paisa, check your backend.
-
+        agentId: agentId,
         uid: uid,
         email: email,
         fullName: fullName,
         phone: phone,
+        region: region,
+        district: district,
+
+        gender: gender,
       );
 
       _razorpayService.open({
@@ -78,7 +99,7 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
       });
     } catch (e) {
       state = state.copyWith(
-        status: PaymentStatus.failure,
+        status: PayStatus.failure,
         message: e.toString(),
       );
     }
@@ -89,7 +110,7 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
     // Update state to success so UI can react.
     // Backend verification should happen via Webhook as per your architecture.
     state = state.copyWith(
-      status: PaymentStatus.success,
+      status: PayStatus.success,
       message: "Payment Successful",
       razorpayPaymentId: response.paymentId,
       razorpayOrderId: response.orderId,
@@ -99,7 +120,7 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
 
   void _onError(PaymentFailureResponse response) {
     state = state.copyWith(
-      status: PaymentStatus.failure,
+      status: PayStatus.failure,
       message: response.message ?? "Payment Failed",
     );
   }

@@ -35,13 +35,32 @@ class UserEducationController extends StateNotifier<EducationState> {
       debugPrint(e.toString());
     }
   }
+
+  void updateEducation({required EducationProfile educationProfile}) {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      _ref
+          .read(matrimonyRepositoryProvider)
+          .updateEducationProfile(_uid, educationProfile);
+
+      state = state.copyWith(isLoading: false, education: educationProfile);
+      debugPrint('✅ Education Updated Successfully');
+      debugPrint(educationProfile.toString());
+      _ref
+          .read(metrimonyControllerProvider.notifier)
+          .saveEducation(educationProfile);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      debugPrint('❌ Education Update Failed: $e');
+    }
+  }
 }
 
 final userEducationControllerProvider =
     StateNotifierProvider.autoDispose<UserEducationController, EducationState>((
       ref,
     ) {
-      final uid = ref.watch(authStateProvider).value?.uid;
+      final uid = ref.read(authStateProvider).value?.uid;
       if (uid == null) throw Exception('User not authenticated');
       return UserEducationController(uid, ref);
     });

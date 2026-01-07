@@ -45,7 +45,7 @@ final agentProfileControllerProvider =
       AsyncValue<AgentProfile>,
       String
     >((ref, agentId) {
-      final agentRepository = ref.watch(agentRepositoryProvider);
+      final agentRepository = ref.read(agentRepositoryProvider);
       return AgentProfileController(
         agentRepository as AgentRepositoryImpl,
         agentId,

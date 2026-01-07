@@ -5,7 +5,7 @@ class AgentProfile {
   final String? photoUrl;
   final String agentId;
   final String agentName;
-  final String agentAadhar;
+  final String agentAadharUrl;
 
   final String agentMobile;
   final DateTime registrationDate;
@@ -20,7 +20,7 @@ class AgentProfile {
     required this.agentMobile,
     required this.registrationDate,
     required this.role,
-    required this.agentAadhar,
+    required this.agentAadharUrl,
 
     required this.uid,
     required this.email,
@@ -30,14 +30,14 @@ class AgentProfile {
   Map<String, dynamic> toMap() => {
     'agentId': agentId,
     'address': address,
-    'agentAadhar': agentAadhar,
+    'agentAadhar': agentAadharUrl,
     'agentName': agentName,
     'agentMobile': agentMobile,
     'registrationDate': registrationDate.toIso8601String(),
     'role': role,
     'uid': uid,
     'email': email,
-    'agentAadhar': agentAadhar,
+    'agentAadharUrl': agentAadharUrl,
     'photoUrl': photoUrl,
   };
 
@@ -58,7 +58,7 @@ class AgentProfile {
       address: map['address'] ?? '',
 
       agentId: map['agentId'] ?? '',
-      agentAadhar: map['agentAadhar'] ?? '',
+      agentAadharUrl: map['agentAadharUrl'] ?? '',
       agentName: map['agentName'] ?? '',
       agentMobile: map['agentMobile'] ?? '',
       registrationDate: parseDate(map['registrationDate']),
@@ -71,7 +71,7 @@ class AgentProfile {
 
   @override
   String toString() {
-    return 'AgentProfile(agentId: $agentId, agentAadhar: $agentAadhar, address: $address, agentName: $agentName, agentMobile: $agentMobile, registrationDate: $registrationDate, role: $role, uid: $uid, email: $email, photoUrl: $photoUrl)';
+    return 'AgentProfile(agentId: $agentId, agentAadharUrl: $agentAadharUrl, address: $address, agentName: $agentName, agentMobile: $agentMobile, registrationDate: $registrationDate, role: $role, uid: $uid, email: $email, photoUrl: $photoUrl)';
   }
 
   AgentProfile copyWith({
@@ -92,7 +92,7 @@ class AgentProfile {
 
       agentId: agentId ?? this.agentId,
       agentName: agentName ?? this.agentName,
-      agentAadhar: agentAadhar ?? this.agentAadhar,
+      agentAadharUrl: agentAadhar ?? this.agentAadharUrl,
       agentMobile: agentMobile ?? this.agentMobile,
       registrationDate: registrationDate ?? this.registrationDate,
       role: role ?? this.role,
@@ -109,7 +109,7 @@ class AgentProfile {
       agentId: '',
       agentName: '',
       agentMobile: '',
-      agentAadhar: '',
+      agentAadharUrl: '',
 
       registrationDate: DateTime.now(),
       role: '',

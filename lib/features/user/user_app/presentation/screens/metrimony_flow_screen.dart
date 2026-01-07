@@ -1,3 +1,5 @@
+import 'package:arvika_marriage_bureau/core/enums/enum.dart';
+
 import '../../../../../app/router/app_router.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../controllers/metrimony_profile_controller.dart';
@@ -49,23 +51,23 @@ class MatrimonyFormFlowScreen extends ConsumerWidget {
   Widget _buildStep(MatrimonyStep step) {
     switch (step) {
       case MatrimonyStep.identity:
-        return const UserIdentityFormScreen();
+        return const UserIdentityFormScreen(mode: FormMode.create);
 
       case MatrimonyStep.address:
-        return const UserAddressFormScreen();
+        return const UserAddressFormScreen(mode: FormMode.create, existingAddressProfile: null,);
       case MatrimonyStep.education:
-        return const UserEducationFormScreen();
+        return const UserEducationFormScreen(mode: FormMode.create, existingEducationProfile: null,);
 
       case MatrimonyStep.employment:
-        return const UserEmploymentFormScreen();
+        return const UserEmploymentFormScreen(mode: FormMode.create, existingEmploymentProfile: null,);
 
       case MatrimonyStep.family:
-        return const UserFamilyFormScreen();
+        return const UserFamilyFormScreen(mode: FormMode.create, existingFamilyProfile: null,);
 
       case MatrimonyStep.cultural:
-        return const UserCultureFormScreen();
+        return const UserCultureFormScreen(mode: FormMode.create);
       case MatrimonyStep.physical:
-        return const UserPhysicalFormScreen();
+        return const UserPhysicalFormScreen(mode: FormMode.create, existingPhysicalProfile: null,);
       case MatrimonyStep.image:
         return const UserImageFormScreen();
 

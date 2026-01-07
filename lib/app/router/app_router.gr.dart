@@ -92,13 +92,6 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const OnboardingScreen(),
       );
     },
-
-    // PaymentOptionRoute.name: (routeData) {
-    //   return AutoRoutePage<dynamic>(
-    //     routeData: routeData,
-    //     child: const PaymentOptionScreen(),
-    //   );
-    // },
     PrivacyPolicyRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -123,6 +116,12 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const SearchScreen(),
       );
     },
+    SplashRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const SplashScreen(),
+      );
+    },
     TermsAndConditionsRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -130,9 +129,14 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     UserAddressFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserAddressFormRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const UserAddressFormScreen(),
+        child: UserAddressFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingAddressProfile: args.existingAddressProfile,
+        ),
       );
     },
     UserBiodataCheckRoute.name: (routeData) {
@@ -149,9 +153,14 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     UserCultureFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserCultureFormRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const UserCultureFormScreen(),
+        child: UserCultureFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingCulturalProfile: args.existingCulturalProfile,
+        ),
       );
     },
     UserDetailRoute.name: (routeData) {
@@ -162,21 +171,36 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     UserEducationFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserEducationFormRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const UserEducationFormScreen(),
+        child: UserEducationFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingEducationProfile: args.existingEducationProfile,
+        ),
       );
     },
     UserEmploymentFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserEmploymentFormRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const UserEmploymentFormScreen(),
+        child: UserEmploymentFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingEmploymentProfile: args.existingEmploymentProfile,
+        ),
       );
     },
     UserFamilyFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserFamilyFormRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const UserFamilyFormScreen(),
+        child: UserFamilyFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingFamilyProfile: args.existingFamilyProfile,
+        ),
       );
     },
     UserHomeRoute.name: (routeData) {
@@ -186,9 +210,14 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     UserIdentityFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserIdentityFormRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const UserIdentityFormScreen(),
+        child: UserIdentityFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingIdentityProfile: args.existingIdentityProfile,
+        ),
       );
     },
     UserImageFormRoute.name: (routeData) {
@@ -209,17 +238,38 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const UserNotificationScreen(),
       );
     },
+    UserPaymentOrderHistoryRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserPaymentOrderHistoryScreen(),
+      );
+    },
     UserPaymentRoute.name: (routeData) {
       final args = routeData.argsAs<UserPaymentRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserPaymentScreen(key: args.key, appUser: args.appUser),
+        child: UserPaymentScreen(
+          key: args.key,
+          metrimonyProfileViewModel: args.metrimonyProfileViewModel,
+        ),
+      );
+    },
+    UserPaymentSuccessRoute.name: (routeData) {
+      final args = routeData.argsAs<UserPaymentSuccessRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserPaymentSuccessScreen(key: args.key, user: args.user),
       );
     },
     UserPhysicalFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserPhysicalFormRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const UserPhysicalFormScreen(),
+        child: UserPhysicalFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingPhysicalProfile: args.existingPhysicalProfile,
+        ),
       );
     },
     UserProfileRoute.name: (routeData) {
@@ -227,6 +277,12 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: UserProfileScreen(key: args.key, userId: args.userId),
+      );
+    },
+    UserStatusRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserStatusScreen(),
       );
     },
     UserWishListRoute.name: (routeData) {
@@ -476,28 +532,6 @@ class OnboardingRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [PaymentOptionScreen]
-class PaymentOptionRoute extends PageRouteInfo<void> {
-  const PaymentOptionRoute({List<PageRouteInfo>? children})
-    : super(PaymentOptionRoute.name, initialChildren: children);
-
-  static const String name = 'PaymentOptionRoute';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [PaymentScreen]
-class PaymentRoute extends PageRouteInfo<void> {
-  const PaymentRoute({List<PageRouteInfo>? children})
-    : super(PaymentRoute.name, initialChildren: children);
-
-  static const String name = 'PaymentRoute';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
 /// [PrivacyPolicyScreen]
 class PrivacyPolicyRoute extends PageRouteInfo<void> {
   const PrivacyPolicyRoute({List<PageRouteInfo>? children})
@@ -542,6 +576,17 @@ class SearchRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [SplashScreen]
+class SplashRoute extends PageRouteInfo<void> {
+  const SplashRoute({List<PageRouteInfo>? children})
+    : super(SplashRoute.name, initialChildren: children);
+
+  static const String name = 'SplashRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [TermsAndConditionsScreen]
 class TermsAndConditionsRoute extends PageRouteInfo<void> {
   const TermsAndConditionsRoute({List<PageRouteInfo>? children})
@@ -554,13 +599,45 @@ class TermsAndConditionsRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [UserAddressFormScreen]
-class UserAddressFormRoute extends PageRouteInfo<void> {
-  const UserAddressFormRoute({List<PageRouteInfo>? children})
-    : super(UserAddressFormRoute.name, initialChildren: children);
+class UserAddressFormRoute extends PageRouteInfo<UserAddressFormRouteArgs> {
+  UserAddressFormRoute({
+    Key? key,
+    required FormMode mode,
+    required AddressProfile? existingAddressProfile,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserAddressFormRoute.name,
+         args: UserAddressFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingAddressProfile: existingAddressProfile,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserAddressFormRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<UserAddressFormRouteArgs> page =
+      PageInfo<UserAddressFormRouteArgs>(name);
+}
+
+class UserAddressFormRouteArgs {
+  const UserAddressFormRouteArgs({
+    this.key,
+    required this.mode,
+    required this.existingAddressProfile,
+  });
+
+  final Key? key;
+
+  final FormMode mode;
+
+  final AddressProfile? existingAddressProfile;
+
+  @override
+  String toString() {
+    return 'UserAddressFormRouteArgs{key: $key, mode: $mode, existingAddressProfile: $existingAddressProfile}';
+  }
 }
 
 /// generated route for
@@ -608,13 +685,45 @@ class UserChatRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [UserCultureFormScreen]
-class UserCultureFormRoute extends PageRouteInfo<void> {
-  const UserCultureFormRoute({List<PageRouteInfo>? children})
-    : super(UserCultureFormRoute.name, initialChildren: children);
+class UserCultureFormRoute extends PageRouteInfo<UserCultureFormRouteArgs> {
+  UserCultureFormRoute({
+    Key? key,
+    required FormMode mode,
+    CulturalProfile? existingCulturalProfile,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserCultureFormRoute.name,
+         args: UserCultureFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingCulturalProfile: existingCulturalProfile,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserCultureFormRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<UserCultureFormRouteArgs> page =
+      PageInfo<UserCultureFormRouteArgs>(name);
+}
+
+class UserCultureFormRouteArgs {
+  const UserCultureFormRouteArgs({
+    this.key,
+    required this.mode,
+    this.existingCulturalProfile,
+  });
+
+  final Key? key;
+
+  final FormMode mode;
+
+  final CulturalProfile? existingCulturalProfile;
+
+  @override
+  String toString() {
+    return 'UserCultureFormRouteArgs{key: $key, mode: $mode, existingCulturalProfile: $existingCulturalProfile}';
+  }
 }
 
 /// generated route for
@@ -651,35 +760,132 @@ class UserDetailRouteArgs {
 
 /// generated route for
 /// [UserEducationFormScreen]
-class UserEducationFormRoute extends PageRouteInfo<void> {
-  const UserEducationFormRoute({List<PageRouteInfo>? children})
-    : super(UserEducationFormRoute.name, initialChildren: children);
+class UserEducationFormRoute extends PageRouteInfo<UserEducationFormRouteArgs> {
+  UserEducationFormRoute({
+    Key? key,
+    required FormMode mode,
+    required EducationProfile? existingEducationProfile,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserEducationFormRoute.name,
+         args: UserEducationFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingEducationProfile: existingEducationProfile,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserEducationFormRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<UserEducationFormRouteArgs> page =
+      PageInfo<UserEducationFormRouteArgs>(name);
+}
+
+class UserEducationFormRouteArgs {
+  const UserEducationFormRouteArgs({
+    this.key,
+    required this.mode,
+    required this.existingEducationProfile,
+  });
+
+  final Key? key;
+
+  final FormMode mode;
+
+  final EducationProfile? existingEducationProfile;
+
+  @override
+  String toString() {
+    return 'UserEducationFormRouteArgs{key: $key, mode: $mode, existingEducationProfile: $existingEducationProfile}';
+  }
 }
 
 /// generated route for
 /// [UserEmploymentFormScreen]
-class UserEmploymentFormRoute extends PageRouteInfo<void> {
-  const UserEmploymentFormRoute({List<PageRouteInfo>? children})
-    : super(UserEmploymentFormRoute.name, initialChildren: children);
+class UserEmploymentFormRoute
+    extends PageRouteInfo<UserEmploymentFormRouteArgs> {
+  UserEmploymentFormRoute({
+    Key? key,
+    required FormMode mode,
+    required EmploymentProfile? existingEmploymentProfile,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserEmploymentFormRoute.name,
+         args: UserEmploymentFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingEmploymentProfile: existingEmploymentProfile,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserEmploymentFormRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<UserEmploymentFormRouteArgs> page =
+      PageInfo<UserEmploymentFormRouteArgs>(name);
+}
+
+class UserEmploymentFormRouteArgs {
+  const UserEmploymentFormRouteArgs({
+    this.key,
+    required this.mode,
+    required this.existingEmploymentProfile,
+  });
+
+  final Key? key;
+
+  final FormMode mode;
+
+  final EmploymentProfile? existingEmploymentProfile;
+
+  @override
+  String toString() {
+    return 'UserEmploymentFormRouteArgs{key: $key, mode: $mode, existingEmploymentProfile: $existingEmploymentProfile}';
+  }
 }
 
 /// generated route for
 /// [UserFamilyFormScreen]
-class UserFamilyFormRoute extends PageRouteInfo<void> {
-  const UserFamilyFormRoute({List<PageRouteInfo>? children})
-    : super(UserFamilyFormRoute.name, initialChildren: children);
+class UserFamilyFormRoute extends PageRouteInfo<UserFamilyFormRouteArgs> {
+  UserFamilyFormRoute({
+    Key? key,
+    required FormMode mode,
+    required FamilyProfile? existingFamilyProfile,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserFamilyFormRoute.name,
+         args: UserFamilyFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingFamilyProfile: existingFamilyProfile,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserFamilyFormRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<UserFamilyFormRouteArgs> page =
+      PageInfo<UserFamilyFormRouteArgs>(name);
+}
+
+class UserFamilyFormRouteArgs {
+  const UserFamilyFormRouteArgs({
+    this.key,
+    required this.mode,
+    required this.existingFamilyProfile,
+  });
+
+  final Key? key;
+
+  final FormMode mode;
+
+  final FamilyProfile? existingFamilyProfile;
+
+  @override
+  String toString() {
+    return 'UserFamilyFormRouteArgs{key: $key, mode: $mode, existingFamilyProfile: $existingFamilyProfile}';
+  }
 }
 
 /// generated route for
@@ -695,13 +901,45 @@ class UserHomeRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [UserIdentityFormScreen]
-class UserIdentityFormRoute extends PageRouteInfo<void> {
-  const UserIdentityFormRoute({List<PageRouteInfo>? children})
-    : super(UserIdentityFormRoute.name, initialChildren: children);
+class UserIdentityFormRoute extends PageRouteInfo<UserIdentityFormRouteArgs> {
+  UserIdentityFormRoute({
+    Key? key,
+    required FormMode mode,
+    IdentityProfile? existingIdentityProfile,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserIdentityFormRoute.name,
+         args: UserIdentityFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingIdentityProfile: existingIdentityProfile,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserIdentityFormRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<UserIdentityFormRouteArgs> page =
+      PageInfo<UserIdentityFormRouteArgs>(name);
+}
+
+class UserIdentityFormRouteArgs {
+  const UserIdentityFormRouteArgs({
+    this.key,
+    required this.mode,
+    this.existingIdentityProfile,
+  });
+
+  final Key? key;
+
+  final FormMode mode;
+
+  final IdentityProfile? existingIdentityProfile;
+
+  @override
+  String toString() {
+    return 'UserIdentityFormRouteArgs{key: $key, mode: $mode, existingIdentityProfile: $existingIdentityProfile}';
+  }
 }
 
 /// generated route for
@@ -738,15 +976,29 @@ class UserNotificationRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [UserPaymentOrderHistoryScreen]
+class UserPaymentOrderHistoryRoute extends PageRouteInfo<void> {
+  const UserPaymentOrderHistoryRoute({List<PageRouteInfo>? children})
+    : super(UserPaymentOrderHistoryRoute.name, initialChildren: children);
+
+  static const String name = 'UserPaymentOrderHistoryRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [UserPaymentScreen]
 class UserPaymentRoute extends PageRouteInfo<UserPaymentRouteArgs> {
   UserPaymentRoute({
     Key? key,
-    required AppUser appUser,
+    required MetrimonyProfileViewModel metrimonyProfileViewModel,
     List<PageRouteInfo>? children,
   }) : super(
          UserPaymentRoute.name,
-         args: UserPaymentRouteArgs(key: key, appUser: appUser),
+         args: UserPaymentRouteArgs(
+           key: key,
+           metrimonyProfileViewModel: metrimonyProfileViewModel,
+         ),
          initialChildren: children,
        );
 
@@ -757,27 +1009,95 @@ class UserPaymentRoute extends PageRouteInfo<UserPaymentRouteArgs> {
 }
 
 class UserPaymentRouteArgs {
-  const UserPaymentRouteArgs({this.key, required this.appUser});
+  const UserPaymentRouteArgs({
+    this.key,
+    required this.metrimonyProfileViewModel,
+  });
 
   final Key? key;
 
-  final AppUser appUser;
+  final MetrimonyProfileViewModel metrimonyProfileViewModel;
 
   @override
   String toString() {
-    return 'UserPaymentRouteArgs{key: $key, appUser: $appUser}';
+    return 'UserPaymentRouteArgs{key: $key, metrimonyProfileViewModel: $metrimonyProfileViewModel}';
+  }
+}
+
+/// generated route for
+/// [UserPaymentSuccessScreen]
+class UserPaymentSuccessRoute
+    extends PageRouteInfo<UserPaymentSuccessRouteArgs> {
+  UserPaymentSuccessRoute({
+    Key? key,
+    required AppUser user,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserPaymentSuccessRoute.name,
+         args: UserPaymentSuccessRouteArgs(key: key, user: user),
+         initialChildren: children,
+       );
+
+  static const String name = 'UserPaymentSuccessRoute';
+
+  static const PageInfo<UserPaymentSuccessRouteArgs> page =
+      PageInfo<UserPaymentSuccessRouteArgs>(name);
+}
+
+class UserPaymentSuccessRouteArgs {
+  const UserPaymentSuccessRouteArgs({this.key, required this.user});
+
+  final Key? key;
+
+  final AppUser user;
+
+  @override
+  String toString() {
+    return 'UserPaymentSuccessRouteArgs{key: $key, user: $user}';
   }
 }
 
 /// generated route for
 /// [UserPhysicalFormScreen]
-class UserPhysicalFormRoute extends PageRouteInfo<void> {
-  const UserPhysicalFormRoute({List<PageRouteInfo>? children})
-    : super(UserPhysicalFormRoute.name, initialChildren: children);
+class UserPhysicalFormRoute extends PageRouteInfo<UserPhysicalFormRouteArgs> {
+  UserPhysicalFormRoute({
+    Key? key,
+    required FormMode mode,
+    required PhysicalProfile? existingPhysicalProfile,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserPhysicalFormRoute.name,
+         args: UserPhysicalFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingPhysicalProfile: existingPhysicalProfile,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserPhysicalFormRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<UserPhysicalFormRouteArgs> page =
+      PageInfo<UserPhysicalFormRouteArgs>(name);
+}
+
+class UserPhysicalFormRouteArgs {
+  const UserPhysicalFormRouteArgs({
+    this.key,
+    required this.mode,
+    required this.existingPhysicalProfile,
+  });
+
+  final Key? key;
+
+  final FormMode mode;
+
+  final PhysicalProfile? existingPhysicalProfile;
+
+  @override
+  String toString() {
+    return 'UserPhysicalFormRouteArgs{key: $key, mode: $mode, existingPhysicalProfile: $existingPhysicalProfile}';
+  }
 }
 
 /// generated route for
@@ -810,6 +1130,17 @@ class UserProfileRouteArgs {
   String toString() {
     return 'UserProfileRouteArgs{key: $key, userId: $userId}';
   }
+}
+
+/// generated route for
+/// [UserStatusScreen]
+class UserStatusRoute extends PageRouteInfo<void> {
+  const UserStatusRoute({List<PageRouteInfo>? children})
+    : super(UserStatusRoute.name, initialChildren: children);
+
+  static const String name = 'UserStatusRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for

@@ -47,6 +47,39 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
+
+  void updateEmployment({
+    required String jobType,
+    required String company,
+    required String designation,
+    required int annualIncome,
+    required String workLocation,
+  }) {
+    state = state.copyWith(isLoading: true, error: null);
+    final employmentProfile = EmploymentProfile(
+      jobType: jobType,
+      company: company,
+      designation: designation,
+      annualIncome: annualIncome,
+      workLocation: workLocation,
+    );
+
+    try {
+      _ref
+          .read(matrimonyRepositoryProvider)
+          .updateEmploymentProfile(_uid, employmentProfile);
+
+      state = state.copyWith(employment: employmentProfile, isLoading: false);
+      print('✅ Employment Updated Successfully');
+      print(employmentProfile.toString());
+      _ref
+          .read(metrimonyControllerProvider.notifier)
+          .saveEmployment(employmentProfile);
+    } catch (e) {
+      print('❌ Employment Update Failed: $e');
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
 }
 
 final userEmploymentControllerProvider =
@@ -54,8 +87,8 @@ final userEmploymentControllerProvider =
       UserEmploymentController,
       EmploymentState
     >((ref) {
-      final matrimonyRepo = ref.watch(matrimonyRepositoryProvider);
-      final uid = ref.watch(authStateProvider).value?.uid;
+      final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
+      final uid = ref.read(authStateProvider).value?.uid;
       if (uid == null) throw Exception('User not authenticated');
       return UserEmploymentController(matrimonyRepo, uid, ref);
     });

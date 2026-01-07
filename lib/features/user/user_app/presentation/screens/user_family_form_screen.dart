@@ -1,4 +1,5 @@
 import '../../../../../app/custom/custom_widgets/widgets.dart';
+import 'package:arvika_marriage_bureau/core/enums/enum.dart';
 
 import '../../domain/states/family_state.dart';
 import '../controllers/user_family_controllers.dart';
@@ -10,7 +11,13 @@ import 'package:auto_route/auto_route.dart';
 
 @RoutePage()
 class UserFamilyFormScreen extends ConsumerStatefulWidget {
-  const UserFamilyFormScreen({super.key});
+  final FormMode mode;
+  final FamilyProfile? existingFamilyProfile;
+  const UserFamilyFormScreen({
+    super.key,
+    required this.mode,
+    required this.existingFamilyProfile,
+  });
 
   @override
   ConsumerState<UserFamilyFormScreen> createState() =>
@@ -28,7 +35,19 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
 
   String? _familyType;
 
- 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.mode == FormMode.edit && widget.existingFamilyProfile != null) {
+      final profile = widget.existingFamilyProfile!;
+      _fatherNameController.text = profile.fatherName;
+      _motherNameController.text = profile.motherName;
+      _brothersController.text = profile.numberOfBrothers.toString();
+      _sistersController.text = profile.numberOfSisters.toString();
+      _familyType = profile.familyType;
+      _familyStatusController.text = profile.familyStatus;
+    }
+  }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
@@ -49,6 +68,34 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
             familyType: _familyType!,
             familyStatus: _familyStatusController.text,
           );
+
+    final notifier = ref.read(userFamilyControllerProvider.notifier);
+
+    if (widget.mode == FormMode.create) {
+      notifier.saveFamily(
+        fatherName: _fatherNameController.text,
+        motherName: _motherNameController.text,
+        brothers: int.parse(_brothersController.text),
+        sisters: int.parse(_sistersController.text),
+        familyType: _familyType!,
+        familyStatus: _familyStatusController.text,
+      );
+    } else {
+      // Update logic (using saveFamily as upsert)
+      notifier.updateFamily(
+        fatherName: _fatherNameController.text,
+        motherName: _motherNameController.text,
+        brothers: int.parse(_brothersController.text),
+        sisters: int.parse(_sistersController.text),
+        familyType: _familyType!,
+        familyStatus: _familyStatusController.text,
+      );
+    } 
+
+
+
+
+
     }
   }
 

@@ -1,4 +1,5 @@
 import '../../../../../app/custom/custom_widgets/widgets.dart';
+import 'package:arvika_marriage_bureau/core/enums/enum.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +9,13 @@ import '../../domain/states/physical_state.dart';
 
 @RoutePage()
 class UserPhysicalFormScreen extends ConsumerStatefulWidget {
-  const UserPhysicalFormScreen({super.key});
+  final FormMode mode;
+  final PhysicalProfile? existingPhysicalProfile;
+  const UserPhysicalFormScreen({
+    super.key,
+    required this.mode,
+    required this.existingPhysicalProfile,
+  });
 
   @override
   ConsumerState<UserPhysicalFormScreen> createState() =>
@@ -21,9 +28,23 @@ class _UserPhysicalFormScreenState
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
   final _bodyTypeController = TextEditingController();
-  final _complexionController = TextEditingController(); 
-  
+  final _complexionController = TextEditingController();
+
   bool _physicallyChallenged = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.mode == FormMode.edit &&
+        widget.existingPhysicalProfile != null) {
+      final profile = widget.existingPhysicalProfile!;
+      _heightController.text = profile.height.toString();
+      _weightController.text = profile.weight.toString();
+      _bodyTypeController.text = profile.bodyType;
+      _complexionController.text = profile.complexion;
+      _physicallyChallenged = profile.physicallyChallenged;
+    }
+  }
 
   @override
   void dispose() {
@@ -47,6 +68,33 @@ class _UserPhysicalFormScreenState
             complexion: _complexionController.text,
             physicallyChallenged: _physicallyChallenged,
           );
+
+
+    final notifier = ref.read(userPhysicalControllerProvider.notifier);
+
+    if (widget.mode == FormMode.create) {
+      notifier.savePhysicals(
+        height: double.parse(_heightController.text),
+        weight: double.parse(_weightController.text),
+        bodyType: _bodyTypeController.text,
+        complexion: _complexionController.text,
+        physicallyChallenged: _physicallyChallenged,
+      );
+    } else {
+      // Update logic (using savePhysicals as upsert)
+      notifier.updatePhysicals(
+        height: double.parse(_heightController.text),
+        weight: double.parse(_weightController.text),
+        bodyType: _bodyTypeController.text,
+        complexion: _complexionController.text,
+        physicallyChallenged: _physicallyChallenged,
+      );
+    }
+
+
+
+
+
     }
   }
 

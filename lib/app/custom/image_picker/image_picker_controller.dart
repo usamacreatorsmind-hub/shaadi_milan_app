@@ -42,15 +42,34 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     return croppedFile?.path;
   }
 
-  // 📄 Pick Aadhar PDF
-  Future<void> pickAadharPdf() async {
+  // // 📄 Pick Aadhar PDF
+  // Future<void> pickAadharPdf() async {
+  //   if (_isPicking) return;
+  //   _isPicking = true;
+
+  //   try {
+  //     FilePickerResult? result = await FilePicker.platform.pickFiles(
+  //       type: FileType.custom,
+  //       allowedExtensions: ['pdf'],
+  //     );
+
+  //     if (result == null || result.files.single.path == null) return;
+
+  //     state = state.copyWith(aadharPdfPath: result.files.single.path);
+  //   } finally {
+  //     _isPicking = false;
+  //   }
+  // }
+
+  // pick images from gallary
+  Future<void> pickAadharImages() async {
     if (_isPicking) return;
     _isPicking = true;
 
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['pdf'],
+        allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
       );
 
       if (result == null || result.files.single.path == null) return;

@@ -30,8 +30,11 @@ class FirebaseAuthDS {
   Future<UserCredential> signInWithEmail(String email, String password) =>
       _auth.signInWithEmailAndPassword(email: email, password: password);
 
-  Future<void> sendPasswordResetEmail(String email) =>
-      _auth.sendPasswordResetEmail(email: email);
+  Future<void> sendPasswordResetEmail(String email) async {
+    print("password Sent ");
+
+    return _auth.sendPasswordResetEmail(email: email);
+  }
 
   Future<UserCredential> signUpWithEmail({
     required String email,
@@ -39,7 +42,7 @@ class FirebaseAuthDS {
     required String password,
     required String agentId,
     required String phone,
-    required List<String> wishlists, 
+    required List<String> wishlists,
   }) async {
     try {
       var agentUid = "";
@@ -84,7 +87,7 @@ class FirebaseAuthDS {
 
         'agentId': agentUid,
 
-        'createdAt': FieldValue.serverTimestamp(), 
+        'createdAt': FieldValue.serverTimestamp(),
 
         'lastSeen': FieldValue.serverTimestamp(),
       });

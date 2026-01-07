@@ -30,11 +30,11 @@ final amountFirestoreDSProvider = Provider<AmountFirestore>((ref) {
 
 final amountRepositoryProvider = Provider<AmountRepository>((ref) {
   return AmountRepository(
-    amountFirestoreDS: ref.watch(amountFirestoreDSProvider),
+    amountFirestoreDS: ref.read(amountFirestoreDSProvider),
   );
 });
 
 final amountNotifierProvider =
     StateNotifierProvider<AmountNotifier, AmountState>((ref) {
-      return AmountNotifier(ref.watch(amountRepositoryProvider));
+      return AmountNotifier(ref.read(amountRepositoryProvider));
     });

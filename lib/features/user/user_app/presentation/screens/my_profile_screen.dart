@@ -1,9 +1,8 @@
-import 'dart:ffi';
-
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/core/enums/enum.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
@@ -19,43 +18,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final matrimonyProfileProvider =
-    FutureProvider.family<MetrimonyProfileViewModel, String>((ref, uid) async {
-      final matrimonyProfile = await ref
-          .watch(matrimonyRepositoryProvider)
-          .getMatrimonyProfile(uid);
-
+    StreamProvider.family<MetrimonyProfileViewModel, String>((ref, uid) {
+      final matrimonyRepo = ref.watch(matrimonyRepositoryProvider);
       final userRepo = ref.watch(userRepositoryProvider);
-      final user = await userRepo.fetchUser(matrimonyProfile.userId);
+      final agentRepo = ref.watch(agentRepositoryProvider);
 
-      final AgentProfile agent;
+      return matrimonyRepo.watchMatrimonyProfile(uid).asyncMap((
+        matrimonyProfile,
+      ) async {
+        final user = await userRepo.fetchUser(matrimonyProfile.userId);
 
-      if (matrimonyProfile.agentId.isNotEmpty) {
-        // print agetn id
-        print("This is agent id");
-        print(matrimonyProfile.agentId);
+        final AgentProfile agent;
 
-        final agentRepo = ref.watch(agentRepositoryProvider);
-        agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
-      } else {
-        agent = AgentProfile(
-          agentId: '',
-          agentName: '',
-          agentMobile: '',
-          email: '',
-          registrationDate: DateTime.now(),
-          role: '',
-          photoUrl: '',
-          address: '',
-          agentAadhar: '',
-          uid: '',
+        if (matrimonyProfile.agentId.isNotEmpty) {
+          // print agetn id
+          print("This is agent id");
+          print(matrimonyProfile.agentId);
+
+          agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
+        } else {
+          agent = AgentProfile(
+            agentId: '',
+            agentName: '',
+            agentMobile: '',
+            email: '',
+            registrationDate: DateTime.now(),
+            role: '',
+            photoUrl: '',
+            address: '',
+            agentAadharUrl: '',
+            uid: '',
+          );
+        }
+
+        return MetrimonyProfileViewModel(
+          metrimonyProfile: matrimonyProfile,
+          userProfile: user,
+          agentProfile: agent,
         );
-      }
-
-      return MetrimonyProfileViewModel(
-        metrimonyProfile: matrimonyProfile,
-        userProfile: user,
-        agentProfile: agent,
-      );
+      });
     });
 
 @RoutePage()
@@ -242,22 +243,20 @@ class MyProfileScreen extends ConsumerWidget {
                     label: "Edit",
                     icon: Icons.edit,
 
-                    // onTap: () =>
-
-                    // navigate to userIdentity form
-
-                    // AutoRouter.of(context).push(
-                    //                     UserIdentityFormRoute(
-                    //                       userIdentity: profile.identity!,
-                    //                       uid: uid,
-                    //                     ),
-                    //                   ),
+                    onTap: () => AutoRouter.of(context).push(
+                      UserIdentityFormRoute(
+                        mode: FormMode.edit,
+                        existingIdentityProfile: profile.identity,
+                      ),
+                    ),
                   ),
 
                   children: [
                     _DetailRow(
                       "Aadhar",
                       profile.identity?.aadhar.toString() ?? 'N/A',
+
+                      // SHOW  snack bar
                     ),
 
                     _DetailRow(
@@ -280,7 +279,12 @@ class MyProfileScreen extends ConsumerWidget {
                   actionChip: AppChip(
                     label: "Edit",
                     icon: Icons.edit,
-                    onTap: () {},
+                    onTap: () => AutoRouter.of(context).push(
+                      UserEducationFormRoute(
+                        mode: FormMode.edit,
+                        existingEducationProfile: profile.education,
+                      ),
+                    ),
                   ),
 
                   children: [
@@ -319,7 +323,12 @@ class MyProfileScreen extends ConsumerWidget {
                     actionChip: AppChip(
                       label: "Edit",
                       icon: Icons.edit,
-                      onTap: () {},
+                      onTap: () => AutoRouter.of(context).push(
+                        UserEducationFormRoute(
+                          mode: FormMode.edit,
+                          existingEducationProfile: profile.education,
+                        ),
+                      ),
                     ),
                     children: [
                       Wrap(
@@ -346,7 +355,12 @@ class MyProfileScreen extends ConsumerWidget {
                   actionChip: AppChip(
                     label: "Edit",
                     icon: Icons.edit,
-                    onTap: () {},
+                    onTap: () => AutoRouter.of(context).push(
+                      UserEmploymentFormRoute(
+                        mode: FormMode.edit,
+                        existingEmploymentProfile: profile.employment,
+                      ),
+                    ),
                   ),
                   children: [
                     _DetailRow("Company", profile.employment?.company ?? "N/A"),
@@ -370,7 +384,12 @@ class MyProfileScreen extends ConsumerWidget {
                   title: "Address",
                   actionChip: AppChip(
                     label: "Edit",
-                    onTap: () {},
+                    onTap: () => AutoRouter.of(context).push(
+                      UserAddressFormRoute(
+                        mode: FormMode.edit,
+                        existingAddressProfile: profile.address,
+                      ),
+                    ),
                     icon: Icons.edit,
                   ),
 
@@ -385,7 +404,12 @@ class MyProfileScreen extends ConsumerWidget {
                   title: "Family Details",
                   actionChip: AppChip(
                     label: "Edit",
-                    onTap: () {},
+                    onTap: () => AutoRouter.of(context).push(
+                      UserFamilyFormRoute(
+                        mode: FormMode.edit,
+                        existingFamilyProfile: profile.family,
+                      ),
+                    ),
 
                     icon: Icons.edit,
                   ),
@@ -405,7 +429,12 @@ class MyProfileScreen extends ConsumerWidget {
                   title: "Physical Details",
                   actionChip: AppChip(
                     label: "Edit",
-                    onTap: () {},
+                    onTap: () => AutoRouter.of(context).push(
+                      UserPhysicalFormRoute(
+                        mode: FormMode.edit,
+                        existingPhysicalProfile: profile.physical,
+                      ),
+                    ),
                     icon: Icons.edit,
                   ),
                   children: [
@@ -438,7 +467,12 @@ class MyProfileScreen extends ConsumerWidget {
                   actionChip: AppChip(
                     label: "Edit",
                     icon: Icons.edit,
-                    onTap: () {},
+                    onTap: () => AutoRouter.of(context).push(
+                      UserCultureFormRoute(
+                        mode: FormMode.edit,
+                        existingCulturalProfile: profile.cultural,
+                      ),
+                    ),
                   ),
 
                   children: [
@@ -496,6 +530,7 @@ class MyProfileScreen extends ConsumerWidget {
     );
   }
 }
+
 class PhotoPreviewDialog extends StatelessWidget {
   final String photoUrl;
 
@@ -550,11 +585,7 @@ class PhotoPreviewDialog extends StatelessWidget {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: IconButton(
-                icon: const Icon(
-                  Icons.close,
-                  color: Colors.white,
-                  size: 30,
-                ),
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
@@ -564,7 +595,6 @@ class PhotoPreviewDialog extends StatelessWidget {
     );
   }
 }
-
 
 class _DetailRowWithAction extends StatelessWidget {
   final String label;

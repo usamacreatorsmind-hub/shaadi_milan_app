@@ -28,7 +28,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final authRepo = ref.read(authRepositoryProvider);
+    final authRepo = ref.watch(authRepositoryProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text("Reset Password"), centerTitle: true),
@@ -83,6 +83,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     keyboardType: TextInputType.emailAddress,
                   ),
 
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     height: 55,
@@ -152,6 +153,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       },
                     ),
                   ),
+                  SizedBox(height: 40),
                 ],
               ),
             ),
