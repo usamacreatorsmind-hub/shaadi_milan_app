@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-import '../../../../agent/domain/states/agent_entity.dart';
 import '../../data/datasources/firebase/agent_firestore_ds.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/address_state.dart';
@@ -30,20 +29,16 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
   // ================= STEP NAVIGATION =================
 
   void nextStep() {
-    final index = MatrimonyStep.values.indexOf(state.step);
-
-    if (index == MatrimonyStep.values.length - 1) {
-      state = state.copyWith(isCompleted: true);
-      return;
+    final currentIndex = MatrimonyStep.values.indexOf(state.step);
+    if (currentIndex < MatrimonyStep.values.length - 1) {
+      state = state.copyWith(step: MatrimonyStep.values[currentIndex + 1]);
     }
-
-    state = state.copyWith(step: MatrimonyStep.values[index + 1]);
   }
 
   void previousStep() {
-    final index = MatrimonyStep.values.indexOf(state.step);
-    if (index > 0) {
-      state = state.copyWith(step: MatrimonyStep.values[index - 1]);
+    final currentIndex = MatrimonyStep.values.indexOf(state.step);
+    if (currentIndex > 0) {
+      state = state.copyWith(step: MatrimonyStep.values[currentIndex - 1]);
     }
   }
 
@@ -124,9 +119,9 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
 
     final metrimonyProfile = MatrimonyProfile(
       userId: uid,
-      metrimonyId: uid, // ✅ SAME AS UID
+      metrimonyId: uid,
+      // ✅ SAME AS UID
       agentId: agentUid,
-    
 
       identity: IdentityProfile.empty(),
       address: AddressProfile.empty(),
@@ -172,6 +167,8 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     await ref
         .read(matrimonyRepositoryProvider)
         .updateMatrimonyProfile(uid, profile);
+
+        
 
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
       'userStatus.isProfileCreated': true,

@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:arvika_marriage_bureau/data_core/metrimony_profiles_data.dart';
+
+import 'package:arvika_marriage_bureau/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 
 import '../../../../../app/custom/image_picker/image_picker_controller.dart';
-import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../domain/states/image_state.dart';
 import '../controllers/metrimony_profile_controller.dart';
@@ -38,9 +38,16 @@ class _UserBiodataCheckScreenState
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
       appBar: AppBar(
-        title: const Text('Verify Your Profile'),
+        automaticallyImplyLeading: true,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: Text(
+          'Verify Your Profile',
+
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
         centerTitle: true,
       ),
       body: ListView(
@@ -50,28 +57,18 @@ class _UserBiodataCheckScreenState
 
           _section('User Details', Icons.person, [
             _infoRow('Full Name', currentUser?.fullName),
-            _infoRow('agent id', currentUser?.agentId),
-            _infoRow('uid  id ', currentUser?.uid),
 
             _infoRow('Email', currentUser?.email),
             _infoRow('Phone', currentUser?.phone),
-          
           ]),
 
           _section('Identity', Icons.badge, [
             _infoRow('Gender', profile.identity.gender),
             _infoRow(
               'Date of Birth',
-              profile.identity.dob != null
-                  ? DateFormat('dd MMM yyyy').format(profile.identity.dob)
-                  : null,
+              DateFormat('dd MMM yyyy').format(profile.identity.dob),
             ),
-            _infoRow(
-              'Age',
-              profile.identity.age != null
-                  ? '${profile.identity.age} Years'
-                  : null,
-            ),
+            _infoRow('Age', '${profile.identity.age} Years'),
             _infoRow('Aadhar', profile.identity.aadhar),
           ]),
 
@@ -91,10 +88,7 @@ class _UserBiodataCheckScreenState
           ]),
 
           _section('Education', Icons.school, [
-            _infoRow(
-              'College',
-              profile.education.education?.college,
-            ),
+            _infoRow('College', profile.education.education?.college),
             _infoRow('course', profile.education.education?.course),
             _infoRow('Percentage ', profile.education.education?.percentage),
             _infoRow('Passing Year', profile.education.education?.passingYear),
@@ -136,35 +130,90 @@ class _UserBiodataCheckScreenState
 
           _imageSection(profile.images, imageState),
 
-          CheckboxListTile(
-            contentPadding: EdgeInsets.zero,
-            value: isAgreed,
-            onChanged: (v) => setState(() => isAgreed = v ?? false),
-            title: const Text(
-              'I confirm all details are correct',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            subtitle: const Text(
-              'Once submitted, profile cannot be edited',
-              style: TextStyle(color: Colors.redAccent),
-            ),
-          ),
+          if (imageState.aadharPdfPath != null &&
+              imageState.aadharPdfPath!.isNotEmpty)
+            _section('Aadhar Document', Icons.document_scanner, [
+              imageState.aadharPdfPath!.toLowerCase().endsWith('.pdf')
+                  ? GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (_) => PdfViewerBottomsheet(
+                            source: imageState.aadharPdfPath!,
+                            title: 'Aadhar PDF',
+                            isLocal: true,
+                          ),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.picture_as_pdf,
+                            color: Colors.redAccent,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'View Aadhar PDF',
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Image.file(
+                        File(imageState.aadharPdfPath!),
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+            ]),
 
-          const SizedBox(height: 12),
-
-          ElevatedButton(
-            onPressed: isAgreed ? _confirmSubmit : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
+          Container(
+            margin: const EdgeInsets.only(top: 20),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                ),
+              ],
             ),
-            child: const Text(
-              'FINAL SUBMIT',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            child: Column(
+              children: [
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: isAgreed,
+                  onChanged: (v) => setState(() => isAgreed = v ?? false),
+                  title: const Text(
+                    'I confirm all details are correct',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: isAgreed ? _confirmSubmit : null,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    'FINAL SUBMIT',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -173,40 +222,33 @@ class _UserBiodataCheckScreenState
   }
 
   // ================= UI HELPERS =================
-
   Widget _section(String title, IconData icon, List<Widget> children) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(icon, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 10),
+                Icon(icon, size: 20, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 8),
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-            const Divider(height: 24),
+            const SizedBox(height: 10),
             ...children,
           ],
         ),
@@ -220,29 +262,22 @@ class _UserBiodataCheckScreenState
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 130,
+          Expanded(
+            flex: 4,
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: Colors.black54,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
             ),
           ),
           Expanded(
+            flex: 6,
             child: Text(
               value.toString(),
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -289,19 +324,24 @@ class _UserBiodataCheckScreenState
   Widget _warningCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.red.shade50,
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.orange.shade50,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.orange.shade200),
       ),
       child: Row(
-        children: const [
-          Icon(Icons.warning_amber_rounded, color: Colors.red, size: 30),
-          SizedBox(width: 12),
+        children: [
+          const Icon(Icons.info_outline, color: Colors.orange),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Please verify carefully.\nOnce submitted, profile cannot be edited.',
-              style: TextStyle(fontWeight: FontWeight.w600, color: Colors.red),
+              'Please verify carefully. Once submitted, profile cannot be edited.',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.orange.shade900,
+              ),
             ),
           ),
         ],
@@ -318,10 +358,10 @@ class _UserBiodataCheckScreenState
     return _section('Profile Images', Icons.photo, [
       if (hasLocalPrimary)
         ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           child: Image.file(
             File(localImages.primaryImage!),
-            height: 200,
+            height: 220,
             width: double.infinity,
             fit: BoxFit.cover,
           ),
@@ -330,7 +370,7 @@ class _UserBiodataCheckScreenState
         ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Image.network(
-            images!.primaryImageUrl!,
+            images!.primaryImageUrl,
             height: 200,
             width: double.infinity,
             fit: BoxFit.cover,

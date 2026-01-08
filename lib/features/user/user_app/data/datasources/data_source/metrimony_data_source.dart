@@ -1,6 +1,4 @@
-import '../../../../../agent/domain/states/agent_entity.dart';
 import '../../../domain/states/address_state.dart';
-import '../../../domain/states/agent_state.dart';
 import '../../../domain/states/cultural_state.dart';
 import '../../../domain/states/education_state.dart';
 import '../../../domain/states/employee_state.dart';

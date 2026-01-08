@@ -1,6 +1,5 @@
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:flutter/material.dart';
-import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:auto_route/auto_route.dart';
 
 @RoutePage()

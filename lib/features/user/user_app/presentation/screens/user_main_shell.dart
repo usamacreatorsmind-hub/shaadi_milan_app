@@ -30,7 +30,8 @@ class _UserMainShellState extends State<UserMainShellScreen> {
         final tabsRouter = AutoTabsRouter.of(context);
 
         return Scaffold(
-          backgroundColor: Colors.grey[100],
+          extendBody: true,
+
           body: child,
           bottomNavigationBar: CustomBottomNavBar(
             currentIndex: tabsRouter.activeIndex,

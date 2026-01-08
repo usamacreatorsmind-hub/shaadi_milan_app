@@ -1,13 +1,8 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/home_controller.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/metrimony_profile_controller.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_api_notifier.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 
-import '../../../../../app/router/app_router.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,7 +25,13 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(paymentNotifierProvider(widget.metrimonyProfileViewModel.user.uid).notifier).fetchUserPayment();
+      ref
+          .read(
+            paymentNotifierProvider(
+              widget.metrimonyProfileViewModel.user.uid,
+            ).notifier,
+          )
+          .fetchUserPayment();
     });
   }
 
@@ -222,36 +223,79 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
 
                         debugPrint("Selected Plan: ${selectedPlan.name}");
 
+                        // ✅ Extract all user profile data
+                        final profile =
+                            widget.metrimonyProfileViewModel.metrimonyProfile;
+                        final user = widget.metrimonyProfileViewModel.user;
+
+                        debugPrint("Profile: $profile");
+
+                        // Extract Address Data (Region/District/State)
+                        final region = profile.address.state.trim().isEmpty
+                            ? "Not Provided"
+                            : profile.address.state;
+
+                        final district = profile.address.city.trim().isEmpty
+                            ? "Not Provided"
+                            : profile.address.city;
+
+                        // Extract Identity Data (Gender)
+                        final gender = profile.identity.gender.trim().isEmpty
+                            ? "Not Provided"
+                            : profile.identity.gender;
+
+                        // Extract Phone (user or address)
+
+                        // Log all extracted data
+                        debugPrint("\n=== 📋 PAYMENT DATA ===");
+                        debugPrint("User UID: ${user.uid}");
+                        debugPrint("Full Name: ${user.fullName}");
+                        debugPrint("Email: ${user.email}");
+                        debugPrint("Phone: $user.phone");
+                        debugPrint("Agent ID: ${user.agentId}");
+                        debugPrint("Region/State: $region");
+                        debugPrint("District/City: $district");
+                        debugPrint("Gender: $gender");
+                        debugPrint("Amount: ${amountState.amount?.amount}");
+                        debugPrint("======================\n");
+
+                        // Validate required fields
+                        if (gender == "Not Provided") {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "⚠️ Please complete your identity form (Gender required)",
+                              ),
+                              backgroundColor: Colors.orange,
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (district == "Not Provided") {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "⚠️ Please complete your address form (City required)",
+                              ),
+                              backgroundColor: Colors.orange,
+                            ),
+                          );
+                          return;
+                        }
+
                         ref
                             .read(paymentProvider.notifier)
                             .startOneTimePayment(
                               amount: amountState.amount!.amount.toDouble(),
-                              uid: widget.metrimonyProfileViewModel.user.uid,
-                              email:
-                                  widget.metrimonyProfileViewModel.user.email,
-                              fullName: widget
-                                  .metrimonyProfileViewModel
-                                  .user
-                                  .fullName,
-                              phone:
-                                  widget.metrimonyProfileViewModel.user.phone,
-                              agentId:
-                                  widget.metrimonyProfileViewModel.user.agentId,
-                              region: widget
-                                  .metrimonyProfileViewModel
-                                  .metrimonyProfile
-                                  .address
-                                  .state,
-                              district: widget
-                                  .metrimonyProfileViewModel
-                                  .metrimonyProfile
-                                  .address
-                                  .city,
-                              gender: widget
-                                  .metrimonyProfileViewModel
-                                  .metrimonyProfile
-                                  .identity
-                                  .gender,
+                              uid: user.uid,
+                              email: user.email ?? "N/A",
+                              fullName: user.fullName ?? "N/A",
+                              phone: user.phone,
+                              agentId: user.agentId,
+                              region: region,
+                              district: district,
+                              gender: gender,
                             );
                       },
                       child: const Text("Pay Once & Unlock Premium"),

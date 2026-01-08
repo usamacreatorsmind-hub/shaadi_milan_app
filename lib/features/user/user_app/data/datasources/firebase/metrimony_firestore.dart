@@ -1,4 +1,3 @@
-import '../../../../../agent/domain/states/agent_entity.dart';
 import '../data_source/metrimony_data_source.dart';
 import '../../../domain/states/address_state.dart';
 import '../../../domain/states/agent_state.dart';
@@ -12,8 +11,6 @@ import '../../../domain/states/physical_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../../domain/states/image_state.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 // provider
 

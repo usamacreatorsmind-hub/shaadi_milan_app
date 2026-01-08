@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import '../datasources/firebase/user_image_firestore.dart';
 import '../../domain/repositories/user_image_repository.dart';
@@ -33,6 +32,7 @@ class UserImageRepositoryImpl implements UserImageRepository {
   Future<ProfileImages> getProfileImages(String uid) async {
     final imagesMap = await _imageUploadService.getProfileImages(uid);
     return ProfileImages(
+      imageWithAgentUrl: imagesMap['imageWithAgentUrl'] as String,
       primaryImageUrl: imagesMap['primaryImageUrl'] as String,
       aadharCardUrl: imagesMap['aadharCardUrl'] as String,
 

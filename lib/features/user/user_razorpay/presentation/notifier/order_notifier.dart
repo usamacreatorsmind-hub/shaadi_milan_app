@@ -1,9 +1,6 @@
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/providers/providers.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/providers/providers.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/repository/order_repository.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/order.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 class OrderNotifier extends StateNotifier<OrderState> {

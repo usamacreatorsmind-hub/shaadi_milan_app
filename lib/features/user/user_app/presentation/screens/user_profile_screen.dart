@@ -1,5 +1,3 @@
-import 'package:arvika_marriage_bureau/core/themes/theme_notifier.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
@@ -8,8 +6,6 @@ import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bott
 
 import '../../../../../app/router/app_router.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
-import '../../domain/states/metrimony_state.dart';
-import '../../domain/states/user_state.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
@@ -46,6 +42,7 @@ class UserProfileScreen extends ConsumerWidget {
   final String userId;
   const UserProfileScreen({super.key, required this.userId});
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(userProfileScreenProvider(userId));
     final theme = Theme.of(context);
@@ -60,297 +57,339 @@ class UserProfileScreen extends ConsumerWidget {
           return Center(child: Text('Error: $err'));
         },
         data: (profile) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 24),
-
-                // 🔹 TITLE
-                Padding(
-                  padding: const EdgeInsets.symmetric(
+          return CustomScrollView(
+            slivers: [
+              // SliverAppBar(
+              //   backgroundColor: Colors.grey[100],
+              //   expandedHeight: 120,
+              //   floating: false,
+              //   pinned: true,
+              //   flexibleSpace: FlexibleSpaceBar(
+              //     titlePadding: const EdgeInsets.symmetric(
+              //       horizontal: 16,
+              //       vertical: 10,
+              //     ),
+              //     centerTitle: false,
+              //     title: Text(
+              //       "My Profile",
+              //       style: TextStyle(
+              //         fontSize: 24,
+              //         fontWeight: FontWeight.bold,
+              //         color: theme.primaryColor,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              SliverAppBar(
+                backgroundColor: Colors.grey[100],
+                expandedHeight: 120,
+                floating: false,
+                pinned: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  titlePadding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 15,
+                    vertical: 10,
                   ),
-                  child: Text(
+                  centerTitle: false,
+                  title: Text(
                     "My Profile",
                     style: TextStyle(
-                      fontSize: 36,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: theme.primaryColor,
                     ),
                   ),
                 ),
+              ),
+              SliverToBoxAdapter(child: _ProfileHeaderCard(profile: profile)),
 
-                // 🔹 PROFILE HEADER
-                _ProfileHeaderCard(profile: profile),
+              SliverPadding(
+                padding: const EdgeInsets.only(bottom: 1),
 
-                // 🔹 PREMIUM CARD
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 24),
 
-                //  check for payments collection if status is success then show premium card
-                Consumer(
-                  builder: (context, ref, child) {
-                    final userStatusState = ref.watch(
-                      userStatusControllerProvider,
-                    );
-                    if (userStatusState.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (userStatusState.userStatus.subscriptionActive) {
-                      return GestureDetector(
-                        onTap: () => AutoRouter.of(
-                          context,
-                        ).push(UserPaymentSuccessRoute(user: profile.user!)),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 18,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade50,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.green.shade200,
-                              width: 1.5,
+                        // 🔹 TITLE
+
+                        // 🔹 PREMIUM CARD
+
+                        //  check for payments collection if status is success then show premium card
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final userStatusState = ref.watch(
+                              userStatusControllerProvider,
+                            );
+                            if (userStatusState.isLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            if (userStatusState.userStatus.subscriptionActive) {
+                              return GestureDetector(
+                                onTap: () => AutoRouter.of(context).push(
+                                  UserPaymentSuccessRoute(user: profile.user),
+                                ),
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 18,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.shade50,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.green.shade200,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // Custom Icon Container
+                                      Container(
+                                        height: 45,
+                                        width: 45,
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.shade500,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.verified_user_rounded,
+                                          color: Colors.white,
+                                          size: 26,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Premium Active",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.green.shade800,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 1.1,
+                                              ),
+                                            ),
+                                            const Text(
+                                              "You are a Premium Member!",
+                                              style: TextStyle(
+                                                fontSize: 17,
+                                                color: Colors.black87,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 14,
+                                        color: Colors.green.shade300,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                            return _PremiumCard(profile: profile);
+                          },
+                        ),
+
+                        // 🔹 GENERAL SECTION
+                        _SectionTitle(title: "General"),
+                        _SettingsTile(
+                          icon: Icons.person_search_outlined,
+                          title: "My Profile",
+                          onTap: () {
+                            AutoRouter.of(
+                              context,
+                            ).push(MyProfileRoute(uid: userId));
+                          },
+                        ),
+                        _SettingsTile(
+                          icon: Icons.support_agent_outlined,
+                          title: "Agent Details",
+                          onTap: () {
+                            if (profile.agentProfile != null) {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => AgentBottomSheet(
+                                  agent: profile.agentProfile!,
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("No agent assigned yet."),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+
+                        // user status
+                        _SettingsTile(
+                          icon: Icons.verified_user_outlined,
+                          title: "User Status",
+                          onTap: () {
+                            // navigate to user status screen
+                            AutoRouter.of(
+                              context,
+                            ).push(const UserStatusRoute());
+                          },
+                        ),
+
+                        // Contact Support
+                        // stting tile
+                        _SettingsTile(
+                          icon: Icons.contact_support_outlined,
+                          title: "Contact Support",
+                          onTap: () {
+                            AutoRouter.of(context).push(const ContactUsRoute());
+                          },
+                        ),
+
+                        // 🔹 ACCOUNT SETTINGS SECTION
+                        _SectionTitle(title: "Account Settings"),
+
+                        _SettingsTile(
+                          icon: Icons.lock_outline,
+                          title: "Change Password",
+                          onTap: () {
+                            // navigate to change password screen
+                            AutoRouter.of(
+                              context,
+                            ).push(const ChangePasswordRoute());
+                          },
+                        ),
+
+                        // payment route
+                        _SettingsTile(
+                          icon: Icons.payment_outlined,
+                          title: "Payment History",
+                          onTap: () {
+                            AutoRouter.of(
+                              context,
+                            ).push(const UserPaymentOrderHistoryRoute());
+                          },
+                        ),
+
+                        // Privacy Policy
+                        _SettingsTile(
+                          icon: Icons.policy_outlined,
+                          title: "Privacy Policy",
+                          onTap: () {
+                            AutoRouter.of(
+                              context,
+                            ).push(const PrivacyPolicyRoute());
+                          },
+                        ),
+
+                        // Terms & Conditions
+                        _SettingsTile(
+                          icon: Icons.description_outlined,
+                          title: "Terms & Conditions",
+                          onTap: () {
+                            AutoRouter.of(
+                              context,
+                            ).push(const TermsAndConditionsRoute());
+                          },
+                        ),
+                        // help and support
+                        _SettingsTile(
+                          icon: Icons.info_outline,
+                          title: "About Us",
+                          onTap: () {
+                            AutoRouter.of(context).push(const AboutUsRoute());
+                          },
+                        ),
+
+                        // 🔹 APP PREFERENCES SECTION
+                        _SectionTitle(title: "App Preferences"),
+                        _SettingsTile(
+                          icon: Icons.notifications_active_outlined,
+                          title: "Push Notifications",
+                          trailing: Switch(value: true, onChanged: (v) {}),
+                        ),
+                        _SettingsTile(
+                          icon: Icons.email_outlined,
+                          title: "Email Notifications",
+                          trailing: Switch(value: false, onChanged: (v) {}),
+                        ),
+                        // _SettingsTile(
+                        //   icon: Icons.dark_mode_outlined,
+                        //   title: "Dark Mode",
+                        //   trailing: Switch(
+                        //     value: ref.watch(themeProvider) == ThemeMode.dark,
+                        //     onChanged: (value) {
+                        //       ref
+                        //           .read(themeProvider.notifier)
+                        //           .setTheme(value ? ThemeMode.dark : ThemeMode.light);
+
+                        //       // print selected theme
+                        //       print('Selected theme: ${value ? 'Dark' : 'Light'}');
+                        //     },
+                        //   ),
+                        // ),
+
+                        // 🔹 LOGOUT
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          child: OutlinedButton(
+                            style: ButtonStyle(
+                              foregroundColor: WidgetStateProperty.all(
+                                Theme.of(context).primaryColor,
+                              ),
+                              side: WidgetStateProperty.all(
+                                BorderSide(
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                              padding: WidgetStateProperty.all(
+                                const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              // Custom Icon Container
-                              Container(
-                                height: 45,
-                                width: 45,
-                                decoration: BoxDecoration(
-                                  color: Colors.green.shade500,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Icon(
-                                  Icons.verified_user_rounded,
-                                  color: Colors.white,
-                                  size: 26,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Premium Active",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.green.shade800,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1.1,
-                                      ),
-                                    ),
-                                    const Text(
-                                      "You are a Premium Member!",
-                                      style: TextStyle(
-                                        fontSize: 17,
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Icon(
-                                Icons.arrow_forward_ios,
-                                size: 14,
-                                color: Colors.green.shade300,
-                              ),
-                            ],
+                            onPressed: () {
+                              //LOGOUT HERE
+
+                              ref.watch(authRepositoryProvider).signOut();
+
+                              AutoRouter.of(
+                                context,
+                              ).replace(const LoginRoute());
+
+                              print("Logout button pressed");
+                            },
+                            child: const Text("Logout"),
                           ),
                         ),
-                      );
-                    }
-                    return _PremiumCard(profile: profile);
-                  },
+                      ],
+                    );
+                  }, childCount: 1),
                 ),
-
-                // 🔹 GENERAL SECTION
-                _SectionTitle(title: "General"),
-                _SettingsTile(
-                  icon: Icons.person_search_outlined,
-                  title: "My Profile",
-                  onTap: () {
-                    AutoRouter.of(context).push(MyProfileRoute(uid: userId));
-                  },
-                ),
-                _SettingsTile(
-                  icon: Icons.support_agent_outlined,
-                  title: "Agent Details",
-                  onTap: () {
-                    if (profile.agentProfile != null) {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) =>
-                            AgentBottomSheet(agent: profile.agentProfile!),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("No agent assigned yet.")),
-                      );
-                    }
-                  },
-                ),
-
-                _SettingsTile(
-                  icon: Icons.lock_outline,
-                  title: "Change Password",
-                  onTap: () {
-                    // navigate to change password screen
-                    AutoRouter.of(context).push(const ChangePasswordRoute());
-                  },
-                ),
-
-                // payment route
-                _SettingsTile(
-                  icon: Icons.payment_outlined,
-                  title: "Payment History",
-                  onTap: () {
-                    AutoRouter.of(
-                      context,
-                    ).push(const UserPaymentOrderHistoryRoute());
-                  },
-                ),
-                // user status
-                _SettingsTile(
-                  icon: Icons.verified_user_outlined,
-                  title: "User Status",
-                  onTap: () {
-                    // navigate to user status screen
-                    AutoRouter.of(context).push(const UserStatusRoute());
-                  },
-                ),
-
-                // this is for user data access can be implemented in future
-                _SettingsTile(
-                  icon: Icons.privacy_tip_outlined,
-                  title: "Privacy Settings",
-                  onTap: () {},
-                ),
-                // Terms & Conditions
-                _SettingsTile(
-                  icon: Icons.description_outlined,
-                  title: "Terms & Conditions",
-                  onTap: () {
-                    AutoRouter.of(
-                      context,
-                    ).push(const TermsAndConditionsRoute());
-                  },
-                ),
-                // Privacy Policy
-                _SettingsTile(
-                  icon: Icons.policy_outlined,
-                  title: "Privacy Policy",
-                  onTap: () {
-                    AutoRouter.of(context).push(const PrivacyPolicyRoute());
-                  },
-                ),
-
-                // help and support
-                _SettingsTile(
-                  icon: Icons.info_outline,
-                  title: "About Us",
-                  onTap: () {
-                    AutoRouter.of(context).push(const AboutUsRoute());
-                  },
-                ),
-
-                // Contact Support
-                // stting tile
-                _SettingsTile(
-                  icon: Icons.contact_support_outlined,
-                  title: "Contact Support",
-                  onTap: () {
-                    AutoRouter.of(context).push(const ContactUsRoute());
-                  },
-                ),
-
-                // 🔹 ACCOUNT SETTINGS SECTION
-                _SectionTitle(title: "Account Settings"),
-                _SettingsTile(
-                  icon: Icons.person_outline,
-                  title: "Edit Profile",
-                  onTap: () {},
-                ),
-                _SettingsTile(
-                  icon: Icons.photo_library_outlined,
-                  title: "Manage Photos",
-                  onTap: () {},
-                ),
-                // 🔹 APP PREFERENCES SECTION
-                _SectionTitle(title: "App Preferences"),
-                _SettingsTile(
-                  icon: Icons.notifications_active_outlined,
-                  title: "Push Notifications",
-                  trailing: Switch(value: true, onChanged: (v) {}),
-                ),
-                _SettingsTile(
-                  icon: Icons.email_outlined,
-                  title: "Email Notifications",
-                  trailing: Switch(value: false, onChanged: (v) {}),
-                ),
-                // _SettingsTile(
-                //   icon: Icons.dark_mode_outlined,
-                //   title: "Dark Mode",
-                //   trailing: Switch(
-                //     value: ref.watch(themeProvider) == ThemeMode.dark,
-                //     onChanged: (value) {
-                //       ref
-                //           .read(themeProvider.notifier)
-                //           .setTheme(value ? ThemeMode.dark : ThemeMode.light);
-
-                //       // print selected theme
-                //       print('Selected theme: ${value ? 'Dark' : 'Light'}');
-                //     },
-                //   ),
-                // ),
-
-                // 🔹 LOGOUT
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  child: OutlinedButton(
-                    style: ButtonStyle(
-                      foregroundColor: WidgetStateProperty.all(
-                        Theme.of(context).primaryColor,
-                      ),
-                      side: WidgetStateProperty.all(
-                        BorderSide(color: Theme.of(context).primaryColor),
-                      ),
-                      padding: WidgetStateProperty.all(
-                        const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      shape: WidgetStateProperty.all(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      //LOGOUT HERE
-
-                      ref.watch(authRepositoryProvider).signOut();
-
-                      AutoRouter.of(context).replace(const LoginRoute());
-
-                      print("Logout button pressed");
-                    },
-                    child: const Text("Logout"),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
@@ -375,30 +414,38 @@ class _ProfileHeaderCard extends StatelessWidget {
           children: [
             // 👤 Avatar
             CircleAvatar(
-              radius: MediaQuery.of(context).size.width * 0.30,
+              radius: MediaQuery.of(context).size.width * 0.15,
               backgroundColor: theme.primaryColor.withOpacity(0.15),
               backgroundImage:
-                  (profile.images.primaryImageUrl?.isNotEmpty ?? false)
-                  ? NetworkImage(profile.images.primaryImageUrl!)
+                  (profile.images.primaryImageUrl.isNotEmpty ?? false)
+                  ? NetworkImage(profile.images.primaryImageUrl)
                   : null,
-              child: (profile.images.primaryImageUrl?.isEmpty ?? true)
+              child: (profile.images.primaryImageUrl.isEmpty ?? true)
                   ? Icon(Icons.person, size: 50, color: theme.primaryColor)
                   : null,
             ),
 
             // 📝 Name (unchanged data)
             Text(
-              profile.user?.fullName ?? 'N/A',
+              profile.user.fullName ?? 'N/A',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
 
               style: TextStyle(
-                fontSize: 40,
+                fontSize: 30,
 
                 color: Theme.of(context).primaryColor,
 
                 fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              profile.user.email ?? 'N/A',
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -438,17 +485,38 @@ class _PremiumCard extends StatelessWidget {
           children: [
             Icon(
               Icons.workspace_premium_outlined,
-              size: 30,
+              size: 50,
               color: theme.primaryColor,
             ),
             const SizedBox(width: 16),
-            const Expanded(
-              child: Text(
-                "Upgrade Account to Premium",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Upgrade to Premium",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: theme.primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Get unlimited access to all features and connect with more matches.",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: theme.primaryColor.withOpacity(0.8),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, size: 16),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: theme.primaryColor.withOpacity(0.6),
+            ),
           ],
         ),
       ),

@@ -24,3 +24,11 @@ final authStateProvider = StreamProvider<AppUser?>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
   return authRepository.authStateChanges();
 });
+
+/// Helper to invalidate auth cache after profile creation
+/// Call: ref.invalidate(authStateProvider) to refresh user data from server
+extension AuthStateInvalidator on WidgetRef {
+  void invalidateAuthState() {
+    invalidate(authStateProvider);
+  }
+}

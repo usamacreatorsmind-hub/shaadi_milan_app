@@ -1,5 +1,4 @@
 import '../../../../../app/custom/shimmer.dart';
-import '../../../../../app/router/app_router.dart';
 import '../../../user_app/presentation/controllers/agent_profile_controller.dart';
  
 import 'package:auto_route/auto_route.dart';
@@ -98,7 +97,7 @@ class AgentProfileVerifyScreen extends ConsumerWidget {
                             onPressed: () {
                               context.router.pop();
                             },
-                            child: const Text("No, I don\'t agree"),
+                            child: const Text("No, I don't agree"),
                           ),
                         ),
                       ],

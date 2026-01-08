@@ -1,9 +1,7 @@
-import '../../../../../core/env/app_env.dart';
 import '../../domain/states/agent_state.dart'; 
 
 import '../../domain/states/address_state.dart';
 import '../../domain/states/cultural_state.dart';
-import '../../../../../core/env/app_env_config.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/states/education_state.dart';
 import '../../domain/states/employee_state.dart';
@@ -12,11 +10,8 @@ import '../../domain/states/identity_state.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/physical_state.dart';
 
-import '../../../../agent/domain/states/agent_entity.dart';
-import '../datasources/data_source/metrimony_data_source.dart'; 
 import '../datasources/firebase/metrimony_firestore.dart';
 import '../../domain/repositories/metrimony_repository.dart';
-import 'package:hive/hive.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MatrimonyRepositoryImpl implements MatrimonyRepository {
@@ -106,33 +101,33 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
 
   @override
   Future<AddressProfile> getAddressProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).address!;
+      (await getMatrimonyProfile(uid)).address;
  
 
   @override
   Future<CulturalProfile> getCulturalProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).cultural!;
+      (await getMatrimonyProfile(uid)).cultural;
 
   @override
   Future<EducationProfile> getEducationProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).education!;
+      (await getMatrimonyProfile(uid)).education;
 
   @override
   Future<EmploymentProfile> getEmploymentProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).employment!;
+      (await getMatrimonyProfile(uid)).employment;
 
   @override
   Future<FamilyProfile> getFamilyProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).family!;
+      (await getMatrimonyProfile(uid)).family;
 
   @override
   Future<IdentityProfile> getIdentityProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).identity!;
+      (await getMatrimonyProfile(uid)).identity;
 
    
   @override
   Future<PhysicalProfile> getPhysicalProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).physical!;
+      (await getMatrimonyProfile(uid)).physical;
 
   @override
   Future<List<MatrimonyProfile>> getAllMatrimonyProfiles() {

@@ -1,4 +1,3 @@
-import '../../../../../agent/domain/states/agent_entity.dart';
 import '../../../domain/states/agent_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';

@@ -7,13 +7,9 @@ import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metr
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
 
-import '../../../../../app/app.dart';
 import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
 import '../../../../../app/custom/shimmer.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
-import '../../domain/states/metrimony_state.dart';
-import '../../domain/states/user_state.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -183,12 +179,11 @@ class MyProfileScreen extends ConsumerWidget {
                     },
                   ),
                   children: [
-                    if (profile.metrimonyProfile.images.aadharCardUrl != null &&
-                        profile
-                            .metrimonyProfile
-                            .images
-                            .aadharCardUrl!
-                            .isNotEmpty)
+                    if (profile
+                        .metrimonyProfile
+                        .images
+                        .aadharCardUrl
+                        .isNotEmpty)
                       _DetailRowWithAction(
                         label: "Aadhar Card",
                         value: "View PDF",
@@ -198,11 +193,10 @@ class MyProfileScreen extends ConsumerWidget {
                             isScrollControlled: true,
                             backgroundColor: Colors.transparent,
                             builder: (context) => PdfViewerBottomsheet(
-                              pdfUrl: profile
-                                  .metrimonyProfile
-                                  .images
-                                  .aadharCardUrl!,
-                              title: "Aadhar Card",
+                              source:
+                                  profile.metrimonyProfile.images.aadharCardUrl,
+                              title: 'Aadhar PDF',
+                              isLocal: false,
                             ),
                           );
                         },
@@ -254,21 +248,16 @@ class MyProfileScreen extends ConsumerWidget {
                   children: [
                     _DetailRow(
                       "Aadhar",
-                      profile.identity?.aadhar.toString() ?? 'N/A',
+                      profile.identity.aadhar.toString() ?? 'N/A',
 
                       // SHOW  snack bar
                     ),
 
-                    _DetailRow(
-                      "Age",
-                      "${profile.identity?.age ?? 'N/A'} years",
-                    ),
-                    _DetailRow("Gender", profile.identity?.gender ?? 'N/A'),
+                    _DetailRow("Age", "${profile.identity.age ?? 'N/A'} years"),
+                    _DetailRow("Gender", profile.identity.gender ?? 'N/A'),
                     _DetailRow(
                       "Date of Birth",
-                      profile.identity?.dob != null
-                          ? profile.identity!.dob.toString().split(" ").first
-                          : 'N/A',
+                      profile.identity.dob.toString().split(" ").first,
                     ),
                   ],
                 ),
@@ -290,20 +279,20 @@ class MyProfileScreen extends ConsumerWidget {
                   children: [
                     _DetailRow(
                       "Course",
-                      profile.education?.education?.course ?? "N/A",
+                      profile.education.education?.course ?? "N/A",
                     ),
                     _DetailRow(
                       "College",
-                      profile.education?.education?.college ?? "N/A",
+                      profile.education.education?.college ?? "N/A",
                     ),
                     _DetailRow(
                       "Passing Year",
-                      profile.education?.education?.passingYear?.toString() ??
+                      profile.education.education?.passingYear.toString() ??
                           "N/A",
                     ),
                     _DetailRow(
                       "Percentage",
-                      profile.education?.education?.percentage?.toString() ??
+                      profile.education.education?.percentage.toString() ??
                           "N/A",
                     ),
 
@@ -314,7 +303,7 @@ class MyProfileScreen extends ConsumerWidget {
                 // dettail sectionfor  additional qualification
                 if (profile
                         .education
-                        ?.extraQualification
+                        .extraQualification
                         ?.qualifications
                         .isNotEmpty ??
                     false)
@@ -335,7 +324,7 @@ class MyProfileScreen extends ConsumerWidget {
                         spacing: 10.0,
                         runSpacing: 4.0,
                         children: profile
-                            .education!
+                            .education
                             .extraQualification!
                             .qualifications
                             .map(
@@ -363,18 +352,15 @@ class MyProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   children: [
-                    _DetailRow("Company", profile.employment?.company ?? "N/A"),
+                    _DetailRow("Company", profile.employment.company ?? "N/A"),
                     _DetailRow(
                       "Income",
-                      profile.employment?.annualIncome?.toString() ?? "N/A",
+                      profile.employment.annualIncome.toString() ?? "N/A",
                     ),
-                    _DetailRow(
-                      "Job Type",
-                      profile.employment?.jobType ?? "N/A",
-                    ),
+                    _DetailRow("Job Type", profile.employment.jobType ?? "N/A"),
                     _DetailRow(
                       "Designation",
-                      profile.employment?.designation ?? "N/A",
+                      profile.employment.designation ?? "N/A",
                     ),
                   ],
                 ),
@@ -394,8 +380,8 @@ class MyProfileScreen extends ConsumerWidget {
                   ),
 
                   children: [
-                    _DetailRow("City", profile.address?.city ?? "N/A"),
-                    _DetailRow("State", profile.address?.state ?? "N/A"),
+                    _DetailRow("City", profile.address.city ?? "N/A"),
+                    _DetailRow("State", profile.address.state ?? "N/A"),
                   ],
                 ),
 
@@ -415,11 +401,11 @@ class MyProfileScreen extends ConsumerWidget {
                   ),
 
                   children: [
-                    _DetailRow("Father", profile.family?.fatherName ?? "N/A"),
-                    _DetailRow("Mother", profile.family?.motherName ?? "N/A"),
+                    _DetailRow("Father", profile.family.fatherName ?? "N/A"),
+                    _DetailRow("Mother", profile.family.motherName ?? "N/A"),
                     _DetailRow(
                       "Family Type",
-                      profile.family?.familyType ?? "N/A",
+                      profile.family.familyType ?? "N/A",
                     ),
                   ],
                 ),
@@ -438,24 +424,21 @@ class MyProfileScreen extends ConsumerWidget {
                     icon: Icons.edit,
                   ),
                   children: [
-                    _DetailRow("Height", profile.physical?.height ?? "N/A"),
+                    _DetailRow("Height", profile.physical.height ?? "N/A"),
                     _DetailRow(
                       "Weight",
-                      profile.physical?.weight?.toString() ?? "N/A",
+                      profile.physical.weight.toString() ?? "N/A",
                     ),
-                    _DetailRow(
-                      "Body Type",
-                      profile.physical?.bodyType ?? "N/A",
-                    ),
+                    _DetailRow("Body Type", profile.physical.bodyType ?? "N/A"),
 
                     _DetailRow(
                       "Complexion",
-                      profile.physical?.complexion ?? "N/A",
+                      profile.physical.complexion ?? "N/A",
                     ),
 
                     _DetailRow(
                       "Disability",
-                      profile.physical!.physicallyChallenged ? "Yes" : "No ",
+                      profile.physical.physicallyChallenged ? "Yes" : "No ",
                     ),
                   ],
                 ),
@@ -476,16 +459,13 @@ class MyProfileScreen extends ConsumerWidget {
                   ),
 
                   children: [
-                    _DetailRow("Religion", profile.cultural?.religion ?? "N/A"),
-                    _DetailRow("Caste", profile.cultural?.caste ?? "N/A"),
-                    _DetailRow(
-                      "Sub-caste",
-                      profile.cultural?.subCaste ?? "N/A",
-                    ),
+                    _DetailRow("Religion", profile.cultural.religion ?? "N/A"),
+                    _DetailRow("Caste", profile.cultural.caste ?? "N/A"),
+                    _DetailRow("Sub-caste", profile.cultural.subCaste ?? "N/A"),
 
                     _DetailRow(
                       "Languages",
-                      profile.cultural?.languages.join(", ") ?? "N/A",
+                      profile.cultural.languages.join(", ") ?? "N/A",
                     ),
                   ],
                 ),
@@ -602,7 +582,6 @@ class _DetailRowWithAction extends StatelessWidget {
   final VoidCallback onTap;
 
   const _DetailRowWithAction({
-    super.key,
     required this.label,
     required this.value,
     required this.onTap,
@@ -633,128 +612,312 @@ class _DetailRowWithAction extends StatelessWidget {
   }
 }
 
-class _ProfileHeroCard extends StatelessWidget {
+class _ProfileHeroCard extends StatefulWidget {
   final MetrimonyProfileViewModel profile;
   const _ProfileHeroCard({required this.profile});
+
+  @override
+  State<_ProfileHeroCard> createState() => _ProfileHeroCardState();
+}
+
+class _ProfileHeroCardState extends State<_ProfileHeroCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _hoverController;
+  late Animation<double> _elevationAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _hoverController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _elevationAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(_hoverController);
+  }
+
+  @override
+  void dispose() {
+    _hoverController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: () => AutoRouter.of(
-        context,
-      ).push(MyProfileDetailRoute(user: profile.user!)),
-
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: theme.canvasColor,
-          borderRadius: BorderRadius.circular(26),
-          // gradient: LinearGradient(
-          //   colors: [theme.primaryColor.withOpacity(0.12), Colors.white],
-          // ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.10),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () => showPhotoDialogBox(
-                    photoUrl: profile.images.primaryImageUrl!,
-                    context: context,
+    return MouseRegion(
+      onEnter: (_) => _hoverController.forward(),
+      onExit: (_) => _hoverController.reverse(),
+      child: GestureDetector(
+        onTap: () => AutoRouter.of(
+          context,
+        ).push(MyProfileDetailRoute(user: widget.profile.user)),
+        child: AnimatedBuilder(
+          animation: _elevationAnimation,
+          builder: (context, child) {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.primaryColor.withOpacity(
+                      0.15 + 0.1 * _elevationAnimation.value,
+                    ),
+                    blurRadius: 20 + 10 * _elevationAnimation.value,
+                    offset: Offset(0, 10 + 5 * _elevationAnimation.value),
                   ),
-
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: theme.primaryColor.withOpacity(0.15),
-                    backgroundImage:
-                        (profile.images.primaryImageUrl?.isNotEmpty ?? false)
-                        ? NetworkImage(profile.images.primaryImageUrl!)
-                        : null,
-                    child: (profile.images.primaryImageUrl?.isEmpty ?? true)
-                        ? Icon(
-                            Icons.person,
-                            size: 48,
-                            color: theme.primaryColor,
-                          )
-                        : null,
-                  ),
-                ),
-                const SizedBox(width: 18),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        profile.user?.fullName ?? "N/A",
-                        style: TextStyle(
-                          fontSize: 30,
-
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      _buildContactTile(
-                        label: profile.user?.phone ?? "N/A",
-                        icon: Icons.phone_outlined,
-
-                        color: theme.primaryColor,
-                      ),
-                      SizedBox(height: 16),
-                      _buildContactTile(
-                        label: profile.user?.email ?? "N/A",
-                        icon: Icons.email_outlined,
-                        color: theme.primaryColor,
-                      ),
-
-                      SizedBox(height: 10),
-
-                      const SizedBox(height: 10),
+                ],
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      theme.canvasColor,
+                      theme.primaryColor.withOpacity(0.04),
                     ],
                   ),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: theme.primaryColor.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
-              ],
-            ),
-            SizedBox(height: 20),
-
-            Wrap(
-              runSpacing: 10,
-              spacing: 10,
-
-              children: [
-                AppChip(
-                  label: profile.identity?.gender ?? "N/A",
-                  icon: Icons.person_outline,
+                child: Column(
+                  children: [
+                    // ✨ Profile Header Section
+                    Row(
+                      children: [
+                        // Profile Image with Badge
+                        GestureDetector(
+                          onTap: () => showPhotoDialogBox(
+                            photoUrl: widget.profile.images.primaryImageUrl,
+                            context: context,
+                          ),
+                          child: Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 54,
+                                backgroundColor: theme.primaryColor.withOpacity(
+                                  0.15,
+                                ),
+                                backgroundImage:
+                                    (widget
+                                        .profile
+                                        .images
+                                        .primaryImageUrl
+                                        .isNotEmpty)
+                                    ? NetworkImage(
+                                        widget.profile.images.primaryImageUrl,
+                                      )
+                                    : null,
+                                child:
+                                    (widget
+                                        .profile
+                                        .images
+                                        .primaryImageUrl
+                                        .isEmpty)
+                                    ? Icon(
+                                        Icons.person_outline,
+                                        size: 52,
+                                        color: theme.primaryColor,
+                                      )
+                                    : null,
+                              ),
+                              // Online/Status Badge
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  width: 18,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.green.shade400,
+                                    border: Border.all(
+                                      color: theme.canvasColor,
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        // User Info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Name with Verified Badge
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      widget.profile.user.fullName ?? "N/A",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                            color: theme.primaryColor,
+                                            fontSize: 24,
+                                          ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              // Contact Info - Compact
+                              _buildCompactContactInfo(
+                                phone: widget.profile.user.phone ?? "N/A",
+                                email: widget.profile.user.email ?? "N/A",
+                                theme: theme,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 22),
+                    // ✨ Stats & Attributes Chips
+                    Wrap(
+                      runSpacing: 10,
+                      spacing: 10,
+                      children: [
+                        _buildAttributeChip(
+                          label: widget.profile.identity.gender ?? "N/A",
+                          icon: Icons.person_outline,
+                          theme: theme,
+                        ),
+                        _buildAttributeChip(
+                          label: "${widget.profile.identity.age ?? 'N/A'} yrs",
+                          icon: Icons.cake_outlined,
+                          theme: theme,
+                        ),
+                        _buildAttributeChip(
+                          label: widget.profile.employment.designation ?? "N/A",
+                          icon: Icons.work_outline,
+                          theme: theme,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-
-                AppChip(
-                  label: "${profile.identity?.age ?? 'N/A'} yrs",
-                  icon: Icons.cake_outlined,
-                ),
-
-                AppChip(
-                  label: profile.employment?.designation ?? "N/A",
-                  icon: Icons.work_outline,
-                ),
-              ],
-            ),
-          ],
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  _buildContactTile({
+  Widget _buildCompactContactInfo({
+    required String phone,
+    required String email,
+    required ThemeData theme,
+  }) {
+    final fontSize = 12.0;
+    const maxChars = 20;
+
+    String truncate(String text) {
+      return text.length > maxChars
+          ? '${text.substring(0, maxChars)}...'
+          : text;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.phone_outlined,
+              size: 14,
+              color: theme.primaryColor.withOpacity(0.7),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                truncate(phone),
+                style: TextStyle(fontSize: fontSize, color: Colors.grey[700]),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Icon(
+              Icons.email_outlined,
+              size: 14,
+              color: theme.primaryColor.withOpacity(0.7),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                truncate(email),
+                style: TextStyle(fontSize: fontSize, color: Colors.grey[700]),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAttributeChip({
+    required String label,
+    required IconData icon,
+    required ThemeData theme,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            theme.primaryColor.withOpacity(0.08),
+            theme.primaryColor.withOpacity(0.04),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.primaryColor.withOpacity(0.15),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: theme.primaryColor),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: theme.primaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container _buildContactTile({
     required String label,
     required IconData icon,
     required Color color,

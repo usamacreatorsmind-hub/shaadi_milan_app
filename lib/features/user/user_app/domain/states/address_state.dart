@@ -55,7 +55,7 @@ class AddressProfile {
       state: state ?? this.state,
       pincode: pincode ?? this.pincode,
 
-      policeStation: police_station ?? this.policeStation,
+      policeStation: police_station ?? policeStation,
     );
   }
 

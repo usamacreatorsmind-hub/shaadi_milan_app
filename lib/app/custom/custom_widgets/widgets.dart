@@ -1,6 +1,49 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+enum CounterType { words, characters }
+
+class WordLengthFormatter extends TextInputFormatter {
+  final int maxWords;
+
+  WordLengthFormatter({required this.maxWords});
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final words = newValue.text
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
+
+    if (words.length > maxWords) {
+      return oldValue; // 🚫 stop typing
+    }
+    return newValue; // ✅ allow input
+  }
+}
+
+class MaxLengthFormatter extends TextInputFormatter {
+  final int max;
+
+  MaxLengthFormatter({required this.max});
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.length > max) {
+      return oldValue; // 🚫 stop typing
+    }
+    return newValue; // ✅ allow input
+  }
+}
 
 class AppButton extends StatelessWidget {
   final String text;
@@ -71,7 +114,7 @@ class AppSwitch extends StatelessWidget {
       title: Text(title),
       value: value,
       onChanged: onChanged,
-      activeColor: Theme.of(context).colorScheme.primary,
+      activeThumbColor: Theme.of(context).colorScheme.primary,
       inactiveThumbColor: Theme.of(
         context,
       ).colorScheme.onSurface.withOpacity(0.6),
@@ -88,6 +131,8 @@ class AppSwitch extends StatelessWidget {
 }
 
 class AppTextField extends ConsumerStatefulWidget {
+  final CounterType counterType;
+
   final TextEditingController? controller;
   final IconData prefixIcon;
   final Color iconColor;
@@ -96,46 +141,120 @@ class AppTextField extends ConsumerStatefulWidget {
   final bool obscureText;
   final TextInputType keyboardType;
   final VoidCallback? ontap;
-
   final String? Function(String?)? validator;
 
+  // 🔹 Word count options
+  final bool showWordCount;
+  final int? maxLimit; // Unified max limit for words or characters
+  final int maxLines;
+
+  final List<TextInputFormatter>? inputFormatters;
+
   const AppTextField({
+    this.counterType = CounterType.words,
     super.key,
     this.controller,
     required this.prefixIcon,
+    this.inputFormatters,
     required this.iconColor,
     required this.label,
     required this.hint,
     required this.obscureText,
     this.ontap,
-
     required this.keyboardType,
     this.validator,
+    this.showWordCount = false,
+    this.maxLimit, // Unified max limit
+    this.maxLines = 1,
   });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _TextFormWidgetState();
+  ConsumerState<AppTextField> createState() => _TextFormWidgetState();
 }
 
 class _TextFormWidgetState extends ConsumerState<AppTextField> {
+  int _currentCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller?.addListener(_updateCount);
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.removeListener(_updateCount);
+    super.dispose();
+  }
+
+  void _updateCount() {
+    final value = widget.controller?.text ?? '';
+    int count;
+
+    if (widget.counterType == CounterType.characters) {
+      count = value.length;
+    } else {
+      final text = value.trim();
+      count = text.isEmpty ? 0 : text.split(RegExp(r'\s+')).length;
+    }
+
+    if (count != _currentCount && mounted) {
+      setState(() => _currentCount = count);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final List<TextInputFormatter> formatters = [
+      ...?widget.inputFormatters,
+      if (widget.counterType == CounterType.words && widget.maxLimit != null)
+        WordLengthFormatter(maxWords: widget.maxLimit!),
+      if (widget.counterType == CounterType.characters &&
+          widget.maxLimit != null)
+        MaxLengthFormatter(max: widget.maxLimit!),
+    ];
+
     return Padding(
       padding: const EdgeInsets.all(4),
       child: SizedBox(
         width: MediaQuery.sizeOf(context).width * 0.8,
         child: TextFormField(
+          controller: widget.controller,
           onTap: widget.ontap,
-
           readOnly: widget.ontap != null,
+          obscureText: widget.obscureText,
+          inputFormatters: formatters,
+          keyboardType: widget.keyboardType,
+          maxLines: widget.maxLines,
+          maxLength: widget.counterType == CounterType.characters
+              ? widget.maxLimit
+              : null, // Pass maxLength only for character count
           cursorColor: Theme.of(context).colorScheme.primary,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-          controller: widget.controller,
-          obscureText: widget.obscureText,
-          keyboardType: widget.keyboardType,
+          onChanged: (value) {
+            if (widget.showWordCount) {
+              _updateCount();
+            }
+          },
           decoration: InputDecoration(
             labelText: widget.label,
             hintText: widget.hint,
+            counterText: widget.showWordCount
+                ? widget.counterType == CounterType.words
+                      ? widget.maxLimit != null
+                            ? '$_currentCount / ${widget.maxLimit} words'
+                            : '$_currentCount words'
+                      : widget.maxLimit != null
+                      ? '$_currentCount / ${widget.maxLimit} characters'
+                      : '$_currentCount characters'
+                : null,
+            counterStyle: TextStyle(
+              fontSize: 12,
+              color:
+                  (widget.maxLimit != null && _currentCount > widget.maxLimit!)
+                  ? Colors.red
+                  : Colors.grey,
+            ),
             prefixIcon: Padding(
               padding: const EdgeInsets.all(8.0),
               child: CircleAvatar(
@@ -148,10 +267,8 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
                 ),
               ),
             ),
-
             filled: true,
             fillColor: Theme.of(context).cardColor,
-
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),

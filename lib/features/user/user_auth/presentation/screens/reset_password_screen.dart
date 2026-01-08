@@ -1,7 +1,6 @@
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../app/router/app_router.dart';
 import '../providers/auth_providers.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

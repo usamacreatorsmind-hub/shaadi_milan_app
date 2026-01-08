@@ -1,11 +1,8 @@
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_status_repo_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_status_repository.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../user_auth/presentation/providers/auth_providers.dart';
-import '../../data/repositories_impl/user_repo_impl.dart';
-import '../../domain/repositories/user_repository.dart';
 import '../../domain/states/user_status_state.dart';
 
 class UserStatusController extends StateNotifier<UserStatusState> {

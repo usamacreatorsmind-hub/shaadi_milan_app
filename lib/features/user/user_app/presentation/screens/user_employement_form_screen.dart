@@ -11,10 +11,12 @@ import '../../domain/states/employee_state.dart';
 class UserEmploymentFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final EmploymentProfile? existingEmploymentProfile;
+  final void Function(VoidCallback)? registerSubmit;
   const UserEmploymentFormScreen({
     super.key,
     required this.mode,
     required this.existingEmploymentProfile,
+    this.registerSubmit,
   });
 
   @override
@@ -36,6 +38,7 @@ class _UserEmploymentFormScreenState
   @override
   void initState() {
     super.initState();
+    widget.registerSubmit?.call(_submitForm);
     if (widget.mode == FormMode.edit &&
         widget.existingEmploymentProfile != null) {
       final profile = widget.existingEmploymentProfile!;
@@ -47,12 +50,12 @@ class _UserEmploymentFormScreenState
     }
   }
 
-  @override
-  void dispose() {
-    _companyController.dispose();
-    _annualIncomeController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _companyController.dispose();
+  //   _annualIncomeController.dispose();
+  //   super.dispose();
+  // }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
@@ -62,37 +65,27 @@ class _UserEmploymentFormScreenState
         );
         return;
       }
-      ref
-          .read(userEmploymentControllerProvider.notifier)
-          .saveEmployment(
-            jobType: _jobType!,
-            company: _companyController.text,
-            designation: _designationController.text,
-            annualIncome: int.tryParse(_annualIncomeController.text) ?? 0,
-            workLocation: _workLocationController.text,
-          );
 
-    final notifier = ref.read(userEmploymentControllerProvider.notifier);
+      final notifier = ref.read(userEmploymentControllerProvider.notifier);
 
-    if (widget.mode == FormMode.create) {
-      notifier.saveEmployment(
-        jobType: _jobType!,
-        company: _companyController.text,
-        designation: _designationController.text,
-        annualIncome: int.tryParse(_annualIncomeController.text) ?? 0,
-        workLocation: _workLocationController.text,
-      );
-    } else {
-      // Update logic (using saveEmployment as upsert)
-      notifier.updateEmployment(
-        jobType: _jobType!,
-        company: _companyController.text,
-        designation: _designationController.text,
-        annualIncome: int.tryParse(_annualIncomeController.text) ?? 0,
-        workLocation: _workLocationController.text,
-      );
-    }
-
+      if (widget.mode == FormMode.create) {
+        notifier.saveEmployment(
+          jobType: _jobType!,
+          company: _companyController.text,
+          designation: _designationController.text,
+          annualIncome: int.tryParse(_annualIncomeController.text) ?? 0,
+          workLocation: _workLocationController.text,
+        );
+      } else {
+        // Update logic (using saveEmployment as upsert)
+        notifier.updateEmployment(
+          jobType: _jobType!,
+          company: _companyController.text,
+          designation: _designationController.text,
+          annualIncome: int.tryParse(_annualIncomeController.text) ?? 0,
+          workLocation: _workLocationController.text,
+        );
+      }
     }
   }
 
@@ -118,7 +111,12 @@ class _UserEmploymentFormScreenState
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Employment Details')),
+      appBar: AppBar(
+        title: Text(
+          'Employment Details',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -128,10 +126,11 @@ class _UserEmploymentFormScreenState
               AppDropDown(
                 label: "Job Type",
                 items: const [
-                  'Private Company',
-                  'Government/PSU',
+                  'Private',
+                  'Government',
                   'Business',
                   'Defence',
+
                   'Self Employed',
                   'Not Working',
                 ],
@@ -192,13 +191,15 @@ class _UserEmploymentFormScreenState
               if (employmentState.isLoading)
                 const CircularProgressIndicator()
               else
-                SizedBox(
-                  width: double.infinity,
-                  child: AppButton(
-                    onPressed: _submitForm,
-                    text: 'Save Employment',
-                  ),
-                ),
+                (widget.registerSubmit != null
+                    ? const SizedBox.shrink()
+                    : SizedBox(
+                        width: double.infinity,
+                        child: AppButton(
+                          onPressed: _submitForm,
+                          text: 'Save Employment',
+                        ),
+                      )),
             ],
           ),
         ),

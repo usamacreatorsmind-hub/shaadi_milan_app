@@ -3,7 +3,6 @@ import 'package:arvika_marriage_bureau/core/enums/enum.dart';
 
 import '../../domain/states/family_state.dart';
 import '../controllers/user_family_controllers.dart';
-import '../providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,10 +12,12 @@ import 'package:auto_route/auto_route.dart';
 class UserFamilyFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final FamilyProfile? existingFamilyProfile;
+  final void Function(VoidCallback)? registerSubmit;
   const UserFamilyFormScreen({
     super.key,
     required this.mode,
     required this.existingFamilyProfile,
+    this.registerSubmit,
   });
 
   @override
@@ -38,6 +39,7 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
   @override
   void initState() {
     super.initState();
+    widget.registerSubmit?.call(_submitForm);
     if (widget.mode == FormMode.edit && widget.existingFamilyProfile != null) {
       final profile = widget.existingFamilyProfile!;
       _fatherNameController.text = profile.fatherName;
@@ -58,44 +60,28 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
         return;
       }
 
-      ref
-          .read(userFamilyControllerProvider.notifier)
-          .saveFamily(
-            fatherName: _fatherNameController.text,
-            motherName: _motherNameController.text,
-            brothers: int.parse(_brothersController.text),
-            sisters: int.parse(_sistersController.text),
-            familyType: _familyType!,
-            familyStatus: _familyStatusController.text,
-          );
+      final notifier = ref.read(userFamilyControllerProvider.notifier);
 
-    final notifier = ref.read(userFamilyControllerProvider.notifier);
-
-    if (widget.mode == FormMode.create) {
-      notifier.saveFamily(
-        fatherName: _fatherNameController.text,
-        motherName: _motherNameController.text,
-        brothers: int.parse(_brothersController.text),
-        sisters: int.parse(_sistersController.text),
-        familyType: _familyType!,
-        familyStatus: _familyStatusController.text,
-      );
-    } else {
-      // Update logic (using saveFamily as upsert)
-      notifier.updateFamily(
-        fatherName: _fatherNameController.text,
-        motherName: _motherNameController.text,
-        brothers: int.parse(_brothersController.text),
-        sisters: int.parse(_sistersController.text),
-        familyType: _familyType!,
-        familyStatus: _familyStatusController.text,
-      );
-    } 
-
-
-
-
-
+      if (widget.mode == FormMode.create) {
+        notifier.saveFamily(
+          fatherName: _fatherNameController.text,
+          motherName: _motherNameController.text,
+          brothers: int.parse(_brothersController.text),
+          sisters: int.parse(_sistersController.text),
+          familyType: _familyType!,
+          familyStatus: _familyStatusController.text,
+        );
+      } else {
+        // Update logic (using saveFamily as upsert)
+        notifier.updateFamily(
+          fatherName: _fatherNameController.text,
+          motherName: _motherNameController.text,
+          brothers: int.parse(_brothersController.text),
+          sisters: int.parse(_sistersController.text),
+          familyType: _familyType!,
+          familyStatus: _familyStatusController.text,
+        );
+      }
     }
   }
 
@@ -116,7 +102,12 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Family Details')),
+      appBar: AppBar(
+        title: Text(
+          'Family Details',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -203,7 +194,9 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
               if (familyState.isLoading)
                 const CircularProgressIndicator()
               else
-                AppButton(onPressed: _submitForm, text: 'Save Family'),
+                (widget.registerSubmit != null
+                    ? const SizedBox.shrink()
+                    : AppButton(onPressed: _submitForm, text: 'Save Family')),
             ],
           ),
         ),

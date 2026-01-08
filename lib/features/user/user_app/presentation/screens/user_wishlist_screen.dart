@@ -134,32 +134,22 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> {
                                           );
                                         },
                                       );
-
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            "Profile removed from wishlist",
-                                          ),
-                                        ),
-                                      );
                                     },
 
-                                    uid: wishlistedProfile.user?.uid ?? '',
+                                    uid: wishlistedProfile.user.uid ?? '',
                                     name:
-                                        wishlistedProfile.user?.fullName ??
+                                        wishlistedProfile.user.fullName ??
                                         'N/A',
-                                    age: wishlistedProfile.identity?.age ?? 0,
+                                    age: wishlistedProfile.identity.age ?? 0,
                                     occupation:
-                                        wishlistedProfile.employment?.jobType ??
+                                        wishlistedProfile.employment.jobType ??
                                         'N/A',
                                     location:
-                                        '${wishlistedProfile.address?.city ?? ''}, ${wishlistedProfile.address?.state ?? ''}',
+                                        '${wishlistedProfile.address.city ?? ''}, ${wishlistedProfile.address.state ?? ''}',
                                     imageUrl:
                                         wishlistedProfile
                                             .images
-                                            ?.primaryImageUrl ??
+                                            .primaryImageUrl ??
                                         '',
                                   );
                                 },

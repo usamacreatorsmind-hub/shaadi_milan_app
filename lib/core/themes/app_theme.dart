@@ -12,6 +12,8 @@ class AppTheme {
       scaffoldBackgroundColor: Colors.white,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       cardColor: Colors.white,
+      // setfont family
+      fontFamily: 'Roboto',
 
       textTheme: const TextTheme(
         displayLarge: TextStyle(
@@ -95,12 +97,10 @@ class AppTheme {
         primary: primaryRed,
         secondary: accentRed,
         surface: Colors.white,
-        background: Colors.white,
         error: Colors.red,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: Colors.black,
-        onBackground: Colors.black,
         onError: Colors.white,
       ),
 
@@ -116,6 +116,7 @@ class AppTheme {
         ),
       ),
 
+      // appbar theme
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -146,7 +147,7 @@ class AppTheme {
       ),
 
       appBarTheme: const AppBarTheme(
-        backgroundColor: primaryRed,
+        backgroundColor: Colors.white,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -262,7 +263,6 @@ class AppTheme {
         primary: primaryRed,
         secondary: accentRed,
         surface: surface,
-        background: background,
         error: Color(0xFFEF5350),
       ),
 
@@ -335,8 +335,15 @@ class AppTheme {
       textTheme: const TextTheme(
         bodyMedium: TextStyle(color: Colors.white),
         bodySmall: TextStyle(color: Colors.white70),
+        headlineMedium: TextStyle(
+          color: Colors.white,
+          backgroundColor: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+
         titleMedium: TextStyle(
           color: Colors.white,
+
           fontWeight: FontWeight.w600,
         ),
       ),

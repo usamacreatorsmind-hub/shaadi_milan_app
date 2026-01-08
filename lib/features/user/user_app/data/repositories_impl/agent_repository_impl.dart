@@ -1,9 +1,6 @@
-import '../../../../agent/domain/states/agent_entity.dart';
 import '../datasources/firebase/agent_firestore_ds.dart';
 import '../../domain/repositories/agent_repository.dart';
 import '../../domain/states/agent_state.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final agentRepositoryProvider = Provider<AgentRepository>((ref) {
@@ -11,7 +8,7 @@ final agentRepositoryProvider = Provider<AgentRepository>((ref) {
 });
 
 class AgentRepositoryImpl implements AgentRepository {
-  AgentFirestoreDs _firestore;
+  final AgentFirestoreDs _firestore;
 
   AgentRepositoryImpl(this._firestore);
 

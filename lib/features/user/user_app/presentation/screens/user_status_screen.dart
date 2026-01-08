@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/appbar.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +15,8 @@ class UserStatusScreen extends ConsumerWidget {
 
     final userStatus = userStatusState.userStatus;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('User Status')),
+    return Scaffold( 
+      appBar:  CustomAppBar(title: 'User Status'),
       body: userStatusState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : userStatusState.error != null
@@ -25,6 +26,8 @@ class UserStatusScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+             
+
                   _buildStatusRow(
                     context,
                     'Payment Done:',
@@ -73,8 +76,6 @@ class UserStatusScreen extends ConsumerWidget {
                       Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   const SizedBox(height: 20),
-
-                 
                 ],
               ),
             ),

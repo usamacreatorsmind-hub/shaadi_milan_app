@@ -1,14 +1,14 @@
-import 'package:arvika_marriage_bureau/app/custom/image_picker/image_picker_widget.dart';
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:arvika_marriage_bureau/core/enums/enum.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/user_image_firestore.dart';
 
+import '../../../../../app/custom/custom_widgets/validators.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../data/datasources/firebase/agent_firestore_ds.dart';
-import '../../../user_auth/presentation/controllers/auth_controller.dart';
 import 'package:intl/intl.dart';
 import '../controllers/user_identity_controllers.dart';
 import '../../domain/states/identity_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:auto_route/auto_route.dart';
 
@@ -16,10 +16,12 @@ import 'package:auto_route/auto_route.dart';
 class UserIdentityFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final IdentityProfile? existingIdentityProfile;
+  final void Function(VoidCallback)? registerSubmit;
   const UserIdentityFormScreen({
     super.key,
     required this.mode,
     this.existingIdentityProfile,
+    this.registerSubmit,
   });
 
   @override
@@ -40,6 +42,7 @@ class _UserIdentityFormScreenState
   @override
   void initState() {
     super.initState();
+    widget.registerSubmit?.call(_submitForm);
     if (widget.mode == FormMode.edit &&
         widget.existingIdentityProfile != null) {
       _aadharController.text = widget.existingIdentityProfile!.aadhar;
@@ -48,11 +51,11 @@ class _UserIdentityFormScreenState
     }
   }
 
-  @override
-  void dispose() {
-    _aadharController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _aadharController.dispose();
+  //   super.dispose();
+  // }
 
   // ----------------------------
   // DATE PICKER
@@ -120,16 +123,15 @@ class _UserIdentityFormScreenState
       return;
     }
 
-    ref
-        .read(identityControllerProvider.notifier)
-        .saveIdentity(
-          gender: _gender!,
-          dob: _selectedDate!,
-          age: _age!,
-          aadhar: _aadharController.text.trim(),
-        );
+    // ref
+    //     .read(identityControllerProvider.notifier)
+    //     .saveIdentity(
+    //       gender: _gender!,
+    //       dob: _selectedDate!,
+    //       age: _age!,
+    //       aadhar: _aadharController.text.trim(),
+    //     );
 
-        
     final notifier = ref.read(identityControllerProvider.notifier);
 
     if (widget.mode == FormMode.create) {
@@ -172,9 +174,14 @@ class _UserIdentityFormScreenState
     });
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
         title: Text(
           widget.mode == FormMode.create ? 'Create Identity' : 'Edit Identity',
+
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
       body: Padding(
@@ -185,30 +192,33 @@ class _UserIdentityFormScreenState
             children: [
               const SizedBox(height: 12),
 
+              const SizedBox(height: 12),
+
               // ----------------------------
               // AADHAR
               // ----------------------------
               AppTextField(
                 controller: _aadharController,
+                maxLines: 1,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  MaxLengthFormatter(max: 12),
+                ],
+
+                showWordCount: true,
+                counterType: CounterType.characters, // ✅ IMPORTANT
+
                 prefixIcon: Icons.credit_card,
                 iconColor: Theme.of(context).colorScheme.primary,
                 label: "Aadhar Number",
                 hint: "Enter your Aadhar number",
                 obscureText: false,
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Aadhar number is required';
-                  }
-                  if (value.length != 12) {
-                    return 'Enter valid 12-digit Aadhar number';
-                  }
-                  return null;
-                },
+                validator: Validators.validateAadhar,
               ),
-
-              // add  widget for  aadhar upload
               const SizedBox(height: 12),
+
+              // Widget for Aadhar upload 
 
               // ----------------------------
               // GENDER
@@ -228,7 +238,7 @@ class _UserIdentityFormScreenState
                 },
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
 
               // ----------------------------
               // DOB PICKER
@@ -261,7 +271,7 @@ class _UserIdentityFormScreenState
                 ),
               ),
 
-              const SizedBox(height: 34),
+              const SizedBox(height: 20),
 
               // ----------------------------
               // SUBMIT / AGE VALIDATION
@@ -271,12 +281,14 @@ class _UserIdentityFormScreenState
               else if (_age! >= 18)
                 identityState.isLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : AppButton(
-                        onPressed: _submitForm,
-                        text: widget.mode == FormMode.create
-                            ? 'Save Identity'
-                            : 'Update Identity',
-                      )
+                    : (widget.registerSubmit != null
+                          ? const SizedBox.shrink()
+                          : AppButton(
+                              onPressed: _submitForm,
+                              text: widget.mode == FormMode.create
+                                  ? 'Save Identity'
+                                  : 'Update Identity',
+                            ))
               else
                 const Text(
                   "You are not eligible to create a profile as you are under 18 years old.",

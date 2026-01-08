@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/legacy.dart';
 
 import '../../domain/repositories/auth_repository.dart';
 import '../providers/auth_providers.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AuthController extends StateNotifier<User?> {
   bool isProfileCreated = false;

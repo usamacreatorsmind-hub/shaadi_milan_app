@@ -48,21 +48,38 @@ class _AuthWrapperScreenState extends ConsumerState<AuthWrapperScreen> {
             return;
           }
 
-          // 🔹 User flow
+          // 🔹 User flow - Add small delay to ensure Firestore sync
+          if (!mounted || _hasNavigated) return;
+
+          // Wait a moment to allow server to sync isProfileCreated flag
+          await Future.delayed(const Duration(milliseconds: 500));
+
           if (!mounted || _hasNavigated) return;
           _hasNavigated = true;
 
+          debugPrint('🔄 Checking profile creation status...');
+          debugPrint('👤 User ID: ${user.uid}');
+
+          debugPrint(
+            '📊 User profile status: isProfileCreated=${user.isProfileCreated}',
+          );
+
+          //  print all user data
+          debugPrint('🗂️ Full user data: $user');
+
           if (user.isProfileCreated) {
-            debugPrint('✅ Profile created');
+            debugPrint('✅ Profile created - Navigating to main shell');
             router.replaceAll([const UserMainShellRoute()]);
           } else {
-            debugPrint('📝 Profile not created');
+            debugPrint('📝 Profile not created - Navigating to form flow');
             router.replaceAll([const MatrimonyFormFlowRoute()]);
           }
         },
-        loading: () {},
-        error: (e, _) {
-          debugPrint('Auth error: $e');
+        loading: () {
+          debugPrint('⏳ Auth state loading...');
+        },
+        error: (e, st) {
+          debugPrint('❌ Auth error: $e\n$st');
         },
       );
     });

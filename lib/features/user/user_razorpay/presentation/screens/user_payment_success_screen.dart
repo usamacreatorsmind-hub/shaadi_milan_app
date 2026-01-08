@@ -1,8 +1,6 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -122,11 +120,9 @@ class _UserPaymentSuccessScreenState
                   const Divider(height: 24),
                   _buildDetailRow(
                     'Date',
-                    payment.createdAt != null
-                        ? DateFormat(
+                    DateFormat(
                             'dd MMM yyyy, hh:mm a',
-                          ).format(payment.createdAt!)
-                        : 'N/A',
+                          ).format(payment.createdAt),
                   ),
                 ],
               ),

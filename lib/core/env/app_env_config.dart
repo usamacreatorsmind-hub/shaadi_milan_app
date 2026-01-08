@@ -23,8 +23,8 @@ class AppEnvConfig {
 
   AppEnvConfig._();
 
-  static get isProd => _instance.environment == AppEnvironment.prod;
-  static get isDev =>
+  static bool get isProd => _instance.environment == AppEnvironment.prod;
+  static bool get isDev =>
       _instance.environment ==
       AppEnvironment.dev; // Private constructor to prevent instantiation
 }

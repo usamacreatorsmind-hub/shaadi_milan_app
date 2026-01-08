@@ -1,6 +1,5 @@
 import '../states/agent_state.dart';
 
-import '../../../../agent/domain/states/agent_entity.dart';
 import '../states/address_state.dart';
 import '../states/cultural_state.dart';
 import '../states/education_state.dart';
@@ -10,7 +9,6 @@ import '../states/identity_state.dart';
 import '../states/metrimony_state.dart';
 import '../states/physical_state.dart';
 
-import '../../../../agent/domain/states/agent_entity.dart';
 
 enum EnumUserStatus { active, inactive, blocked, pending }
 

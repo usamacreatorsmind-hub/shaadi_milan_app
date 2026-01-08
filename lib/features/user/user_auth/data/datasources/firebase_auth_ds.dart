@@ -1,4 +1,3 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 

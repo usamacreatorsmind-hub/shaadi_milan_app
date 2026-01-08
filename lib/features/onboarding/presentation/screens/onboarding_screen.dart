@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
 import '../../../../app/router/app_router.dart';
-import 'page_view_model.dart';
+import 'page_view_model_list.dart';
 
 @RoutePage()
 class OnboardingScreen extends StatelessWidget {
@@ -69,7 +69,7 @@ class OnboardingScreen extends StatelessWidget {
 
       animationDuration: 1000,
       globalBackgroundColor: Colors.white,
-      pages: pageViewModelList,
+      pages: pageViewModelList(context),
       onDone: () => _onDone(context),
       onSkip: () => _onDone(context), // You can also override onSkip behavior
 
@@ -105,6 +105,9 @@ class OnboardingScreen extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
+      overrideDone: (context, onPressed) {
+        return SizedBox(width: 60);
+      },
 
       dotsDecorator: DotsDecorator(
         size: const Size.square(10.0),

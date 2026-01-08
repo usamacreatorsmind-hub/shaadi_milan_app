@@ -671,7 +671,7 @@ class FilterRightSheet extends ConsumerWidget {
         Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
-          value: value,
+          initialValue: value,
           items: items
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),
@@ -730,17 +730,25 @@ class ProfileCard extends StatelessWidget {
                 top: Radius.circular(10),
                 bottom: Radius.circular(10),
               ),
-              child: Image.network(
-                imageUrl,
-                height: MediaQuery.of(context).size.height * 0.55,
-                width: double.infinity,
-                fit: BoxFit.fill,
-                errorBuilder: (_, __, ___) => Container(
-                  height: 220,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.person, size: 60),
-                ),
-              ),
+              child: imageUrl.isEmpty
+                  ? Container(
+                      height: MediaQuery.of(context).size.height * 0.55,
+                      width: double.infinity,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.person, size: 60),
+                    )
+                  : Image.network(
+                      imageUrl,
+                      height: MediaQuery.of(context).size.height * 0.55,
+                      width: double.infinity,
+                      fit: BoxFit.fill,
+                      errorBuilder: (_, __, ___) => Container(
+                        height: MediaQuery.of(context).size.height * 0.55,
+                        width: double.infinity,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.person, size: 60),
+                      ),
+                    ),
             ),
             Padding(
               padding: const EdgeInsets.all(16),

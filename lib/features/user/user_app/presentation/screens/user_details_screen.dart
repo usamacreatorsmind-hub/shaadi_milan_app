@@ -1,18 +1,14 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart'
     show agentFirestoreDsProvider;
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
 import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/agent_state.dart';
 import '../../domain/states/metrimony_state.dart';
-import '../../domain/states/user_state.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -111,13 +107,14 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
 
           final profile = viewModel.profile;
           final List<String> images = [
-            if (profile.images.primaryImageUrl != null &&
-                profile.images.primaryImageUrl.isNotEmpty)
+            if (profile.images.primaryImageUrl.isNotEmpty)
               profile.images.primaryImageUrl
             else
               'https://via.placeholder.com/150',
 
             ...(profile.images.secondaryImageUrls ?? []),
+            if (profile.images.imageWithAgentUrl.isNotEmpty)
+              profile.images.imageWithAgentUrl,
           ];
 
           return Stack(
@@ -166,7 +163,9 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
                                 child: Wrap(
                                   spacing: 8,
                                   runSpacing: 8,
@@ -177,9 +176,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                     ),
 
                                     _infoChip(
-                                      profile.identity.age != null
-                                          ? "${profile.identity.age} yrs"
-                                          : '',
+                                      "${profile.identity.age} yrs",
                                       Icons.cake_outlined,
                                     ),
                                     _infoChip(
@@ -371,6 +368,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   icon: Icons.local_post_office_outlined,
                                   value: profile.address.pincode,
                                 ),
+
+                                SizedBox(height: 20),
                               ],
                             ),
                           ],
@@ -418,13 +417,25 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             ),
 
                             // ================= EDUCATION SECTION =================
-                            if (profile.education.education != null ||
+                            if (profile.education.isIlletrate == true) ...[
+                              _InfoCard(
+                                title: 'Education',
+                                icon: Icons.school_outlined,
+                                children: const [
+                                  _InfoTile(
+                                    label: 'Education Status',
+                                    icon: Icons.info_outline,
+                                    value: 'Illiterate',
+                                  ),
+                                ],
+                              ),
+                            ] else if (profile.education.education != null ||
                                 (profile
                                         .education
                                         .extraQualification
                                         ?.qualifications
                                         .isNotEmpty ??
-                                    false))
+                                    false)) ...[
                               _InfoCard(
                                 title: 'Education',
                                 icon: Icons.school_outlined,
@@ -461,6 +472,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                           .toString(),
                                     ),
                                   ],
+
                                   if (profile
                                           .education
                                           .extraQualification
@@ -473,12 +485,12 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
+                                          const Text(
                                             'Additional Courses',
                                             style: TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.w500,
-                                              color: const Color.fromARGB(
+                                              color: Color.fromARGB(
                                                 255,
                                                 24,
                                                 22,
@@ -505,6 +517,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                     ),
                                 ],
                               ),
+                            ],
                           ],
                         ),
                       ),
@@ -876,6 +889,11 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      clipBehavior: Clip.antiAlias,
+
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+      ),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         border: BoxBorder.fromLTRB(
@@ -884,6 +902,11 @@ class _InfoCard extends StatelessWidget {
               BorderSide(color: Theme.of(context).primaryColor, width: 4),
         ),
         borderRadius: BorderRadius.circular(20),
+        // gradient: LinearGradient(
+        //   colors: [Colors.white, Colors.white.withOpacity(0.95)],
+        //   begin: Alignment.topCenter,
+        //   end: Alignment.bottomCenter,
+        // ),
         color: Colors.white,
 
         boxShadow: [

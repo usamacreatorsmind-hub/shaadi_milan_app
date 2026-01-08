@@ -1,11 +1,16 @@
 import '../../../../../app/custom/image_picker/image_picker_widget.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../../../../app/custom/image_picker/image_picker_controller.dart';
-import '../controllers/metrimony_profile_controller.dart';
-import '../../../user_auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../../app/custom/image_picker/image_picker_widget.dart';
+import '../../../../../app/custom/image_picker/image_picker_controller.dart';
+import '../../../../../app/router/app_router.dart';
 
 @RoutePage()
 class UserImageFormScreen extends ConsumerWidget {
@@ -14,62 +19,79 @@ class UserImageFormScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Upload Profile Images')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            ImagePickerWidget(),
-            SizedBox(height: 100),
-            ElevatedButton(
-              onPressed: () {
-                // ✅ Validate that an image is selected
-                final images = ref.read(imagePickerProvider);
-                if (images.primaryImage == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please select a primary profile image'),
-                    ),
-                  );
-                  return;
-                }
-
-                if (images.aadharPdfPath == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please select Aadhar PDF')),
-                  );
-                  return;
-                }
-
-                context.router.push(UserBiodataCheckRoute(isAgreed: false));
-              },
-
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
-                ),
+      backgroundColor: Colors.grey.shade100,
+      body: Stack(
+        children: [
+          // 🔽 SCROLLABLE CONTENT
+          ListView(
+            padding: const EdgeInsets.fromLTRB(16, 40, 16, 120),
+            children: [
+              Text(
+                'Upload Profile Images',
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                height: 50,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.circular(22),
+              const SizedBox(height: 20),
+              ExpandableImagePickerList(),
+            ],
+          ),
+
+          // // 🔒 FIXED BOTTOM BUTTON
+          // Positioned(left: 0, right: 0, bottom: 0, child: _FixedBottomButton()),
+        ],
+      ),
+    );
+  }
+}
+
+class _FixedBottomButton extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 12),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: ElevatedButton(
+          onPressed: () {
+            final images = ref.read(imagePickerProvider);
+
+            if (images.primaryImage == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Please select a primary profile image'),
                 ),
-                padding: const EdgeInsets.all(9),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Icon(Icons.cloud_upload_outlined, size: 30),
-                    Text("Review & Submit"),
-                  ],
-                ),
-              ),
+              );
+              return;
+            }
+
+            if (images.aadharPdfPath == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Please select Aadhar PDF')),
+              );
+              return;
+            }
+
+            context.router.push(UserBiodataCheckRoute(isAgreed: false));
+          },
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 52),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
             ),
-          ],
+          ),
+          child: const Text(
+            'Continue',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
     );

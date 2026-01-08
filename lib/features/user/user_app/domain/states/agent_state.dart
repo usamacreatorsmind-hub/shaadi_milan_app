@@ -92,7 +92,7 @@ class AgentProfile {
 
       agentId: agentId ?? this.agentId,
       agentName: agentName ?? this.agentName,
-      agentAadharUrl: agentAadhar ?? this.agentAadharUrl,
+      agentAadharUrl: agentAadhar ?? agentAadharUrl,
       agentMobile: agentMobile ?? this.agentMobile,
       registrationDate: registrationDate ?? this.registrationDate,
       role: role ?? this.role,

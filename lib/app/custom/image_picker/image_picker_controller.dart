@@ -88,6 +88,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
+
         imageQuality: 80,
       );
 
@@ -205,17 +206,46 @@ class ImagePickerController extends StateNotifier<ImagesState> {
         onProgress: (p) => updateStepProgress(nextStep, p),
       );
 
+      final imagewithagenturl = await service.uploadImageWithAgent(
+        uid: uid,
+        filePath: state.imageWithAgentUrl!,
+        onProgress: (p) => updateStepProgress(nextStep + 1, p),
+      );
+
       ref
           .read(metrimonyControllerProvider.notifier)
           .saveImages(
             ProfileImages(
               primaryImageUrl: primaryImageUrl,
+              imageWithAgentUrl: imagewithagenturl,
               aadharCardUrl: aadharCardUrl,
               secondaryImageUrls: secondaryImageUrls,
             ),
           );
     } catch (e) {
       rethrow; // UI will handle snackbar
+    }
+  }
+
+  void pickImageWithAgent() async {
+    // Implementation for picking image with agent
+    if (_isPicking) return;
+    _isPicking = true;
+
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 80,
+      );
+
+      if (image == null) return;
+
+      final croppedPath = await _cropImage(image.path, isPrimary: false);
+      if (croppedPath != null) {
+        state = state.copyWith(imageWithAgentUrl: croppedPath);
+      }
+    } finally {
+      _isPicking = false;
     }
   }
 }

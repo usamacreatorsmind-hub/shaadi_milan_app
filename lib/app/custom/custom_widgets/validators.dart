@@ -126,4 +126,15 @@ class Validators {
     }
     return null;
   }
+  
+  static String? validateAadhar(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Aadhar number is required';
+    }
+    final aadharRegex = RegExp(r'^[0-9]{12}$');
+    if (!aadharRegex.hasMatch(value)) {
+      return 'Enter a valid 12-digit Aadhar number';
+    }
+    return null;
+  }
 }

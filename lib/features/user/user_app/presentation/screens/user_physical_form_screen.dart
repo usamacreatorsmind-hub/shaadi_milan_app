@@ -11,10 +11,12 @@ import '../../domain/states/physical_state.dart';
 class UserPhysicalFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final PhysicalProfile? existingPhysicalProfile;
+  final void Function(VoidCallback)? registerSubmit;
   const UserPhysicalFormScreen({
     super.key,
     required this.mode,
     required this.existingPhysicalProfile,
+    this.registerSubmit,
   });
 
   @override
@@ -35,6 +37,7 @@ class _UserPhysicalFormScreenState
   @override
   void initState() {
     super.initState();
+    widget.registerSubmit?.call(_submitForm);
     if (widget.mode == FormMode.edit &&
         widget.existingPhysicalProfile != null) {
       final profile = widget.existingPhysicalProfile!;
@@ -46,55 +49,37 @@ class _UserPhysicalFormScreenState
     }
   }
 
-  @override
-  void dispose() {
-    _heightController.dispose();
-    _weightController.dispose();
-    _bodyTypeController.dispose();
-    _complexionController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _heightController.dispose();
+  //   _weightController.dispose();
+  //   _bodyTypeController.dispose();
+  //   _complexionController.dispose();
+  //   super.dispose();
+  // }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      ref
-          .read(userPhysicalControllerProvider.notifier)
-          .savePhysicals(
-            height: double.parse(_heightController.text),
+      final notifier = ref.read(userPhysicalControllerProvider.notifier);
 
-            weight: double.parse(_weightController.text),
-
-            bodyType: _bodyTypeController.text,
-            complexion: _complexionController.text,
-            physicallyChallenged: _physicallyChallenged,
-          );
-
-
-    final notifier = ref.read(userPhysicalControllerProvider.notifier);
-
-    if (widget.mode == FormMode.create) {
-      notifier.savePhysicals(
-        height: double.parse(_heightController.text),
-        weight: double.parse(_weightController.text),
-        bodyType: _bodyTypeController.text,
-        complexion: _complexionController.text,
-        physicallyChallenged: _physicallyChallenged,
-      );
-    } else {
-      // Update logic (using savePhysicals as upsert)
-      notifier.updatePhysicals(
-        height: double.parse(_heightController.text),
-        weight: double.parse(_weightController.text),
-        bodyType: _bodyTypeController.text,
-        complexion: _complexionController.text,
-        physicallyChallenged: _physicallyChallenged,
-      );
-    }
-
-
-
-
-
+      if (widget.mode == FormMode.create) {
+        notifier.savePhysicals(
+          height: double.parse(_heightController.text),
+          weight: double.parse(_weightController.text),
+          bodyType: _bodyTypeController.text,
+          complexion: _complexionController.text,
+          physicallyChallenged: _physicallyChallenged,
+        );
+      } else {
+        // Update logic (using savePhysicals as upsert)
+        notifier.updatePhysicals(
+          height: double.parse(_heightController.text),
+          weight: double.parse(_weightController.text),
+          bodyType: _bodyTypeController.text,
+          complexion: _complexionController.text,
+          physicallyChallenged: _physicallyChallenged,
+        );
+      }
     }
   }
 
@@ -118,7 +103,12 @@ class _UserPhysicalFormScreenState
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Physical Details')),
+      appBar: AppBar(
+        title: Text(
+          'Physical Details',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -216,7 +206,12 @@ class _UserPhysicalFormScreenState
               if (physicalState.isLoading)
                 const CircularProgressIndicator()
               else
-                AppButton(onPressed: _submitForm, text: 'Physical Profile'),
+                (widget.registerSubmit != null
+                    ? const SizedBox.shrink()
+                    : AppButton(
+                        onPressed: _submitForm,
+                        text: 'Physical Profile',
+                      )),
             ],
           ),
         ),

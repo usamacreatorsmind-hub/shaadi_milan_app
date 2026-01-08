@@ -41,7 +41,7 @@ class Education {
   }) {
     return Education(
       college: college ?? this.college,
-      course: degree ?? this.course,
+      course: degree ?? course,
       passingYear: passingYear ?? this.passingYear,
       percentage: percentage ?? this.percentage,
     );
@@ -52,7 +52,7 @@ class Education {
   }
 }
 
-class ExtraQualification {
+class ExtraQualification { 
   List<String> qualifications;
 
   ExtraQualification({required this.qualifications});

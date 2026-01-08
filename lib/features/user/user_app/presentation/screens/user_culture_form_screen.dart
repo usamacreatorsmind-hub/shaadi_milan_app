@@ -11,11 +11,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class UserCultureFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final CulturalProfile? existingCulturalProfile;
+  final void Function(VoidCallback)? registerSubmit;
 
   const UserCultureFormScreen({
     super.key,
     required this.mode,
     this.existingCulturalProfile,
+    this.registerSubmit,
   });
 
   @override
@@ -26,11 +28,13 @@ class UserCultureFormScreen extends ConsumerStatefulWidget {
 class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _subCasteController = TextEditingController();
+  final _manualCasteController = TextEditingController();
   final _languagesController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    widget.registerSubmit?.call(_submitForm);
     if (widget.mode == FormMode.edit &&
         widget.existingCulturalProfile != null) {
       final cult = widget.existingCulturalProfile!;
@@ -46,18 +50,30 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _subCasteController.dispose();
-    _languagesController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _subCasteController.dispose();
+  //   _languagesController.dispose();
+  //   super.dispose();
+  // }
 
   void _submitForm() {
     if (!_formKey.currentState!.validate()) return;
 
     final religion = ref.read(religionControllerProvider).religion;
-    final caste = ref.read(religionControllerProvider).caste;
+    var caste = ref.read(religionControllerProvider).caste;
+
+    // If user selected 'Other', take manual input
+    if (caste.toLowerCase() == 'other') {
+      final manual = _manualCasteController.text.trim();
+      if (manual.isEmpty) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Please enter caste')));
+        return;
+      }
+      caste = manual;
+    }
 
     ref
         .read(cultureControllerProvider.notifier)
@@ -70,6 +86,14 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
               .map((e) => e.trim())
               .toList(),
         );
+  }
+
+  @override
+  void dispose() {
+    _subCasteController.dispose();
+    _manualCasteController.dispose();
+    _languagesController.dispose();
+    super.dispose();
   }
 
   @override
@@ -94,6 +118,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
+          style: Theme.of(context).textTheme.headlineMedium,
           widget.mode == FormMode.create
               ? 'Add Cultural Details'
               : 'Edit Cultural Details',
@@ -184,6 +209,22 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
               const SizedBox(height: 16),
 
               const SizedBox(height: 12),
+              // If caste is Other, show manual input
+              if (ref.watch(religionControllerProvider).caste.toLowerCase() ==
+                  'other')
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: AppTextField(
+                    controller: _manualCasteController,
+                    label: 'Specify Caste',
+                    hint: 'Enter your caste',
+                    prefixIcon: Icons.edit,
+                    iconColor: Theme.of(context).colorScheme.primary,
+                    obscureText: false,
+                    keyboardType: TextInputType.text,
+                    validator: (v) => v?.isEmpty == true ? 'Required' : null,
+                  ),
+                ),
               AppTextField(
                 controller: _subCasteController,
                 label: "Sub-Caste",
@@ -197,18 +238,21 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
               const SizedBox(height: 12),
               AppTextField(
                 controller: _languagesController,
-                label: "Languages",
-                hint: "English, Hindi (comma separated)",
+                label: "Languages Known",
+                hint: "Enter languages separated by commas",
                 prefixIcon: Icons.language,
                 validator: (v) => v?.isEmpty == true ? "Required" : null,
                 iconColor: Theme.of(context).colorScheme.primary,
                 obscureText: false,
                 keyboardType: TextInputType.text,
               ),
+
               const SizedBox(height: 24),
               state.isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : AppButton(text: "Save", onPressed: _submitForm),
+                  : (widget.registerSubmit != null
+                        ? const SizedBox.shrink()
+                        : AppButton(text: "Save", onPressed: _submitForm)),
             ],
           ),
         ),

@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../domain/states/user_status_state.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../domain/states/user_status_state.dart';
 
 class UserStatusFirestore {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

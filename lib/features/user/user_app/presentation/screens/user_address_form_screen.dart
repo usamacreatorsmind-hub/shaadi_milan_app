@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import 'package:arvika_marriage_bureau/core/enums/enum.dart';
 import '../../domain/states/state_city.dart';
@@ -14,10 +16,12 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 class UserAddressFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final AddressProfile? existingAddressProfile;
+  final void Function(VoidCallback)? registerSubmit;
   const UserAddressFormScreen({
     super.key,
     required this.mode,
     required this.existingAddressProfile,
+    this.registerSubmit,
   });
 
   @override
@@ -39,6 +43,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
   @override
   void initState() {
     super.initState();
+    widget.registerSubmit?.call(_submitForm);
     if (widget.mode == FormMode.edit && widget.existingAddressProfile != null) {
       final profile = widget.existingAddressProfile!;
       _atController.text = profile.addressLine1;
@@ -55,34 +60,20 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _atController.dispose();
-    _postController.dispose();
-    _districtController.dispose();
-    _stateController.dispose();
-    _pinController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _atController.dispose();
+  //   _postController.dispose();
+  //   _districtController.dispose();
+  //   _stateController.dispose();
+  //   _pinController.dispose();
+  //   super.dispose();
+  // }
 
   void _submitForm() {
     if (!_formKey.currentState!.validate()) return;
 
-
-
-    ref
-        .read(addressControllerProvider.notifier)
-        .saveAddress(
-          at: _atController.text.trim(),
-          post: _postController.text.trim(),
-          policeStation: _policeStationController.text.trim(),
-
-          district: _districtController.text.trim(),
-          stateName: _stateController.text.trim(),
-          pin: _pinController.text.trim(),
-        );
-  
-  final notifier = ref.read(addressControllerProvider.notifier);
+    final notifier = ref.read(addressControllerProvider.notifier);
 
     if (widget.mode == FormMode.create) {
       notifier.saveAddress(
@@ -92,12 +83,11 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
         district: _districtController.text.trim(),
         stateName: _stateController.text.trim(),
         pin: _pinController.text.trim(),
-        
-       );
+      );
     } else {
       // Update logic (using saveIdentity as upsert)
       notifier.updateAddress(
-         at: _atController.text.trim(),
+        at: _atController.text.trim(),
         post: _postController.text.trim(),
         policeStation: _policeStationController.text.trim(),
         district: _districtController.text.trim(),
@@ -105,7 +95,6 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
         pin: _pinController.text.trim(),
       );
     }
-  
   }
 
   @override
@@ -130,7 +119,12 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Address Details')),
+      appBar: AppBar(
+        title: Text(
+          'Address Details',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -234,6 +228,15 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
 
                 /// ================= PIN =================
                 AppTextField(
+                  showWordCount: true,
+
+                  maxLines: 1,
+                  counterType: CounterType.characters,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    MaxLengthFormatter(max: 6),
+                  ],
+
                   controller: _pinController,
                   prefixIcon: Icons.numbers,
                   iconColor: Theme.of(context).colorScheme.primary,
@@ -256,7 +259,12 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                 /// ================= SAVE =================
                 addressState.isLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : AppButton(onPressed: _submitForm, text: 'Save Address'),
+                    : (widget.registerSubmit != null
+                          ? const SizedBox.shrink()
+                          : AppButton(
+                              onPressed: _submitForm,
+                              text: 'Save Address',
+                            )),
               ],
             ),
           ),
