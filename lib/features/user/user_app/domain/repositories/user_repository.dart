@@ -1,13 +1,12 @@
-
 import '../states/address_state.dart';
-import '../states/user_state.dart';
+import '../../../../auth/domain/states/user_state.dart';
 
 abstract class UserRepository {
-  Stream<AppUser> watchUser(String uid);
-  Future<AppUser> fetchUser(String uid);
-  Future<List<AppUser>> fetchUsers();
+  Stream<UserEntity> watchUser(String uid);
+  Future<UserEntity> fetchUser(String uid);
+  Future<List<UserEntity>> fetchUsers();
 
-  Future<void> updateUser(String uid, AppUser user);
+  Future<void> updateUser(String uid, UserEntity user);
   Future<void> updateField(String uid, String fieldPath, dynamic value);
   Future<void> deleteUser(String uid);
 

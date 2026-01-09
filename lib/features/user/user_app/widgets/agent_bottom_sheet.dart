@@ -1,9 +1,9 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AgentBottomSheet extends StatelessWidget {
-  final AgentProfile agent;
+  final AgentEntity agent;
 
   const AgentBottomSheet({super.key, required this.agent});
 
@@ -45,13 +45,17 @@ class AgentBottomSheet extends StatelessWidget {
               title: 'Agent Information',
               children: [
                 _InfoRow(Icons.phone, 'Mobile', agent.agentMobile),
-                _InfoRow(Icons.email_outlined, 'Email', agent.email),
+                _InfoRow(Icons.email_outlined, 'Email', agent.agentEmail),
                 _InfoRow(
                   Icons.calendar_today_outlined,
                   'Registered On',
                   _formatDate(agent.registrationDate),
                 ),
-                _InfoRow(Icons.location_on_outlined, 'Address', agent.address),
+                _InfoRow(
+                  Icons.location_on_outlined,
+                  'Address',
+                  agent.agentAddress,
+                ),
               ],
             ),
 
@@ -84,7 +88,7 @@ class AgentBottomSheet extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    onPressed: () => _email(agent.email),
+                    onPressed: () => _email(agent.agentEmail),
                   ),
                 ),
               ],
@@ -97,7 +101,7 @@ class AgentBottomSheet extends StatelessWidget {
 
   // ───────────────── Helpers ─────────────────
 
-  static Widget _AgentHeader({required AgentProfile agent}) {
+  static Widget _AgentHeader({required AgentEntity agent}) {
     return Row(
       children: [
         CircleAvatar(

@@ -1,6 +1,7 @@
-import 'agent_state.dart'; 
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+ 
 import 'image_state.dart';
-import 'user_state.dart';
 import '../../presentation/screens/metrimony_flow_screen.dart';
 
 import 'address_state.dart';
@@ -188,8 +189,8 @@ MatrimonyProfile(
 
 class MatrimonyProfileViewModel {
   final MatrimonyProfile profile;
-  final AppUser? user;
-  final AgentProfile? agent;
+  final UserEntity? user;
+  final AgentEntity? agent;
 
   const MatrimonyProfileViewModel({
     required this.profile,
@@ -200,8 +201,8 @@ class MatrimonyProfileViewModel {
   // copy with
   MatrimonyProfileViewModel copyWith({
     MatrimonyProfile? profile,
-    AppUser? user,
-    AgentProfile? agent,
+    UserEntity? user,
+    AgentEntity? agent,
   }) {
     return MatrimonyProfileViewModel(
       profile: profile ?? this.profile,
@@ -212,8 +213,8 @@ class MatrimonyProfileViewModel {
 
   factory MatrimonyProfileViewModel.empty() => MatrimonyProfileViewModel(
     profile: MatrimonyProfile.empty(),
-    user: AppUser.empty(),
-    agent: AgentProfile.empty(),
+    user: UserEntity.empty(),
+    agent: AgentEntity.empty(),
   );
 }
 

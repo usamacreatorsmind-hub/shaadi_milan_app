@@ -1,7 +1,7 @@
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/core/enums/enum.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
@@ -24,7 +24,7 @@ final matrimonyProfileProvider =
       ) async {
         final user = await userRepo.fetchUser(matrimonyProfile.userId);
 
-        final AgentProfile agent;
+        final AgentEntity agent;
 
         if (matrimonyProfile.agentId.isNotEmpty) {
           // print agetn id
@@ -33,24 +33,13 @@ final matrimonyProfileProvider =
 
           agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
         } else {
-          agent = AgentProfile(
-            agentId: '',
-            agentName: '',
-            agentMobile: '',
-            email: '',
-            registrationDate: DateTime.now(),
-            role: '',
-            photoUrl: '',
-            address: '',
-            agentAadharUrl: '',
-            uid: '',
-          );
+          agent = AgentEntity.empty();
         }
 
         return MetrimonyProfileViewModel(
           metrimonyProfile: matrimonyProfile,
           userProfile: user,
-          agentProfile: agent,
+          agentEntity: agent,
         );
       });
     });
@@ -76,7 +65,7 @@ class MyProfileScreen extends ConsumerWidget {
           print(profile.toString());
           print(profile.user.toString());
           print("this is agent ");
-          print(profile.agentProfile);
+          print(profile.agentEntity);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 40),

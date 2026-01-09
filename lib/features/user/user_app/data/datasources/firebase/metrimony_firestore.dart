@@ -1,6 +1,7 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+
 import '../data_source/metrimony_data_source.dart';
 import '../../../domain/states/address_state.dart';
-import '../../../domain/states/agent_state.dart';
 import '../../../domain/states/cultural_state.dart';
 import '../../../domain/states/education_state.dart';
 import '../../../domain/states/employee_state.dart';
@@ -10,7 +11,6 @@ import '../../../domain/states/metrimony_state.dart';
 import '../../../domain/states/physical_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 
 // provider
 
@@ -98,7 +98,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
     await _updateProfileSection(uid, 'address', address.toMap());
   }
 
-  Future<void> updateAgent(String uid, AgentProfile agent) async {
+  Future<void> updateAgent(String uid, AgentEntity agent) async {
     await _updateProfileSection(uid, 'agent', agent.toMap());
   }
 

@@ -1,9 +1,8 @@
-import '../states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+ 
 
 abstract class AgentRepository {
-  Future<AgentProfile> fetchAgent(String uid);
-  Future<AgentProfile> fetchAgentProfilebyAgentId(String agentId);
+  Future<AgentEntity> fetchAgent(String uid);
+  Future<AgentEntity> fetchAgentEntitybyAgentId(String agentId);
   Future<String> fetchAgentUidbyAgentId(String agentId);
-  
-
 }

@@ -1,4 +1,5 @@
-import '../../domain/states/agent_state.dart'; 
+ 
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 
 import '../../domain/states/address_state.dart';
 import '../../domain/states/cultural_state.dart';
@@ -6,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/states/education_state.dart';
 import '../../domain/states/employee_state.dart';
 import '../../domain/states/family_state.dart';
-import '../../domain/states/identity_state.dart'; 
+import '../../domain/states/identity_state.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/physical_state.dart';
 
@@ -18,11 +19,6 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   final MatrimonyFirestoreDS _remoteDS;
 
   MatrimonyRepositoryImpl(this._remoteDS);
-
-
-
- 
-
 
   @override
   Future<void> createMatrimonyProfile(
@@ -80,8 +76,6 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
     return _remoteDS.updateIdentity(uid, identity);
   }
 
-  
-
   @override
   Future<void> updatePhysicalProfile(String uid, PhysicalProfile physical) {
     return _remoteDS.updatePhysical(uid, physical);
@@ -93,7 +87,7 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   }
 
   @override
-  Future<void> updateAgentProfile(String uid, AgentProfile agent) {
+  Future<void> updateAgentEntity(String uid, AgentEntity agent) {
     return _remoteDS.updateAgent(uid, agent);
   }
 
@@ -102,7 +96,6 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   @override
   Future<AddressProfile> getAddressProfile(String uid) async =>
       (await getMatrimonyProfile(uid)).address;
- 
 
   @override
   Future<CulturalProfile> getCulturalProfile(String uid) async =>
@@ -124,18 +117,14 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   Future<IdentityProfile> getIdentityProfile(String uid) async =>
       (await getMatrimonyProfile(uid)).identity;
 
-   
   @override
   Future<PhysicalProfile> getPhysicalProfile(String uid) async =>
       (await getMatrimonyProfile(uid)).physical;
 
   @override
   Future<List<MatrimonyProfile>> getAllMatrimonyProfiles() {
- 
     return _remoteDS.getAllMatrimonyProfiles();
   }
-  
-   
 }
 
 final matrimonyFirestoreDSProvider = Provider<MatrimonyFirestoreDS>((ref) {

@@ -1,6 +1,7 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+
 import '../datasources/firebase/agent_firestore_ds.dart';
 import '../../domain/repositories/agent_repository.dart';
-import '../../domain/states/agent_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final agentRepositoryProvider = Provider<AgentRepository>((ref) {
@@ -13,15 +14,15 @@ class AgentRepositoryImpl implements AgentRepository {
   AgentRepositoryImpl(this._firestore);
 
   @override
-  Future<AgentProfile> getAgentProfile(String agentId) async {
-    final agentProfile = await _firestore.fetchAgentByUid(agentId);
-    return agentProfile;
+  Future<AgentEntity> getAgentEntity(String agentId) async {
+    final agent = await _firestore.fetchAgentByUid(agentId);
+    return agent;
   }
 
   @override
-  Future<AgentProfile> fetchAgentProfilebyAgentId(String agentId) async {
-    final agentProfile = await _firestore.fetchAgentbyAgentId(agentId);
-    return agentProfile;
+  Future<AgentEntity> fetchAgentEntitybyAgentId(String agentId) async {
+    final agent = await _firestore.fetchAgentbyAgentId(agentId);
+    return agent;
   }
 
   @override
@@ -36,18 +37,18 @@ class AgentRepositoryImpl implements AgentRepository {
   }
 
   @override
-  Future<void> updateProfile(AgentProfile agent) {
+  Future<void> updateProfile(AgentEntity agent) {
     throw UnimplementedError();
   }
 
   @override
-  Stream<AgentProfile> watchAgent(String uid) {
+  Stream<AgentEntity> watchAgent(String uid) {
     throw UnimplementedError();
   }
 
   @override
-  Future<AgentProfile> fetchAgent(String uid) {
-    final agentProfile = _firestore.fetchAgentByUid(uid);
-    return agentProfile;
+  Future<AgentEntity> fetchAgent(String uid) {
+    final agent = _firestore.fetchAgentByUid(uid);
+    return agent;
   }
 }

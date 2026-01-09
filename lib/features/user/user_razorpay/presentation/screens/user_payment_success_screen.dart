@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import 'package:auto_route/auto_route.dart';
@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 @RoutePage()
 class UserPaymentSuccessScreen extends ConsumerStatefulWidget {
-  final AppUser user;
+  final UserEntity user;
 
   const UserPaymentSuccessScreen({super.key, required this.user});
 
@@ -121,8 +121,8 @@ class _UserPaymentSuccessScreenState
                   _buildDetailRow(
                     'Date',
                     DateFormat(
-                            'dd MMM yyyy, hh:mm a',
-                          ).format(payment.createdAt),
+                      'dd MMM yyyy, hh:mm a',
+                    ).format(payment.createdAt),
                   ),
                 ],
               ),

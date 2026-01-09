@@ -1,4 +1,4 @@
-import '../../../user_auth/presentation/providers/auth_providers.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import 'metrimony_profile_controller.dart';
@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 
 class UserFamilyController extends StateNotifier<FamilyState> {
   final MatrimonyRepository _matrimonyRepository;
@@ -89,7 +88,10 @@ class UserFamilyController extends StateNotifier<FamilyState> {
 final userFamilyControllerProvider =
     StateNotifierProvider.autoDispose<UserFamilyController, FamilyState>((ref) {
       final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
-      final uid = ref.read(authStateProvider).value?.uid;
+      final uid = ref
+          .read(authStateProvider)
+          .value
+          ?.fold((agent) => agent.uid, (user) => user.uid);
       if (uid == null) throw Exception('User not authenticated');
       return UserFamilyController(matrimonyRepo, uid, ref);
     });

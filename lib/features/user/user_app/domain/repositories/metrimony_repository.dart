@@ -1,14 +1,14 @@
-import '../states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+ 
 
 import '../states/address_state.dart';
 import '../states/cultural_state.dart';
 import '../states/education_state.dart';
 import '../states/employee_state.dart';
 import '../states/family_state.dart';
-import '../states/identity_state.dart'; 
+import '../states/identity_state.dart';
 import '../states/metrimony_state.dart';
 import '../states/physical_state.dart';
-
 
 enum EnumUserStatus { active, inactive, blocked, pending }
 
@@ -39,7 +39,6 @@ abstract class MatrimonyRepository {
   Future<void> updatePhysicalProfile(String uid, PhysicalProfile physical);
 
   Future<void> updateCulturalProfile(String uid, CulturalProfile cultural);
- 
 
   Future<void> updateEducationProfile(String uid, EducationProfile education);
 
@@ -52,7 +51,7 @@ abstract class MatrimonyRepository {
 
   Future<void> updateAddressProfile(String uid, AddressProfile address);
 
-  Future<void> updateAgentProfile(String uid, AgentProfile agent);
+  Future<void> updateAgentEntity(String uid, AgentEntity agent);
 
   Future<void> updateMatrimonyProfile(String uid, MatrimonyProfile profile);
 
@@ -61,7 +60,7 @@ abstract class MatrimonyRepository {
   // ─────────────────────────────────────────────
   Future<IdentityProfile> getIdentityProfile(String uid);
   Future<PhysicalProfile> getPhysicalProfile(String uid);
-  Future<CulturalProfile> getCulturalProfile(String uid); 
+  Future<CulturalProfile> getCulturalProfile(String uid);
   Future<EducationProfile> getEducationProfile(String uid);
   Future<EmploymentProfile> getEmploymentProfile(String uid);
   Future<FamilyProfile> getFamilyProfile(String uid);

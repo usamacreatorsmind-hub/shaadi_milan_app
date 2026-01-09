@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
+import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/providers/providers.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/order.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -35,7 +35,8 @@ final orderNotifierProvider = StateNotifierProvider<OrderNotifier, OrderState>((
   ref,
 ) {
   final orderRepository = ref.read(orderRepositoryProvider);
-  final uid = ref.read(authStateProvider).value?.uid;
+  final authState = ref.read(authStateProvider);
+  final uid = authState.value?.fold((agent) => agent.uid, (user) => user.uid);
   if (uid == null) {
     throw Exception('User not authenticated');
   }

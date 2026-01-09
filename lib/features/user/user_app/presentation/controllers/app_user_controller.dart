@@ -1,14 +1,14 @@
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/repositories/user_repository.dart';
-import '../../domain/states/user_state.dart';
+import '../../../../auth/domain/states/user_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-class AppUserController extends StateNotifier<AsyncValue<AppUser?>> {
+class UserEntityController extends StateNotifier<AsyncValue<UserEntity?>> {
   final UserRepository _userRepository;
   final String _uid;
 
-  AppUserController(this._userRepository, this._uid)
+  UserEntityController(this._userRepository, this._uid)
     : super(const AsyncValue.loading()) {
     _userRepository
         .watchUser(_uid)
@@ -83,13 +83,12 @@ class AppUserController extends StateNotifier<AsyncValue<AppUser?>> {
   }
 }
 
-final appUserControllerProvider =
+final UserEntityControllerProvider =
     StateNotifierProvider.family<
-      AppUserController,
-      AsyncValue<AppUser?>,
+      UserEntityController,
+      AsyncValue<UserEntity?>,
       String
     >((ref, uid) {
-      final userRepository = ref.read
-      (userRepositoryProvider);
-      return AppUserController(userRepository, uid);
+      final userRepository = ref.read(userRepositoryProvider);
+      return UserEntityController(userRepository, uid);
     });

@@ -1,4 +1,4 @@
-import '../../../domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +10,8 @@ final agentFirestoreDsProvider = Provider<AgentFirestoreDs>((ref) {
 
 class AgentFirestoreDs {
   final FirebaseFirestore _firestore;
-  AgentFirestoreDs(this._firestore);
+
+  const AgentFirestoreDs(this._firestore);
 
   final String _collection = 'agents';
 
@@ -33,8 +34,8 @@ class AgentFirestoreDs {
     return docId;
   }
 
-  // fetch agentprofile using agent id
-  Future<AgentProfile> fetchAgentByUid(String agentId) async {
+  // fetch AgentEntity using agent id
+  Future<AgentEntity> fetchAgentByUid(String agentId) async {
     final querySnapshot = await _firestore
         .collection(_collection)
         .doc(agentId)
@@ -44,11 +45,11 @@ class AgentFirestoreDs {
       throw Exception('Agent with UID $agentId not found');
     }
 
-    return AgentProfile.fromMap(querySnapshot.data()!);
+    return AgentEntity.fromMap(querySnapshot.data()!);
   }
 
   // fetch agent doumetn using agent id
-  Future<AgentProfile> fetchAgentbyAgentId(String agentId) async {
+  Future<AgentEntity> fetchAgentbyAgentId(String agentId) async {
     final querySnapshot = await _firestore
         .collection(_collection)
         .where('agentId', isEqualTo: agentId)
@@ -58,6 +59,6 @@ class AgentFirestoreDs {
     if (querySnapshot.docs.isEmpty) {
       throw Exception('Agent with ID $agentId not found');
     }
-    return AgentProfile.fromMap(querySnapshot.docs.first.data());
+    return AgentEntity.fromMap(querySnapshot.docs.first.data());
   }
 }

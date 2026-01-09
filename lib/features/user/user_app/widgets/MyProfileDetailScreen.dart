@@ -1,11 +1,11 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 @RoutePage()
 class MyProfileDetailScreen extends ConsumerStatefulWidget {
-  final AppUser user;
+  final UserEntity user;
   const MyProfileDetailScreen({super.key, required this.user});
 
   @override
@@ -36,11 +36,7 @@ class _MyProfileCardState extends ConsumerState<MyProfileDetailScreen> {
                     _buildInfoRow('Agent ID', widget.user.agentId),
                   ]),
 
-                  _buildInfoCard(context, 'Verification Status', [
-                   
-
-                    
-                  ]),
+                  _buildInfoCard(context, 'Verification Status', []),
 
                   const SizedBox(height: 16),
 

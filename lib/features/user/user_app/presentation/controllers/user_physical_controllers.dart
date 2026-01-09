@@ -1,7 +1,7 @@
 import '../../domain/repositories/metrimony_repository.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-import '../../../user_auth/presentation/providers/auth_providers.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/physical_state.dart';
 import 'metrimony_profile_controller.dart';
@@ -48,8 +48,13 @@ class UserPhysicalController extends StateNotifier<PhysicalState> {
     }
   }
 
-  void updatePhysicals({required double height, required double weight, required String bodyType, required String complexion, required bool physicallyChallenged}) {
-
+  void updatePhysicals({
+    required double height,
+    required double weight,
+    required String bodyType,
+    required String complexion,
+    required bool physicallyChallenged,
+  }) {
     state = state.copyWith(isLoading: true, error: null);
     final physicalProfile = PhysicalProfile(
       height: height.toString(),
@@ -74,12 +79,6 @@ class UserPhysicalController extends StateNotifier<PhysicalState> {
       debugPrint('❌ Physical Update Failed: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
     }
-
-
-
-
-
-
   }
 }
 
@@ -88,7 +87,10 @@ final userPhysicalControllerProvider =
       ref,
     ) {
       final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
-      final uid = ref.read(authStateProvider).value?.uid;
+      final uid = ref
+          .read(authStateProvider)
+          .value
+          ?.fold((agent) => null, (user) => user.uid);
       if (uid == null) throw Exception('User not authenticated');
       return UserPhysicalController(matrimonyRepo, uid, ref);
     });

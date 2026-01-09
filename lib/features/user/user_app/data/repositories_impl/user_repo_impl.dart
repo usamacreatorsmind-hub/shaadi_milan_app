@@ -1,10 +1,10 @@
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_status_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../user_auth/presentation/providers/auth_providers.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../domain/states/address_state.dart';
-import '../../domain/states/user_state.dart';
+import '../../../../auth/domain/states/user_state.dart';
 import '../datasources/firebase/user_firestore_ds.dart';
 
 class UserRepositoryImpl implements UserRepository {
@@ -12,18 +12,18 @@ class UserRepositoryImpl implements UserRepository {
 
   UserRepositoryImpl(this._ds);
   @override
-  Future<List<AppUser>> fetchUsers() async {
+  Future<List<UserEntity>> fetchUsers() async {
     final data = await _ds.fetchUsers();
-    return data.map((e) => AppUser.fromMap(e)).toList();
+    return data.map((e) => UserEntity.fromMap(e)).toList();
   }
 
   @override
-  Stream<AppUser> watchUser(String uid) {
-    return _ds.watchUser(uid).map((data) => AppUser.fromMap(data));
+  Stream<UserEntity> watchUser(String uid) {
+    return _ds.watchUser(uid).map((data) => UserEntity.fromMap(data));
   }
 
   @override
-  Future<void> updateUser(String uid, AppUser user) {
+  Future<void> updateUser(String uid, UserEntity user) {
     return _ds.updateUser(uid, user.toMap());
   }
 
@@ -38,9 +38,9 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<AppUser> fetchUser(String uid) async {
+  Future<UserEntity> fetchUser(String uid) async {
     final data = await _ds.fetchUser(uid);
-    return AppUser.fromMap(data);
+    return UserEntity.fromMap(data);
   }
 
   @override
@@ -127,33 +127,38 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
   return UserRepositoryImpl(userFirestoreDS);
 });
 
-final currentUserProvider = StreamProvider<AppUser?>((ref) {
-  final authState = ref.read(authStateProvider);
+final currentUserProvider = StreamProvider<UserEntity?>((ref) {
+  final authState = ref.watch(authStateProvider);
 
   return authState.when(
-    data: (user) {
-      if (user == null) {
+    data: (eitherUser) {
+      if (eitherUser == null) {
         return const Stream.empty();
       }
 
-      final repo = ref.read(userRepositoryProvider);
-      return repo.watchUser(user.uid);
+      return eitherUser.fold(
+        (agent) => const Stream.empty(),
+        (user) => ref.watch(userRepositoryProvider).watchUser(user.uid),
+      );
     },
     loading: () => const Stream.empty(),
     error: (_, __) => const Stream.empty(),
   );
 });
 
-final currentUserProfileProvider = StreamProvider<AppUser?>((ref) {
-  final authState = ref.read(authStateProvider);
-  final userRepository = ref.read(userRepositoryProvider);
+final currentUserProfileProvider = StreamProvider<UserEntity?>((ref) {
+  final authState = ref.watch(authStateProvider);
+  final userRepository = ref.watch(userRepositoryProvider);
 
   return authState.when(
-    data: (user) {
-      if (user == null) {
+    data: (eitherUser) {
+      if (eitherUser == null) {
         return Stream.value(null);
       }
-      return userRepository.watchUser(user.uid);
+      return eitherUser.fold(
+        (agent) => Stream.value(null),
+        (user) => userRepository.watchUser(user.uid),
+      );
     },
     loading: () => Stream.value(null),
     error: (error, stackTrace) => Stream.value(null),

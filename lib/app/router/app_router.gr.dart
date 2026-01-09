@@ -11,7 +11,7 @@ part of 'app_router.dart';
 
 abstract class _$AppRouter extends RootStackRouter {
   // ignore: unused_element
-  _$AppRouter();
+  _$AppRouter({super.navigatorKey});
 
   @override
   final Map<String, PageFactory> pagesMap = {
@@ -25,21 +25,49 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<AgentContactRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentContactScreen(key: args.key, agentId: args.agentId),
+        child: AgentContactScreen(
+          key: args.key,
+          agentId: args.agentId,
+        ),
       );
     },
     AgentDashboardRoute.name: (routeData) {
       final args = routeData.argsAs<AgentDashboardRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentDashboardScreen(uid: args.uid, key: args.key),
+        child: AgentDashboardScreen(uid: args.uid),
       );
     },
-    AgentProfileVerifyRoute.name: (routeData) {
-      final args = routeData.argsAs<AgentProfileVerifyRouteArgs>();
+    AgentEntityRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentEntityRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentProfileVerifyScreen(key: args.key, agentId: args.agentId),
+        child: AgentEntityScreen(
+          key: args.key,
+          uid: args.uid,
+        ),
+      );
+    },
+    AgentHomeRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AgentHomeScreen(),
+      );
+    },
+    AgentLoginRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AgentLoginScreen(),
+      );
+    },
+    AgentMainShellRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentMainShellRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentMainShellScreen(
+          agentId: args.agentId,
+          key: args.key,
+        ),
       );
     },
     AuthWrapperRoute.name: (routeData) {
@@ -60,12 +88,6 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const ContactUsScreen(),
       );
     },
-    LoginRoute.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const LoginScreen(),
-      );
-    },
     MatrimonyFormFlowRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -76,14 +98,20 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<MyProfileDetailRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: MyProfileDetailScreen(key: args.key, user: args.user),
+        child: MyProfileDetailScreen(
+          key: args.key,
+          user: args.user,
+        ),
       );
     },
     MyProfileRoute.name: (routeData) {
       final args = routeData.argsAs<MyProfileRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: MyProfileScreen(key: args.key, uid: args.uid),
+        child: MyProfileScreen(
+          key: args.key,
+          uid: args.uid,
+        ),
       );
     },
     OnboardingRoute.name: (routeData) {
@@ -96,12 +124,6 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const PrivacyPolicyScreen(),
-      );
-    },
-    RegisterRoute.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const RegisterScreen(),
       );
     },
     ResetPasswordRoute.name: (routeData) {
@@ -136,6 +158,7 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           mode: args.mode,
           existingAddressProfile: args.existingAddressProfile,
+          registerSubmit: args.registerSubmit,
         ),
       );
     },
@@ -143,7 +166,10 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<UserBiodataCheckRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserBiodataCheckScreen(key: args.key, isAgreed: args.isAgreed),
+        child: UserBiodataCheckScreen(
+          key: args.key,
+          isAgreed: args.isAgreed,
+        ),
       );
     },
     UserChatRoute.name: (routeData) {
@@ -160,6 +186,7 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           mode: args.mode,
           existingCulturalProfile: args.existingCulturalProfile,
+          registerSubmit: args.registerSubmit,
         ),
       );
     },
@@ -167,7 +194,10 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<UserDetailRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserDetailScreen(key: args.key, uid: args.uid),
+        child: UserDetailScreen(
+          key: args.key,
+          uid: args.uid,
+        ),
       );
     },
     UserEducationFormRoute.name: (routeData) {
@@ -178,6 +208,7 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           mode: args.mode,
           existingEducationProfile: args.existingEducationProfile,
+          registerSubmit: args.registerSubmit,
         ),
       );
     },
@@ -189,6 +220,7 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           mode: args.mode,
           existingEmploymentProfile: args.existingEmploymentProfile,
+          registerSubmit: args.registerSubmit,
         ),
       );
     },
@@ -200,6 +232,7 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           mode: args.mode,
           existingFamilyProfile: args.existingFamilyProfile,
+          registerSubmit: args.registerSubmit,
         ),
       );
     },
@@ -217,6 +250,7 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           mode: args.mode,
           existingIdentityProfile: args.existingIdentityProfile,
+          registerSubmit: args.registerSubmit,
         ),
       );
     },
@@ -224,6 +258,12 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const UserImageFormScreen(),
+      );
+    },
+    UserLoginRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserLoginScreen(),
       );
     },
     UserMainShellRoute.name: (routeData) {
@@ -258,7 +298,10 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<UserPaymentSuccessRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserPaymentSuccessScreen(key: args.key, user: args.user),
+        child: UserPaymentSuccessScreen(
+          key: args.key,
+          user: args.user,
+        ),
       );
     },
     UserPhysicalFormRoute.name: (routeData) {
@@ -269,6 +312,7 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           mode: args.mode,
           existingPhysicalProfile: args.existingPhysicalProfile,
+          registerSubmit: args.registerSubmit,
         ),
       );
     },
@@ -276,7 +320,16 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<UserProfileRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserProfileScreen(key: args.key, userId: args.userId),
+        child: UserProfileScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
+    UserRegisterRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserRegisterScreen(),
       );
     },
     UserStatusRoute.name: (routeData) {
@@ -289,7 +342,10 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<UserWishListRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserWishListScreen(key: args.key, userId: args.userId),
+        child: UserWishListScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
       );
     },
   };
@@ -299,7 +355,10 @@ abstract class _$AppRouter extends RootStackRouter {
 /// [AboutUsScreen]
 class AboutUsRoute extends PageRouteInfo<void> {
   const AboutUsRoute({List<PageRouteInfo>? children})
-    : super(AboutUsRoute.name, initialChildren: children);
+      : super(
+          AboutUsRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'AboutUsRoute';
 
@@ -314,10 +373,13 @@ class AgentContactRoute extends PageRouteInfo<AgentContactRouteArgs> {
     required String agentId,
     List<PageRouteInfo>? children,
   }) : super(
-         AgentContactRoute.name,
-         args: AgentContactRouteArgs(key: key, agentId: agentId),
-         initialChildren: children,
-       );
+          AgentContactRoute.name,
+          args: AgentContactRouteArgs(
+            key: key,
+            agentId: agentId,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'AgentContactRoute';
 
@@ -326,7 +388,10 @@ class AgentContactRoute extends PageRouteInfo<AgentContactRouteArgs> {
 }
 
 class AgentContactRouteArgs {
-  const AgentContactRouteArgs({this.key, required this.agentId});
+  const AgentContactRouteArgs({
+    this.key,
+    required this.agentId,
+  });
 
   final Key? key;
 
@@ -343,13 +408,12 @@ class AgentContactRouteArgs {
 class AgentDashboardRoute extends PageRouteInfo<AgentDashboardRouteArgs> {
   AgentDashboardRoute({
     required String uid,
-    Key? key,
     List<PageRouteInfo>? children,
   }) : super(
-         AgentDashboardRoute.name,
-         args: AgentDashboardRouteArgs(uid: uid, key: key),
-         initialChildren: children,
-       );
+          AgentDashboardRoute.name,
+          args: AgentDashboardRouteArgs(uid: uid),
+          initialChildren: children,
+        );
 
   static const String name = 'AgentDashboardRoute';
 
@@ -358,48 +422,117 @@ class AgentDashboardRoute extends PageRouteInfo<AgentDashboardRouteArgs> {
 }
 
 class AgentDashboardRouteArgs {
-  const AgentDashboardRouteArgs({required this.uid, this.key});
+  const AgentDashboardRouteArgs({required this.uid});
 
   final String uid;
 
-  final Key? key;
-
   @override
   String toString() {
-    return 'AgentDashboardRouteArgs{uid: $uid, key: $key}';
+    return 'AgentDashboardRouteArgs{uid: $uid}';
   }
 }
 
 /// generated route for
-/// [AgentProfileVerifyScreen]
-class AgentProfileVerifyRoute
-    extends PageRouteInfo<AgentProfileVerifyRouteArgs> {
-  AgentProfileVerifyRoute({
+/// [AgentEntityScreen]
+class AgentEntityRoute extends PageRouteInfo<AgentEntityRouteArgs> {
+  AgentEntityRoute({
     Key? key,
-    required String agentId,
+    required String uid,
     List<PageRouteInfo>? children,
   }) : super(
-         AgentProfileVerifyRoute.name,
-         args: AgentProfileVerifyRouteArgs(key: key, agentId: agentId),
-         initialChildren: children,
-       );
+          AgentEntityRoute.name,
+          args: AgentEntityRouteArgs(
+            key: key,
+            uid: uid,
+          ),
+          initialChildren: children,
+        );
 
-  static const String name = 'AgentProfileVerifyRoute';
+  static const String name = 'AgentEntityRoute';
 
-  static const PageInfo<AgentProfileVerifyRouteArgs> page =
-      PageInfo<AgentProfileVerifyRouteArgs>(name);
+  static const PageInfo<AgentEntityRouteArgs> page =
+      PageInfo<AgentEntityRouteArgs>(name);
 }
 
-class AgentProfileVerifyRouteArgs {
-  const AgentProfileVerifyRouteArgs({this.key, required this.agentId});
+class AgentEntityRouteArgs {
+  const AgentEntityRouteArgs({
+    this.key,
+    required this.uid,
+  });
 
   final Key? key;
 
-  final String agentId;
+  final String uid;
 
   @override
   String toString() {
-    return 'AgentProfileVerifyRouteArgs{key: $key, agentId: $agentId}';
+    return 'AgentEntityRouteArgs{key: $key, uid: $uid}';
+  }
+}
+
+/// generated route for
+/// [AgentHomeScreen]
+class AgentHomeRoute extends PageRouteInfo<void> {
+  const AgentHomeRoute({List<PageRouteInfo>? children})
+      : super(
+          AgentHomeRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'AgentHomeRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [AgentLoginScreen]
+class AgentLoginRoute extends PageRouteInfo<void> {
+  const AgentLoginRoute({List<PageRouteInfo>? children})
+      : super(
+          AgentLoginRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'AgentLoginRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [AgentMainShellScreen]
+class AgentMainShellRoute extends PageRouteInfo<AgentMainShellRouteArgs> {
+  AgentMainShellRoute({
+    required String agentId,
+    Key? key,
+    List<PageRouteInfo>? children,
+  }) : super(
+          AgentMainShellRoute.name,
+          args: AgentMainShellRouteArgs(
+            agentId: agentId,
+            key: key,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'AgentMainShellRoute';
+
+  static const PageInfo<AgentMainShellRouteArgs> page =
+      PageInfo<AgentMainShellRouteArgs>(name);
+}
+
+class AgentMainShellRouteArgs {
+  const AgentMainShellRouteArgs({
+    required this.agentId,
+    this.key,
+  });
+
+  final String agentId;
+
+  final Key? key;
+
+  @override
+  String toString() {
+    return 'AgentMainShellRouteArgs{agentId: $agentId, key: $key}';
   }
 }
 
@@ -407,7 +540,10 @@ class AgentProfileVerifyRouteArgs {
 /// [AuthWrapperScreen]
 class AuthWrapperRoute extends PageRouteInfo<void> {
   const AuthWrapperRoute({List<PageRouteInfo>? children})
-    : super(AuthWrapperRoute.name, initialChildren: children);
+      : super(
+          AuthWrapperRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'AuthWrapperRoute';
 
@@ -418,7 +554,10 @@ class AuthWrapperRoute extends PageRouteInfo<void> {
 /// [ChangePasswordScreen]
 class ChangePasswordRoute extends PageRouteInfo<void> {
   const ChangePasswordRoute({List<PageRouteInfo>? children})
-    : super(ChangePasswordRoute.name, initialChildren: children);
+      : super(
+          ChangePasswordRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'ChangePasswordRoute';
 
@@ -429,20 +568,12 @@ class ChangePasswordRoute extends PageRouteInfo<void> {
 /// [ContactUsScreen]
 class ContactUsRoute extends PageRouteInfo<void> {
   const ContactUsRoute({List<PageRouteInfo>? children})
-    : super(ContactUsRoute.name, initialChildren: children);
+      : super(
+          ContactUsRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'ContactUsRoute';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [LoginScreen]
-class LoginRoute extends PageRouteInfo<void> {
-  const LoginRoute({List<PageRouteInfo>? children})
-    : super(LoginRoute.name, initialChildren: children);
-
-  static const String name = 'LoginRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -451,7 +582,10 @@ class LoginRoute extends PageRouteInfo<void> {
 /// [MatrimonyFormFlowScreen]
 class MatrimonyFormFlowRoute extends PageRouteInfo<void> {
   const MatrimonyFormFlowRoute({List<PageRouteInfo>? children})
-    : super(MatrimonyFormFlowRoute.name, initialChildren: children);
+      : super(
+          MatrimonyFormFlowRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'MatrimonyFormFlowRoute';
 
@@ -463,13 +597,16 @@ class MatrimonyFormFlowRoute extends PageRouteInfo<void> {
 class MyProfileDetailRoute extends PageRouteInfo<MyProfileDetailRouteArgs> {
   MyProfileDetailRoute({
     Key? key,
-    required AppUser user,
+    required UserEntity user,
     List<PageRouteInfo>? children,
   }) : super(
-         MyProfileDetailRoute.name,
-         args: MyProfileDetailRouteArgs(key: key, user: user),
-         initialChildren: children,
-       );
+          MyProfileDetailRoute.name,
+          args: MyProfileDetailRouteArgs(
+            key: key,
+            user: user,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'MyProfileDetailRoute';
 
@@ -478,11 +615,14 @@ class MyProfileDetailRoute extends PageRouteInfo<MyProfileDetailRouteArgs> {
 }
 
 class MyProfileDetailRouteArgs {
-  const MyProfileDetailRouteArgs({this.key, required this.user});
+  const MyProfileDetailRouteArgs({
+    this.key,
+    required this.user,
+  });
 
   final Key? key;
 
-  final AppUser user;
+  final UserEntity user;
 
   @override
   String toString() {
@@ -493,22 +633,30 @@ class MyProfileDetailRouteArgs {
 /// generated route for
 /// [MyProfileScreen]
 class MyProfileRoute extends PageRouteInfo<MyProfileRouteArgs> {
-  MyProfileRoute({Key? key, required String uid, List<PageRouteInfo>? children})
-    : super(
-        MyProfileRoute.name,
-        args: MyProfileRouteArgs(key: key, uid: uid),
-        initialChildren: children,
-      );
+  MyProfileRoute({
+    Key? key,
+    required String uid,
+    List<PageRouteInfo>? children,
+  }) : super(
+          MyProfileRoute.name,
+          args: MyProfileRouteArgs(
+            key: key,
+            uid: uid,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'MyProfileRoute';
 
-  static const PageInfo<MyProfileRouteArgs> page = PageInfo<MyProfileRouteArgs>(
-    name,
-  );
+  static const PageInfo<MyProfileRouteArgs> page =
+      PageInfo<MyProfileRouteArgs>(name);
 }
 
 class MyProfileRouteArgs {
-  const MyProfileRouteArgs({this.key, required this.uid});
+  const MyProfileRouteArgs({
+    this.key,
+    required this.uid,
+  });
 
   final Key? key;
 
@@ -524,7 +672,10 @@ class MyProfileRouteArgs {
 /// [OnboardingScreen]
 class OnboardingRoute extends PageRouteInfo<void> {
   const OnboardingRoute({List<PageRouteInfo>? children})
-    : super(OnboardingRoute.name, initialChildren: children);
+      : super(
+          OnboardingRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'OnboardingRoute';
 
@@ -535,20 +686,12 @@ class OnboardingRoute extends PageRouteInfo<void> {
 /// [PrivacyPolicyScreen]
 class PrivacyPolicyRoute extends PageRouteInfo<void> {
   const PrivacyPolicyRoute({List<PageRouteInfo>? children})
-    : super(PrivacyPolicyRoute.name, initialChildren: children);
+      : super(
+          PrivacyPolicyRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'PrivacyPolicyRoute';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [RegisterScreen]
-class RegisterRoute extends PageRouteInfo<void> {
-  const RegisterRoute({List<PageRouteInfo>? children})
-    : super(RegisterRoute.name, initialChildren: children);
-
-  static const String name = 'RegisterRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -557,7 +700,10 @@ class RegisterRoute extends PageRouteInfo<void> {
 /// [ResetPasswordScreen]
 class ResetPasswordRoute extends PageRouteInfo<void> {
   const ResetPasswordRoute({List<PageRouteInfo>? children})
-    : super(ResetPasswordRoute.name, initialChildren: children);
+      : super(
+          ResetPasswordRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'ResetPasswordRoute';
 
@@ -568,7 +714,10 @@ class ResetPasswordRoute extends PageRouteInfo<void> {
 /// [SearchScreen]
 class SearchRoute extends PageRouteInfo<void> {
   const SearchRoute({List<PageRouteInfo>? children})
-    : super(SearchRoute.name, initialChildren: children);
+      : super(
+          SearchRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'SearchRoute';
 
@@ -579,7 +728,10 @@ class SearchRoute extends PageRouteInfo<void> {
 /// [SplashScreen]
 class SplashRoute extends PageRouteInfo<void> {
   const SplashRoute({List<PageRouteInfo>? children})
-    : super(SplashRoute.name, initialChildren: children);
+      : super(
+          SplashRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'SplashRoute';
 
@@ -590,7 +742,10 @@ class SplashRoute extends PageRouteInfo<void> {
 /// [TermsAndConditionsScreen]
 class TermsAndConditionsRoute extends PageRouteInfo<void> {
   const TermsAndConditionsRoute({List<PageRouteInfo>? children})
-    : super(TermsAndConditionsRoute.name, initialChildren: children);
+      : super(
+          TermsAndConditionsRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'TermsAndConditionsRoute';
 
@@ -604,16 +759,18 @@ class UserAddressFormRoute extends PageRouteInfo<UserAddressFormRouteArgs> {
     Key? key,
     required FormMode mode,
     required AddressProfile? existingAddressProfile,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-         UserAddressFormRoute.name,
-         args: UserAddressFormRouteArgs(
-           key: key,
-           mode: mode,
-           existingAddressProfile: existingAddressProfile,
-         ),
-         initialChildren: children,
-       );
+          UserAddressFormRoute.name,
+          args: UserAddressFormRouteArgs(
+            key: key,
+            mode: mode,
+            existingAddressProfile: existingAddressProfile,
+            registerSubmit: registerSubmit,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserAddressFormRoute';
 
@@ -626,6 +783,7 @@ class UserAddressFormRouteArgs {
     this.key,
     required this.mode,
     required this.existingAddressProfile,
+    this.registerSubmit,
   });
 
   final Key? key;
@@ -634,9 +792,11 @@ class UserAddressFormRouteArgs {
 
   final AddressProfile? existingAddressProfile;
 
+  final void Function(void Function())? registerSubmit;
+
   @override
   String toString() {
-    return 'UserAddressFormRouteArgs{key: $key, mode: $mode, existingAddressProfile: $existingAddressProfile}';
+    return 'UserAddressFormRouteArgs{key: $key, mode: $mode, existingAddressProfile: $existingAddressProfile, registerSubmit: $registerSubmit}';
   }
 }
 
@@ -648,10 +808,13 @@ class UserBiodataCheckRoute extends PageRouteInfo<UserBiodataCheckRouteArgs> {
     required bool isAgreed,
     List<PageRouteInfo>? children,
   }) : super(
-         UserBiodataCheckRoute.name,
-         args: UserBiodataCheckRouteArgs(key: key, isAgreed: isAgreed),
-         initialChildren: children,
-       );
+          UserBiodataCheckRoute.name,
+          args: UserBiodataCheckRouteArgs(
+            key: key,
+            isAgreed: isAgreed,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserBiodataCheckRoute';
 
@@ -660,7 +823,10 @@ class UserBiodataCheckRoute extends PageRouteInfo<UserBiodataCheckRouteArgs> {
 }
 
 class UserBiodataCheckRouteArgs {
-  const UserBiodataCheckRouteArgs({this.key, required this.isAgreed});
+  const UserBiodataCheckRouteArgs({
+    this.key,
+    required this.isAgreed,
+  });
 
   final Key? key;
 
@@ -676,7 +842,10 @@ class UserBiodataCheckRouteArgs {
 /// [UserChatScreen]
 class UserChatRoute extends PageRouteInfo<void> {
   const UserChatRoute({List<PageRouteInfo>? children})
-    : super(UserChatRoute.name, initialChildren: children);
+      : super(
+          UserChatRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'UserChatRoute';
 
@@ -690,16 +859,18 @@ class UserCultureFormRoute extends PageRouteInfo<UserCultureFormRouteArgs> {
     Key? key,
     required FormMode mode,
     CulturalProfile? existingCulturalProfile,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-         UserCultureFormRoute.name,
-         args: UserCultureFormRouteArgs(
-           key: key,
-           mode: mode,
-           existingCulturalProfile: existingCulturalProfile,
-         ),
-         initialChildren: children,
-       );
+          UserCultureFormRoute.name,
+          args: UserCultureFormRouteArgs(
+            key: key,
+            mode: mode,
+            existingCulturalProfile: existingCulturalProfile,
+            registerSubmit: registerSubmit,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserCultureFormRoute';
 
@@ -712,6 +883,7 @@ class UserCultureFormRouteArgs {
     this.key,
     required this.mode,
     this.existingCulturalProfile,
+    this.registerSubmit,
   });
 
   final Key? key;
@@ -720,9 +892,11 @@ class UserCultureFormRouteArgs {
 
   final CulturalProfile? existingCulturalProfile;
 
+  final void Function(void Function())? registerSubmit;
+
   @override
   String toString() {
-    return 'UserCultureFormRouteArgs{key: $key, mode: $mode, existingCulturalProfile: $existingCulturalProfile}';
+    return 'UserCultureFormRouteArgs{key: $key, mode: $mode, existingCulturalProfile: $existingCulturalProfile, registerSubmit: $registerSubmit}';
   }
 }
 
@@ -734,10 +908,13 @@ class UserDetailRoute extends PageRouteInfo<UserDetailRouteArgs> {
     required String uid,
     List<PageRouteInfo>? children,
   }) : super(
-         UserDetailRoute.name,
-         args: UserDetailRouteArgs(key: key, uid: uid),
-         initialChildren: children,
-       );
+          UserDetailRoute.name,
+          args: UserDetailRouteArgs(
+            key: key,
+            uid: uid,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserDetailRoute';
 
@@ -746,7 +923,10 @@ class UserDetailRoute extends PageRouteInfo<UserDetailRouteArgs> {
 }
 
 class UserDetailRouteArgs {
-  const UserDetailRouteArgs({this.key, required this.uid});
+  const UserDetailRouteArgs({
+    this.key,
+    required this.uid,
+  });
 
   final Key? key;
 
@@ -764,17 +944,19 @@ class UserEducationFormRoute extends PageRouteInfo<UserEducationFormRouteArgs> {
   UserEducationFormRoute({
     Key? key,
     required FormMode mode,
-    required EducationProfile? existingEducationProfile,
+    EducationProfile? existingEducationProfile,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-         UserEducationFormRoute.name,
-         args: UserEducationFormRouteArgs(
-           key: key,
-           mode: mode,
-           existingEducationProfile: existingEducationProfile,
-         ),
-         initialChildren: children,
-       );
+          UserEducationFormRoute.name,
+          args: UserEducationFormRouteArgs(
+            key: key,
+            mode: mode,
+            existingEducationProfile: existingEducationProfile,
+            registerSubmit: registerSubmit,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserEducationFormRoute';
 
@@ -786,7 +968,8 @@ class UserEducationFormRouteArgs {
   const UserEducationFormRouteArgs({
     this.key,
     required this.mode,
-    required this.existingEducationProfile,
+    this.existingEducationProfile,
+    this.registerSubmit,
   });
 
   final Key? key;
@@ -795,9 +978,11 @@ class UserEducationFormRouteArgs {
 
   final EducationProfile? existingEducationProfile;
 
+  final void Function(void Function())? registerSubmit;
+
   @override
   String toString() {
-    return 'UserEducationFormRouteArgs{key: $key, mode: $mode, existingEducationProfile: $existingEducationProfile}';
+    return 'UserEducationFormRouteArgs{key: $key, mode: $mode, existingEducationProfile: $existingEducationProfile, registerSubmit: $registerSubmit}';
   }
 }
 
@@ -809,16 +994,18 @@ class UserEmploymentFormRoute
     Key? key,
     required FormMode mode,
     required EmploymentProfile? existingEmploymentProfile,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-         UserEmploymentFormRoute.name,
-         args: UserEmploymentFormRouteArgs(
-           key: key,
-           mode: mode,
-           existingEmploymentProfile: existingEmploymentProfile,
-         ),
-         initialChildren: children,
-       );
+          UserEmploymentFormRoute.name,
+          args: UserEmploymentFormRouteArgs(
+            key: key,
+            mode: mode,
+            existingEmploymentProfile: existingEmploymentProfile,
+            registerSubmit: registerSubmit,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserEmploymentFormRoute';
 
@@ -831,6 +1018,7 @@ class UserEmploymentFormRouteArgs {
     this.key,
     required this.mode,
     required this.existingEmploymentProfile,
+    this.registerSubmit,
   });
 
   final Key? key;
@@ -839,9 +1027,11 @@ class UserEmploymentFormRouteArgs {
 
   final EmploymentProfile? existingEmploymentProfile;
 
+  final void Function(void Function())? registerSubmit;
+
   @override
   String toString() {
-    return 'UserEmploymentFormRouteArgs{key: $key, mode: $mode, existingEmploymentProfile: $existingEmploymentProfile}';
+    return 'UserEmploymentFormRouteArgs{key: $key, mode: $mode, existingEmploymentProfile: $existingEmploymentProfile, registerSubmit: $registerSubmit}';
   }
 }
 
@@ -852,16 +1042,18 @@ class UserFamilyFormRoute extends PageRouteInfo<UserFamilyFormRouteArgs> {
     Key? key,
     required FormMode mode,
     required FamilyProfile? existingFamilyProfile,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-         UserFamilyFormRoute.name,
-         args: UserFamilyFormRouteArgs(
-           key: key,
-           mode: mode,
-           existingFamilyProfile: existingFamilyProfile,
-         ),
-         initialChildren: children,
-       );
+          UserFamilyFormRoute.name,
+          args: UserFamilyFormRouteArgs(
+            key: key,
+            mode: mode,
+            existingFamilyProfile: existingFamilyProfile,
+            registerSubmit: registerSubmit,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserFamilyFormRoute';
 
@@ -874,6 +1066,7 @@ class UserFamilyFormRouteArgs {
     this.key,
     required this.mode,
     required this.existingFamilyProfile,
+    this.registerSubmit,
   });
 
   final Key? key;
@@ -882,9 +1075,11 @@ class UserFamilyFormRouteArgs {
 
   final FamilyProfile? existingFamilyProfile;
 
+  final void Function(void Function())? registerSubmit;
+
   @override
   String toString() {
-    return 'UserFamilyFormRouteArgs{key: $key, mode: $mode, existingFamilyProfile: $existingFamilyProfile}';
+    return 'UserFamilyFormRouteArgs{key: $key, mode: $mode, existingFamilyProfile: $existingFamilyProfile, registerSubmit: $registerSubmit}';
   }
 }
 
@@ -892,7 +1087,10 @@ class UserFamilyFormRouteArgs {
 /// [UserHomeScreen]
 class UserHomeRoute extends PageRouteInfo<void> {
   const UserHomeRoute({List<PageRouteInfo>? children})
-    : super(UserHomeRoute.name, initialChildren: children);
+      : super(
+          UserHomeRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'UserHomeRoute';
 
@@ -906,16 +1104,18 @@ class UserIdentityFormRoute extends PageRouteInfo<UserIdentityFormRouteArgs> {
     Key? key,
     required FormMode mode,
     IdentityProfile? existingIdentityProfile,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-         UserIdentityFormRoute.name,
-         args: UserIdentityFormRouteArgs(
-           key: key,
-           mode: mode,
-           existingIdentityProfile: existingIdentityProfile,
-         ),
-         initialChildren: children,
-       );
+          UserIdentityFormRoute.name,
+          args: UserIdentityFormRouteArgs(
+            key: key,
+            mode: mode,
+            existingIdentityProfile: existingIdentityProfile,
+            registerSubmit: registerSubmit,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserIdentityFormRoute';
 
@@ -928,6 +1128,7 @@ class UserIdentityFormRouteArgs {
     this.key,
     required this.mode,
     this.existingIdentityProfile,
+    this.registerSubmit,
   });
 
   final Key? key;
@@ -936,9 +1137,11 @@ class UserIdentityFormRouteArgs {
 
   final IdentityProfile? existingIdentityProfile;
 
+  final void Function(void Function())? registerSubmit;
+
   @override
   String toString() {
-    return 'UserIdentityFormRouteArgs{key: $key, mode: $mode, existingIdentityProfile: $existingIdentityProfile}';
+    return 'UserIdentityFormRouteArgs{key: $key, mode: $mode, existingIdentityProfile: $existingIdentityProfile, registerSubmit: $registerSubmit}';
   }
 }
 
@@ -946,9 +1149,26 @@ class UserIdentityFormRouteArgs {
 /// [UserImageFormScreen]
 class UserImageFormRoute extends PageRouteInfo<void> {
   const UserImageFormRoute({List<PageRouteInfo>? children})
-    : super(UserImageFormRoute.name, initialChildren: children);
+      : super(
+          UserImageFormRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'UserImageFormRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [UserLoginScreen]
+class UserLoginRoute extends PageRouteInfo<void> {
+  const UserLoginRoute({List<PageRouteInfo>? children})
+      : super(
+          UserLoginRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'UserLoginRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -957,7 +1177,10 @@ class UserImageFormRoute extends PageRouteInfo<void> {
 /// [UserMainShellScreen]
 class UserMainShellRoute extends PageRouteInfo<void> {
   const UserMainShellRoute({List<PageRouteInfo>? children})
-    : super(UserMainShellRoute.name, initialChildren: children);
+      : super(
+          UserMainShellRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'UserMainShellRoute';
 
@@ -968,7 +1191,10 @@ class UserMainShellRoute extends PageRouteInfo<void> {
 /// [UserNotificationScreen]
 class UserNotificationRoute extends PageRouteInfo<void> {
   const UserNotificationRoute({List<PageRouteInfo>? children})
-    : super(UserNotificationRoute.name, initialChildren: children);
+      : super(
+          UserNotificationRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'UserNotificationRoute';
 
@@ -979,7 +1205,10 @@ class UserNotificationRoute extends PageRouteInfo<void> {
 /// [UserPaymentOrderHistoryScreen]
 class UserPaymentOrderHistoryRoute extends PageRouteInfo<void> {
   const UserPaymentOrderHistoryRoute({List<PageRouteInfo>? children})
-    : super(UserPaymentOrderHistoryRoute.name, initialChildren: children);
+      : super(
+          UserPaymentOrderHistoryRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'UserPaymentOrderHistoryRoute';
 
@@ -994,13 +1223,13 @@ class UserPaymentRoute extends PageRouteInfo<UserPaymentRouteArgs> {
     required MetrimonyProfileViewModel metrimonyProfileViewModel,
     List<PageRouteInfo>? children,
   }) : super(
-         UserPaymentRoute.name,
-         args: UserPaymentRouteArgs(
-           key: key,
-           metrimonyProfileViewModel: metrimonyProfileViewModel,
-         ),
-         initialChildren: children,
-       );
+          UserPaymentRoute.name,
+          args: UserPaymentRouteArgs(
+            key: key,
+            metrimonyProfileViewModel: metrimonyProfileViewModel,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserPaymentRoute';
 
@@ -1030,13 +1259,16 @@ class UserPaymentSuccessRoute
     extends PageRouteInfo<UserPaymentSuccessRouteArgs> {
   UserPaymentSuccessRoute({
     Key? key,
-    required AppUser user,
+    required UserEntity user,
     List<PageRouteInfo>? children,
   }) : super(
-         UserPaymentSuccessRoute.name,
-         args: UserPaymentSuccessRouteArgs(key: key, user: user),
-         initialChildren: children,
-       );
+          UserPaymentSuccessRoute.name,
+          args: UserPaymentSuccessRouteArgs(
+            key: key,
+            user: user,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserPaymentSuccessRoute';
 
@@ -1045,11 +1277,14 @@ class UserPaymentSuccessRoute
 }
 
 class UserPaymentSuccessRouteArgs {
-  const UserPaymentSuccessRouteArgs({this.key, required this.user});
+  const UserPaymentSuccessRouteArgs({
+    this.key,
+    required this.user,
+  });
 
   final Key? key;
 
-  final AppUser user;
+  final UserEntity user;
 
   @override
   String toString() {
@@ -1064,16 +1299,18 @@ class UserPhysicalFormRoute extends PageRouteInfo<UserPhysicalFormRouteArgs> {
     Key? key,
     required FormMode mode,
     required PhysicalProfile? existingPhysicalProfile,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-         UserPhysicalFormRoute.name,
-         args: UserPhysicalFormRouteArgs(
-           key: key,
-           mode: mode,
-           existingPhysicalProfile: existingPhysicalProfile,
-         ),
-         initialChildren: children,
-       );
+          UserPhysicalFormRoute.name,
+          args: UserPhysicalFormRouteArgs(
+            key: key,
+            mode: mode,
+            existingPhysicalProfile: existingPhysicalProfile,
+            registerSubmit: registerSubmit,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserPhysicalFormRoute';
 
@@ -1086,6 +1323,7 @@ class UserPhysicalFormRouteArgs {
     this.key,
     required this.mode,
     required this.existingPhysicalProfile,
+    this.registerSubmit,
   });
 
   final Key? key;
@@ -1094,9 +1332,11 @@ class UserPhysicalFormRouteArgs {
 
   final PhysicalProfile? existingPhysicalProfile;
 
+  final void Function(void Function())? registerSubmit;
+
   @override
   String toString() {
-    return 'UserPhysicalFormRouteArgs{key: $key, mode: $mode, existingPhysicalProfile: $existingPhysicalProfile}';
+    return 'UserPhysicalFormRouteArgs{key: $key, mode: $mode, existingPhysicalProfile: $existingPhysicalProfile, registerSubmit: $registerSubmit}';
   }
 }
 
@@ -1108,10 +1348,13 @@ class UserProfileRoute extends PageRouteInfo<UserProfileRouteArgs> {
     required String userId,
     List<PageRouteInfo>? children,
   }) : super(
-         UserProfileRoute.name,
-         args: UserProfileRouteArgs(key: key, userId: userId),
-         initialChildren: children,
-       );
+          UserProfileRoute.name,
+          args: UserProfileRouteArgs(
+            key: key,
+            userId: userId,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserProfileRoute';
 
@@ -1120,7 +1363,10 @@ class UserProfileRoute extends PageRouteInfo<UserProfileRouteArgs> {
 }
 
 class UserProfileRouteArgs {
-  const UserProfileRouteArgs({this.key, required this.userId});
+  const UserProfileRouteArgs({
+    this.key,
+    required this.userId,
+  });
 
   final Key? key;
 
@@ -1133,10 +1379,27 @@ class UserProfileRouteArgs {
 }
 
 /// generated route for
+/// [UserRegisterScreen]
+class UserRegisterRoute extends PageRouteInfo<void> {
+  const UserRegisterRoute({List<PageRouteInfo>? children})
+      : super(
+          UserRegisterRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'UserRegisterRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [UserStatusScreen]
 class UserStatusRoute extends PageRouteInfo<void> {
   const UserStatusRoute({List<PageRouteInfo>? children})
-    : super(UserStatusRoute.name, initialChildren: children);
+      : super(
+          UserStatusRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'UserStatusRoute';
 
@@ -1151,10 +1414,13 @@ class UserWishListRoute extends PageRouteInfo<UserWishListRouteArgs> {
     required String userId,
     List<PageRouteInfo>? children,
   }) : super(
-         UserWishListRoute.name,
-         args: UserWishListRouteArgs(key: key, userId: userId),
-         initialChildren: children,
-       );
+          UserWishListRoute.name,
+          args: UserWishListRouteArgs(
+            key: key,
+            userId: userId,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'UserWishListRoute';
 
@@ -1163,7 +1429,10 @@ class UserWishListRoute extends PageRouteInfo<UserWishListRouteArgs> {
 }
 
 class UserWishListRouteArgs {
-  const UserWishListRouteArgs({this.key, required this.userId});
+  const UserWishListRouteArgs({
+    this.key,
+    required this.userId,
+  });
 
   final Key? key;
 

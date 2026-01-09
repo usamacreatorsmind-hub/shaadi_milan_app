@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +15,7 @@ class AgentContactScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final agentAsync = ref.watch(agentProfileControllerProvider(agentId));
+    final agentAsync = ref.watch(AgentEntityControllerProvider(agentId));
 
     return Scaffold(
       appBar: AppBar(title: const Text('Agent Details'), centerTitle: true),
@@ -27,7 +27,7 @@ class AgentContactScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAgentDetails(BuildContext context, AgentProfile agent) {
+  Widget _buildAgentDetails(BuildContext context, AgentEntity agent) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -65,8 +65,8 @@ class AgentContactScreen extends ConsumerWidget {
             context,
             Icons.email,
             'Email Agent',
-            agent.email,
-            () => _sendEmail(agent.email),
+            agent.agentEmail,
+            () => _sendEmail(agent.agentEmail),
           ),
           _buildContactTile(
             context,

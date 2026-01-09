@@ -1,9 +1,9 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/agent_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_repository.dart'; 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
@@ -64,10 +64,10 @@ class HomeController extends StateNotifier<HomeState> {
         profiles.map((profile) async {
           final user = users.firstWhere(
             (u) => u.uid == profile.userId,
-            orElse: () => AppUser.empty(),
+            orElse: () => UserEntity.empty(),
           );
 
-          AgentProfile? agent;
+          AgentEntity? agent;
           if (profile.agentId.isNotEmpty) {
             agent = await _agentRepository.fetchAgent(profile.agentId);
           }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-import '../../../user_auth/presentation/providers/auth_providers.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import '../../domain/states/address_state.dart';
@@ -91,7 +91,7 @@ final addressControllerProvider =
       final repo = ref.read(matrimonyRepositoryProvider);
       final authState = ref.read(authStateProvider);
 
-      final uid = authState.value?.uid;
+      final uid = authState.value?.fold((agent) => null, (user) => user.uid);
       if (uid == null) {
         throw Exception('User not authenticated');
       }

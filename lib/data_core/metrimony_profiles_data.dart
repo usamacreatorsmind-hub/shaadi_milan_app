@@ -14,27 +14,27 @@
 // import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 
-// Future<AppUser> fetchUserProfile(String userId) async {
+// Future<UserEntity> fetchUserProfile(String userId) async {
 //   final userFirestoreDs = UserFirestoreDS(FirebaseFirestore.instance);
 //   final userData = await userFirestoreDs.fetchUser(userId);
-//   return AppUser.fromMap(userData);
+//   return UserEntity.fromMap(userData);
 // }
 
-// Future<AgentProfile> fetchAgentProfile(String agentId) async {
+// Future<AgentEntity> fetchAgentEntity(String agentId) async {
 //   final agentFirestoreDs = AgentFirestoreDs(FirebaseFirestore.instance);
 //   return await agentFirestoreDs.fetchAgentbyAgentId(agentId);
 // }
 
 // final uid = "cTfOSye3OO6sdPa48zgBy1pucm2";
-// final AppUser dummyUser = AppUser(
+// final UserEntity dummyUser = UserEntity(
 //   uid: uid, // 🔥 REAL UID
 //   fullName: '',
 //   email: '',
 //   role: 'user',
-  
+
 // );
 // final agentId = "81266";
-// final AgentProfile dummyAgent = AgentProfile(
+// final AgentEntity dummyAgent = AgentEntity(
 //   agentId: agentId,
 //   agentName: '',
 //   agentMobile: '',
@@ -138,7 +138,7 @@
 //   try {
 //     for (final profile in metrimonyProfiles) {
 //       final fetchedUser = await fetchUserProfile(profile.user!.uid);
-//       final fetchedAgent = await fetchAgentProfile(profile.agent!.agentId);
+//       final fetchedAgent = await fetchAgentEntity(profile.agent!.agentId);
 
 //       final updatedProfile = profile.copyWith(
 //         user: fetchedUser,

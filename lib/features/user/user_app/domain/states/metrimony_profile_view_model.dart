@@ -1,35 +1,35 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/address_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/address_state.dart'; 
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/cultural_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/education_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/employee_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/family_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/identity_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart'; 
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/physical_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 
 class MetrimonyProfileViewModel {
   final MatrimonyProfile metrimonyProfile;
-  final AppUser userProfile;
-  final AgentProfile? agentProfile;
+  final UserEntity userProfile;
+  final AgentEntity? agentEntity;
 
   MetrimonyProfileViewModel({
     required this.metrimonyProfile,
     required this.userProfile,
-    this.agentProfile,
+    required this.agentEntity,
   });
 
   factory MetrimonyProfileViewModel.fromMetrimonyProfile({
     required MatrimonyProfile matrimonyProfile,
-    required AppUser userProfile,
-    AgentProfile? agentProfile,
+    required UserEntity userProfile,
+    required AgentEntity? agentEntity,
   }) {
     return MetrimonyProfileViewModel(
       metrimonyProfile: matrimonyProfile,
       userProfile: userProfile,
-      agentProfile: agentProfile,
+      agentEntity: agentEntity,
     );
   }
 
@@ -39,21 +39,21 @@ class MetrimonyProfileViewModel {
   CulturalProfile get cultural => metrimonyProfile.cultural;
   EducationProfile get education => metrimonyProfile.education;
   EmploymentProfile get employment => metrimonyProfile.employment;
-  FamilyProfile get family => metrimonyProfile.family; 
+  FamilyProfile get family => metrimonyProfile.family;
   PhysicalProfile get physical => metrimonyProfile.physical;
   ProfileImages get images => metrimonyProfile.images;
-  AppUser get user => userProfile;
-  AgentProfile? get agent => agentProfile;
+  UserEntity get user => userProfile;
+  AgentEntity? get agent => agentEntity;
 
   MetrimonyProfileViewModel copyWith({
     MatrimonyProfile? metrimonyProfile,
-    AppUser? userProfile,
-    AgentProfile? agentProfile,
+    UserEntity? userProfile,
+    AgentEntity? AgentEntity,
   }) {
     return MetrimonyProfileViewModel(
       metrimonyProfile: metrimonyProfile ?? this.metrimonyProfile,
       userProfile: userProfile ?? this.userProfile,
-      agentProfile: agentProfile ?? this.agentProfile,
+      agentEntity: AgentEntity ?? this.agentEntity,
     );
   }
 
@@ -61,23 +61,23 @@ class MetrimonyProfileViewModel {
     return {
       'metrimonyProfile': metrimonyProfile.toMap(),
       'userProfile': userProfile.toMap(),
-      'agentProfile': agentProfile?.toMap(),
+      'agentEntity': agentEntity?.toMap(),
     };
   }
 
   factory MetrimonyProfileViewModel.fromMap(Map<String, dynamic> map) {
     return MetrimonyProfileViewModel(
       metrimonyProfile: MatrimonyProfile.fromMap(map['metrimonyProfile']),
-      userProfile: AppUser.fromMap(map['userProfile']),
-      agentProfile: map['agentProfile'] != null
-          ? AgentProfile.fromMap(map['agentProfile'])
+      userProfile: UserEntity.fromMap(map['userProfile']),
+      agentEntity: map['agentEntity'] != null
+          ? AgentEntity.fromMap(map['agentEntity'])
           : null,
     );
   }
 
   @override
   String toString() {
-    return 'MetrimonyProfileViewModel(metrimonyProfile: $metrimonyProfile, userProfile: $userProfile, agentProfile: $agentProfile)';
+    return 'MetrimonyProfileViewModel(metrimonyProfile: $metrimonyProfile, userProfile: $userProfile, AgentEntity: $AgentEntity)';
   }
 
   // to json
@@ -85,7 +85,7 @@ class MetrimonyProfileViewModel {
     return {
       'metrimonyProfile': metrimonyProfile.toMap(),
       'userProfile': userProfile.toMap(),
-      'agentProfile': agentProfile?.toMap(),
+      'agentEntity': agentEntity?.toMap(),
     };
   }
 }

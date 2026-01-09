@@ -1,13 +1,13 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart'
     show agentFirestoreDsProvider;
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
-import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
+import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 
 import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
-import '../../data/repositories_impl/matrimony_repository_impl.dart';
-import '../../domain/states/agent_state.dart';
+import '../../data/repositories_impl/matrimony_repository_impl.dart'; 
 import '../../domain/states/metrimony_state.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,7 @@ final matrimonyProfileProvider =
       print("user");
       print(user.toString());
 
-      AgentProfile? agent;
+      AgentEntity? agent;
       if (matrimonyProfile.agentId.isNotEmpty) {
         agent = await ref
             .watch(agentFirestoreDsProvider)
@@ -741,7 +741,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
     );
   }
 
-  void showAgentBottomSheet(BuildContext context, AgentProfile agent) {
+  void showAgentBottomSheet(BuildContext context, AgentEntity agent) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,

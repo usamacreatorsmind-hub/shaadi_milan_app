@@ -1,12 +1,13 @@
 import 'dart:io';
 
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 
 import '../../../../../app/custom/image_picker/image_picker_controller.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../domain/states/image_state.dart';
 import '../controllers/metrimony_profile_controller.dart';
-import '../../../user_auth/presentation/providers/auth_providers.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,7 +31,8 @@ class _UserBiodataCheckScreenState
     final state = ref.watch(metrimonyControllerProvider);
     final profile = state.metrimony;
     final authState = ref.watch(authStateProvider);
-    final currentUser = authState.value;
+    final eitherUser = authState.value;
+    final currentUser = eitherUser?.fold((l) => null, (r) => r);
     final imageState = ref.watch(imagePickerProvider);
 
     if (state.isLoading) {
@@ -57,8 +59,6 @@ class _UserBiodataCheckScreenState
 
           _section('User Details', Icons.person, [
             _infoRow('Full Name', currentUser?.fullName),
-
-            _infoRow('Email', currentUser?.email),
             _infoRow('Phone', currentUser?.phone),
           ]),
 
@@ -417,7 +417,13 @@ class _UserBiodataCheckScreenState
   // ================= SUBMIT =================
 
   Future<void> _confirmSubmit() async {
-    final user = ref.read(authStateProvider).value;
+    final authState = ref.read(authStateProvider);
+    final eitherUser = authState.value;
+
+    if (eitherUser == null) return;
+
+    final user = eitherUser.fold((l) => null, (r) => r);
+
     if (user == null) return;
 
     // 1. Upload Images if local images exist

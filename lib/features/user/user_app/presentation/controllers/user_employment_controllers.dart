@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-import '../../../user_auth/presentation/providers/auth_providers.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import '../../domain/states/employee_state.dart';
@@ -88,7 +88,8 @@ final userEmploymentControllerProvider =
       EmploymentState
     >((ref) {
       final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
-      final uid = ref.read(authStateProvider).value?.uid;
+      final authState = ref.read(authStateProvider);
+      final uid = authState.value?.fold((agent) => null, (user) => user.uid);
       if (uid == null) throw Exception('User not authenticated');
       return UserEmploymentController(matrimonyRepo, uid, ref);
     });

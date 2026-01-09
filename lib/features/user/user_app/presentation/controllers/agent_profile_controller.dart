@@ -1,24 +1,22 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../data/repositories_impl/agent_repository_impl.dart';
-import '../../domain/states/agent_state.dart';
 
-class AgentProfileController extends StateNotifier<AsyncValue<AgentProfile>> {
+class AgentEntityController extends StateNotifier<AsyncValue<AgentEntity>> {
   final AgentRepositoryImpl _agentRepository;
   final String _agentId;
 
-  AgentProfileController(this._agentRepository, this._agentId)
+  AgentEntityController(this._agentRepository, this._agentId)
     : super(const AsyncValue.loading()) {
-    _fetchAgentProfile();
+    _fetchAgentEntity();
   }
 
-  Future<void> _fetchAgentProfile() async {
+  Future<void> _fetchAgentEntity() async {
     try {
-      final agentProfile = await _agentRepository.fetchAgentProfilebyAgentId(
-        _agentId,
-      );
-      state = AsyncValue.data(agentProfile);
+      final agent = await _agentRepository.fetchAgentEntitybyAgentId(_agentId);
+      state = AsyncValue.data(agent);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -39,14 +37,14 @@ class AgentProfileController extends StateNotifier<AsyncValue<AgentProfile>> {
   }
 }
 
-final agentProfileControllerProvider =
+final AgentEntityControllerProvider =
     StateNotifierProvider.family<
-      AgentProfileController,
-      AsyncValue<AgentProfile>,
+      AgentEntityController,
+      AsyncValue<AgentEntity>,
       String
     >((ref, agentId) {
       final agentRepository = ref.read(agentRepositoryProvider);
-      return AgentProfileController(
+      return AgentEntityController(
         agentRepository as AgentRepositoryImpl,
         agentId,
       );

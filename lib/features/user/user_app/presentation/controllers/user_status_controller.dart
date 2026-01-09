@@ -2,7 +2,7 @@ import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_status_repository.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-import '../../../user_auth/presentation/providers/auth_providers.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../domain/states/user_status_state.dart';
 
 class UserStatusController extends StateNotifier<UserStatusState> {
@@ -31,7 +31,10 @@ class UserStatusController extends StateNotifier<UserStatusState> {
 final userStatusControllerProvider =
     StateNotifierProvider<UserStatusController, UserStatusState>((ref) {
       final userRepository = ref.read(userStatusRepositoryProvider);
-      final uid = ref.read(authStateProvider).value?.uid;
+      final uid = ref
+          .read(authStateProvider)
+          .value
+          ?.fold((agent) => null, (user) => user.uid);
       if (uid == null) {
         throw Exception('User not authenticated');
       }

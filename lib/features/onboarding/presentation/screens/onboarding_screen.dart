@@ -11,7 +11,7 @@ class OnboardingScreen extends StatelessWidget {
 
   void _onDone(BuildContext context) {
     // When done button is press
-    context.router.replace(const LoginRoute());
+    context.router.replace(const UserLoginRoute());
   }
 
   @override

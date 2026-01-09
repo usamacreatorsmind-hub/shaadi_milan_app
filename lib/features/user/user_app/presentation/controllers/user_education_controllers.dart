@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/legacy.dart';
 
-import '../../../user_auth/presentation/providers/auth_providers.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/education_state.dart';
 import 'metrimony_profile_controller.dart';
@@ -58,7 +58,10 @@ final userEducationControllerProvider =
     StateNotifierProvider.autoDispose<UserEducationController, EducationState>((
       ref,
     ) {
-      final uid = ref.read(authStateProvider).value?.uid;
+      final uid = ref
+          .read(authStateProvider)
+          .value
+          ?.fold((agent) => null, (user) => user.uid);
       if (uid == null) throw Exception('User not authenticated');
       return UserEducationController(uid, ref);
     });

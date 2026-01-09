@@ -59,15 +59,7 @@ List<PageViewModel> pageViewModelList(BuildContext context) {
                 ),
                 onPressed: () {
                   // Navigate to Agent Registration/Login
-                  // context.router.replace(const AgentLoginRoute());
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      duration: Duration(seconds: 2),
-
-                      // appread from top
-                      content: const Text('Agent login coming soon!'),
-                    ),
-                  );
+                  context.router.replace(const AgentLoginRoute());
                 },
                 child: const Text(
                   "Continue as Agent",
@@ -92,7 +84,7 @@ List<PageViewModel> pageViewModelList(BuildContext context) {
                 ),
                 onPressed: () {
                   // Navigate to User Login/Signup
-                  context.router.replace(const LoginRoute());
+                  context.router.replace(const UserLoginRoute());
                 },
                 child: const Text(
                   "Continue as User",

@@ -1,13 +1,13 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
 
 import '../../../../../app/router/app_router.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
-import 'package:arvika_marriage_bureau/features/user/user_auth/presentation/providers/auth_providers.dart';
+import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,8 +23,8 @@ final userProfileScreenProvider =
       ) async {
         final user = await userRepo.fetchUser(userId);
 
-        // fetch agentprofile
-        AgentProfile? agent;
+        // fetch AgentEntity
+        AgentEntity? agent;
         if (matrimonyProfile.agentId.isNotEmpty) {
           agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
         }
@@ -32,7 +32,7 @@ final userProfileScreenProvider =
         return MetrimonyProfileViewModel(
           metrimonyProfile: matrimonyProfile,
           userProfile: user,
-          agentProfile: agent,
+          agentEntity: agent,
         );
       });
     });
@@ -223,13 +223,13 @@ class UserProfileScreen extends ConsumerWidget {
                           icon: Icons.support_agent_outlined,
                           title: "Agent Details",
                           onTap: () {
-                            if (profile.agentProfile != null) {
+                            if (profile.agentEntity != null) {
                               showModalBottomSheet(
                                 context: context,
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,
                                 builder: (context) => AgentBottomSheet(
-                                  agent: profile.agentProfile!,
+                                  agent: profile.agentEntity!,
                                 ),
                               );
                             } else {
@@ -377,13 +377,15 @@ class UserProfileScreen extends ConsumerWidget {
 
                               AutoRouter.of(
                                 context,
-                              ).replace(const LoginRoute());
+                              ).replace(const UserLoginRoute());
 
                               print("Logout button pressed");
                             },
                             child: const Text("Logout"),
                           ),
                         ),
+
+                        SizedBox(height: 100),
                       ],
                     );
                   }, childCount: 1),

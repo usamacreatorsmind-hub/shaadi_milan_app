@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../router/app_router.dart';
 
-final appRouterProvider = Provider((ref) => AppRouter());
+final appRouterProvider = Provider((ref) => AppRouter(ref));
 
 final firebaseAuthProvider = Provider<FirebaseAuth>(
   (ref) => FirebaseAuth.instance,
