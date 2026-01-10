@@ -31,6 +31,7 @@ class _UserPhysicalFormScreenState
   final _weightController = TextEditingController();
   final _bodyTypeController = TextEditingController();
   final _complexionController = TextEditingController();
+  final _disabilityDetailsController = TextEditingController();
 
   bool _physicallyChallenged = false;
 
@@ -46,6 +47,7 @@ class _UserPhysicalFormScreenState
       _bodyTypeController.text = profile.bodyType;
       _complexionController.text = profile.complexion;
       _physicallyChallenged = profile.physicallyChallenged;
+      _disabilityDetailsController.text = profile.disabilityDetails ?? '';
     }
   }
 
@@ -69,6 +71,9 @@ class _UserPhysicalFormScreenState
           bodyType: _bodyTypeController.text,
           complexion: _complexionController.text,
           physicallyChallenged: _physicallyChallenged,
+          disabilityDetails: _physicallyChallenged
+              ? _disabilityDetailsController.text
+              : null,
         );
       } else {
         // Update logic (using savePhysicals as upsert)
@@ -78,6 +83,9 @@ class _UserPhysicalFormScreenState
           bodyType: _bodyTypeController.text,
           complexion: _complexionController.text,
           physicallyChallenged: _physicallyChallenged,
+          disabilityDetails: _physicallyChallenged
+              ? _disabilityDetailsController.text
+              : null,
         );
       }
     }
@@ -123,6 +131,7 @@ class _UserPhysicalFormScreenState
                 hint: "Enter your height in centimeters",
                 obscureText: false,
                 keyboardType: TextInputType.number,
+                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
               ),
 
               const SizedBox(height: 16),
@@ -134,6 +143,7 @@ class _UserPhysicalFormScreenState
                 hint: "Enter your weight in kilograms",
                 obscureText: false,
                 keyboardType: TextInputType.number,
+                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
 
@@ -201,6 +211,21 @@ class _UserPhysicalFormScreenState
                   });
                 },
               ),
+
+              if (_physicallyChallenged) ...[
+                const SizedBox(height: 16),
+                AppTextField(
+                  controller: _disabilityDetailsController,
+                  prefixIcon: Icons.accessible,
+                  iconColor: Theme.of(context).colorScheme.primary,
+                  label: "Disability Details",
+                  hint: "Please specify details",
+                  obscureText: false,
+                  keyboardType: TextInputType.text,
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Please enter details' : null,
+                ),
+              ],
 
               const SizedBox(height: 20),
               if (physicalState.isLoading)

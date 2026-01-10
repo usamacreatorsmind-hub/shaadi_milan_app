@@ -1,4 +1,3 @@
-
 import '../datasources/firebase/user_image_firestore.dart';
 import '../../domain/repositories/user_image_repository.dart';
 import '../../domain/states/image_state.dart';
@@ -37,6 +36,7 @@ class UserImageRepositoryImpl implements UserImageRepository {
       aadharCardUrl: imagesMap['aadharCardUrl'] as String,
 
       secondaryImageUrls: imagesMap['secondaryImageUrls'] as List<String>,
+      profileImageUrl: imagesMap['profileImageUrl'] as String,
     );
   }
 

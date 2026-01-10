@@ -413,11 +413,8 @@ class MyProfileScreen extends ConsumerWidget {
                     icon: Icons.edit,
                   ),
                   children: [
-                    _DetailRow("Height", profile.physical.height ?? "N/A"),
-                    _DetailRow(
-                      "Weight",
-                      profile.physical.weight.toString() ?? "N/A",
-                    ),
+                    _DetailRow("Height", "${profile.physical.height} cm"),
+                    _DetailRow("Weight", "${profile.physical.weight} kg"),
                     _DetailRow("Body Type", profile.physical.bodyType ?? "N/A"),
 
                     _DetailRow(
@@ -429,6 +426,11 @@ class MyProfileScreen extends ConsumerWidget {
                       "Disability",
                       profile.physical.physicallyChallenged ? "Yes" : "No ",
                     ),
+                    if (profile.physical.physicallyChallenged)
+                      _DetailRow(
+                        "Details",
+                        profile.physical.disabilityDetails ?? "N/A",
+                      ),
                   ],
                 ),
 

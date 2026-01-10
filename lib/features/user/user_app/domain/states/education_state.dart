@@ -21,10 +21,10 @@ class Education {
 
   factory Education.fromMap(Map<String, dynamic> map) {
     return Education(
-      college: map['college'] as String,
-      course: map['course'] as String,
-      passingYear: map['passingYear'] as int,
-      percentage: map['percentage'] as double,
+      college: map['college'] as String? ?? '',
+      course: map['course'] as String? ?? '',
+      passingYear: int.tryParse(map['passingYear']?.toString() ?? '') ?? 0,
+      percentage: double.tryParse(map['percentage']?.toString() ?? '') ?? 0.0,
     );
   }
 
@@ -52,7 +52,7 @@ class Education {
   }
 }
 
-class ExtraQualification { 
+class ExtraQualification {
   List<String> qualifications;
 
   ExtraQualification({required this.qualifications});

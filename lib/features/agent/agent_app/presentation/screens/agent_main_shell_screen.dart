@@ -1,6 +1,8 @@
 import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agent_dashboard_screen.dart';
 import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,9 +32,10 @@ class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
 
     return AutoTabsRouter(
       routes: [
-        const UserHomeRoute(),
-        AgentDashboardRoute(uid: widget.agentId),
-        AgentEntityRoute(uid: widget.agentId),
+        AgentDashboardRoute(agentId: widget.agentId),
+        AgentUserRoute(agentId: widget.agentId),
+        AgentRevenueRoute(agentId: widget.agentId),
+        AgentActivitiesRoute(agentId: widget.agentId),
       ],
       transitionBuilder: (context, child, animation) =>
           FadeTransition(opacity: animation, child: child),
@@ -41,6 +44,7 @@ class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
 
         return Scaffold(
           extendBody: true,
+        
 
           body: child,
           bottomNavigationBar: CustomBottomNavBar(
@@ -71,9 +75,22 @@ class CustomBottomNavBar extends StatelessWidget {
   });
 
   static const List<BottomNavItem> items = [
-    BottomNavItem(icon: Icons.home_outlined, label: 'Home'),
-    BottomNavItem(icon: Icons.favorite_outline, label: 'Dashboard'),
-    BottomNavItem(icon: Icons.person_outline, label: 'Profile'),
+    BottomNavItem(
+      icon: Icons.analytics_outlined,
+      label: 'Dashboard', // Stats & Overview
+    ),
+    BottomNavItem(
+      icon: Icons.groups_3_outlined,
+      label: 'Clients', // Their own data/profiles
+    ),
+    BottomNavItem(
+      icon: Icons.payments_outlined,
+      label: 'Revenue', // Earnings & Commissions
+    ),
+    BottomNavItem(
+      icon: Icons.task_alt_outlined,
+      label: 'Activities', // Tasks, Meetings, & Follow-ups
+    ),
   ];
 
   @override
@@ -105,7 +122,7 @@ class CustomBottomNavBar extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 35,
+                  horizontal: 16,
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(

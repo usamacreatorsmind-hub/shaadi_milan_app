@@ -170,7 +170,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       final service = ref.read(imageUploadServiceProvider);
 
       final hasSecondary = state.secondaryImages.isNotEmpty;
-      final steps = hasSecondary ? 3 : 2;
+      final steps = hasSecondary ? 5 : 4; // primary, aadhar, imageWithAgent, profileImage + optional secondary
       final stepWeight = 1.0 / steps;
 
       void updateStepProgress(int stepIndex, double p) {
@@ -212,10 +212,17 @@ class ImagePickerController extends StateNotifier<ImagesState> {
         onProgress: (p) => updateStepProgress(nextStep + 1, p),
       );
 
+      final profileImageUrl = await service.uploadProfileImage(
+        uid: uid,
+        filePath: state.profileImage!,
+        onProgress: (p) => updateStepProgress(nextStep + 2, p),
+      );
+
       ref
           .read(metrimonyControllerProvider.notifier)
           .saveImages(
             ProfileImages(
+              profileImageUrl: profileImageUrl,
               primaryImageUrl: primaryImageUrl,
               imageWithAgentUrl: imagewithagenturl,
               aadharCardUrl: aadharCardUrl,
@@ -243,6 +250,27 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       final croppedPath = await _cropImage(image.path, isPrimary: false);
       if (croppedPath != null) {
         state = state.copyWith(imageWithAgentUrl: croppedPath);
+      }
+    } finally {
+      _isPicking = false;
+    }
+  }
+
+  void pickProfileImage() async {
+    if (_isPicking) return;
+    _isPicking = true;
+
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+
+      if (image == null) return;
+
+      final croppedPath = await _cropImage(image.path, isPrimary: true);
+      if (croppedPath != null) {
+        state = state.copyWith(profileImage: croppedPath);
       }
     } finally {
       _isPicking = false;

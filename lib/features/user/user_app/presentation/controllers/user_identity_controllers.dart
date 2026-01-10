@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -71,10 +72,12 @@ class UserIdentityController extends StateNotifier<IdentityState> {
     );
 
     try {
-      // await _matrimonyRepository.updateIdentityProfile(_uid, identityProfile);
+      // Update gender in users collection
+      await FirebaseFirestore.instance.collection('users').doc(_uid).update({
+        'gender': gender,
+      });
 
-      // 🔹 Update Matrimony Profile
-
+      // Update Matrimony Profile
       _ref
           .read(metrimonyControllerProvider.notifier)
           .saveIdentity(identityProfile);

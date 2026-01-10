@@ -495,6 +495,13 @@ class _PremiumCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      context.router.push(UserImageFormRoute());
+                    },
+                    child: Text("Elevated Button"),
+                  ),
+
                   Text(
                     "Upgrade to Premium",
                     style: TextStyle(

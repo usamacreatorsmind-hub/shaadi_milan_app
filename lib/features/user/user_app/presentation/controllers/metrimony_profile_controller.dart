@@ -168,10 +168,10 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
         .read(matrimonyRepositoryProvider)
         .updateMatrimonyProfile(uid, profile);
 
-        
-
+    // Update photoUrl in users collection with profileImageUrl
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
       'userStatus.isProfileCreated': true,
+      'photoUrl': profile.images.profileImageUrl,
     });
   }
 }

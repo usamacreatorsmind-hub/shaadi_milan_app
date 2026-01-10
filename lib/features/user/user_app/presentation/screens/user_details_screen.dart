@@ -7,7 +7,7 @@ import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth
 import 'package:auto_route/auto_route.dart';
 
 import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
-import '../../data/repositories_impl/matrimony_repository_impl.dart'; 
+import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/metrimony_state.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
@@ -311,18 +311,26 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 _InfoTile(
                                   label: 'Height',
                                   icon: Icons.height,
-                                  value: profile.physical.height,
+                                  value: "${profile.physical.height} cm",
                                 ),
                                 _InfoTile(
                                   label: 'Weight',
                                   icon: Icons.scale,
-                                  value: profile.physical.weight.toString(),
+                                  value: "${profile.physical.weight} kg",
                                 ),
                                 _InfoTile(
                                   label: 'Body Type',
                                   icon: Icons.accessibility_new,
                                   value: profile.physical.bodyType,
                                 ),
+                                if (profile.physical.physicallyChallenged)
+                                  _InfoTile(
+                                    label: 'Disability',
+                                    icon: Icons.accessible,
+                                    value:
+                                        profile.physical.disabilityDetails ??
+                                        "Yes",
+                                  ),
                               ],
                             ),
 
@@ -390,29 +398,35 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   icon: Icons.work_outline,
                                   value: profile.employment.jobType,
                                 ),
-                                _InfoTile(
-                                  label: 'Company',
-                                  icon: Icons.business,
-                                  value: profile.employment.company,
-                                ),
-                                _InfoTile(
-                                  label: 'Designation',
-                                  icon: Icons.work_history,
-                                  value: profile.employment.designation,
-                                ),
-                                _InfoTile(
-                                  label: 'Income',
-                                  icon: Icons.attach_money,
-                                  value: profile.employment.annualIncome
-                                      .toString(),
-                                ),
-
-                                _InfoTile(
-                                  label: 'Work Location',
-                                  icon: Icons.location_city_outlined,
-                                  value: profile.employment.workLocation
-                                      .toString(),
-                                ),
+                                if (profile.employment.jobType !=
+                                    "Not Working") ...[
+                                  _InfoTile(
+                                    label: 'Company',
+                                    icon: Icons.business,
+                                    value: profile.employment.company ?? "N/A",
+                                  ),
+                                  _InfoTile(
+                                    label: 'Designation',
+                                    icon: Icons.work_history,
+                                    value:
+                                        profile.employment.designation ?? "N/A",
+                                  ),
+                                  _InfoTile(
+                                    label: 'Income',
+                                    icon: Icons.attach_money,
+                                    value:
+                                        profile.employment.annualIncome
+                                            ?.toString() ??
+                                        "N/A",
+                                  ),
+                                  _InfoTile(
+                                    label: 'Work Location',
+                                    icon: Icons.location_city_outlined,
+                                    value:
+                                        profile.employment.workLocation ??
+                                        "N/A",
+                                  ),
+                                ],
                               ],
                             ),
 

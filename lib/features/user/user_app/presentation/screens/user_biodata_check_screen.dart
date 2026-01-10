@@ -77,6 +77,11 @@ class _UserBiodataCheckScreenState
             _infoRow('Weight', profile.physical.weight),
             _infoRow('Complexion', profile.physical.complexion),
             _infoRow('Body Type', profile.physical.bodyType),
+            if (profile.physical.physicallyChallenged)
+              _infoRow('Disability', "Yes"),
+            if (profile.physical.physicallyChallenged &&
+                profile.physical.disabilityDetails != null)
+              _infoRow('Details', profile.physical.disabilityDetails),
           ]),
 
           _section('Cultural', Icons.temple_hindu, [

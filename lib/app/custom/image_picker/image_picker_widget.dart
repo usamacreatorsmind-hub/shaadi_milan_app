@@ -18,6 +18,12 @@ class ExpandableImagePickerList extends ConsumerWidget {
       children: [
         // ================= MATRIMONY IMAGE =================
         _ExpandableTile(
+          title: "Profile Image",
+          isSelected: state.profileImage != null,
+          onTapPick: controller.pickProfileImage,
+          child: _profileImagePreview(state.profileImage),
+        ),
+        _ExpandableTile(
           title: 'Matrimony Image',
           isSelected: state.primaryImage != null,
           onTapPick: controller.pickPrimaryImage,
@@ -128,6 +134,19 @@ class ExpandableImagePickerList extends ConsumerWidget {
             child: Text(path.split('/').last, overflow: TextOverflow.ellipsis),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _profileImagePreview(profilImage) {
+    if (profilImage == null) return const SizedBox();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.file(
+        File(profilImage),
+        height: 220,
+        width: double.infinity,
+        fit: BoxFit.cover,
       ),
     );
   }

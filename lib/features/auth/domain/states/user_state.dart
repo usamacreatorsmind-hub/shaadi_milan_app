@@ -10,6 +10,8 @@ class UserEntity {
   final String agentId;
   final String userType;
   final String role;
+  final String profileImageUrl;
+  final String? gender;
 
   final bool isProfileCreated;
 
@@ -22,6 +24,7 @@ class UserEntity {
   final DateTime lastSeen;
 
   const UserEntity({
+    required this.profileImageUrl,
     required this.uid,
     required this.email,
     required this.fullName,
@@ -29,6 +32,8 @@ class UserEntity {
     required this.agentId,
     required this.userType,
     required this.role,
+    this.gender,
+
     required this.isProfileCreated,
     required this.metrimonyId,
     required this.profileId,
@@ -40,9 +45,11 @@ class UserEntity {
   /// ------------------ EMPTY ------------------
   factory UserEntity.empty() {
     return UserEntity(
+      profileImageUrl: "",
       uid: '',
       email: '',
       fullName: '',
+
       phone: '',
       agentId: '',
       userType: '',
@@ -60,6 +67,7 @@ class UserEntity {
   /// ------------------ MAP ------------------
   Map<String, dynamic> toMap() {
     return {
+      "photoUrl": profileImageUrl,
       'uid': uid,
       'email': email,
       'fullName': fullName,
@@ -67,6 +75,7 @@ class UserEntity {
       'agentId': agentId,
       'userType': userType,
       'role': role,
+      'gender': gender,
       'isProfileCreated': isProfileCreated,
       'metrimonyId': metrimonyId,
       'profileId': profileId,
@@ -88,6 +97,9 @@ class UserEntity {
     }
 
     return UserEntity(
+      profileImageUrl:
+          map['photoUrl'] ??
+          "https://firebasestorage.googleapis.com/v0/b/fir-app-e3a53.firebasestorage.app/o/company_files%2Ficon-7797704_640.png?alt=media&token=90d1d7fc-9dd9-4ab9-8dfc-480646f5777f",
       uid: map['uid'] ?? '',
       email: map['email'] ?? '',
       fullName: map['fullName'] ?? '',
@@ -95,6 +107,7 @@ class UserEntity {
       agentId: map['agentId'] ?? '',
       userType: map['userType'] ?? '',
       role: map['role'] ?? '',
+      gender: map['gender'],
       isProfileCreated: map['isProfileCreated'] ?? false,
       metrimonyId: map['metrimonyId'] ?? '',
       profileId: map['profileId'] ?? '',
@@ -115,11 +128,14 @@ class UserEntity {
   UserEntity copyWith({
     String? uid,
     String? email,
+    String? photoUrl,
     String? fullName,
     String? phone,
+
     String? agentId,
     String? userType,
     String? role,
+    String? gender,
     bool? isProfileCreated,
     String? metrimonyId,
     String? profileId,
@@ -128,13 +144,16 @@ class UserEntity {
     DateTime? lastSeen,
   }) {
     return UserEntity(
+      profileImageUrl: photoUrl ?? this.profileImageUrl,
       uid: uid ?? this.uid,
       email: email ?? this.email,
       fullName: fullName ?? this.fullName,
       phone: phone ?? this.phone,
       agentId: agentId ?? this.agentId,
       userType: userType ?? this.userType,
+
       role: role ?? this.role,
+      gender: gender ?? this.gender,
       isProfileCreated: isProfileCreated ?? this.isProfileCreated,
       metrimonyId: metrimonyId ?? this.metrimonyId,
       profileId: profileId ?? this.profileId,
@@ -148,7 +167,7 @@ class UserEntity {
   /// ------------------ OVERRIDES ------------------
   @override
   String toString() {
-    return 'UserEntity(uid: $uid, email: $email, fullName: $fullName, userType: $userType, role: $role)';
+    return 'UserEntity(uid: $uid, fullName: $fullName, userType: $userType, role: $role, gender: $gender, email: $email, profileImageUrl: $profileImageUrl, phone: $phone, agentId: $agentId, isProfileCreated: $isProfileCreated, metrimonyId: $metrimonyId, profileId: $profileId, wishlists: $wishlists, createdAt: $createdAt, lastSeen: $lastSeen)';
   }
 
   @override
@@ -157,12 +176,14 @@ class UserEntity {
 
     return other is UserEntity &&
         other.uid == uid &&
+        other.profileImageUrl == profileImageUrl &&
         other.email == email &&
         other.fullName == fullName &&
         other.phone == phone &&
         other.agentId == agentId &&
         other.userType == userType &&
         other.role == role &&
+        other.gender == gender &&
         other.isProfileCreated == isProfileCreated &&
         other.metrimonyId == metrimonyId &&
         other.profileId == profileId &&
@@ -179,7 +200,9 @@ class UserEntity {
         phone.hashCode ^
         agentId.hashCode ^
         userType.hashCode ^
+        profileImageUrl.hashCode ^
         role.hashCode ^
+        gender.hashCode ^
         isProfileCreated.hashCode ^
         metrimonyId.hashCode ^
         profileId.hashCode ^
@@ -187,6 +210,7 @@ class UserEntity {
         createdAt.hashCode ^
         lastSeen.hashCode;
   }
+ 
 }
 
 /// ================= USER STATE =================

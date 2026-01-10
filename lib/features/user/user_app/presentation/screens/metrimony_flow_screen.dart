@@ -49,7 +49,7 @@ class _MatrimonyFormFlowScreenState
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          'Step ${MatrimonyStep.values.indexOf(state.step) + 1} / ${MatrimonyStep.values.length - 1}',
+          'Step ${MatrimonyStep.values.indexOf(state.step) + 1} / ${MatrimonyStep.values.length }',
 
           style: Theme.of(context).textTheme.headlineMedium,
         ),
@@ -184,6 +184,7 @@ class _MatrimonyFormFlowScreenState
         registerSubmit: (cb) => _registerSubmit(MatrimonyStep.physical, cb),
       ),
       const UserImageFormScreen(),
+      
       const UserBiodataCheckScreen(isAgreed: false),
     ];
   }

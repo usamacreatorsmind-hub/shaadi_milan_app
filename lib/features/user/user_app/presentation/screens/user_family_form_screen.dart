@@ -174,8 +174,14 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
 
               // use dropdown
               AppDropDown(
-                label: "Family Status",
-                items: const ['Rich', 'Middle Class', 'Poor'],
+                label: "LifeStyle Status",
+                items: const [
+                  'Prefer not to say',
+                  'Simple Lifestyle',
+                  'Moderate Lifestyle',
+                  'Comfortable Lifestyle',
+                  'Well-established Lifestyle',
+                ],
                 value: _familyStatusController.text.isEmpty
                     ? null
                     : _familyStatusController.text,

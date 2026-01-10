@@ -1,16 +1,16 @@
 class EmploymentProfile {
   final String jobType;
-  final String company;
-  final String designation;
-  final int annualIncome;
-  final String workLocation;
+  final String? company;
+  final String? designation;
+  final int? annualIncome;
+  final String? workLocation;
 
   EmploymentProfile({
     required this.jobType,
-    required this.company,
-    required this.designation,
-    required this.annualIncome,
-    required this.workLocation,
+    this.company,
+    this.designation,
+    this.annualIncome,
+    this.workLocation,
   });
 
   Map<String, dynamic> toMap() {
@@ -25,11 +25,11 @@ class EmploymentProfile {
 
   factory EmploymentProfile.fromMap(Map<String, dynamic> map) {
     return EmploymentProfile(
-      jobType: map['jobType'] as String,
-      company: map['company'] as String,
-      designation: map['designation'] as String,
-      annualIncome: map['annualIncome'] as int,
-      workLocation: map['workLocation'] as String,
+      jobType: map['jobType'] as String? ?? '',
+      company: map['company'] as String?,
+      designation: map['designation'] as String?,
+      annualIncome: int.tryParse(map['annualIncome']?.toString() ?? ''),
+      workLocation: map['workLocation'] as String?,
     );
   }
 
@@ -56,11 +56,11 @@ class EmploymentProfile {
 
   factory EmploymentProfile.empty() {
     return EmploymentProfile(
-      jobType: '',
-      company: '',
-      designation: '',
-      annualIncome: 0,
-      workLocation: '',
+      jobType: 'Not Working',
+      company: null,
+      designation: null,
+      annualIncome: null,
+      workLocation: null,
     );
   }
 }

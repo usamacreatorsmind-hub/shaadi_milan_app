@@ -18,7 +18,7 @@ class Payment {
   final String fullName;
   final String razorpayPaymentId;
   final String? razorpaySignature;
-  final String? agentId;
+  final String agentId;
   final String? region;
   final String? district;
   final String? gender;
@@ -33,7 +33,7 @@ class Payment {
     required this.razorpayPaymentId,
 
     this.razorpaySignature,
-    this.agentId,
+    required this.agentId,
     this.region,
     this.district,
     this.gender,

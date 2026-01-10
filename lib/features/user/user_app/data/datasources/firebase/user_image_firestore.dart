@@ -37,9 +37,9 @@ class ImageUploadService {
     return validFormats.contains(ext);
   }
 
-  /// Validate document file format
+  /// Validate document file format (includes images for aadhar)
   bool _isValidDocumentFormat(String ext) {
-    const validFormats = ['pdf', 'doc', 'docx'];
+    const validFormats = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
     return validFormats.contains(ext);
   }
 
@@ -213,7 +213,7 @@ class ImageUploadService {
       final ext = _getFileExtension(filePath);
       if (!_isValidDocumentFormat(ext)) {
         throw UploadException(
-          'Invalid document format: .$ext. Allowed: pdf, doc, docx',
+          'Invalid file format: .$ext. Allowed: pdf, doc, docx, jpg, jpeg, png',
           code: 'invalid-format',
         );
       }
@@ -221,7 +221,8 @@ class ImageUploadService {
       _validateFileSize(filePath, maxMB: 50);
 
       final file = File(filePath);
-      final ref = _storage.ref().child('profile_images/$uid/aadhar_card.pdf');
+      // Use the actual file extension
+      final ref = _storage.ref().child('profile_images/$uid/aadhar_card.$ext');
 
       final task = ref.putFile(file);
 
@@ -328,6 +329,51 @@ class ImageUploadService {
       );
     } catch (e) {
       throw UploadException('Unexpected error fetching image with agent: $e');
+    }
+  }
+
+  // 🔥 PROFILE IMAGE UPLOAD
+  Future<String> uploadProfileImage({
+    required String uid,
+    required String filePath,
+    void Function(double)? onProgress,
+  }) async {
+    try {
+      _validateFile(filePath);
+
+      final ext = _getFileExtension(filePath);
+      if (!_isValidImageFormat(ext)) {
+        throw UploadException(
+          'Invalid image format: .$ext. Allowed: jpg, jpeg, png, gif, webp',
+          code: 'invalid-format',
+        );
+      }
+
+      _validateFileSize(filePath);
+
+      final file = File(filePath);
+      final ref = _storage.ref().child('profile_images/$uid/profile_image.jpg');
+
+      final task = ref.putFile(file);
+
+      task.snapshotEvents.listen((event) {
+        if (onProgress != null && event.totalBytes > 0) {
+          onProgress(event.bytesTransferred / event.totalBytes);
+        }
+      });
+
+      await task;
+
+      return await ref.getDownloadURL();
+    } on FirebaseException catch (e) {
+      throw UploadException(
+        'Firebase upload failed: ${e.message}',
+        code: e.code,
+      );
+    } on UploadException {
+      rethrow;
+    } catch (e) {
+      throw UploadException('Unexpected error during upload: $e');
     }
   }
 

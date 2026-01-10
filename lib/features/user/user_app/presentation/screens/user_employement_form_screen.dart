@@ -42,10 +42,10 @@ class _UserEmploymentFormScreenState
     if (widget.mode == FormMode.edit &&
         widget.existingEmploymentProfile != null) {
       final profile = widget.existingEmploymentProfile!;
-      _companyController.text = profile.company;
-      _designationController.text = profile.designation;
+      _companyController.text = profile.company ?? "";
+      _designationController.text = profile.designation ?? "";
       _annualIncomeController.text = profile.annualIncome.toString();
-      _workLocationController.text = profile.workLocation;
+      _workLocationController.text = profile.workLocation ?? "";
       _jobType = profile.jobType;
     }
   }
@@ -58,32 +58,69 @@ class _UserEmploymentFormScreenState
   // }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      if (_jobType == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a job type')),
-        );
-        return;
-      }
+    if (_jobType == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select a job type')));
+      return;
+    }
 
+    // If "Not Working", skip validation and submit with null values
+    if (_jobType == 'Not Working') {
       final notifier = ref.read(userEmploymentControllerProvider.notifier);
 
       if (widget.mode == FormMode.create) {
         notifier.saveEmployment(
           jobType: _jobType!,
-          company: _companyController.text,
-          designation: _designationController.text,
-          annualIncome: int.tryParse(_annualIncomeController.text) ?? 0,
-          workLocation: _workLocationController.text,
+          company: null,
+          designation: null,
+          annualIncome: int.tryParse(_annualIncomeController.text),
+          workLocation: null,
         );
       } else {
-        // Update logic (using saveEmployment as upsert)
         notifier.updateEmployment(
           jobType: _jobType!,
-          company: _companyController.text,
-          designation: _designationController.text,
-          annualIncome: int.tryParse(_annualIncomeController.text) ?? 0,
-          workLocation: _workLocationController.text,
+          company: null,
+          designation: null,
+          annualIncome: int.tryParse(_annualIncomeController.text),
+          workLocation: null,
+        );
+      }
+      
+      return;
+    }
+
+    // For other job types, validate form
+    if (_formKey.currentState!.validate()) {
+      final notifier = ref.read(userEmploymentControllerProvider.notifier);
+
+      if (widget.mode == FormMode.create) {
+        notifier.saveEmployment(
+          jobType: _jobType!,
+          company: _companyController.text.isEmpty
+              ? null
+              : _companyController.text,
+          designation: _designationController.text.isEmpty
+              ? null
+              : _designationController.text,
+          annualIncome: int.tryParse(_annualIncomeController.text),
+          workLocation: _workLocationController.text.isEmpty
+              ? null
+              : _workLocationController.text,
+        );
+      } else {
+        notifier.updateEmployment(
+          jobType: _jobType!,
+          company: _companyController.text.isEmpty
+              ? null
+              : _companyController.text,
+          designation: _designationController.text.isEmpty
+              ? null
+              : _designationController.text,
+          annualIncome: int.tryParse(_annualIncomeController.text),
+          workLocation: _workLocationController.text.isEmpty
+              ? null
+              : _workLocationController.text,
         );
       }
     }
@@ -109,6 +146,47 @@ class _UserEmploymentFormScreenState
         );
       }
     });
+
+    Widget buildEmploymentForm() {
+      return ListView(
+        shrinkWrap: true,
+        children: [
+          AppTextField(
+            controller: _companyController,
+            prefixIcon: Icons.business,
+            iconColor: Theme.of(context).colorScheme.primary,
+            label: "Organaization",
+            hint: "Enter your Organaization name",
+            obscureText: false,
+            keyboardType: TextInputType.text,
+          ),
+          const SizedBox(height: 16),
+
+          AppTextField(
+            controller: _designationController,
+            prefixIcon: Icons.work,
+            iconColor: Theme.of(context).colorScheme.primary,
+            label: "Designation",
+            hint: "Enter your designation",
+            obscureText: false,
+            keyboardType: TextInputType.text,
+          ),
+          const SizedBox(height: 16),
+
+          const SizedBox(height: 16),
+
+          AppTextField(
+            controller: _workLocationController,
+            prefixIcon: Icons.location_on,
+            iconColor: Theme.of(context).colorScheme.primary,
+            label: "Work Location",
+            hint: "Enter your work location",
+            obscureText: false,
+            keyboardType: TextInputType.text,
+          ),
+        ],
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -140,29 +218,9 @@ class _UserEmploymentFormScreenState
                 },
               ),
               const SizedBox(height: 16),
+              _jobType == "Not Working" ? SizedBox() : buildEmploymentForm(),
 
-              AppTextField(
-                controller: _companyController,
-                prefixIcon: Icons.business,
-                iconColor: Theme.of(context).colorScheme.primary,
-                label: "Organaization",
-                hint: "Enter your Organaization name",
-                obscureText: false,
-                keyboardType: TextInputType.text,
-              ),
-              const SizedBox(height: 16),
-
-              AppTextField(
-                controller: _designationController,
-                prefixIcon: Icons.work,
-                iconColor: Theme.of(context).colorScheme.primary,
-                label: "Designation",
-                hint: "Enter your designation",
-                obscureText: false,
-                keyboardType: TextInputType.text,
-              ),
-              const SizedBox(height: 16),
-
+              SizedBox(height: 25),
               AppTextField(
                 controller: _annualIncomeController,
 
@@ -174,17 +232,6 @@ class _UserEmploymentFormScreenState
                 hint: "Enter your annual income",
                 obscureText: false,
                 keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 16),
-
-              AppTextField(
-                controller: _workLocationController,
-                prefixIcon: Icons.location_on,
-                iconColor: Theme.of(context).colorScheme.primary,
-                label: "Work Location",
-                hint: "Enter your work location",
-                obscureText: false,
-                keyboardType: TextInputType.text,
               ),
 
               const SizedBox(height: 20),

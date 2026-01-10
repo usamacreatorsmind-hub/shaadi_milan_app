@@ -32,8 +32,10 @@ class FamilyProfile {
       fatherName: map['fatherName'] as String? ?? '',
       motherName: map['motherName'] as String? ?? '',
 
-      numberOfBrothers: map['numberOfBrothers'] as int? ?? 0,
-      numberOfSisters: map['numberOfSisters'] as int? ?? 0,
+      numberOfBrothers:
+          int.tryParse(map['numberOfBrothers']?.toString() ?? '') ?? 0,
+      numberOfSisters:
+          int.tryParse(map['numberOfSisters']?.toString() ?? '') ?? 0,
 
       familyType: map['familyType'] as String? ?? '',
       familyStatus: map['familyStatus'] as String? ?? '',

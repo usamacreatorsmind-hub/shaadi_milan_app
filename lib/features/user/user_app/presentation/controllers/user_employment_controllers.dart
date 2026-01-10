@@ -17,11 +17,19 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
 
   Future<void> saveEmployment({
     required String jobType,
-    required String company,
-    required String designation,
-    required int annualIncome,
-    required String workLocation,
+    String? company,
+    String? designation,
+    int? annualIncome,
+    String? workLocation,
   }) async {
+    // print data
+    print('Saving Employment:');
+    print('Job Type: $jobType');
+    print('Company: $company');
+    print('Designation: $designation');
+    print('Annual Income: $annualIncome');
+    print('Work Location: $workLocation');
+
     state = state.copyWith(isLoading: true, error: null);
     final employmentProfile = EmploymentProfile(
       jobType: jobType,
@@ -32,11 +40,6 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
     );
 
     try {
-      // await _matrimonyRepository.updateEmploymentProfile(
-      //   _uid,
-      //   employmentProfile,
-      // );
-
       _ref
           .read(metrimonyControllerProvider.notifier)
           .saveEmployment(employmentProfile);
@@ -50,10 +53,10 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
 
   void updateEmployment({
     required String jobType,
-    required String company,
-    required String designation,
-    required int annualIncome,
-    required String workLocation,
+    String? company,
+    String? designation,
+    int? annualIncome,
+    String? workLocation,
   }) {
     state = state.copyWith(isLoading: true, error: null);
     final employmentProfile = EmploymentProfile(
@@ -65,6 +68,13 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
     );
 
     try {
+      // print       print('Updating Employment:');
+      print('Job Type: $jobType');
+      print('Company: $company');
+      print('Designation: $designation');
+      print('Annual Income: $annualIncome');
+      print('Work Location: $workLocation');
+
       _ref
           .read(matrimonyRepositoryProvider)
           .updateEmploymentProfile(_uid, employmentProfile);

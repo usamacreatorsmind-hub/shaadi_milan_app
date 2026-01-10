@@ -42,10 +42,10 @@ class AuthRepositoryImpl implements AuthRepository {
         email: user.email ?? '',
         fullName: '',
         phone: '',
+        profileImageUrl: '',
         agentId: '',
         userType: '',
         isProfileCreated: false,
-
         wishlists: const [],
         metrimonyId: '',
         profileId: '',
@@ -106,9 +106,9 @@ class AuthRepositoryImpl implements AuthRepository {
       wishlists: const [],
     );
   }
-  
+
   @override
-  Future<void> logout() { 
+  Future<void> logout() {
     return ds.logout();
   }
 
