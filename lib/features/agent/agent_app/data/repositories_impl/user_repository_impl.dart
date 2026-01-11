@@ -1,6 +1,6 @@
-import 'package:arvika_marriage_bureau/features/agent/agent_app/data/datasources/user_firestore.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/domain/repositories/user_repository.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+import '../datasources/user_firestore.dart';
+import '../../domain/repositories/user_repository.dart';
+import '../../../../auth/domain/states/user_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserRepositoryImpl implements UserRepository {

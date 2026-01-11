@@ -1,6 +1,6 @@
-import 'package:arvika_marriage_bureau/features/auth/data/repositories_impl/data_source/firebase_auth_ds.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+import '../../data/repositories_impl/data_source/firebase_auth_ds.dart';
+import '../../domain/states/agent_state.dart';
+import '../../domain/states/user_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

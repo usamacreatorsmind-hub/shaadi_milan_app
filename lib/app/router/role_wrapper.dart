@@ -1,7 +1,7 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import 'app_router.dart';
+import '../../features/auth/domain/states/agent_state.dart';
+import '../../features/auth/domain/states/user_state.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
@@ -102,7 +102,10 @@ class _AuthWrapperScreenState extends ConsumerState<AuthWrapperScreen> {
             Text(
               authState.when(
                 data: (_) => 'Authenticating...',
-                loading: () => 'Loading auth state...',
+                loading: () {
+                  return 'Checking authentication...';
+                },
+
                 error: (e, st) => 'Auth error, redirecting...',
               ),
               textAlign: TextAlign.center,
@@ -110,6 +113,40 @@ class _AuthWrapperScreenState extends ConsumerState<AuthWrapperScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class LoadingWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+
+    return Scaffold(
+      body: Column(
+        children: [
+          // a beatifull loader
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/logo.png', // Replace with your actual logo path
+                  width: 120,
+                  height: 120,
+                ),
+                const SizedBox(height: 20),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 20),
+                Text(
+                  'Loading...',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

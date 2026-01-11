@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/validators.dart';
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import '../../../../app/custom/custom_widgets/validators.dart';
+import '../providers/auth_providers.dart';
 
 import '../../../../app/router/app_router.dart';
 import '../../../../app/custom/custom_widgets/widgets.dart'; 

@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/core/filters/home_filter_controller.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../../app/router/app_router.dart';
@@ -9,73 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:ui';
 
-/// =======================
-/// FILTER STATE
-/// =======================
-class HomeFilterState {
-  final String state;
-  final String city;
-  final String religion;
-  final String caste;
 
-  const HomeFilterState({
-    required this.state,
-    required this.city,
-    required this.religion,
-    required this.caste,
-  });
-
-  HomeFilterState copyWith({
-    String? state,
-    String? city,
-    String? religion,
-    String? caste,
-  }) {
-    return HomeFilterState(
-      state: state ?? this.state,
-      city: city ?? this.city,
-      religion: religion ?? this.religion,
-      caste: caste ?? this.caste,
-    );
-  }
-}
-
-/// =======================
-/// FILTER PROVIDER
-/// =======================
-final homeFilterProvider =
-    StateNotifierProvider<HomeFilterController, HomeFilterState>(
-      (ref) => HomeFilterController(),
-    );
-
-class HomeFilterController extends StateNotifier<HomeFilterState> {
-  HomeFilterController()
-    : super(
-        const HomeFilterState(state: '', city: '', religion: '', caste: ''),
-      );
-
-  void updateState(String value) {
-    // reset city when state changes
-    state = state.copyWith(state: value, city: '');
-  }
-
-  void reset() {
-    state = const HomeFilterState(state: '', city: '', religion: '', caste: '');
-  }
-
-  void updateCity(String value) {
-    state = state.copyWith(city: value);
-  }
-
-  void updateReligion(String value) {
-    // reset caste when religion changes
-    state = state.copyWith(religion: value, caste: '');
-  }
-
-  void updateCaste(String value) {
-    state = state.copyWith(caste: value);
-  }
-}
 
 /// =======================
 /// USER HOME SCREEN

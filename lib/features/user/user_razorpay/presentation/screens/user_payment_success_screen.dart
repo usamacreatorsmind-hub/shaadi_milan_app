@@ -1,6 +1,6 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+import '../../../../auth/domain/states/user_state.dart';
+import '../../domain/states/payment.dart';
+import '../notifier/payment_notifier.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

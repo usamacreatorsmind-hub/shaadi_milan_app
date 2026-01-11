@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
+import '../../../../auth/domain/states/agent_state.dart';
+import '../../../../user/user_app/domain/states/metrimony_profile_view_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class MetrimonyFirestoreDs {

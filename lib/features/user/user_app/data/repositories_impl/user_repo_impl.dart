@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/user_status_state.dart';
+import '../../domain/states/user_status_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';

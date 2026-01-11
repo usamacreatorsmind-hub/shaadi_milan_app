@@ -1,14 +1,14 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/address_state.dart'; 
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/cultural_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/education_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/employee_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/family_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/identity_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/physical_state.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+import '../../../../auth/domain/states/agent_state.dart';
+import 'address_state.dart';
+import 'cultural_state.dart';
+import 'education_state.dart';
+import 'employee_state.dart';
+import 'family_state.dart';
+import 'identity_state.dart';
+import 'image_state.dart';
+import 'metrimony_state.dart';
+import 'physical_state.dart';
+import '../../../../auth/domain/states/user_state.dart';
 
 class MetrimonyProfileViewModel {
   final MatrimonyProfile metrimonyProfile;

@@ -1,5 +1,5 @@
 import '../../../../../app/custom/custom_widgets/widgets.dart';
-import 'package:arvika_marriage_bureau/core/enums/enum.dart';
+import '../../../../../core/enums/enum.dart';
 
 import '../../domain/states/family_state.dart';
 import '../controllers/user_family_controllers.dart';

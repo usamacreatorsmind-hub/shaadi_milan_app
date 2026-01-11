@@ -292,7 +292,7 @@ class ImageUploadService {
       final task = ref.putFile(file);
 
       task.snapshotEvents.listen((event) {
-        if (onProgress != null && event.totalBytes > 0) {
+        if (event.totalBytes > 0) {
           onProgress(event.bytesTransferred / event.totalBytes);
         }
       });

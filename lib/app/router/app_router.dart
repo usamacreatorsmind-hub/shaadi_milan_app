@@ -1,36 +1,39 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/contact_us_screen.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/privacy_policy_route.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/terms_and_conditions_route.dart';
-import 'package:arvika_marriage_bureau/app/router/agent_guard.dart';
-import 'package:arvika_marriage_bureau/app/router/auth_guard.dart';
-import 'package:arvika_marriage_bureau/app/router/role_wrapper.dart';
-import 'package:arvika_marriage_bureau/app/router/user_guard.dart';
-import 'package:arvika_marriage_bureau/core/enums/enum.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_home_screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agent_activities_screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agent_main_shell_screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agent_revenue_screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agent_users_screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/view_metrimony_profile_screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/view_payment_detail_screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/view_user_screen.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
-import 'package:arvika_marriage_bureau/features/onboarding/presentation/screens/splash_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/address_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/cultural_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/education_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/employee_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/family_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/identity_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/physical_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/about_us_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_status_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_contact_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/widgets/MyProfileDetailScreen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_order_history_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_success_screen.dart';
+ 
+import 'package:arvika_marriage_bureau/features/onboarding/presentation/screens/role_selection_screen.dart';
+
+import '../custom/custom_widgets/contact_us_screen.dart';
+import '../custom/custom_widgets/privacy_policy_route.dart';
+import '../custom/custom_widgets/terms_and_conditions_route.dart';
+import 'agent_guard.dart';
+import 'auth_guard.dart';
+import 'role_wrapper.dart';
+import 'user_guard.dart';
+import '../../core/enums/enum.dart';
+import '../../features/agent/agent_app/presentation/screens/agen_home_screen.dart';
+import '../../features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
+import '../../features/agent/agent_app/presentation/screens/agent_activities_screen.dart';
+import '../../features/agent/agent_app/presentation/screens/agent_main_shell_screen.dart';
+import '../../features/agent/agent_app/presentation/screens/agent_revenue_screen.dart';
+import '../../features/agent/agent_app/presentation/screens/agent_users_screen.dart';
+import '../../features/agent/agent_app/presentation/screens/view_metrimony_profile_screen.dart';
+import '../../features/agent/agent_app/presentation/screens/view_payment_detail_screen.dart';
+import '../../features/agent/agent_app/presentation/screens/view_user_screen.dart';
+import '../../features/auth/domain/states/user_state.dart';
+import '../../features/onboarding/presentation/screens/splash_screen.dart';
+import '../../features/user/user_app/domain/states/address_state.dart';
+import '../../features/user/user_app/domain/states/cultural_state.dart';
+import '../../features/user/user_app/domain/states/education_state.dart';
+import '../../features/user/user_app/domain/states/employee_state.dart';
+import '../../features/user/user_app/domain/states/family_state.dart';
+import '../../features/user/user_app/domain/states/identity_state.dart';
+import '../../features/user/user_app/domain/states/metrimony_profile_view_model.dart';
+import '../../features/user/user_app/domain/states/physical_state.dart';
+import '../../features/user/user_app/presentation/screens/about_us_screen.dart';
+import '../../features/user/user_app/presentation/screens/user_status_screen.dart';
+import '../../features/user/user_app/widgets/agent_contact_screen.dart';
+import '../../features/user/user_app/widgets/MyProfileDetailScreen.dart';
+import '../../features/user/user_razorpay/presentation/screens/user_payment_order_history_screen.dart';
+import '../../features/user/user_razorpay/presentation/screens/user_payment_success_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/agent/agent_app/presentation/screens/agent_dashboard_screen.dart';
@@ -78,6 +81,10 @@ class AppRouter extends _$AppRouter {
   List<AutoRoute> get routes => [
     // ================= ROOT =================
     AutoRoute(page: SplashRoute.page, initial: true),
+    AutoRoute(page: RoleSelectionRoute.page),
+    AutoRoute(page: ChangePasswordRoute.page),
+    AutoRoute(page: ResetPasswordRoute.page),
+
     AutoRoute(page: AuthWrapperRoute.page), // Unified authentication wrapper
     // ================= AUTH & PUBLIC =================
     AutoRoute(page: OnboardingRoute.page),

@@ -1,12 +1,11 @@
+import 'package:flutter_riverpod/legacy.dart';
+
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import 'metrimony_profile_controller.dart';
 import '../../domain/states/family_state.dart';
-import 'package:flutter_riverpod/legacy.dart';
-
 import 'package:flutter/material.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserFamilyController extends StateNotifier<FamilyState> {

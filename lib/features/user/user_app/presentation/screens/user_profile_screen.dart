@@ -1,13 +1,13 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
+import '../../../../auth/domain/states/agent_state.dart';
+import '../../data/repositories_impl/agent_repository_impl.dart';
+import '../../data/repositories_impl/user_repo_impl.dart';
+import '../controllers/user_status_controller.dart';
+import '../../widgets/agent_bottom_sheet.dart';
 
 import '../../../../../app/router/app_router.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -419,10 +419,10 @@ class _ProfileHeaderCard extends StatelessWidget {
               radius: MediaQuery.of(context).size.width * 0.15,
               backgroundColor: theme.primaryColor.withOpacity(0.15),
               backgroundImage:
-                  (profile.images.primaryImageUrl.isNotEmpty ?? false)
+                  (profile.user.profileImageUrl.isNotEmpty ?? false)
                   ? NetworkImage(profile.images.primaryImageUrl)
                   : null,
-              child: (profile.images.primaryImageUrl.isEmpty ?? true)
+              child: (profile.user.profileImageUrl.isNotEmpty ?? true)
                   ? Icon(Icons.person, size: 50, color: theme.primaryColor)
                   : null,
             ),
@@ -495,13 +495,6 @@ class _PremiumCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      context.router.push(UserImageFormRoute());
-                    },
-                    child: Text("Elevated Button"),
-                  ),
-
                   Text(
                     "Upgrade to Premium",
                     style: TextStyle(

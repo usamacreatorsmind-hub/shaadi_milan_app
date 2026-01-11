@@ -3,35 +3,36 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Order {
   final String orderId; // internal order id
   final String razorpayOrderId; // Razorpay order id
-
   final String userId;
   final String email;
   final String phone;
   final String fullName;
   final String razorpayPaymentId;
   final String? razorpaySignature;
-  final String? agentId;
-  final String? region;
-  final String? district;
-  final String? gender;
-
+  final String agentId;
+  final String region;
+  final String district;
+  final String gender;
+  final String religion;
+  final String caste;
   final int amount;
   final String status; // PENDING | SUCCESS | FAILED
   final String gateway;
   final DateTime createdAt;
-  final DateTime? updatedAt;
+  final DateTime updatedAt;
 
   Order({
     required this.orderId,
     required this.razorpayOrderId,
-
+    required this.religion,
+    required this.caste,
     required this.userId,
     required this.razorpayPaymentId,
     this.razorpaySignature,
-    this.agentId,
-    this.region,
-    this.district,
-    this.gender,
+    required this.agentId,
+    required this.region,
+    required this.district,
+    required this.gender,
 
     required this.email,
     required this.phone,
@@ -40,12 +41,15 @@ class Order {
     required this.status,
     this.gateway = 'razorpay',
     required this.createdAt,
-    this.updatedAt,
+    required this.updatedAt,
   });
 
   // ---------------- FIRESTORE ----------------
   factory Order.fromMap(Map<String, dynamic> map) {
     return Order(
+      religion: map['religion'],
+      caste: map['caste'],
+
       userId: map['userId'] ?? '',
       razorpayPaymentId: map['razorpayPaymentId'] ?? '',
       razorpaySignature: map['razorpaySignature'],
@@ -69,12 +73,14 @@ class Order {
           : DateTime.now(),
       updatedAt: map['updatedAt'] is Timestamp
           ? (map['updatedAt'] as Timestamp).toDate()
-          : null,
+          : DateTime.now(),
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
+      'religion': religion,
+      'caste': caste,
       'orderId': orderId,
       'razorpayOrderId': razorpayOrderId,
       'userId': userId,

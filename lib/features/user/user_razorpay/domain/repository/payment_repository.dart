@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_firestore.dart';
+import '../../data/firestore/payment_firestore.dart';
 import '../states/payment.dart';
 
 class PaymentRepository {

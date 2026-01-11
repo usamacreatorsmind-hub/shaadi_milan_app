@@ -1,6 +1,6 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/core/enums/enum.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/user_image_firestore.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../../../../core/enums/enum.dart';
+import '../../data/datasources/firebase/user_image_firestore.dart';
 
 import '../../../../../app/custom/custom_widgets/validators.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';

@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import '../providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -109,121 +109,174 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // ---------------- LOGO ----------------
-              Material(
-                shape: const CircleBorder(),
-                elevation: 6,
-                shadowColor: theme.colorScheme.primary.withOpacity(0.4),
-                child: CircleAvatar(
-                  radius: MediaQuery.of(context).size.width * 0.25,
-                  backgroundImage: const AssetImage('assets/images/logo.png'),
-                  backgroundColor: Colors.transparent,
-                ),
-              ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFE0E6), Colors.white],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
 
-              const SizedBox(height: 20),
-
-              Text(
-                "Welcome Back User!",
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-
-              const SizedBox(height: 6),
-
-              Text(
-                "Login to your account",
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ---------------- LOGIN CARD ----------------
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                /// 🔙 Back Button
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    onPressed: () => context.router.back(),
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      size: 20,
                     ),
-                  ],
+                  ),
                 ),
-                child: Column(
+
+                const SizedBox(height: 40),
+
+                // only name
+                Text(
+                  "Welcome Back!",
+                  style: theme.textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Sign in to continue your journey",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                ),
+
+                const SizedBox(height: 40),
+
+                /// 💳 Login Card
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(
+                          255,
+                          136,
+                          135,
+                          135,
+                        ).withOpacity(0.05),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      AppTextField(
+                        iconColor: theme.colorScheme.primary,
+                        obscureText: false,
+
+                        controller: emailCtrl,
+                        prefixIcon: Icons.email_outlined,
+                        label: "Email Address",
+                        hint: "name@example.com",
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 20),
+                      AppTextField(
+                        iconColor: theme.colorScheme.primary,
+                        obscureText: false,
+
+                        controller: pwCtrl,
+                        prefixIcon: Icons.lock_open_rounded,
+                        label: "Password",
+                        hint: "••••••••",
+
+                        keyboardType: TextInputType.visiblePassword,
+                      ),
+
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () =>
+                              context.navigateTo(const ResetPasswordRoute()),
+                          child: Text(
+                            "Forgot Password?",
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : () => _login(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "Login",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                /// 🆕 Registration Prompt
+                Column(
                   children: [
-                    AppTextField(
-                      controller: emailCtrl,
-                      prefixIcon: Icons.email,
-                      iconColor: theme.colorScheme.primary,
-                      label: "Email",
-                      hint: "Enter your email",
-                      keyboardType: TextInputType.emailAddress,
-                      obscureText: false,
+                    Text(
+                      "Don't have an account?",
+                      style: TextStyle(color: Colors.grey.shade600),
                     ),
-
-                    const SizedBox(height: 12),
-
-                    AppTextField(
-                      controller: pwCtrl,
-                      prefixIcon: Icons.lock,
-                      iconColor: theme.colorScheme.primary,
-                      label: "Password",
-                      hint: "Enter your password",
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: true,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: AppButton(
-                        text: isLoading ? "Logging in..." : "Login",
-                        onPressed: isLoading ? () {} : () => _login(context),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
+                    const SizedBox(height: 4),
                     TextButton(
-                      onPressed: () {
-                        context.navigateTo(const UserRegisterRoute());
-                      },
-                      child: const Text(
-                        "New here? Create an account",
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      onPressed: () =>
+                          context.navigateTo(const UserRegisterRoute()),
+                      child: Text(
+                        "Create a New Profile",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
-
-                    TextButton(
-                      onPressed: () {
-                        context.navigateTo(const ResetPasswordRoute());
-                      },
-                      child: const Text(
-                        "Forgot Password?",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-
-                    // navigate to education form screen
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

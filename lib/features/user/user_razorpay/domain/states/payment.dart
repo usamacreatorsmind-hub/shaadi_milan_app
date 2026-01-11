@@ -11,7 +11,6 @@ enum PayStatus {
 class Payment {
   final String orderId; // internal order id
   final String razorpayOrderId; // Razorpay order id
-
   final String userId;
   final String email;
   final String phone;
@@ -19,24 +18,27 @@ class Payment {
   final String razorpayPaymentId;
   final String? razorpaySignature;
   final String agentId;
-  final String? region;
-  final String? district;
-  final String? gender;
-
+  final String region;
+  final String district;
+  final String gender;
   final int amount;
   final String status; // PENDING | SUCCESS | FAILED
   final String gateway;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final String religion;
+  final String caste;
 
   Payment({
     required this.razorpayPaymentId,
 
     this.razorpaySignature,
     required this.agentId,
-    this.region,
-    this.district,
-    this.gender,
+    required this.region,
+    required this.district,
+    required this.gender,
+    required this.religion,
+    required this.caste,
 
     required this.orderId,
     required this.razorpayOrderId,
@@ -53,6 +55,8 @@ class Payment {
 
   factory Payment.fromMap(Map<String, dynamic> map) {
     return Payment(
+      religion: map['religion'] ?? '',
+      caste: map['caste'] ?? '',
       razorpayPaymentId: map['razorpayPaymentId'] ?? '',
       razorpaySignature: map['razorpaySignature'],
       agentId: map['agentId'],
@@ -80,13 +84,14 @@ class Payment {
 
   Map<String, dynamic> toMap() {
     return {
+      'religion': religion,
+      'caste': caste,
       'razorpayPaymentId': razorpayPaymentId,
       'razorpaySignature': razorpaySignature,
       'agentId': agentId,
       'region': region,
       'district': district,
       'gender': gender,
-
       'orderId': orderId,
       'razorpayOrderId': razorpayOrderId,
       'userId': userId,
@@ -109,7 +114,6 @@ class PaymentState {
   final String? razorpayOrderId;
   final String? signature;
   final Payment? payment;
-
   const PaymentState({
     this.status = PayStatus.idle,
     this.message,

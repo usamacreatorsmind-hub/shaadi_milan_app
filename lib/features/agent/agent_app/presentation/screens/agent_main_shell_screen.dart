@@ -1,8 +1,7 @@
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agent_dashboard_screen.dart';
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import 'package:flutter/rendering.dart';
+
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,6 +17,8 @@ class AgentMainShellScreen extends ConsumerStatefulWidget {
 }
 
 class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
+  bool _isVisible = true;
+
   @override
   Widget build(BuildContext context) {
     // 🔹 Listen for Auth State Changes (Logout)
@@ -44,12 +45,28 @@ class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
 
         return Scaffold(
           extendBody: true,
-        
-
-          body: child,
-          bottomNavigationBar: CustomBottomNavBar(
-            currentIndex: tabsRouter.activeIndex,
-            onTap: tabsRouter.setActiveIndex,
+          body: NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.direction == ScrollDirection.reverse) {
+                if (_isVisible) setState(() => _isVisible = false);
+              } else if (notification.direction == ScrollDirection.forward) {
+                if (!_isVisible) setState(() => _isVisible = true);
+              }
+              return true;
+            },
+            child: child,
+          ),
+          bottomNavigationBar: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: _isVisible ? 100 : 0,
+            child: Wrap(
+              children: [
+                CustomBottomNavBar(
+                  currentIndex: tabsRouter.activeIndex,
+                  onTap: tabsRouter.setActiveIndex,
+                ),
+              ],
+            ),
           ),
         );
       },

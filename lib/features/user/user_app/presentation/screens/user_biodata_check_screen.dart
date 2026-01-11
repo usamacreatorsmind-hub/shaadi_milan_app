@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
+import '../../../../auth/domain/states/user_state.dart';
+import '../../widgets/pdf_viewer_bottomsheet.dart';
 
 import '../../../../../app/custom/image_picker/image_picker_controller.dart';
 import '../../../../../app/router/app_router.dart';

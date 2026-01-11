@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:arvika_marriage_bureau/features/auth/domain/repositories/auth_repository.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import '../../domain/repositories/auth_repository.dart';
+import '../../domain/states/agent_state.dart';
+import '../providers/auth_providers.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../../auth/domain/states/user_state.dart';

@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
+import '../../../../user/user_razorpay/domain/states/payment.dart';
 
 abstract class UserPaymentsRepository {
   Future<Payment?> getUserPayment({
@@ -6,5 +6,5 @@ abstract class UserPaymentsRepository {
     required String userId,
   });
 
-  Future<List<Payment?>> getUsersPayment();
+  Future<List<Payment?>> getUsersPayment({required String agentId});
 }

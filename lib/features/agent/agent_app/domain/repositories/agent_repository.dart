@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+import '../../../../auth/domain/states/agent_state.dart';
  
 
 abstract class AgentRepository {

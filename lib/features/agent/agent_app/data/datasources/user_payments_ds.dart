@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
+import '../../../../user/user_razorpay/domain/states/payment.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class UserPaymentDs {
@@ -6,18 +6,18 @@ abstract class UserPaymentDs {
     required String userId,
     required String agentId,
   });
-  Future<List<Payment?>> getUsersPayment();
+  Future<List<Payment?>> getUsersPayment({required String agentId});
 }
 
 class UserpaymentsDSImpl implements UserPaymentDs {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   @override
   Future<Payment?> getUserPayment({
     required String userId,
     required String agentId,
   }) async {
     try {
-      // match field value
       final querySnapshot = await firestore
           .collection('payments')
           .where('userId', isEqualTo: userId)
@@ -26,27 +26,44 @@ class UserpaymentsDSImpl implements UserPaymentDs {
           .get();
 
       if (querySnapshot.docs.isEmpty) {
-        return null; // No payment found for this user and agent
+        return null;
       }
-      final doc = querySnapshot.docs.first;
 
-      return Payment.fromMap(doc.data()!);
+      return Payment.fromMap(querySnapshot.docs.first.data());
     } catch (e) {
-      print(e);
+      print('Error fetching user payment: $e');
       throw Exception('Failed to get user payment: $e');
     }
   }
 
   @override
-  Future<List<Payment?>> getUsersPayment() async {
+  Future<List<Payment?>> getUsersPayment({required String agentId}) async {
     try {
-      final querySnapshot = await firestore.collection('payments').get();
-      return querySnapshot.docs.map((doc) {
-        if (!doc.exists) return null;
-        return Payment.fromMap(doc.data());
+      print('Fetching payments for agent: $agentId');
+
+      final querySnapshot = await firestore
+          .collection('payments')
+          .where('agentId', isEqualTo: agentId)
+          .get();
+
+      print('Found ${querySnapshot.docs.length} payments for agent $agentId');
+
+      if (querySnapshot.docs.isEmpty) {
+        return [];
+      }
+
+      final payments = querySnapshot.docs.map((doc) {
+        try {
+          return Payment.fromMap(doc.data());
+        } catch (e) {
+          print('Error parsing payment document ${doc.id}: $e');
+          return null;
+        }
       }).toList();
+
+      return payments;
     } catch (e) {
-      print(e);
+      print('Error fetching users payments: $e');
       throw Exception('Failed to get users payments: $e');
     }
   }

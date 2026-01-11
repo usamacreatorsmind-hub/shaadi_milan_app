@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+import '../../../../auth/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart'
     show agentFirestoreDsProvider;
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
@@ -250,409 +250,419 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                       ),
                     ];
                   },
-                  body: TabBarView(
-                    children: [
-                      // 1️⃣ BASIC INFO
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 100),
-                        child: Column(
-                          children: [
-                            _InfoCard(
-                              title: 'Basic Information',
-                              icon: Icons.person,
-                              children: [
-                                _InfoTile(
-                                  label: 'Gender',
-                                  icon: Icons.person_outline,
-                                  value: profile.identity.gender,
-                                ),
-                                _InfoTile(
-                                  label: 'Age',
-                                  icon: Icons.cake_outlined,
-                                  value: '${profile.identity.age} years',
-                                ),
-                                _InfoTile(
-                                  label: 'Date of Birth',
-                                  icon: Icons.calendar_today_outlined,
-                                  value: DateFormat(
-                                    'dd-MM-yyyy',
-                                  ).format(profile.identity.dob),
-                                ),
-                              ],
-                            ),
-
-                            _InfoCard(
-                              title: 'About Me',
-                              icon: Icons.description,
-                              children: const [
-                                Text(
-                                  textAlign: TextAlign.justify,
-                                  softWrap: true,
-                                  overflow: TextOverflow.clip,
-                                  "I am a simple, caring, and family-oriented person. "
-                                  "I believe in mutual respect, honesty, and understanding "
-                                  "in a relationship.",
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // 2️⃣ PERSONAL DETAILS
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 100),
-                        child: Column(
-                          children: [
-                            _InfoCard(
-                              title: 'Physical',
-                              icon: Icons.accessibility,
-                              children: [
-                                _InfoTile(
-                                  label: 'Height',
-                                  icon: Icons.height,
-                                  value: "${profile.physical.height} cm",
-                                ),
-                                _InfoTile(
-                                  label: 'Weight',
-                                  icon: Icons.scale,
-                                  value: "${profile.physical.weight} kg",
-                                ),
-                                _InfoTile(
-                                  label: 'Body Type',
-                                  icon: Icons.accessibility_new,
-                                  value: profile.physical.bodyType,
-                                ),
-                                if (profile.physical.physicallyChallenged)
-                                  _InfoTile(
-                                    label: 'Disability',
-                                    icon: Icons.accessible,
-                                    value:
-                                        profile.physical.disabilityDetails ??
-                                        "Yes",
-                                  ),
-                              ],
-                            ),
-
-                            _InfoCard(
-                              title: 'Address',
-                              icon: Icons.location_on,
-                              children: [
-                                // show addrress tile wise
-                                _InfoTile(
-                                  label: 'Place of residence',
-                                  icon: Icons.location_on_outlined,
-                                  value: profile.address.addressLine1,
-                                ),
-                                _InfoTile(
-                                  label: 'Post Office',
-
-                                  icon: Icons.local_post_office_outlined,
-
-                                  value: profile.address.post,
-                                ),
-
-                                _InfoTile(
-                                  label: 'City',
-                                  icon: Icons.location_city_outlined,
-                                  value: profile.address.city,
-                                ),
-                                _InfoTile(
-                                  label: 'Police Station',
-
-                                  icon: Icons.local_police_outlined,
-
-                                  value: profile.address.policeStation,
-                                ),
-
-                                _InfoTile(
-                                  label: 'State',
-                                  icon: Icons.map_outlined,
-                                  value: profile.address.state,
-                                ),
-
-                                _InfoTile(
-                                  label: 'Pin Code',
-                                  icon: Icons.local_post_office_outlined,
-                                  value: profile.address.pincode,
-                                ),
-
-                                SizedBox(height: 20),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // 3️⃣ EDUCATION & CAREER
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 100),
-                        child: Column(
-                          children: [
-                            _InfoCard(
-                              title: 'Employment',
-                              icon: Icons.work,
-                              children: [
-                                _InfoTile(
-                                  label: 'Job Type',
-                                  icon: Icons.work_outline,
-                                  value: profile.employment.jobType,
-                                ),
-                                if (profile.employment.jobType !=
-                                    "Not Working") ...[
-                                  _InfoTile(
-                                    label: 'Company',
-                                    icon: Icons.business,
-                                    value: profile.employment.company ?? "N/A",
-                                  ),
-                                  _InfoTile(
-                                    label: 'Designation',
-                                    icon: Icons.work_history,
-                                    value:
-                                        profile.employment.designation ?? "N/A",
-                                  ),
-                                  _InfoTile(
-                                    label: 'Income',
-                                    icon: Icons.attach_money,
-                                    value:
-                                        profile.employment.annualIncome
-                                            ?.toString() ??
-                                        "N/A",
-                                  ),
-                                  _InfoTile(
-                                    label: 'Work Location',
-                                    icon: Icons.location_city_outlined,
-                                    value:
-                                        profile.employment.workLocation ??
-                                        "N/A",
-                                  ),
-                                ],
-                              ],
-                            ),
-
-                            // ================= EDUCATION SECTION =================
-                            if (profile.education.isIlletrate == true) ...[
+                  body: Builder(
+                    builder: (context) => TabBarView(
+                      children: [
+                        // 1️⃣ BASIC INFO
+                        SingleChildScrollView(
+                          padding: const EdgeInsets.only(bottom: 100),
+                          child: Column(
+                            children: [
                               _InfoCard(
-                                title: 'Education',
-                                icon: Icons.school_outlined,
-                                children: const [
+                                title: 'Basic Information',
+                                icon: Icons.person,
+                                children: [
                                   _InfoTile(
-                                    label: 'Education Status',
-                                    icon: Icons.info_outline,
-                                    value: 'Illiterate',
+                                    label: 'Gender',
+                                    icon: Icons.person_outline,
+                                    value: profile.identity.gender,
+                                  ),
+                                  _InfoTile(
+                                    label: 'Age',
+                                    icon: Icons.cake_outlined,
+                                    value: '${profile.identity.age} years',
+                                  ),
+                                  _InfoTile(
+                                    label: 'Date of Birth',
+                                    icon: Icons.calendar_today_outlined,
+                                    value: DateFormat(
+                                      'dd-MM-yyyy',
+                                    ).format(profile.identity.dob),
                                   ),
                                 ],
                               ),
-                            ] else if (profile.education.education != null ||
-                                (profile
-                                        .education
-                                        .extraQualification
-                                        ?.qualifications
-                                        .isNotEmpty ??
-                                    false)) ...[
+
                               _InfoCard(
-                                title: 'Education',
-                                icon: Icons.school_outlined,
+                                title: 'About Me',
+                                icon: Icons.description,
+                                children: const [
+                                  Text(
+                                    textAlign: TextAlign.justify,
+                                    softWrap: true,
+                                    overflow: TextOverflow.clip,
+                                    "I am a simple, caring, and family-oriented person. "
+                                    "I believe in mutual respect, honesty, and understanding "
+                                    "in a relationship.",
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // 2️⃣ PERSONAL DETAILS
+                        SingleChildScrollView(
+                          padding: const EdgeInsets.only(bottom: 100),
+                          child: Column(
+                            children: [
+                              _InfoCard(
+                                title: 'Physical',
+                                icon: Icons.accessibility,
                                 children: [
-                                  if (profile.education.education != null) ...[
+                                  _InfoTile(
+                                    label: 'Height',
+                                    icon: Icons.height,
+                                    value: "${profile.physical.height} cm",
+                                  ),
+                                  _InfoTile(
+                                    label: 'Weight',
+                                    icon: Icons.scale,
+                                    value: "${profile.physical.weight} kg",
+                                  ),
+                                  _InfoTile(
+                                    label: 'Body Type',
+                                    icon: Icons.accessibility_new,
+                                    value: profile.physical.bodyType,
+                                  ),
+                                  if (profile.physical.physicallyChallenged)
                                     _InfoTile(
-                                      label: 'College',
-                                      icon: Icons.account_balance,
+                                      label: 'Disability',
+                                      icon: Icons.accessible,
                                       value:
-                                          profile.education.education!.college,
+                                          profile.physical.disabilityDetails ??
+                                          "Yes",
                                     ),
+                                ],
+                              ),
+
+                              _InfoCard(
+                                title: 'Address',
+                                icon: Icons.location_on,
+                                children: [
+                                  // show addrress tile wise
+                                  _InfoTile(
+                                    label: 'Place of residence',
+                                    icon: Icons.location_on_outlined,
+                                    value: profile.address.addressLine1,
+                                  ),
+                                  _InfoTile(
+                                    label: 'Post Office',
+
+                                    icon: Icons.local_post_office_outlined,
+
+                                    value: profile.address.post,
+                                  ),
+
+                                  _InfoTile(
+                                    label: 'City',
+                                    icon: Icons.location_city_outlined,
+                                    value: profile.address.city,
+                                  ),
+                                  _InfoTile(
+                                    label: 'Police Station',
+
+                                    icon: Icons.local_police_outlined,
+
+                                    value: profile.address.policeStation,
+                                  ),
+
+                                  _InfoTile(
+                                    label: 'State',
+                                    icon: Icons.map_outlined,
+                                    value: profile.address.state,
+                                  ),
+
+                                  _InfoTile(
+                                    label: 'Pin Code',
+                                    icon: Icons.local_post_office_outlined,
+                                    value: profile.address.pincode,
+                                  ),
+
+                                  SizedBox(height: 20),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // 3️⃣ EDUCATION & CAREER
+                        SingleChildScrollView(
+                          padding: const EdgeInsets.only(bottom: 100),
+                          child: Column(
+                            children: [
+                              _InfoCard(
+                                title: 'Employment',
+                                icon: Icons.work,
+                                children: [
+                                  _InfoTile(
+                                    label: 'Job Type',
+                                    icon: Icons.work_outline,
+                                    value: profile.employment.jobType,
+                                  ),
+                                  if (profile.employment.jobType !=
+                                      "Not Working") ...[
                                     _InfoTile(
-                                      label: 'Course',
-                                      icon: Icons.menu_book,
+                                      label: 'Company',
+                                      icon: Icons.business,
                                       value:
-                                          profile.education.education!.course,
+                                          profile.employment.company ?? "N/A",
                                     ),
                                     _InfoTile(
-                                      label: 'Percentage',
-                                      icon: Icons.percent,
-                                      value: profile
-                                          .education
-                                          .education!
-                                          .percentage
-                                          .toString(),
+                                      label: 'Designation',
+                                      icon: Icons.work_history,
+                                      value:
+                                          profile.employment.designation ??
+                                          "N/A",
                                     ),
                                     _InfoTile(
-                                      label: 'Passing Year',
-                                      icon: Icons.calendar_today,
-                                      value: profile
-                                          .education
-                                          .education!
-                                          .passingYear
-                                          .toString(),
+                                      label: 'Income',
+                                      icon: Icons.attach_money,
+                                      value:
+                                          profile.employment.annualIncome
+                                              ?.toString() ??
+                                          "N/A",
+                                    ),
+                                    _InfoTile(
+                                      label: 'Work Location',
+                                      icon: Icons.location_city_outlined,
+                                      value:
+                                          profile.employment.workLocation ??
+                                          "N/A",
                                     ),
                                   ],
+                                ],
+                              ),
 
-                                  if (profile
+                              // ================= EDUCATION SECTION =================
+                              if (profile.education.isIlletrate == true) ...[
+                                _InfoCard(
+                                  title: 'Education',
+                                  icon: Icons.school_outlined,
+                                  children: const [
+                                    _InfoTile(
+                                      label: 'Education Status',
+                                      icon: Icons.info_outline,
+                                      value: 'Illiterate',
+                                    ),
+                                  ],
+                                ),
+                              ] else if (profile.education.education != null ||
+                                  (profile
                                           .education
                                           .extraQualification
                                           ?.qualifications
                                           .isNotEmpty ??
-                                      false)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 12),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Additional Courses',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color.fromARGB(
-                                                255,
-                                                24,
-                                                22,
-                                                22,
+                                      false)) ...[
+                                _InfoCard(
+                                  title: 'Education',
+                                  icon: Icons.school_outlined,
+                                  children: [
+                                    if (profile.education.education !=
+                                        null) ...[
+                                      _InfoTile(
+                                        label: 'College',
+                                        icon: Icons.account_balance,
+                                        value: profile
+                                            .education
+                                            .education!
+                                            .college,
+                                      ),
+                                      _InfoTile(
+                                        label: 'Course',
+                                        icon: Icons.menu_book,
+                                        value:
+                                            profile.education.education!.course,
+                                      ),
+                                      _InfoTile(
+                                        label: 'Percentage',
+                                        icon: Icons.percent,
+                                        value: profile
+                                            .education
+                                            .education!
+                                            .percentage
+                                            .toString(),
+                                      ),
+                                      _InfoTile(
+                                        label: 'Passing Year',
+                                        icon: Icons.calendar_today,
+                                        value: profile
+                                            .education
+                                            .education!
+                                            .passingYear
+                                            .toString(),
+                                      ),
+                                    ],
+
+                                    if (profile
+                                            .education
+                                            .extraQualification
+                                            ?.qualifications
+                                            .isNotEmpty ??
+                                        false)
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 12),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Additional Courses',
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w500,
+                                                color: Color.fromARGB(
+                                                  255,
+                                                  24,
+                                                  22,
+                                                  22,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Wrap(
-                                            spacing: 8.0,
-                                            runSpacing: 4.0,
-                                            children: profile
-                                                .education
-                                                .extraQualification!
-                                                .qualifications
-                                                .map(
-                                                  (course) =>
-                                                      Chip(label: Text(course)),
-                                                )
-                                                .toList(),
-                                          ),
-                                        ],
+                                            const SizedBox(height: 8),
+                                            Wrap(
+                                              spacing: 8.0,
+                                              runSpacing: 4.0,
+                                              children: profile
+                                                  .education
+                                                  .extraQualification!
+                                                  .qualifications
+                                                  .map(
+                                                    (course) => Chip(
+                                                      label: Text(course),
+                                                    ),
+                                                  )
+                                                  .toList(),
+                                            ),
+                                          ],
+                                        ),
                                       ),
+                                  ],
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+
+                        // 4️⃣ FAMILY & CULTURE
+                        SingleChildScrollView(
+                          padding: const EdgeInsets.only(bottom: 100),
+                          child: Column(
+                            children: [
+                              _InfoCard(
+                                title: 'Family',
+                                icon: Icons.family_restroom,
+                                children: [
+                                  _InfoTile(
+                                    label: 'Father',
+                                    icon: Icons.person_outline,
+                                    value: profile.family.fatherName,
+                                  ),
+                                  _InfoTile(
+                                    label: 'Mother',
+                                    icon: Icons.person_outline,
+                                    value: profile.family.motherName,
+                                  ),
+                                  _InfoTile(
+                                    label: 'Family Type',
+                                    icon: Icons.family_restroom,
+                                    value: profile.family.familyType,
+                                  ),
+                                  _InfoTile(
+                                    label: 'No. of Brother',
+                                    icon: Icons.people_outline,
+                                    value: profile.family.numberOfBrothers
+                                        .toString(),
+                                  ),
+
+                                  _InfoTile(
+                                    label: 'No. of Sister',
+                                    icon: Icons.people_outline,
+                                    value: profile.family.numberOfSisters
+                                        .toString(),
+                                  ),
+                                ],
+                              ),
+
+                              _InfoCard(
+                                title: 'Cultural',
+                                icon: Icons.temple_hindu,
+                                children: [
+                                  _InfoTile(
+                                    label: 'Religion',
+                                    icon: Icons.temple_hindu,
+                                    value: profile.cultural.religion,
+                                  ),
+                                  _InfoTile(
+                                    label: 'Caste',
+                                    icon: Icons.group,
+                                    value: profile.cultural.caste,
+                                  ),
+
+                                  _InfoTile(
+                                    label: 'Caste',
+                                    icon: Icons.group,
+                                    value: profile.cultural.subCaste,
+                                  ),
+
+                                  _InfoTile(
+                                    label: 'Languages',
+                                    icon: Icons.language,
+                                    value: profile.cultural.languages.join(
+                                      ', ',
                                     ),
+                                  ),
                                 ],
                               ),
                             ],
-                          ],
+                          ),
                         ),
-                      ),
 
-                      // 4️⃣ FAMILY & CULTURE
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 100),
-                        child: Column(
-                          children: [
-                            _InfoCard(
-                              title: 'Family',
-                              icon: Icons.family_restroom,
-                              children: [
-                                _InfoTile(
-                                  label: 'Father',
-                                  icon: Icons.person_outline,
-                                  value: profile.family.fatherName,
-                                ),
-                                _InfoTile(
-                                  label: 'Mother',
-                                  icon: Icons.person_outline,
-                                  value: profile.family.motherName,
-                                ),
-                                _InfoTile(
-                                  label: 'Family Type',
-                                  icon: Icons.family_restroom,
-                                  value: profile.family.familyType,
-                                ),
-                                _InfoTile(
-                                  label: 'No. of Brother',
-                                  icon: Icons.people_outline,
-                                  value: profile.family.numberOfBrothers
-                                      .toString(),
-                                ),
+                        // 5️⃣ AGENT / VERIFICATION
+                        // SingleChildScrollView(
+                        //   padding: const EdgeInsets.only(bottom: 100),
+                        //   child: Column(
+                        //     children: [
+                        //       if (viewModel.agent != null)
+                        //         _InfoCard(
+                        //           title: 'Agent Details',
+                        //           icon: Icons.support_agent,
+                        //           children: [
+                        //             _InfoTile(
+                        //               label: 'Name',
+                        //               icon: Icons.person_outline,
+                        //               value: viewModel.agent!.agentName,
+                        //             ),
+                        //             _InfoTile(
+                        //               label: 'Mobile',
+                        //               icon: Icons.phone,
+                        //               value: viewModel.agent!.agentMobile,
+                        //             ),
+                        //             _InfoTile(
+                        //               label: 'Email',
+                        //               icon: Icons.email_outlined,
+                        //               value: viewModel.agent!.email,
+                        //             ),
 
-                                _InfoTile(
-                                  label: 'No. of Sister',
-                                  icon: Icons.people_outline,
-                                  value: profile.family.numberOfSisters
-                                      .toString(),
-                                ),
-                              ],
-                            ),
+                        //             _InfoTile(
+                        //               label: 'Agent ID',
+                        //               icon: Icons.perm_identity,
+                        //               value: viewModel.agent!.agentId,
+                        //             ),
 
-                            _InfoCard(
-                              title: 'Cultural',
-                              icon: Icons.temple_hindu,
-                              children: [
-                                _InfoTile(
-                                  label: 'Religion',
-                                  icon: Icons.temple_hindu,
-                                  value: profile.cultural.religion,
-                                ),
-                                _InfoTile(
-                                  label: 'Caste',
-                                  icon: Icons.group,
-                                  value: profile.cultural.caste,
-                                ),
-
-                                _InfoTile(
-                                  label: 'Caste',
-                                  icon: Icons.group,
-                                  value: profile.cultural.subCaste,
-                                ),
-
-                                _InfoTile(
-                                  label: 'Languages',
-                                  icon: Icons.language,
-                                  value: profile.cultural.languages.join(', '),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // 5️⃣ AGENT / VERIFICATION
-                      // SingleChildScrollView(
-                      //   padding: const EdgeInsets.only(bottom: 100),
-                      //   child: Column(
-                      //     children: [
-                      //       if (viewModel.agent != null)
-                      //         _InfoCard(
-                      //           title: 'Agent Details',
-                      //           icon: Icons.support_agent,
-                      //           children: [
-                      //             _InfoTile(
-                      //               label: 'Name',
-                      //               icon: Icons.person_outline,
-                      //               value: viewModel.agent!.agentName,
-                      //             ),
-                      //             _InfoTile(
-                      //               label: 'Mobile',
-                      //               icon: Icons.phone,
-                      //               value: viewModel.agent!.agentMobile,
-                      //             ),
-                      //             _InfoTile(
-                      //               label: 'Email',
-                      //               icon: Icons.email_outlined,
-                      //               value: viewModel.agent!.email,
-                      //             ),
-
-                      //             _InfoTile(
-                      //               label: 'Agent ID',
-                      //               icon: Icons.perm_identity,
-                      //               value: viewModel.agent!.agentId,
-                      //             ),
-
-                      //             _InfoTile(
-                      //               label: 'Registered Date',
-                      //               icon: Icons.calendar_today_outlined,
-                      //               value: DateFormat(
-                      //                 'dd-MM-yyyy',
-                      //               ).format(viewModel.agent!.registrationDate),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //     ],
-                      //   ),
-                      // ),
-                    ],
+                        //             _InfoTile(
+                        //               label: 'Registered Date',
+                        //               icon: Icons.calendar_today_outlined,
+                        //               value: DateFormat(
+                        //                 'dd-MM-yyyy',
+                        //               ).format(viewModel.agent!.registrationDate),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //     ],
+                        //   ),
+                        // ),
+                      ],
+                    ),
                   ),
                 ),
               ),

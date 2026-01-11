@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import '../../../../../app/router/app_router.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,16 +21,7 @@ class AgentDashboardScreen extends ConsumerWidget {
       drawer: _buildDrawer(context, ref),
       body: Center(
         child: Column(
-          children: [
-            Text('Agent Dashboard for Agent ID: $agentId'),
-
-            ElevatedButton(
-              onPressed: () {
-                context.router.push(UserImageFormRoute());
-              },
-              child: Text("Elevated Button"),
-            ),
-          ],
+          children: [Text('Agent Dashboard for Agent ID: $agentId')],
         ),
       ),
     );

@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/user_nofier.dart';
+import '../notifier/user_nofier.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 @RoutePage()
 class ViewPaymentDetailScreen extends ConsumerStatefulWidget {
   final String userId;
-  const ViewPaymentDetailScreen({super.key, required this.userId});
+  final String agentId;
+
+  const ViewPaymentDetailScreen({
+    super.key,
+    required this.userId,
+    required this.agentId,
+  });
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
       _ViewPaymentDetailScreenState();
@@ -20,17 +26,19 @@ class _ViewPaymentDetailScreenState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(userPaymentNotifierProvider.notifier)
-          .getUserPayment(agentId: widget.);
+          .getUserPayment(agentId: widget.agentId, userId: widget.userId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final userPaymentState = ref.watch(userPaymentNotifierProvider);
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Payment Details'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: theme.primaryColor,
+        foregroundColor: theme.colorScheme.onPrimary,
         elevation: 0,
       ),
       body: userPaymentState.when(
@@ -78,8 +86,8 @@ class _ViewPaymentDetailScreenState
                         colors: payment.status == 'SUCCESS'
                             ? [Colors.green[400]!, Colors.green[600]!]
                             : payment.status == 'FAILED'
-                                ? [Colors.red[400]!, Colors.red[600]!]
-                                : [Colors.orange[400]!, Colors.orange[600]!],
+                            ? [Colors.red[400]!, Colors.red[600]!]
+                            : [Colors.orange[400]!, Colors.orange[600]!],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -90,8 +98,8 @@ class _ViewPaymentDetailScreenState
                           payment.status == 'SUCCESS'
                               ? Icons.check_circle
                               : payment.status == 'FAILED'
-                                  ? Icons.cancel
-                                  : Icons.pending,
+                              ? Icons.cancel
+                              : Icons.pending,
                           size: 64,
                           color: Colors.white,
                         ),
@@ -125,6 +133,12 @@ class _ViewPaymentDetailScreenState
                   icon: Icons.payment,
                   children: [
                     _DetailItem(
+                      label: 'Status',
+                      value: payment.status,
+                      icon: Icons.info_outline,
+                    ),
+                    const Divider(height: 24),
+                    _DetailItem(
                       label: 'Payment ID',
                       value: payment.razorpayPaymentId.isNotEmpty
                           ? payment.razorpayPaymentId
@@ -155,7 +169,7 @@ class _ViewPaymentDetailScreenState
 
                 // Customer Information
                 _DetailCard(
-                  title: 'Customer Information',
+                  title: 'Client Information',
                   icon: Icons.person,
                   children: [
                     _DetailItem(
@@ -174,6 +188,25 @@ class _ViewPaymentDetailScreenState
                       label: 'Phone',
                       value: payment.phone,
                       icon: Icons.phone,
+                    ),
+
+                    const Divider(height: 24),
+                    _DetailItem(
+                      label: 'Gender',
+                      value: payment.gender!,
+                      icon: Icons.people,
+                    ),
+                    const Divider(height: 24),
+                    _DetailItem(
+                      label: 'Religion',
+                      value: payment.religion,
+                      icon: Icons.people,
+                    ),
+                    const Divider(height: 24),
+                    _DetailItem(
+                      label: 'Caste',
+                      value: payment.caste,
+                      icon: Icons.people,
                     ),
                   ],
                 ),
@@ -234,9 +267,9 @@ class _ViewPaymentDetailScreenState
             ),
           );
         },
-        loading: () => const Center(
+        loading: () => Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation(Colors.deepPurple),
+            valueColor: AlwaysStoppedAnimation(theme.primaryColor),
           ),
         ),
         error: (error, stack) => Center(
@@ -286,6 +319,7 @@ class _DetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -296,14 +330,14 @@ class _DetailCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: Colors.deepPurple, size: 24),
+                Icon(icon, color: theme.primaryColor, size: 24),
                 const SizedBox(width: 12),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
+                    color: theme.primaryColor,
                   ),
                 ),
               ],
@@ -359,63 +393,6 @@ class _DetailItem extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-
-@RoutePage()
-class ViewMetrimonyProfile extends ConsumerStatefulWidget {
-  final String userId;
-
-  const ViewMetrimonyProfile({super.key, required this.userId});
-
-  @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _ViewMetrimonyProfileState();
-}
-
-class _ViewMetrimonyProfileState extends ConsumerState<ViewMetrimonyProfile> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(userPaymentNotifierProvider.notifier)
-          .getUserPayment(widget.userId);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final userPaymentState = ref.watch(userPaymentNotifierProvider);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('User Matrimony Profile'),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: userPaymentState.when(
-        data: (payment) {
-          if (payment == null) {
-            return const Center(child: Text('No payment details found.'));
-          }
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Payment ID: ${payment.razorpayPaymentId}'),
-                Text('Amount: ${payment.amount}'),
-                Text('Status: ${payment.status}'),
-                Text('Order ID: ${payment.orderId}'),
-                Text('Created At: ${payment.createdAt.toLocal()}'),
-              ],
-            ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
-      ),
     );
   }
 }

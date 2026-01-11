@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import '../providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -130,145 +130,178 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // ---------------- LOGO ----------------
-              Material(
-                shape: const CircleBorder(),
-                elevation: 6,
-                shadowColor: theme.colorScheme.primary.withOpacity(0.4),
-                child: CircleAvatar(
-                  radius: MediaQuery.of(context).size.width * 0.25,
-                  backgroundImage: const AssetImage('assets/images/logo.png'),
-                  backgroundColor: Colors.transparent,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              Text(
-                "Create  User Account",
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-
-              const SizedBox(height: 6),
-
-              Text(
-                "Register to get started",
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ---------------- REGISTER CARD ----------------
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
+      // Matching the consistent premium background
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFE0E6), Colors.white],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Column(
+              children: [
+                /// 🔙 Header with Back Button
+                Row(
                   children: [
-                    AppTextField(
-                      controller: nameCtrl,
-                      prefixIcon: Icons.person,
-                      iconColor: theme.colorScheme.primary,
-                      label: "Full Name",
-                      hint: "Enter your full name",
-                      keyboardType: TextInputType.name,
-                      obscureText: false,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    AppTextField(
-                      controller: emailCtrl,
-                      prefixIcon: Icons.email,
-                      iconColor: theme.colorScheme.primary,
-                      label: "Email",
-                      hint: "Enter your email",
-                      keyboardType: TextInputType.emailAddress,
-                      obscureText: false,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    AppTextField(
-                      controller: phoneCtrl,
-                      prefixIcon: Icons.phone,
-                      iconColor: theme.colorScheme.primary,
-                      label: "Phone",
-                      hint: "Enter your phone number",
-                      keyboardType: TextInputType.phone,
-                      obscureText: false,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    AppTextField(
-                      controller: pwCtrl,
-                      prefixIcon: Icons.lock,
-                      iconColor: theme.colorScheme.primary,
-                      label: "Password",
-                      hint: "Enter your password",
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: true,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    AppTextField(
-                      controller: confirmPwCtrl,
-                      prefixIcon: Icons.lock_outline,
-                      iconColor: theme.colorScheme.primary,
-                      label: "Confirm Password",
-                      hint: "Re-enter your password",
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: true,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: AppButton(
-                        text: isLoading ? "Creating Account..." : "Register",
-                        onPressed: isLoading ? () {} : () => _register(context),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    TextButton(
-                      onPressed: () {
-                        context.router.back();
-                      },
-                      child: const Text(
-                        "Already have an account? Login",
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                    IconButton(
+                      onPressed: () => context.router.back(),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 20,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 10),
+
+                const SizedBox(height: 20),
+
+                Text(
+                  "Create Account",
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Join Arvika Marriage Bureau today",
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 15),
+                ),
+
+                const SizedBox(height: 30),
+
+                /// 📝 Registration Card
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 24,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      AppTextField(
+                        iconColor: theme.colorScheme.primary,
+                        obscureText: false,
+                        controller: nameCtrl,
+                        prefixIcon: Icons.person_outline_rounded,
+                        label: "Full Name",
+                        hint: "John Doe",
+                        keyboardType: TextInputType.name,
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        controller: emailCtrl,
+                        prefixIcon: Icons.alternate_email_rounded,
+                        label: "Email",
+                        hint: "example@mail.com",
+                        keyboardType: TextInputType.emailAddress,
+                        iconColor: theme.colorScheme.primary,
+                        obscureText: false,
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        controller: phoneCtrl,
+                        prefixIcon: Icons.phone_android_rounded,
+                        label: "Phone",
+                        hint: "+1 234 567 890",
+                        keyboardType: TextInputType.phone,
+                        obscureText: false,
+                        iconColor: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        obscureText: true,
+                        iconColor: theme.colorScheme.primary,
+
+                        controller: pwCtrl,
+                        prefixIcon: Icons.lock_outline_rounded,
+                        label: "Password",
+                        hint: "••••••••",
+                        keyboardType: TextInputType.visiblePassword,
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        controller: confirmPwCtrl,
+                        prefixIcon: Icons.verified_user_outlined,
+                        label: "Confirm Password",
+                        hint: "••••••••",
+                        obscureText: true,
+
+                        keyboardType: TextInputType.visiblePassword,
+                        iconColor: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(height: 24),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: isLoading
+                              ? null
+                              : () => _register(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "Create Profile",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                /// 🔗 Footer
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already a member?",
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                    TextButton(
+                      onPressed: () => context.router.back(),
+                      child: const Text(
+                        "Login Now",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,11 +1,12 @@
-import 'package:arvika_marriage_bureau/features/agent/agent_app/domain/repositories/user_payments_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/data/datasources/metrimony_firestore_ds.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/data/repositories_impl/metrimony_repository_impl.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/domain/repositories/metrimony_repository.dart';
+
+import '../../domain/repositories/user_payments_repository.dart';
+import '../../../../user/user_app/domain/states/metrimony_state.dart';
+import '../../../../user/user_razorpay/domain/states/payment.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/datasources/metrimony_firestore_ds.dart';
+import '../../data/repositories_impl/metrimony_repository_impl.dart';
+import '../../domain/repositories/metrimony_repository.dart';
 
 final metrimonyFirestoreDsProvider = Provider<MetrimonyFirestoreDs>((ref) {
   return MetrimonyFireStoreDsImpl();

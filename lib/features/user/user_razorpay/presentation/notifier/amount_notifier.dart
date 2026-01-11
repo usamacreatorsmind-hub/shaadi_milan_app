@@ -1,8 +1,9 @@
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/amount_firestore.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/amount.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/repository/amount_repository.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+
+import '../../data/firestore/amount_firestore.dart';
+import '../../domain/states/amount.dart';
+import '../../domain/repository/amount_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AmountNotifier extends StateNotifier<AmountState> {
   final AmountRepository _amountRepository;

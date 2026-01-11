@@ -1,5 +1,5 @@
-import '../states/address_state.dart';
 import '../../../../auth/domain/states/user_state.dart';
+import '../states/address_state.dart';
 
 abstract class UserRepository {
   Stream<UserEntity> watchUser(String uid);

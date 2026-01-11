@@ -1,22 +1,37 @@
+import 'package:flutter/rendering.dart';
+
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../app/router/app_router.dart';
 
 @RoutePage()
-class UserMainShellScreen extends StatefulWidget {
+class UserMainShellScreen extends ConsumerStatefulWidget {
   const UserMainShellScreen({super.key});
 
   @override
-  State<UserMainShellScreen> createState() => _UserMainShellState();
+  ConsumerState<UserMainShellScreen> createState() => _UserMainShellState();
 }
 
-class _UserMainShellState extends State<UserMainShellScreen> {
-  final String uid = FirebaseAuth.instance.currentUser!.uid;
+class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
+  final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+  bool _isVisible = true;
 
   @override
   Widget build(BuildContext context) {
+    // 🔹 Listen for Auth State Changes (Logout)
+    ref.listen(authStateProvider, (previous, next) {
+      next.whenData((data) {
+        if (data == null) {
+          // User logged out, redirect to Onboarding
+          context.router.replaceAll([const OnboardingRoute()]);
+        }
+      });
+    });
+
     return AutoTabsRouter(
       routes: [
         const UserHomeRoute(),
@@ -31,11 +46,28 @@ class _UserMainShellState extends State<UserMainShellScreen> {
 
         return Scaffold(
           extendBody: true,
-
-          body: child,
-          bottomNavigationBar: CustomBottomNavBar(
-            currentIndex: tabsRouter.activeIndex,
-            onTap: tabsRouter.setActiveIndex,
+          body: NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.direction == ScrollDirection.reverse) {
+                if (_isVisible) setState(() => _isVisible = false);
+              } else if (notification.direction == ScrollDirection.forward) {
+                if (!_isVisible) setState(() => _isVisible = true);
+              }
+              return true;
+            },
+            child: child,
+          ),
+          bottomNavigationBar: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: _isVisible ? 100 : 0,
+            child: Wrap(
+              children: [
+                CustomBottomNavBar(
+                  currentIndex: tabsRouter.activeIndex,
+                  onTap: tabsRouter.setActiveIndex,
+                ),
+              ],
+            ),
           ),
         );
       },

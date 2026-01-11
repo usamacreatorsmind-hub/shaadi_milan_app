@@ -1,10 +1,8 @@
-import 'dart:ffi';
-
 import 'package:auto_route/auto_route.dart';
-import 'package:arvika_marriage_bureau/core/enums/enum.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import '../../../../../core/enums/enum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../domain/states/education_state.dart';

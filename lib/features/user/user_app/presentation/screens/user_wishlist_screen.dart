@@ -1,7 +1,7 @@
-import 'package:arvika_marriage_bureau/app/custom/shimmer.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/my_profile_screen.dart';
+import '../../../../../app/custom/shimmer.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../data/repositories_impl/user_repo_impl.dart';
+import 'my_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:auto_route/auto_route.dart';

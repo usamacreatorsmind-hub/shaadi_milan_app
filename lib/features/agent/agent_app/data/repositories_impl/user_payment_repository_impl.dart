@@ -1,6 +1,6 @@
-import 'package:arvika_marriage_bureau/features/agent/agent_app/data/datasources/user_payments_ds.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/domain/repositories/user_payments_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
+import '../datasources/user_payments_ds.dart';
+import '../../domain/repositories/user_payments_repository.dart';
+import '../../../../user/user_razorpay/domain/states/payment.dart';
 
 class UserPaymentRepositoryImpl implements UserPaymentsRepository {
   final UserPaymentDs paymentsDs;
@@ -9,18 +9,14 @@ class UserPaymentRepositoryImpl implements UserPaymentsRepository {
 
   @override
   Future<Payment?> getUserPayment({
-    required String agentid,
+    required String agentId,
     required String userId,
   }) {
-    return paymentsDs.getUserPayment(
-      userId: userId,
-      agentId:
-          agentid, // Agent ID is not available here, pass an empty string or handle it as per your logic
-    );
+    return paymentsDs.getUserPayment(userId: userId, agentId: agentId);
   }
 
   @override
-  Future<List<Payment?>> getUsersPayment() {
-    return paymentsDs.getUsersPayment();
+  Future<List<Payment?>> getUsersPayment({required String agentId}) {
+    return paymentsDs.getUsersPayment(agentId: agentId);
   }
 }

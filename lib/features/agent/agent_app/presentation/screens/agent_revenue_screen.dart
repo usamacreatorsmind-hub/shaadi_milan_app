@@ -1,20 +1,595 @@
+import 'package:arvika_marriage_bureau/core/filters/revenue_filter_controller.dart';
+import 'package:arvika_marriage_bureau/core/filters/revenue_filter_right_sheet.dart';
+import 'package:arvika_marriage_bureau/features/agent/agent_app/domain/states/analytics_state.dart';
+import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/analytics_provider.dart';
+import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/user_nofier.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 @RoutePage()
 class AgentRevenueScreen extends ConsumerStatefulWidget {
   final String agentId;
-
   const AgentRevenueScreen({super.key, required this.agentId});
+
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _AgentRevenueScreenState();
+  ConsumerState<AgentRevenueScreen> createState() => _AgentRevenueScreenState();
 }
 
 class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(usersPaymentsNotifierProvider.notifier)
+          .getUsersPayment(agentId: widget.agentId);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Center(child: Text("This is revenue screen${widget.agentId}"));
+    final analyticsAsync = ref.watch(analyticsProvider);
+
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      body: analyticsAsync.when(
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: theme.primaryColor)),
+        error: (e, _) => Center(child: Text(e.toString())),
+        data: (analytics) {
+          return DefaultTabController(
+            length: 4,
+            child: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  SliverAppBar(
+                    title: const Text('Revenue Dashboard'),
+                    backgroundColor: theme.primaryColor,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    pinned: true,
+                    floating: true,
+                    forceElevated: innerBoxIsScrolled,
+                    actions: [
+                      Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.filter_list),
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (_) => const RevenueFilterRightSheet(),
+                              );
+                            },
+                          ),
+                          if (ref
+                                  .read(revenueFilterProvider.notifier)
+                                  .state
+                                  .city
+                                  .isNotEmpty ||
+                              ref
+                                  .read(revenueFilterProvider.notifier)
+                                  .state
+                                  .religion
+                                  .isNotEmpty ||
+                              ref
+                                  .read(revenueFilterProvider.notifier)
+                                  .state
+                                  .caste
+                                  .isNotEmpty ||
+                              ref
+                                  .read(revenueFilterProvider.notifier)
+                                  .state
+                                  .gender
+                                  .isNotEmpty ||
+                              ref
+                                      .read(revenueFilterProvider.notifier)
+                                      .state
+                                      .startDate
+                                      .day !=
+                                  DateTime.now().day ||
+                              ref
+                                      .read(revenueFilterProvider.notifier)
+                                      .state
+                                      .endDate
+                                      .day !=
+                                  DateTime.now().day)
+                            Positioned(
+                              right: 8,
+                              top: 8,
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                    bottom: const TabBar(
+                      indicatorColor: Colors.white,
+                      labelColor: Colors.white,
+                      unselectedLabelColor: Colors.white70,
+                      isScrollable: true,
+                      tabs: [
+                        Tab(text: 'Overview'),
+                        Tab(text: 'Trends'),
+                        Tab(text: 'Regions'),
+                        Tab(text: 'Transactions'),
+                      ],
+                    ),
+                  ),
+                ];
+              },
+              body: Builder(
+                builder: (context) => TabBarView(
+                  children: [
+                    // Overview Tab
+                    CustomScrollView(
+                      key: const PageStorageKey<String>('overview'),
+                      slivers: [
+                        SliverPadding(
+                          padding: const EdgeInsets.all(16),
+                          sliver: SliverList(
+                            delegate: SliverChildListDelegate([
+                              _RevenueRow(analytics),
+                              const SizedBox(height: 24),
+                              _PaymentStatusPie(analytics),
+                            ]),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Trends Tab
+                    CustomScrollView(
+                      key: const PageStorageKey<String>('trends'),
+                      slivers: [
+                        SliverPadding(
+                          padding: const EdgeInsets.all(16),
+                          sliver: SliverList(
+                            delegate: SliverChildListDelegate([
+                              _DailyRevenueChart(analytics),
+                            ]),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Regions Tab
+                    CustomScrollView(
+                      key: const PageStorageKey<String>('regions'),
+                      slivers: [
+                        SliverPadding(
+                          padding: const EdgeInsets.all(16),
+                          sliver: SliverList(
+                            delegate: SliverChildListDelegate([
+                              _RegionRevenueList(analytics.regionRevenue),
+                            ]),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Transactions Tab
+                    _TransactionList(payments: analytics.filteredPayments),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TransactionList extends StatelessWidget {
+  final List<Payment> payments;
+
+  const _TransactionList({required this.payments});
+
+  @override
+  Widget build(BuildContext context) {
+    if (payments.isEmpty) {
+      return const Center(child: Text("No transactions found"));
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: payments.length,
+      itemBuilder: (context, index) {
+        final payment = payments[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: _getStatusColor(payment.status).withOpacity(0.1),
+              child: Icon(
+                _getStatusIcon(payment.status),
+                color: _getStatusColor(payment.status),
+              ),
+            ),
+            title: Text(
+              payment.fullName,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${payment.region ?? 'N/A'}, ${payment.district ?? 'N/A'}",
+                  style: const TextStyle(fontSize: 12),
+                ),
+                Text(
+                  DateFormat('dd MMM yyyy, hh:mm a').format(payment.createdAt),
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                ),
+              ],
+            ),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  "₹${payment.amount}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  payment.status,
+                  style: TextStyle(
+                    color: _getStatusColor(payment.status),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toUpperCase()) {
+      case 'SUCCESS':
+      case 'PAID':
+      case 'CAPTURED':
+        return Colors.green;
+      case 'PENDING':
+        return Colors.orange;
+      case 'FAILED':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  IconData _getStatusIcon(String status) {
+    switch (status.toUpperCase()) {
+      case 'SUCCESS':
+      case 'PAID':
+      case 'CAPTURED':
+        return Icons.check;
+      case 'PENDING':
+        return Icons.access_time;
+      case 'FAILED':
+        return Icons.close;
+      default:
+        return Icons.info_outline;
+    }
+  }
+}
+
+class _RevenueRow extends StatelessWidget {
+  final AnalyticsState analytics;
+
+  const _RevenueRow(this.analytics);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _RevenueCard('Total Revenue', analytics.totalRevenue),
+        const SizedBox(width: 12),
+        _RevenueCard('Today', analytics.todayRevenue),
+      ],
+    );
+  }
+}
+
+class _RevenueCard extends StatelessWidget {
+  final String title;
+  final int value;
+
+  const _RevenueCard(this.title, this.value);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Expanded(
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '₹ $value',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.primaryColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PaymentStatusPie extends StatelessWidget {
+  final AnalyticsState analytics;
+
+  const _PaymentStatusPie(this.analytics);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              "Payment Status",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 260,
+              child: PieChart(
+                PieChartData(
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 40,
+                  sections: [
+                    PieChartSectionData(
+                      value: analytics.successCount.toDouble(),
+                      title: '${analytics.successCount}',
+                      color: Colors.green,
+                      radius: 50,
+                      titleStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    PieChartSectionData(
+                      value: analytics.pendingCount.toDouble(),
+                      title: '${analytics.pendingCount}',
+                      color: Colors.orange,
+                      radius: 50,
+                      titleStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    PieChartSectionData(
+                      value: analytics.failedCount.toDouble(),
+                      title: '${analytics.failedCount}',
+                      color: Colors.red,
+                      radius: 50,
+                      titleStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _LegendItem(color: Colors.green, text: 'Success'),
+                const SizedBox(width: 16),
+                _LegendItem(color: Colors.orange, text: 'Pending'),
+                const SizedBox(width: 16),
+                _LegendItem(color: Colors.red, text: 'Failed'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  final Color color;
+  final String text;
+  const _LegendItem({required this.color, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+        ),
+        const SizedBox(width: 4),
+        Text(text, style: const TextStyle(fontSize: 12)),
+      ],
+    );
+  }
+}
+
+class _DailyRevenueChart extends StatelessWidget {
+  final AnalyticsState analytics;
+
+  const _DailyRevenueChart(this.analytics);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final sortedEntries = analytics.dailyRevenue.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              "Daily Revenue Trend",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 260,
+              child: LineChart(
+                LineChartData(
+                  gridData: FlGridData(show: true, drawVerticalLine: false),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          if (value.toInt() >= 0 &&
+                              value.toInt() < sortedEntries.length) {
+                            final date = sortedEntries[value.toInt()].key;
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "${date.day}/${date.month}",
+                                style: const TextStyle(fontSize: 10),
+                              ),
+                            );
+                          }
+                          return const Text('');
+                        },
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: List.generate(
+                        sortedEntries.length,
+                        (i) => FlSpot(
+                          i.toDouble(),
+                          sortedEntries[i].value.toDouble(),
+                        ),
+                      ),
+                      isCurved: true,
+                      color: theme.primaryColor,
+                      barWidth: 3,
+                      dotData: FlDotData(show: true),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: theme.primaryColor.withOpacity(0.1),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RegionRevenueList extends StatelessWidget {
+  final Map<String, int> regionRevenue;
+
+  const _RegionRevenueList(this.regionRevenue);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Revenue by Region",
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Divider(),
+            if (regionRevenue.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Center(child: Text("No region data available")),
+              )
+            else
+              ...regionRevenue.entries.map((e) {
+                return ListTile(
+                  title: Text(e.key),
+                  trailing: Text(
+                    '₹ ${e.value}',
+                    style: TextStyle(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              }),
+          ],
+        ),
+      ),
+    );
   }
 }

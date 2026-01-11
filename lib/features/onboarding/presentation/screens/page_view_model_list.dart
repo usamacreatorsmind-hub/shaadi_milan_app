@@ -1,6 +1,5 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import '../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../app/router/app_router.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
@@ -43,62 +42,6 @@ List<PageViewModel> pageViewModelList(BuildContext context) {
     PageViewModel(
       title: "Secure & Private Platform",
       body: "Your privacy is our priority. Connect with confidence.",
-      footer: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.white, width: 2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {
-                  // Navigate to Agent Registration/Login
-                  context.router.replace(const AgentLoginRoute());
-                },
-                child: const Text(
-                  "Continue as Agent",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {
-                  // Navigate to User Login/Signup
-                  context.router.replace(const UserLoginRoute());
-                },
-                child: const Text(
-                  "Continue as User",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
 
       backgroundImage: "assets/images/image_3.jpeg",
 

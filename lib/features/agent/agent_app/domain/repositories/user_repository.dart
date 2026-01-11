@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+import '../../../../auth/domain/states/user_state.dart';
 
 abstract class UserRepository {
   Future<UserEntity> getUserById(String userId);

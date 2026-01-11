@@ -1,10 +1,10 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:arvika_marriage_bureau/core/enums/enum.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../../../auth/domain/states/agent_state.dart';
+import '../../data/repositories_impl/agent_repository_impl.dart';
+import '../../data/repositories_impl/user_repo_impl.dart';
+import '../../../../../core/enums/enum.dart';
+import '../../domain/states/metrimony_profile_view_model.dart';
+import '../../widgets/pdf_viewer_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
 
 import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';

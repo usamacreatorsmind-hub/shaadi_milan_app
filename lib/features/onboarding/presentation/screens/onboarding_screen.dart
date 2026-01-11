@@ -11,7 +11,7 @@ class OnboardingScreen extends StatelessWidget {
 
   void _onDone(BuildContext context) {
     // When done button is press
-    context.router.replace(const UserLoginRoute());
+    context.router.replace(const RoleSelectionRoute());
   }
 
   @override
@@ -105,9 +105,7 @@ class OnboardingScreen extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
-      overrideDone: (context, onPressed) {
-        return SizedBox(width: 60);
-      },
+      dotsContainerDecorator: const BoxDecoration(color: Colors.transparent),
 
       dotsDecorator: DotsDecorator(
         size: const Size.square(10.0),

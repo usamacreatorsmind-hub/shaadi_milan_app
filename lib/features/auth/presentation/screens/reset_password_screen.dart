@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import '../providers/auth_providers.dart';
 
 import '../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../app/router/app_router.dart';

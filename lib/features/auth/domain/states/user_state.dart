@@ -11,7 +11,6 @@ class UserEntity {
   final String userType;
   final String role;
   final String profileImageUrl;
-  final String? gender;
 
   final bool isProfileCreated;
 
@@ -32,7 +31,6 @@ class UserEntity {
     required this.agentId,
     required this.userType,
     required this.role,
-    this.gender,
 
     required this.isProfileCreated,
     required this.metrimonyId,
@@ -75,7 +73,7 @@ class UserEntity {
       'agentId': agentId,
       'userType': userType,
       'role': role,
-      'gender': gender,
+
       'isProfileCreated': isProfileCreated,
       'metrimonyId': metrimonyId,
       'profileId': profileId,
@@ -107,7 +105,7 @@ class UserEntity {
       agentId: map['agentId'] ?? '',
       userType: map['userType'] ?? '',
       role: map['role'] ?? '',
-      gender: map['gender'],
+
       isProfileCreated: map['isProfileCreated'] ?? false,
       metrimonyId: map['metrimonyId'] ?? '',
       profileId: map['profileId'] ?? '',
@@ -153,7 +151,7 @@ class UserEntity {
       userType: userType ?? this.userType,
 
       role: role ?? this.role,
-      gender: gender ?? this.gender,
+
       isProfileCreated: isProfileCreated ?? this.isProfileCreated,
       metrimonyId: metrimonyId ?? this.metrimonyId,
       profileId: profileId ?? this.profileId,
@@ -167,7 +165,7 @@ class UserEntity {
   /// ------------------ OVERRIDES ------------------
   @override
   String toString() {
-    return 'UserEntity(uid: $uid, fullName: $fullName, userType: $userType, role: $role, gender: $gender, email: $email, profileImageUrl: $profileImageUrl, phone: $phone, agentId: $agentId, isProfileCreated: $isProfileCreated, metrimonyId: $metrimonyId, profileId: $profileId, wishlists: $wishlists, createdAt: $createdAt, lastSeen: $lastSeen)';
+    return 'UserEntity(uid: $uid, fullName: $fullName, userType: $userType, role: $role,  email: $email, profileImageUrl: $profileImageUrl, phone: $phone, agentId: $agentId, isProfileCreated: $isProfileCreated, metrimonyId: $metrimonyId, profileId: $profileId, wishlists: $wishlists, createdAt: $createdAt, lastSeen: $lastSeen)';
   }
 
   @override
@@ -183,7 +181,6 @@ class UserEntity {
         other.agentId == agentId &&
         other.userType == userType &&
         other.role == role &&
-        other.gender == gender &&
         other.isProfileCreated == isProfileCreated &&
         other.metrimonyId == metrimonyId &&
         other.profileId == profileId &&
@@ -202,7 +199,6 @@ class UserEntity {
         userType.hashCode ^
         profileImageUrl.hashCode ^
         role.hashCode ^
-        gender.hashCode ^
         isProfileCreated.hashCode ^
         metrimonyId.hashCode ^
         profileId.hashCode ^
@@ -210,7 +206,6 @@ class UserEntity {
         createdAt.hashCode ^
         lastSeen.hashCode;
   }
- 
 }
 
 /// ================= USER STATE =================

@@ -6,13 +6,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../notifier/metrimony_notifier.dart';
 
 // Provider to fetch matrimony profile view model for a specific user
-final matrimonyProfileViewModelProvider = FutureProvider.family<
-    MetrimonyProfileViewModel,
-    String
->((ref, userId) async {
-  final datasource = ref.watch(metrimonyFirestoreDsProvider);
-  return datasource.getMetrimonyProfileViewModel(userId);
-});
+final matrimonyProfileViewModelProvider =
+    FutureProvider.family<MetrimonyProfileViewModel, String>((
+      ref,
+      userId,
+    ) async {
+      final datasource = ref.watch(metrimonyFirestoreDsProvider);
+      return datasource.getMetrimonyProfileViewModel(userId);
+    });
 
 @RoutePage()
 class MetrimonyProfileScreen extends ConsumerStatefulWidget {
@@ -27,7 +28,6 @@ class MetrimonyProfileScreen extends ConsumerStatefulWidget {
 
 class _ViewMetrimonyProfileScreenState
     extends ConsumerState<MetrimonyProfileScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -47,22 +47,16 @@ class _ViewMetrimonyProfileScreenState
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Matrimony Profile'),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 161, 31, 31),
         elevation: 0,
       ),
       body: profileAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Colors.red,
-              ),
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
               Text(
                 'Error loading profile',
@@ -103,7 +97,10 @@ class _ViewMetrimonyProfileScreenState
                   icon: Icons.person,
                   children: [
                     _InfoRow('Full Name', profile.user.fullName),
-                    _InfoRow('Date of Birth', profile.identity.dob.toLocal().toString().split(' ')[0]),
+                    _InfoRow(
+                      'Date of Birth',
+                      profile.identity.dob.toLocal().toString().split(' ')[0],
+                    ),
                     _InfoRow('Age', '${profile.identity.age} years'),
                     _InfoRow('Gender', profile.identity.gender),
                     _InfoRow('Aadhar', profile.identity.aadhar),
@@ -120,9 +117,15 @@ class _ViewMetrimonyProfileScreenState
                     _InfoRow('Weight', '${profile.physical.weight} kg'),
                     _InfoRow('Body Type', profile.physical.bodyType),
                     _InfoRow('Complexion', profile.physical.complexion),
-                    _InfoRow('Physically Challenged', profile.physical.physicallyChallenged ? 'Yes' : 'No'),
+                    _InfoRow(
+                      'Physically Challenged',
+                      profile.physical.physicallyChallenged ? 'Yes' : 'No',
+                    ),
                     if (profile.physical.disabilityDetails != null)
-                      _InfoRow('Disability Details', profile.physical.disabilityDetails ?? ''),
+                      _InfoRow(
+                        'Disability Details',
+                        profile.physical.disabilityDetails ?? '',
+                      ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -135,7 +138,10 @@ class _ViewMetrimonyProfileScreenState
                     _InfoRow('Religion', profile.cultural.religion),
                     _InfoRow('Caste', profile.cultural.caste),
                     _InfoRow('Sub Caste', profile.cultural.subCaste),
-                    _InfoRow('Languages', profile.cultural.languages.join(', ')),
+                    _InfoRow(
+                      'Languages',
+                      profile.cultural.languages.join(', '),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -145,17 +151,37 @@ class _ViewMetrimonyProfileScreenState
                   title: 'Education',
                   icon: Icons.school,
                   children: [
-                    _InfoRow('Is Illiterate', profile.education.isIlletrate ? 'Yes' : 'No'),
-                    if (!profile.education.isIlletrate && profile.education.education != null) ...[
+                    _InfoRow(
+                      'Is Illiterate',
+                      profile.education.isIlletrate ? 'Yes' : 'No',
+                    ),
+                    if (!profile.education.isIlletrate &&
+                        profile.education.education != null) ...[
                       _InfoRow('Course', profile.education.education!.course),
-                      _InfoRow('College/University', profile.education.education!.college),
-                      _InfoRow('Passing Year', '${profile.education.education!.passingYear}'),
-                      _InfoRow('Percentage', '${profile.education.education!.percentage}%'),
+                      _InfoRow(
+                        'College/University',
+                        profile.education.education!.college,
+                      ),
+                      _InfoRow(
+                        'Passing Year',
+                        '${profile.education.education!.passingYear}',
+                      ),
+                      _InfoRow(
+                        'Percentage',
+                        '${profile.education.education!.percentage}%',
+                      ),
                     ],
                     if (profile.education.extraQualification != null &&
-                        profile.education.extraQualification!.qualifications.isNotEmpty)
-                      _InfoRow('Extra Qualifications',
-                          profile.education.extraQualification!.qualifications.join(', ')),
+                        profile
+                            .education
+                            .extraQualification!
+                            .qualifications
+                            .isNotEmpty)
+                      _InfoRow(
+                        'Extra Qualifications',
+                        profile.education.extraQualification!.qualifications
+                            .join(', '),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -169,11 +195,20 @@ class _ViewMetrimonyProfileScreenState
                     if (profile.employment.company != null)
                       _InfoRow('Company', profile.employment.company ?? ''),
                     if (profile.employment.designation != null)
-                      _InfoRow('Designation', profile.employment.designation ?? ''),
+                      _InfoRow(
+                        'Designation',
+                        profile.employment.designation ?? '',
+                      ),
                     if (profile.employment.annualIncome != null)
-                      _InfoRow('Annual Income', '₹${profile.employment.annualIncome}'),
+                      _InfoRow(
+                        'Annual Income',
+                        '₹${profile.employment.annualIncome}',
+                      ),
                     if (profile.employment.workLocation != null)
-                      _InfoRow('Work Location', profile.employment.workLocation ?? ''),
+                      _InfoRow(
+                        'Work Location',
+                        profile.employment.workLocation ?? '',
+                      ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -185,8 +220,14 @@ class _ViewMetrimonyProfileScreenState
                   children: [
                     _InfoRow("Father's Name", profile.family.fatherName),
                     _InfoRow("Mother's Name", profile.family.motherName),
-                    _InfoRow('Number of Brothers', '${profile.family.numberOfBrothers}'),
-                    _InfoRow('Number of Sisters', '${profile.family.numberOfSisters}'),
+                    _InfoRow(
+                      'Number of Brothers',
+                      '${profile.family.numberOfBrothers}',
+                    ),
+                    _InfoRow(
+                      'Number of Sisters',
+                      '${profile.family.numberOfSisters}',
+                    ),
                     _InfoRow('Family Type', profile.family.familyType),
                     _InfoRow('Family Status', profile.family.familyStatus),
                   ],
@@ -206,12 +247,8 @@ class _ViewMetrimonyProfileScreenState
                     _InfoRow('Pincode', profile.address.pincode),
                   ],
                 ),
+
                 const SizedBox(height: 16),
-
-                // Images Section with Tabs
-                _ImagesTabSection(images: profile.images),
-
-                // Agent Info if available
                 if (profile.agentEntity != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
@@ -222,11 +259,21 @@ class _ViewMetrimonyProfileScreenState
                         _InfoRow('Agent Name', profile.agentEntity!.agentName),
                         _InfoRow('Phone', profile.agentEntity!.agentMobile),
                         _InfoRow('Email', profile.agentEntity!.agentEmail),
-                        _InfoRow('License Number', profile.agentEntity!.agentLicenseNumber),
+                        _InfoRow(
+                          'License Number',
+                          profile.agentEntity!.agentLicenseNumber,
+                        ),
                         _InfoRow('City', profile.agentEntity!.agentCity),
                       ],
                     ),
                   ),
+
+                const SizedBox(height: 16),
+
+                // Images Section with Tabs
+                _ImagesTabSection(images: profile.images),
+
+                // Agent Info if available
               ],
             ),
           );
@@ -255,9 +302,12 @@ class _UserInfoCard extends StatelessWidget {
               radius: 40,
               backgroundImage: profile.images.primaryImageUrl.isNotEmpty
                   ? NetworkImage(profile.images.primaryImageUrl)
-                  : null,
+                  : NetworkImage(
+                      "https://firebasestorage.googleapis.com/v0/b/fir-app-e3a53.firebasestorage.app/o/company_files%2Ficon-7797704_640.png?alt=media&token=90d1d7fc-9dd9-4ab9-8dfc-480646f5777f",
+                    ),
+              // onBackgroundImageError: (_, __) {},
               child: profile.images.primaryImageUrl.isEmpty
-                  ? const Icon(Icons.person, size: 40)
+                  ? const Icon(Icons.person, size: 1)
                   : null,
             ),
             const SizedBox(width: 16),
@@ -275,25 +325,16 @@ class _UserInfoCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     '${profile.identity.gender} • ${profile.identity.age} years old',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     profile.user.email,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   ),
                   Text(
                     profile.user.phone,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   ),
                 ],
               ),
@@ -367,20 +408,14 @@ class _InfoRow extends StatelessWidget {
             flex: 2,
             child: Text(
               label,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
             ),
           ),
           Expanded(
             flex: 3,
             child: Text(
               value.isEmpty ? 'Not provided' : value,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -415,72 +450,109 @@ class _ImagesTabSection extends StatelessWidget {
       allImages.add(MapEntry('Gallery ${i + 1}', images.secondaryImageUrls[i]));
     }
 
-    if (allImages.isEmpty) {
+    final hasAadhar = images.aadharCardUrl.isNotEmpty;
+
+    if (allImages.isEmpty && !hasAadhar) {
       return const SizedBox.shrink();
     }
 
+    final tabCount = allImages.length + (hasAadhar ? 1 : 0);
+
     return DefaultTabController(
-      length: allImages.length + (images.aadharCardUrl.isNotEmpty ? 1 : 0),
+      length: tabCount,
+      key: ValueKey('tabs_$tabCount'),
       child: Card(
         elevation: 1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.photo_library,
-                    size: 20,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Photos & Documents',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+        child: Builder(
+          builder: (context) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.photo_library,
+                      size: 20,
+                      color: Theme.of(context).primaryColor,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Photos & Documents',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Divider(height: 1),
+              const Divider(height: 1),
 
-            // Tab Bar
-            TabBar(
-              isScrollable: true,
-              labelColor: Theme.of(context).primaryColor,
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: Theme.of(context).primaryColor,
-              tabs: [
-                ...allImages.map((entry) => Tab(text: entry.key)),
-                if (images.aadharCardUrl.isNotEmpty)
-                  const Tab(text: 'Aadhar Card'),
-              ],
-            ),
-
-            // Tab Bar View
-            SizedBox(
-              height: 400,
-              child: TabBarView(
-                children: [
-                  // Image tabs
-                  ...allImages.map((entry) => _ImageViewer(
-                    imageUrl: entry.value,
-                    label: entry.key,
-                  )),
-
-                  // Aadhar card tab
+              // Tab Bar
+              TabBar(
+                isScrollable: true,
+                labelColor: Theme.of(context).primaryColor,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Theme.of(context).primaryColor,
+                tabs: [
+                  ...allImages.map((entry) => Tab(text: entry.key)),
                   if (images.aadharCardUrl.isNotEmpty)
-                    _DocumentViewer(
-                      documentUrl: images.aadharCardUrl,
-                      label: 'Aadhar Card',
-                    ),
+                    const Tab(text: 'Aadhar Card'),
                 ],
               ),
+
+              // Tab Bar View
+              SizedBox(
+                height: 400,
+                child: TabBarView(
+                  children: [
+                    // Image tabs
+                    ...allImages.map(
+                      (entry) =>
+                          _ImageViewer(imageUrl: entry.value, label: entry.key),
+                    ),
+
+                    // Aadhar card tab
+                    if (images.aadharCardUrl.isNotEmpty)
+                      _DocumentViewer(
+                        documentUrl: images.aadharCardUrl,
+                        label: 'Aadhar Card',
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ImageError extends StatelessWidget {
+  final String label;
+
+  const _ImageError({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.broken_image_outlined,
+              size: 56,
+              color: Colors.grey[500],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '$label not available',
+              style: TextStyle(color: Colors.grey[600]),
             ),
           ],
         ),
@@ -494,83 +566,36 @@ class _ImageViewer extends StatelessWidget {
   final String imageUrl;
   final String label;
 
-  const _ImageViewer({
-    required this.imageUrl,
-    required this.label,
-  });
+  const _ImageViewer({required this.imageUrl, required this.label});
 
   @override
   Widget build(BuildContext context) {
+    if (imageUrl.isEmpty) {
+      return _ImageError(label: label);
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           Expanded(
             child: GestureDetector(
-              onTap: () {
-                // Show full screen image
-                showDialog(
-                  context: context,
-                  builder: (context) => Dialog(
-                    backgroundColor: Colors.black,
-                    insetPadding: EdgeInsets.zero,
-                    child: Stack(
-                      children: [
-                        Center(
-                          child: InteractiveViewer(
-                            child: Image.network(
-                              imageUrl,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Center(
-                                  child: Icon(
-                                    Icons.error_outline,
-                                    color: Colors.white,
-                                    size: 64,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 40,
-                          right: 20,
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                              size: 32,
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+              onTap: () => _openFullscreen(context),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
                   imageUrl,
-                  fit: BoxFit.contain,
                   width: double.infinity,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[300],
-                      child: const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.error_outline, size: 48, color: Colors.grey),
-                            SizedBox(height: 8),
-                            Text('Failed to load image'),
-                          ],
-                        ),
-                      ),
-                    );
+                  fit: BoxFit.contain,
+
+                  /// ✅ LOADING (VERY IMPORTANT)
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return const Center(child: CircularProgressIndicator());
                   },
+
+                  /// ✅ ERROR HANDLING
+                  errorBuilder: (_, __, ___) => _ImageError(label: label),
                 ),
               ),
             ),
@@ -578,12 +603,54 @@ class _ImageViewer extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             'Tap to view fullscreen',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 12,
-            ),
+            style: TextStyle(color: Colors.grey[600], fontSize: 12),
           ),
         ],
+      ),
+    );
+  }
+
+  /// FULLSCREEN VIEW
+  void _openFullscreen(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black,
+      builder: (_) => Dialog(
+        insetPadding: EdgeInsets.zero,
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                minScale: 1,
+                maxScale: 4,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (_, child, progress) {
+                    if (progress == null) return child;
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    );
+                  },
+                  errorBuilder: (_, __, ___) => const Icon(
+                    Icons.broken_image,
+                    color: Colors.white,
+                    size: 64,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 32),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -594,13 +661,14 @@ class _DocumentViewer extends StatelessWidget {
   final String documentUrl;
   final String label;
 
-  const _DocumentViewer({
-    required this.documentUrl,
-    required this.label,
-  });
+  const _DocumentViewer({required this.documentUrl, required this.label});
 
   @override
   Widget build(BuildContext context) {
+    if (documentUrl.isEmpty) {
+      return _ImageError(label: label);
+    }
+
     final isPdf = documentUrl.toLowerCase().endsWith('.pdf');
 
     return Padding(
@@ -616,56 +684,47 @@ class _DocumentViewer extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () async {
-              if (isPdf) {
-                // For PDF, you might want to open in a PDF viewer
-                // For now, just show a dialog
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Aadhar Document'),
-                    content: const Text('PDF viewer integration required.\nDocument URL is ready to use.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                // Show image in dialog
-                showDialog(
-                  context: context,
-                  builder: (context) => Dialog(
-                    child: Image.network(documentUrl),
-                  ),
-                );
-              }
-            },
+            onPressed: () => _openDocument(context, isPdf),
             icon: const Icon(Icons.open_in_new),
             label: Text(isPdf ? 'Open PDF' : 'View Document'),
           ),
           const SizedBox(height: 12),
           Text(
-            documentUrl.split('/').last.length > 30
-                ? '...${documentUrl.split('/').last.substring(documentUrl.split('/').last.length - 30)}'
-                : documentUrl.split('/').last,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 12,
-            ),
+            _shortFileName(documentUrl),
+            style: TextStyle(color: Colors.grey[600], fontSize: 12),
             textAlign: TextAlign.center,
           ),
         ],
       ),
     );
+  }
+
+  void _openDocument(BuildContext context, bool isPdf) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        child: isPdf
+            ? const Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'PDF viewer integration required.\nURL is valid.',
+                  textAlign: TextAlign.center,
+                ),
+              )
+            : Image.network(
+                documentUrl,
+                errorBuilder: (_, __, ___) => _ImageError(label: label),
+              ),
+      ),
+    );
+  }
+
+  String _shortFileName(String url) {
+    final name = url.split('/').last;
+    return name.length > 30 ? '...${name.substring(name.length - 30)}' : name;
   }
 }

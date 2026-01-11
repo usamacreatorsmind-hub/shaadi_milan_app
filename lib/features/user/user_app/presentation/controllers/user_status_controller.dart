@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_status_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_status_repository.dart';
+import '../../data/repositories_impl/user_status_repo_impl.dart';
+import '../../domain/repositories/user_status_repository.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';

@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/order.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/order_notifier.dart';
+import '../../domain/states/order.dart';
+import '../notifier/order_notifier.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

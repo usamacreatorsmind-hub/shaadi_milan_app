@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/amount_firestore.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/amount.dart';
+import '../../data/firestore/amount_firestore.dart';
+import '../states/amount.dart';
 
 class AmountRepository {
   // ------------------  DEPENDENCIES ------------------

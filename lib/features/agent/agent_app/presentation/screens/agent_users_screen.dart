@@ -1,17 +1,12 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/user_nofier.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+import 'package:sizer/sizer.dart';
+
+import '../../../../../app/router/app_router.dart';
+import '../notifier/user_nofier.dart';
+import '../../../../auth/domain/states/user_state.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/user_nofier.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
+import '../../../../user/user_razorpay/domain/states/payment.dart';
 
 @RoutePage()
 class AgentUserScreen extends ConsumerStatefulWidget {
@@ -32,7 +27,9 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
       ref
           .read(agentUsersNotifierProvider.notifier)
           .getUsersForAgent(widget.agentId);
-      ref.read(usersPaymentsNotifierProvider.notifier).getUsersPayment();
+      ref
+          .read(usersPaymentsNotifierProvider.notifier)
+          .getUsersPayment(agentId: widget.agentId);
     });
   }
 
@@ -41,13 +38,23 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
     final usersAsync = ref.watch(agentUsersNotifierProvider);
     final paymentsAsync = ref.watch(usersPaymentsNotifierProvider);
 
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           /// 🔹 APP BAR
-          const SliverAppBar(
+          SliverAppBar(
+            title: const Text('My Clients'),
+            floating: true,
             pinned: true,
-            title: Text('Agent Clients'),
+            backgroundColor: theme.scaffoldBackgroundColor,
+            elevation: 0,
+            centerTitle: false,
+            titleTextStyle: theme.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+            ),
           ),
 
           /// 🔹 BODY
@@ -69,11 +76,10 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
 
             data: (users) {
               if (users.isEmpty) {
-                return const SliverFillRemaining(
-                  child: _EmptyView(),
-                );
+                return const SliverFillRemaining(child: _EmptyView());
               }
 
+              // Get payments from async state
               final payments = paymentsAsync.maybeWhen(
                 data: (data) => data,
                 orElse: () => const <Payment?>[],
@@ -82,38 +88,86 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
               return SliverPadding(
                 padding: const EdgeInsets.all(12),
                 sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final user = users[index];
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final user = users[index];
+                    // print payments
 
-                      final Payment? userPayment = payments.firstWhere(
-                        (p) => p != null && p.userId == user.uid,
-                        orElse: () => null,
+                    // Find all payments for this user
+                    final userPayments = payments
+                        .where((p) => p != null && p.userId == user.uid)
+                        .toList();
+
+                    // debugPrint(
+                    //   'User ${user.fullName}: Payments: ${userPayments.map((p) => p?.status).toList()}',
+                    // );
+
+                    // Determine the payment status to display
+                    String? statusToDisplay;
+
+                    if (userPayments.isEmpty) {
+                      // No payments found for this user
+                      statusToDisplay = 'Not Started';
+                    } else {
+                      // Check for successful payments
+                      final hasSuccess = userPayments.any(
+                        (p) =>
+                            p != null &&
+                            [
+                              'SUCCESS',
+                              'PAID',
+                              'CAPTURED',
+                            ].contains(p.status.toUpperCase()),
                       );
 
-                      return UserCard(
-                        user: user,
-                        paymentStatus: userPayment?.status,
+                      if (hasSuccess) {
+                        statusToDisplay = 'PAID';
+                      } else {
+                        // Check for pending payments
+                        final hasPending = userPayments.any(
+                          (p) =>
+                              p != null && p.status.toUpperCase() == 'PENDING',
+                        );
 
-                        onViewUserProfile: () {
-                          context.router.push(
-                            ViewUserRoute(userId: user.uid),
-                          );
-                        },
-                        onViewMatrimonyProfile: () {
-                          context.router.push(
-                            MetrimonyProfileRoute(userId: user.uid),
-                          );
-                        },
-                        onViewPayment: () {
-                          context.router.push(
-                            ViewPaymentDetailRoute(userId: user.uid),
-                          );
-                        },
-                      );
-                    },
-                    childCount: users.length,
-                  ),
+                        if (hasPending) {
+                          statusToDisplay = 'PENDING';
+                        } else {
+                          // Use the most recent payment status
+                          statusToDisplay =
+                              userPayments.isNotEmpty &&
+                                  userPayments.first != null
+                              ? userPayments.first!.status
+                              : 'Not Started';
+                        }
+                      }
+                    }
+
+                    return UserCard(
+                      user: user,
+                      paymentStatus: statusToDisplay,
+
+                      onViewUserProfile: () {
+                        context.router.push(
+                          ViewUserRoute(
+                            userId: user.uid,
+                            agentId: widget.agentId,
+                          ),
+                        );
+                      },
+                      onViewMatrimonyProfile: () {
+                        context.router.push(
+                          MetrimonyProfileRoute(userId: user.uid),
+                        );
+                      },
+                      onViewPayment: () {
+                        context.router.push(
+                          ViewPaymentDetailRoute(
+                            userId: user.uid,
+                            agentId: user.agentId,
+                          ),
+                        );
+                      },
+                    );
+                  }, childCount: users.length),
                 ),
               );
             },
@@ -123,7 +177,6 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
     );
   }
 }
-
 
 class UserCard extends StatelessWidget {
   final UserEntity user;
@@ -145,6 +198,7 @@ class UserCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = user.profileImageUrl;
+    final theme = Theme.of(context);
 
     return Card(
       elevation: 2,
@@ -163,24 +217,24 @@ class UserCard extends StatelessWidget {
                   height: 56,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.deepPurple.withOpacity(0.1),
-                    image: (imageUrl != null && imageUrl.isNotEmpty)
+                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    image: imageUrl.isNotEmpty
                         ? DecorationImage(
                             image: NetworkImage(imageUrl),
                             fit: BoxFit.cover,
                           )
                         : null,
                   ),
-                  child: (imageUrl == null || imageUrl.isEmpty)
+                  child: imageUrl.isEmpty
                       ? Center(
                           child: Text(
                             user.fullName.isNotEmpty
                                 ? user.fullName[0].toUpperCase()
                                 : '?',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: Colors.deepPurple,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
                         )
@@ -224,40 +278,48 @@ class UserCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _InfoTile(
-                  icon: Icons.phone,
-                  label: 'Phone',
-                  value: user.phone.isNotEmpty ? user.phone : 'N/A',
+                Container(
+                  width: 30.w,
+                  child: _InfoTile(
+                    label: 'Phone',
+                    value: user.phone.isNotEmpty ? user.phone : 'N/A',
+                  ),
                 ),
-                _StatusTile(
-                  label: 'Profile',
-                  value: user.isProfileCreated ? 'Created' : 'Pending',
-                  isActive: user.isProfileCreated,
+                Container(
+                  width: 25.w,
+                  child: _StatusTile(
+                    label: 'Profile',
+                    value: user.isProfileCreated ? 'Created' : 'Pending',
+                    isActive: user.isProfileCreated,
+                  ),
                 ),
-                _StatusTile(
-                  label: 'Payment',
-                  value: _paymentLabel(paymentStatus),
-                  isActive: paymentStatus == 'SUCCESS',
+                Container(
+                  width: 26.w,
+                  child: _StatusTile(
+                    label: 'Payment',
+                    value: paymentStatus ?? 'Not Started',
+                    isActive: paymentStatus?.toUpperCase() == 'PAID',
+                  ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             const Divider(height: 1),
             const SizedBox(height: 8),
 
             /// ================= ACTION ROW =================
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _ActionButton(
                   icon: Icons.person_outline,
-                  label: 'User',
+                  label: 'View Profile',
                   onTap: onViewUserProfile,
                 ),
                 _ActionButton(
                   icon: Icons.favorite_border,
-                  label: 'Matrimony',
+                  label: 'View Matrimony',
                   onTap: onViewMatrimonyProfile,
                 ),
                 _ActionButton(
@@ -271,21 +333,6 @@ class UserCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _paymentLabel(String? status) {
-    if (status == null) return 'Not Started';
-
-    switch (status.toUpperCase()) {
-      case 'SUCCESS':
-        return 'Paid';
-      case 'FAILED':
-        return 'Failed';
-      case 'PENDING':
-        return 'Pending';
-      default:
-        return 'Not Started';
-    }
   }
 }
 
@@ -302,25 +349,26 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(2),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.22,
+          width: 26.w,
           decoration: BoxDecoration(
-            color: Colors.deepPurple.withOpacity(0.05),
+            color: theme.colorScheme.primary.withOpacity(0.05),
 
             border: Border.all(
-              color: Colors.deepPurple.withOpacity(0.2),
+              color: theme.colorScheme.primary.withOpacity(0.2),
               width: 1,
             ),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
             children: [
-              Icon(icon, color: Colors.deepPurple),
+              Icon(icon, color: theme.colorScheme.primary),
               const SizedBox(height: 4),
               Text(
                 label,
@@ -341,34 +389,49 @@ class _ActionButton extends StatelessWidget {
 /// INFO TILE
 /// =======================================================
 class _InfoTile extends StatelessWidget {
-  final IconData icon;
   final String label;
   final String value;
 
-  const _InfoTile({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
+  const _InfoTile({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, size: 20, color: Colors.deepPurple),
-        const SizedBox(width: 6),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-            ),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-            ),
-          ],
+        SizedBox(width: 4.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                label,
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withOpacity(0.3),
+                    width: 1,
+                  ),
+
+                  color: Colors.transparent,
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -391,15 +454,38 @@ class _StatusTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine color based on payment status
+    Color statusColor = Colors.grey;
+    if (value.toUpperCase() == 'PAID') {
+      statusColor = Colors.green;
+    } else if (value.toUpperCase() == 'PENDING') {
+      statusColor = Colors.orange;
+    } else if (value.toUpperCase() == 'FAILED') {
+      statusColor = Colors.red;
+    } else if (value.toUpperCase() == 'NOT STARTED') {
+      statusColor = Colors.grey;
+    }
+
     return Column(
       children: [
         Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isActive ? Colors.green : Colors.orange,
+        Container(
+          width: 20.w,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: statusColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: statusColor.withOpacity(0.3), width: 1),
+          ),
+          child: Center(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: statusColor,
+              ),
+            ),
           ),
         ),
       ],
@@ -437,8 +523,10 @@ class _EmptyView extends StatelessWidget {
 class LoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(color: Colors.deepPurple),
+    return Center(
+      child: CircularProgressIndicator(
+        color: Theme.of(context).colorScheme.primary,
+      ),
     );
   }
 }

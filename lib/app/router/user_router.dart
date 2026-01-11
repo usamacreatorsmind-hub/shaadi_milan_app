@@ -98,10 +98,7 @@ class UserRouter {
       page: UserPaymentRoute.page,
       guards: [AuthGuard(ref), UserGuard(ref)],
     ),
-    AutoRoute(
-      page: ResetPasswordRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
-    ),
+   
     AutoRoute(
       page: ChangePasswordRoute.page,
       guards: [AuthGuard(ref), UserGuard(ref)],

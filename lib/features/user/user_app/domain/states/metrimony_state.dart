@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+import '../../../../auth/domain/states/agent_state.dart';
+import '../../../../auth/domain/states/user_state.dart';
  
 import 'image_state.dart';
 import '../../presentation/screens/metrimony_flow_screen.dart';

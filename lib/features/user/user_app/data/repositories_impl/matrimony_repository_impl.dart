@@ -1,5 +1,5 @@
  
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+import '../../../../auth/domain/states/agent_state.dart';
 
 import '../../domain/states/address_state.dart';
 import '../../domain/states/cultural_state.dart';

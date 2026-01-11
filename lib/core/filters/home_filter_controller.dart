@@ -1,0 +1,40 @@
+
+import 'package:arvika_marriage_bureau/core/filters/home_filter_state.dart';
+import 'package:flutter_riverpod/legacy.dart';
+
+/// =======================
+/// FILTER PROVIDER
+/// =======================
+final homeFilterProvider =
+    StateNotifierProvider<HomeFilterController, HomeFilterState>(
+      (ref) => HomeFilterController(),
+    );
+
+class HomeFilterController extends StateNotifier<HomeFilterState> {
+  HomeFilterController()
+    : super(
+        const HomeFilterState(state: '', city: '', religion: '', caste: ''),
+      );
+
+  void updateState(String value) {
+    // reset city when state changes
+    state = state.copyWith(state: value, city: '');
+  }
+
+  void reset() {
+    state = const HomeFilterState(state: '', city: '', religion: '', caste: '');
+  }
+
+  void updateCity(String value) {
+    state = state.copyWith(city: value);
+  }
+
+  void updateReligion(String value) {
+    // reset caste when religion changes
+    state = state.copyWith(religion: value, caste: '');
+  }
+
+  void updateCaste(String value) {
+    state = state.copyWith(caste: value);
+  }
+}

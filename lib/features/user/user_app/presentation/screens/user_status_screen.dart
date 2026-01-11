@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/appbar.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
+import '../../../../../app/custom/custom_widgets/appbar.dart';
+import '../controllers/user_status_controller.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

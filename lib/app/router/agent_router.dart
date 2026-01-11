@@ -41,5 +41,11 @@ class AgentRouter {
       page: MetrimonyProfileRoute.page,
       guards: [AuthGuard(ref), AgentGuard(ref)],
     ),
+
+    AutoRoute(
+      page: AgentEntityRoute.page,
+      guards: [AuthGuard(ref), AgentGuard(ref)],
+    ),
+   
   ];
 }

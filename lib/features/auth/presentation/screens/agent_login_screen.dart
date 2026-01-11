@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import '../providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -109,119 +109,143 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // ---------------- LOGO ----------------
-              Material(
-                shape: const CircleBorder(),
-                elevation: 6,
-                shadowColor: theme.colorScheme.primary.withOpacity(0.4),
-                child: CircleAvatar(
-                  radius: MediaQuery.of(context).size.width * 0.25,
-                  backgroundImage: const AssetImage('assets/images/logo.png'),
-                  backgroundColor: Colors.transparent,
+      // Matching the gradient from the selection screen
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFE0E6), Colors.white],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+
+                /// 🔙 Back Button
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    onPressed: () => context.router.back(),
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                /// 🏢 Animated Header Area
+                const SizedBox(height: 40),
 
-              Text(
-                "Agent Login",
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
+                Text(
+                  "Agent Login",
+                  style: theme.textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
-              ),
-
-              const SizedBox(height: 6),
-
-              Text(
-                "Login to your agent account",
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                const SizedBox(height: 8),
+                Text(
+                  "Access your agent portal",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 40),
 
-              // ---------------- LOGIN CARD ----------------
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    AppTextField(
-                      controller: emailCtrl,
-                      prefixIcon: Icons.email,
-                      iconColor: theme.colorScheme.primary,
-                      label: "Agent Email",
-                      hint: "Enter your agent email",
-                      keyboardType: TextInputType.emailAddress,
-                      obscureText: false,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    AppTextField(
-                      controller: pwCtrl,
-                      prefixIcon: Icons.lock,
-                      iconColor: theme.colorScheme.primary,
-                      label: "Password",
-                      hint: "Enter your password",
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: true,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: AppButton(
-                        text: isLoading ? "Logging in..." : "Agent Login",
-                        onPressed: isLoading ? () {} : () => _login(context),
+                /// 💳 Login Form Card
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 24,
+                        offset: const Offset(0, 10),
                       ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      AppTextField(
+                        controller: emailCtrl,
+                        prefixIcon: Icons.alternate_email_rounded,
+                        label: "Work Email",
+                        hint: "agent@arvika.com",
+                        keyboardType: TextInputType.emailAddress,
+                        iconColor: theme.colorScheme.primary,
+                        obscureText: false,
+                      ),
+                      const SizedBox(height: 18),
+                      AppTextField(
+                        controller: pwCtrl,
+                        prefixIcon: Icons.lock_outline_rounded,
+                        label: "Password",
+                        hint: "••••••••",
+                        keyboardType: TextInputType.visiblePassword,
+                        obscureText: true,
+                        iconColor: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: AppButton(
+                          text: isLoading ? "Logging in..." : "Login",
+                          onPressed: () => _login(context),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () =>
+                              context.navigateTo(const ResetPasswordRoute()),
+                          child: Text(
+                            "Forgot Password?",
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                /// 🔄 Switch to User Login
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Not an agent?",
+                      style: TextStyle(color: Colors.grey.shade600),
                     ),
-
-                    const SizedBox(height: 12),
-
                     TextButton(
-                      onPressed: () {
-                        context.router.replace(const UserLoginRoute());
-                      },
+                      onPressed: () =>
+                          context.router.replace(const UserLoginRoute()),
                       child: const Text(
                         "User Login",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-
-                    TextButton(
-                      onPressed: () {
-                        context.navigateTo(const ResetPasswordRoute());
-                      },
-                      child: const Text(
-                        "Forgot Password?",
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

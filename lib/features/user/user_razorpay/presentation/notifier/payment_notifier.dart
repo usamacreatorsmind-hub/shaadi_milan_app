@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/providers/providers.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
+import '../../domain/providers/providers.dart';
+import '../../domain/states/payment.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 // Provider family that takes uid as parameter
