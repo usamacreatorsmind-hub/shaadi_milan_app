@@ -36,7 +36,7 @@ class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
         AgentDashboardRoute(agentId: widget.agentId),
         AgentUserRoute(agentId: widget.agentId),
         AgentRevenueRoute(agentId: widget.agentId),
-        AgentActivitiesRoute(agentId: widget.agentId),
+        AgentEntityRoute(uid: widget.agentId),
       ],
       transitionBuilder: (context, child, animation) =>
           FadeTransition(opacity: animation, child: child),
@@ -105,8 +105,8 @@ class CustomBottomNavBar extends StatelessWidget {
       label: 'Revenue', // Earnings & Commissions
     ),
     BottomNavItem(
-      icon: Icons.task_alt_outlined,
-      label: 'Activities', // Tasks, Meetings, & Follow-ups
+      icon: Icons.person_outline,
+      label: 'My Profile', // Tasks, Meetings, & Follow-ups
     ),
   ];
 

@@ -36,6 +36,7 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
       routes: [
         const UserHomeRoute(),
         UserWishListRoute(userId: uid),
+        ReviewRoute(),
 
         UserProfileRoute(userId: uid),
       ],
@@ -95,6 +96,7 @@ class CustomBottomNavBar extends StatelessWidget {
   static const List<BottomNavItem> items = [
     BottomNavItem(icon: Icons.home_outlined, label: 'Home'),
     BottomNavItem(icon: Icons.favorite_outline, label: 'WishList'),
+    BottomNavItem(icon: Icons.person_outline, label: 'Reviews'),
     BottomNavItem(icon: Icons.person_outline, label: 'Profile'),
   ];
 
@@ -127,7 +129,7 @@ class CustomBottomNavBar extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 35,
+                  horizontal: 16,
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
@@ -141,7 +143,7 @@ class CustomBottomNavBar extends StatelessWidget {
                   children: [
                     Icon(
                       items[index].icon,
-                      size: 24,
+                      size: 16,
                       color: isSelected ? Colors.red : Colors.grey,
                     ),
                     const SizedBox(height: 4),

@@ -1,12 +1,17 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/drawer.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/revenue_dashboard_tabbar.dart';
 import 'package:arvika_marriage_bureau/core/filters/revenue_filter_controller.dart';
 import 'package:arvika_marriage_bureau/core/filters/revenue_filter_right_sheet.dart';
 import 'package:arvika_marriage_bureau/features/agent/agent_app/domain/states/analytics_state.dart';
 import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/analytics_provider.dart';
 import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/user_nofier.dart';
+import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -37,6 +42,8 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      drawer: AppDrawer(agentAsync: ref.watch(agentProvider(widget.agentId))),
+
       body: analyticsAsync.when(
         loading: () =>
             Center(child: CircularProgressIndicator(color: theme.primaryColor)),
@@ -114,17 +121,10 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                         ],
                       ),
                     ],
-                    bottom: const TabBar(
-                      indicatorColor: Colors.white,
-                      labelColor: Colors.white,
-                      unselectedLabelColor: Colors.white70,
-                      isScrollable: true,
-                      tabs: [
-                        Tab(text: 'Overview'),
-                        Tab(text: 'Trends'),
-                        Tab(text: 'Regions'),
-                        Tab(text: 'Transactions'),
-                      ],
+                    bottom: PreferredSize(
+                      
+                      preferredSize: const Size.fromHeight(52), // FIXED HEIGHT
+                      child: RevenueDashboardTabbar(),
                     ),
                   ),
                 ];
@@ -143,6 +143,280 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                               _RevenueRow(analytics),
                               const SizedBox(height: 24),
                               _PaymentStatusPie(analytics),
+
+                              FlutterCarousel(
+                                options: FlutterCarouselOptions(
+                                  height: 550,
+                                  scrollBehavior: const ScrollBehavior(),
+
+                                  allowImplicitScrolling: true,
+                                  autoPlay: true,
+                                ),
+                                items: [
+                                  Card(
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "Revenue by Gender",
+                                            style: theme.textTheme.titleMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          SizedBox(
+                                            height: 300,
+
+                                            child: PieChart(
+                                              PieChartData(
+                                                sectionsSpace: 2,
+                                                centerSpaceRadius: 40,
+                                                sections: [
+                                                  PieChartSectionData(
+                                                    value: analytics.maleRevenue
+                                                        .toDouble(),
+                                                    title:
+                                                        'Male\n₹${analytics.maleRevenue}',
+                                                    color: Colors.blue,
+                                                    radius: 50,
+                                                    titleStyle: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  PieChartSectionData(
+                                                    value: analytics
+                                                        .femaleRevenue
+                                                        .toDouble(),
+                                                    title:
+                                                        'Female\n₹${analytics.femaleRevenue}',
+                                                    color: Colors.pink,
+                                                    radius: 50,
+                                                    titleStyle: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  PieChartSectionData(
+                                                    value: analytics
+                                                        .otherRevenue
+                                                        .toDouble(),
+                                                    title:
+                                                        'Other\n₹${analytics.otherRevenue}',
+                                                    color: Colors.purple,
+                                                    radius: 50,
+                                                    titleStyle: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              _LegendItem(
+                                                color: Colors.blue,
+                                                text: 'Male',
+                                              ),
+                                              const SizedBox(width: 16),
+                                              _LegendItem(
+                                                color: Colors.pink,
+                                                text: 'Female',
+                                              ),
+                                              const SizedBox(width: 16),
+                                              _LegendItem(
+                                                color: Colors.purple,
+                                                text: 'Other',
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Card(
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "Revenue by Religion",
+                                            style: theme.textTheme.titleMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          SizedBox(
+                                            height: 300,
+                                            child: PieChart(
+                                              PieChartData(
+                                                sectionsSpace: 2,
+                                                centerSpaceRadius: 40,
+                                                sections: analytics
+                                                    .religionRevenue
+                                                    .entries
+                                                    .map((entry) {
+                                                      return PieChartSectionData(
+                                                        value: entry.value
+                                                            .toDouble(),
+                                                        title:
+                                                            '${entry.key}\n₹${entry.value}',
+                                                        color:
+                                                            Colors
+                                                                .primaries[entry
+                                                                    .key
+                                                                    .hashCode %
+                                                                Colors
+                                                                    .primaries
+                                                                    .length],
+                                                        radius: 50,
+                                                        titleStyle:
+                                                            const TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                      );
+                                                    })
+                                                    .toList(),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Wrap(
+                                            spacing: 8,
+                                            runSpacing: 8,
+                                            alignment: WrapAlignment.center,
+                                            children: analytics
+                                                .religionRevenue
+                                                .entries
+                                                .map((entry) {
+                                                  return _LegendItem(
+                                                    color:
+                                                        Colors.primaries[entry
+                                                                .key
+                                                                .hashCode %
+                                                            Colors
+                                                                .primaries
+                                                                .length],
+                                                    text: entry.key,
+                                                  );
+                                                })
+                                                .toList(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Card(
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "Revenue by Caste",
+
+                                            style: theme.textTheme.titleMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          SizedBox(
+                                            height: 300,
+                                            child: PieChart(
+                                              PieChartData(
+                                                sectionsSpace: 2,
+                                                centerSpaceRadius: 40,
+                                                sections: analytics
+                                                    .casteRevenue
+                                                    .entries
+                                                    .map((entry) {
+                                                      return PieChartSectionData(
+                                                        value: entry.value
+                                                            .toDouble(),
+                                                        title:
+                                                            '${entry.key}\n₹${entry.value}',
+                                                        color:
+                                                            Colors.accents[entry
+                                                                    .key
+                                                                    .hashCode %
+                                                                Colors
+                                                                    .accents
+                                                                    .length],
+                                                        radius: 50,
+                                                        titleStyle:
+                                                            const TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                      );
+                                                    })
+                                                    .toList(),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Wrap(
+                                            spacing: 8,
+                                            runSpacing: 8,
+                                            alignment: WrapAlignment.center,
+                                            children: analytics
+                                                .casteRevenue
+                                                .entries
+                                                .map((entry) {
+                                                  return _LegendItem(
+                                                    color:
+                                                        Colors.accents[entry
+                                                                .key
+                                                                .hashCode %
+                                                            Colors
+                                                                .accents
+                                                                .length],
+                                                    text: entry.key,
+                                                  );
+                                                })
+                                                .toList(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ]),
                           ),
                         ),
@@ -170,6 +444,10 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                           padding: const EdgeInsets.all(16),
                           sliver: SliverList(
                             delegate: SliverChildListDelegate([
+                              // bar chart widget
+                              _RegionRevenueBarChart(analytics.regionRevenue),
+                              const SizedBox(height: 24),
+
                               _RegionRevenueList(analytics.regionRevenue),
                             ]),
                           ),
@@ -184,6 +462,134 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _RegionRevenueBarChart extends StatelessWidget {
+  final Map<String, int> regionRevenue;
+
+  const _RegionRevenueBarChart(this.regionRevenue);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    if (regionRevenue.isEmpty) {
+      return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Center(child: Text("No region data available for chart")),
+        ),
+      );
+    }
+
+    final sortedEntries = regionRevenue.entries.toList()
+      ..sort(
+        (a, b) => b.value.compareTo(a.value),
+      ); // Sort by revenue descending
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              "Region Revenue Distribution",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 300,
+              child: BarChart(
+                BarChartData(
+                  barGroups: sortedEntries.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final data = entry.value;
+                    return BarChartGroupData(
+                      x: index,
+                      barRods: [
+                        BarChartRodData(
+                          toY: data.value.toDouble(),
+                          color: Colors.teal, // Consistent color for regions
+                          width: 16,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4),
+                            topRight: Radius.circular(4),
+                          ),
+                        ),
+                      ],
+                      showingTooltipIndicators: [0],
+                    );
+                  }).toList(),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          if (value.toInt() >= 0 &&
+                              value.toInt() < sortedEntries.length) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                sortedEntries[value.toInt()].key,
+                                style: const TextStyle(fontSize: 10),
+                              ),
+                            );
+                          }
+                          return const Text('');
+                        },
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  barTouchData: BarTouchData(
+                    enabled: true,
+                    allowTouchBarBackDraw: true,
+
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final region = sortedEntries[group.x.toInt()].key;
+                        return BarTooltipItem(
+                          '$region\n',
+                          const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: rod.toY.toInt().toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -373,7 +779,7 @@ class _PaymentStatusPie extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             SizedBox(
-              height: 260,
+              height: 200,
               child: PieChart(
                 PieChartData(
                   sectionsSpace: 2,
@@ -481,7 +887,7 @@ class _DailyRevenueChart extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             SizedBox(
-              height: 260,
+              height: 350,
               child: LineChart(
                 LineChartData(
                   gridData: FlGridData(show: true, drawVerticalLine: false),
@@ -536,6 +942,296 @@ class _DailyRevenueChart extends StatelessWidget {
                 ),
               ),
             ),
+
+            // add another chart
+            const SizedBox(height: 24),
+            Text(
+              "Revenue by Payment Status",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 350,
+              child: BarChart(
+                BarChartData(
+                  barGroups: [
+                    BarChartGroupData(
+                      x: 0,
+                      barRods: [
+                        BarChartRodData(
+                          toY: analytics.successCount.toDouble(),
+                          color: Colors.green,
+                          width: 20,
+                        ),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 1,
+                      barRods: [
+                        BarChartRodData(
+                          toY: analytics.pendingCount.toDouble(),
+                          color: Colors.orange,
+                          width: 20,
+                        ),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 2,
+                      barRods: [
+                        BarChartRodData(
+                          toY: analytics.failedCount.toDouble(),
+                          color: Colors.red,
+                          width: 20,
+                        ),
+                      ],
+                    ),
+                  ],
+                  titlesData: FlTitlesData(
+                    show: true,
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          switch (value.toInt()) {
+                            case 0:
+                              return const Text('Success');
+                            case 1:
+                              return const Text('Pending');
+                            case 2:
+                              return const Text('Failed');
+                            default:
+                              return const Text('');
+                          }
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        String status;
+                        switch (group.x.toInt()) {
+                          case 0:
+                            status = 'Success';
+                            break;
+                          case 1:
+                            status = 'Pending';
+                            break;
+                          case 2:
+                            status = 'Failed';
+                            break;
+                          default:
+                            status = '';
+                        }
+                        return BarTooltipItem(
+                          '$status\n',
+                          const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: rod.toY.toInt().toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              "Revenue by Religion",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 350,
+              child: BarChart(
+                BarChartData(
+                  barGroups: analytics.religionRevenue.entries.map((entry) {
+                    final index = analytics.religionRevenue.keys
+                        .toList()
+                        .indexOf(entry.key);
+                    return BarChartGroupData(
+                      x: index,
+                      barRods: [
+                        BarChartRodData(
+                          toY: entry.value.toDouble(),
+                          color: Colors.purple, // You can customize colors
+                          width: 20,
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final religion = analytics.religionRevenue.keys
+                              .elementAt(value.toInt());
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              religion,
+                              style: const TextStyle(fontSize: 10),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final religion = analytics.religionRevenue.keys
+                            .elementAt(group.x.toInt());
+                        return BarTooltipItem(
+                          '$religion\n',
+                          const TextStyle(
+                            color: Colors.white,
+
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: rod.toY.toInt().toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              "Revenue by Caste",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 350,
+              child: BarChart(
+                BarChartData(
+                  barGroups: analytics.casteRevenue.entries.map((entry) {
+                    final index = analytics.casteRevenue.keys.toList().indexOf(
+                      entry.key,
+                    );
+                    return BarChartGroupData(
+                      x: index,
+                      barRods: [
+                        BarChartRodData(
+                          toY: entry.value.toDouble(),
+                          color: Colors.deepOrange, // You can customize colors
+                          width: 20,
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final caste = analytics.casteRevenue.keys.elementAt(
+                            value.toInt(),
+                          );
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              caste,
+                              style: const TextStyle(fontSize: 10),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final caste = analytics.casteRevenue.keys.elementAt(
+                          group.x.toInt(),
+                        );
+                        return BarTooltipItem(
+                          '$caste\n',
+                          const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: rod.toY.toInt().toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -586,7 +1282,7 @@ class _RegionRevenueList extends StatelessWidget {
                     ),
                   ),
                 );
-              }),
+              }).toList(),
           ],
         ),
       ),

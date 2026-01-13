@@ -18,7 +18,12 @@ class AgentContactScreen extends ConsumerWidget {
     final agentAsync = ref.watch(AgentEntityControllerProvider(agentId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Agent Details'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Agent Details'),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
       body: agentAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, st) => Center(child: Text('Error: $e')),
@@ -35,12 +40,12 @@ class AgentContactScreen extends ConsumerWidget {
         children: [
           CircleAvatar(
             radius: 80,
-            backgroundImage:
-                agent.photoUrl != null && agent.photoUrl!.isNotEmpty
-                ? NetworkImage(agent.photoUrl!)
+            backgroundColor: Colors.blueGrey[100],
+            backgroundImage: agent.profileImageUrl.isNotEmpty
+                ? NetworkImage(agent.profileImageUrl)
                 : null,
-            child: agent.photoUrl == null || agent.photoUrl!.isEmpty
-                ? Icon(Icons.person, size: 80, color: Colors.grey[400])
+            child: agent.profileImageUrl.isEmpty
+                ? Icon(Icons.person, size: 80, color: Colors.blueGrey[400])
                 : null,
           ),
           const SizedBox(height: 20),

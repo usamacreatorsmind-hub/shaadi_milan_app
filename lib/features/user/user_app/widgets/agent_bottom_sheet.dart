@@ -107,12 +107,7 @@ class AgentBottomSheet extends StatelessWidget {
         CircleAvatar(
           radius: 36,
           backgroundColor: Colors.redAccent.withOpacity(0.12),
-          backgroundImage: agent.photoUrl != null
-              ? NetworkImage(agent.photoUrl!)
-              : null,
-          child: agent.photoUrl == null
-              ? const Icon(Icons.person, size: 36, color: Colors.redAccent)
-              : null,
+          backgroundImage: NetworkImage(agent.primaryImageUrl),
         ),
         const SizedBox(width: 16),
         Expanded(

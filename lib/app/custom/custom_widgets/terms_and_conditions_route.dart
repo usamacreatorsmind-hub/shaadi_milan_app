@@ -13,6 +13,8 @@ class TermsAndConditionsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Terms & Conditions"),
         centerTitle: true,
+        backgroundColor: theme.primaryColor,
+        foregroundColor: theme.colorScheme.onPrimary,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

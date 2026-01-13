@@ -27,7 +27,9 @@ class AgentEntity {
 
   // 🔹 Meta
   final DateTime registrationDate;
-  final String? photoUrl;
+  final String profileImageUrl;
+  final String primaryImageUrl;
+  final String aadharUrl;
 
   const AgentEntity({
     required this.uid,
@@ -45,7 +47,10 @@ class AgentEntity {
     required this.isApproved,
     required this.isRejected,
     required this.registrationDate,
-    this.photoUrl,
+    required this.profileImageUrl,
+
+    required this.primaryImageUrl,
+    required this.aadharUrl,
   });
 
   /// ---------------- EMPTY ----------------
@@ -66,7 +71,9 @@ class AgentEntity {
       isApproved: false,
       isRejected: false,
       registrationDate: DateTime.fromMillisecondsSinceEpoch(0),
-      photoUrl: null,
+      profileImageUrl: "",
+      primaryImageUrl: "",
+      aadharUrl: "",
     );
   }
 
@@ -88,7 +95,10 @@ class AgentEntity {
       'isApproved': isApproved,
       'isRejected': isRejected,
       'registrationDate': Timestamp.fromDate(registrationDate),
-      'photoUrl': photoUrl,
+      'profileImageUrl': profileImageUrl,
+
+      'primaryImageUrl': primaryImageUrl,
+      'aadharUrl': aadharUrl,
     };
   }
 
@@ -122,7 +132,10 @@ class AgentEntity {
       isApproved: map['isApproved'] ?? false,
       isRejected: map['isRejected'] ?? false,
       registrationDate: parseDate(map['registrationDate']),
-      photoUrl: map['photoUrl'],
+
+      profileImageUrl: map['profileImageUrl'] ?? '',
+      primaryImageUrl: map['primaryImageUrl'] ?? '',
+      aadharUrl: map['aadharUrl'] ?? '',
     );
   }
 
@@ -149,7 +162,10 @@ class AgentEntity {
     bool? isApproved,
     bool? isRejected,
     DateTime? registrationDate,
-    String? photoUrl,
+
+    String? profileImageUrl,
+    String? primaryImageUrl,
+    String? aadharUrl,
   }) {
     return AgentEntity(
       uid: uid ?? this.uid,
@@ -167,7 +183,9 @@ class AgentEntity {
       isApproved: isApproved ?? this.isApproved,
       isRejected: isRejected ?? this.isRejected,
       registrationDate: registrationDate ?? this.registrationDate,
-      photoUrl: photoUrl ?? this.photoUrl,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      primaryImageUrl: primaryImageUrl ?? this.primaryImageUrl,
+      aadharUrl: aadharUrl ?? this.aadharUrl,
     );
   }
 
@@ -197,7 +215,9 @@ class AgentEntity {
         other.isApproved == isApproved &&
         other.isRejected == isRejected &&
         other.registrationDate == registrationDate &&
-        other.photoUrl == photoUrl;
+        other.profileImageUrl == profileImageUrl &&
+        other.primaryImageUrl == primaryImageUrl &&
+        other.aadharUrl == aadharUrl;
   }
 
   @override
@@ -217,7 +237,9 @@ class AgentEntity {
         isApproved.hashCode ^
         isRejected.hashCode ^
         registrationDate.hashCode ^
-        photoUrl.hashCode;
+        profileImageUrl.hashCode ^
+        primaryImageUrl.hashCode ^
+        aadharUrl.hashCode;
   }
 }
 

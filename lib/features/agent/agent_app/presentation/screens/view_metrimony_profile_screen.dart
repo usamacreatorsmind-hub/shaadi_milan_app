@@ -1,5 +1,7 @@
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/my_profile_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,7 +49,8 @@ class _ViewMetrimonyProfileScreenState
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Matrimony Profile'),
-        backgroundColor: const Color.fromARGB(255, 161, 31, 31),
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         elevation: 0,
       ),
       body: profileAsync.when(
@@ -516,9 +519,21 @@ class _ImagesTabSection extends StatelessWidget {
 
                     // Aadhar card tab
                     if (images.aadharCardUrl.isNotEmpty)
-                      _DocumentViewer(
-                        documentUrl: images.aadharCardUrl,
-                        label: 'Aadhar Card',
+                      DetailRowWithAction(
+                        label: "Aadhar Card",
+                        value: "View PDF",
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => PdfViewerBottomsheet(
+                              source: images.aadharCardUrl,
+                              title: 'Aadhar PDF',
+                              isLocal: false,
+                            ),
+                          );
+                        },
                       ),
                   ],
                 ),
@@ -710,10 +725,7 @@ class _DocumentViewer extends StatelessWidget {
         child: isPdf
             ? const Padding(
                 padding: EdgeInsets.all(24),
-                child: Text(
-                  'PDF viewer integration required.\nURL is valid.',
-                  textAlign: TextAlign.center,
-                ),
+                child: Text('PDF viewer not implemented yet.'),
               )
             : Image.network(
                 documentUrl,

@@ -1,3 +1,5 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/drawer.dart';
+import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../../app/router/app_router.dart';
@@ -41,6 +43,12 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      drawer: AppDrawer(
+      
+        agentAsync: ref.watch(agentProvider(widget.agentId)),
+
+      ),
+
       body: CustomScrollView(
         slivers: [
           /// 🔹 APP BAR
@@ -48,13 +56,10 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
             title: const Text('My Clients'),
             floating: true,
             pinned: true,
-            backgroundColor: theme.scaffoldBackgroundColor,
+            backgroundColor: theme.primaryColor,
+            foregroundColor: theme.colorScheme.onPrimary,
             elevation: 0,
             centerTitle: false,
-            titleTextStyle: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
-            ),
           ),
 
           /// 🔹 BODY

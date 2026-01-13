@@ -216,7 +216,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
 
                               // ================= GENDER SECTION =================
                               const SizedBox(height: 24),
-                              
+
                               const SizedBox(height: 8),
                               _buildDropdown(
                                 title: 'Gender',

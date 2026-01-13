@@ -14,7 +14,12 @@ class ContactUsScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Contact Us"), centerTitle: true),
+      appBar: AppBar(
+        title: const Text("Contact Us"),
+        centerTitle: true,
+        backgroundColor: theme.primaryColor,
+        foregroundColor: theme.colorScheme.onPrimary,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -156,5 +161,3 @@ class ContactUsScreen extends StatelessWidget {
     }
   }
 }
-
- 

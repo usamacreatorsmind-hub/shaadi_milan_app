@@ -21,6 +21,11 @@ final analyticsProvider = Provider<AsyncValue<AnalyticsState>>((ref) {
 
       final Map<DateTime, int> dailyRevenue = {};
       final Map<String, int> regionRevenue = {};
+      final Map<String, int> religionRevenue = {};
+      final Map<String, int> casteRevenue = {};
+      int maleRevenue = 0;
+      int femaleRevenue = 0;
+      int otherRevenue = 0;
 
       final now = DateTime.now();
 
@@ -83,7 +88,19 @@ final analyticsProvider = Provider<AsyncValue<AnalyticsState>>((ref) {
           }
 
           dailyRevenue[date] = (dailyRevenue[date] ?? 0) + p.amount;
-          regionRevenue[p.region!] = (regionRevenue[p.region] ?? 0) + p.amount;
+          if (p.region != null && p.region!.isNotEmpty) {
+            regionRevenue[p.region!] =
+                (regionRevenue[p.region] ?? 0) + p.amount;
+          }
+
+          if (p.religion.isNotEmpty) {
+            religionRevenue[p.religion] =
+                (religionRevenue[p.religion] ?? 0) + p.amount;
+          }
+
+          if (p.caste.isNotEmpty) {
+            casteRevenue[p.caste] = (casteRevenue[p.caste] ?? 0) + p.amount;
+          }
         } else if (status == 'PENDING') {
           pending++;
         } else if (status == 'FAILED') {
@@ -93,6 +110,15 @@ final analyticsProvider = Provider<AsyncValue<AnalyticsState>>((ref) {
 
       return AsyncValue.data(
         AnalyticsState(
+          maleRevenue: maleRevenue,
+          femaleRevenue: femaleRevenue,
+          otherRevenue: otherRevenue,
+          genderRevenue: {
+            'Male': maleRevenue,
+            'Female': femaleRevenue,
+            'Other': otherRevenue,
+          },
+          districtRevenue: {},
           // Add other fields as necessary
           genderCount: {},
 
@@ -103,6 +129,8 @@ final analyticsProvider = Provider<AsyncValue<AnalyticsState>>((ref) {
           failedCount: failed,
           dailyRevenue: dailyRevenue,
           regionRevenue: regionRevenue,
+          religionRevenue: religionRevenue,
+          casteRevenue: casteRevenue,
           filteredPayments: filteredPayments.whereType<Payment>().toList(),
         ),
       );
@@ -225,6 +253,42 @@ final failedCountProvider = Provider<AsyncValue<int>>((ref) {
     error: (e, s) => AsyncValue.error(e, s),
     data: (analyticsState) {
       return AsyncValue.data(analyticsState.failedCount);
+    },
+  );
+});
+
+final maleRevenueProvider = Provider<AsyncValue<int>>((ref) {
+  final analyticsStateAsync = ref.watch(analyticsProvider);
+
+  return analyticsStateAsync.when(
+    loading: () => const AsyncValue.loading(),
+    error: (e, s) => AsyncValue.error(e, s),
+    data: (analyticsState) {
+      return AsyncValue.data(analyticsState.maleRevenue);
+    },
+  );
+});
+
+final femaleRevenueProvider = Provider<AsyncValue<int>>((ref) {
+  final analyticsStateAsync = ref.watch(analyticsProvider);
+
+  return analyticsStateAsync.when(
+    loading: () => const AsyncValue.loading(),
+    error: (e, s) => AsyncValue.error(e, s),
+    data: (analyticsState) {
+      return AsyncValue.data(analyticsState.femaleRevenue);
+    },
+  );
+});
+
+final otherRevenueProvider = Provider<AsyncValue<int>>((ref) {
+  final analyticsStateAsync = ref.watch(analyticsProvider);
+
+  return analyticsStateAsync.when(
+    loading: () => const AsyncValue.loading(),
+    error: (e, s) => AsyncValue.error(e, s),
+    data: (analyticsState) {
+      return AsyncValue.data(analyticsState.otherRevenue);
     },
   );
 });

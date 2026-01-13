@@ -1,3 +1,6 @@
+import 'package:arvika_marriage_bureau/core/env/app_env_config.dart';
+import 'package:riverpod/legacy.dart';
+
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
@@ -26,7 +29,16 @@ final userProfileScreenProvider =
         // fetch AgentEntity
         AgentEntity? agent;
         if (matrimonyProfile.agentId.isNotEmpty) {
-          agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
+          try {
+            agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
+          } catch (e) {
+            debugPrint(
+              'Error fetching agent with ID: ${matrimonyProfile.agentId}, Error: $e',
+            );
+            agent = null;
+          }
+        } else {
+          debugPrint('Agent ID is empty for user: $userId');
         }
 
         return MetrimonyProfileViewModel(
@@ -418,11 +430,10 @@ class _ProfileHeaderCard extends StatelessWidget {
             CircleAvatar(
               radius: MediaQuery.of(context).size.width * 0.15,
               backgroundColor: theme.primaryColor.withOpacity(0.15),
-              backgroundImage:
-                  (profile.user.profileImageUrl.isNotEmpty ?? false)
+              backgroundImage: (profile.images.primaryImageUrl.isNotEmpty)
                   ? NetworkImage(profile.images.primaryImageUrl)
                   : null,
-              child: (profile.user.profileImageUrl.isNotEmpty ?? true)
+              child: (profile.images.primaryImageUrl.isEmpty)
                   ? Icon(Icons.person, size: 50, color: theme.primaryColor)
                   : null,
             ),
@@ -467,13 +478,34 @@ class _PremiumCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (profile != null) {
+          // if agent id not present
+          if (profile!.user.agentId.isEmpty) {
+            // create a model bottom sheet  to take user id or  show contact details if he does not know
+            print(" inside bottom sheet");
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.9,
+              ),
+              // theme color
+              backgroundColor: theme.canvasColor,
+              builder: (BuildContext context) {
+                return AgentFormWidget();
+              },
+            );
+
+            return;
+          }
+
           AutoRouter.of(
             context,
           ).push(UserPaymentRoute(metrimonyProfileViewModel: profile!));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("User data not available.")),
-          );
         }
       },
       child: Container(
@@ -526,6 +558,337 @@ class _PremiumCard extends StatelessWidget {
   }
 }
 
+// creat a state provider for tab
+final agentSetupProvider = StateProvider<int>((ref) => 1);
+
+final agentDetailProvider = StateProvider<int>((ref) => 0);
+
+class AgentFormWidget extends ConsumerStatefulWidget {
+  const AgentFormWidget({super.key});
+
+  @override
+  ConsumerState<AgentFormWidget> createState() => _AgentFormWidgetState();
+}
+
+class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
+  final TextEditingController _agentIdController = TextEditingController();
+  AgentEntity? _fetchedAgent;
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _agentIdController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchAgent() async {
+    final agentId = _agentIdController.text.trim();
+    if (agentId.isEmpty) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _fetchedAgent = null;
+    });
+
+    try {
+      final agent = await ref
+          .read(agentRepositoryProvider)
+          .fetchAgentEntitybyAgentId(agentId);
+
+      if (mounted) {
+        setState(() {
+          _fetchedAgent = agent;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = "Agent not found or invalid ID";
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedTab = ref.watch(agentSetupProvider);
+    final agentDetail = ref.watch(agentDetailProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionTitle(title: "Agent Setup"),
+        const SizedBox(height: 12),
+
+        Row(
+          children: [
+            Expanded(
+              child: _ActionTab(
+                icon: Icons.person_add_alt_1_outlined,
+                title: "Enter Agent ID",
+                isSelected: selectedTab == 1,
+                onTap: () {
+                  ref.read(agentSetupProvider.notifier).state = 1;
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _ActionTab(
+                icon: Icons.contact_phone_outlined,
+                title: "Contact Support",
+                isSelected: selectedTab == 2,
+
+                onTap: () {
+                  ref.read(agentSetupProvider.notifier).state = 2;
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        if (selectedTab == 1)
+          _buildAgentForm()
+        else
+          _buildContactAndSupportForm(),
+      ],
+    );
+  }
+
+  void _assignAgent({required String agentId}) {
+    if (agentId.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please enter Agent ID")));
+      return;
+    }
+
+    ref
+        .read(userRepositoryProvider)
+        .updateAgentId(
+          ref.read(authRepositoryProvider).currentUser!.uid,
+          agentId,
+        );
+
+    /// update state
+    ref.invalidate(
+      userProfileScreenProvider(
+        ref.read(authRepositoryProvider).currentUser!.uid,
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Agent $agentId assigned successfully!")),
+    );
+
+    _agentIdController.clear();
+    Navigator.pop(context);
+  }
+
+  Container _buildAgentForm() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Assign an agent to your profile to get personalized assistance and faster service.",
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: _agentIdController,
+            decoration: InputDecoration(
+              labelText: "Agent ID",
+              hintText: "Enter Agent ID (e.g., AGT-12345)",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              prefixIcon: const Icon(Icons.person_outline),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: _fetchAgent,
+              ),
+            ),
+            onSubmitted: (_) => _fetchAgent(),
+          ),
+          const SizedBox(height: 20),
+
+          if (_isLoading)
+            const Center(child: CircularProgressIndicator())
+          else if (_errorMessage != null)
+            Text(_errorMessage!, style: const TextStyle(color: Colors.red))
+          else if (_fetchedAgent != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+
+                    backgroundImage: _fetchedAgent!.profileImageUrl.isNotEmpty
+                        ? NetworkImage(_fetchedAgent!.profileImageUrl)
+                        : null,
+
+                    backgroundColor: Theme.of(
+                      context,
+                    ).primaryColor.withOpacity(0.15),
+                  ),
+                  const SizedBox(width: 16),
+
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Agent Details:",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text("Name: ${_fetchedAgent!.agentName}"),
+                      Text("Mobile: ${_fetchedAgent!.agentMobile}"),
+                      Text("Email: ${_fetchedAgent!.agentEmail}"),
+                      Text("Agent ID: ${_fetchedAgent!.agentId}"),
+                      Text("Address: ${_fetchedAgent!.agentAddress}"),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          SizedBox(height: 40),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _fetchedAgent != null
+                  ? () => _assignAgent(agentId: _fetchedAgent!.uid)
+                  : null,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                backgroundColor: Theme.of(context).primaryColor,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text("Assign Agent", style: TextStyle(fontSize: 16)),
+            ),
+          ),
+          SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Container _buildContactAndSupportForm() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "If you don't have an Agent ID, you can contact our support team for assistance.",
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                AutoRouter.of(context).push(const ContactUsRoute());
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                "Contact Support",
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionTab extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final bool isSelected;
+
+  final VoidCallback onTap;
+
+  const _ActionTab({
+    required this.icon,
+    required this.title,
+    this.isSelected = false,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        height: 56,
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.primaryColor.withOpacity(0.1)
+              : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? theme.primaryColor : theme.dividerColor,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: isSelected ? theme.primaryColor : Colors.grey),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? theme.primaryColor : null,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _SectionTitle extends StatelessWidget {
   final String title;
   const _SectionTitle({required this.title});
@@ -557,8 +920,10 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -571,10 +936,10 @@ class _SettingsTile extends StatelessWidget {
         ],
       ),
       child: ListTile(
-        leading: Icon(icon, color: Theme.of(context).primaryColor),
+        leading: Icon(icon, color: theme.primaryColor),
         title: Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         trailing: trailing ?? const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: onTap,

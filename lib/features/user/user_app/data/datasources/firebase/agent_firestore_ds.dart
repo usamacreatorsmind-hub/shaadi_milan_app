@@ -57,7 +57,7 @@ class AgentFirestoreDs {
         .get();
 
     if (querySnapshot.docs.isEmpty) {
-      throw Exception('Agent with ID $agentId not found');
+      // throw Exception('Agent with ID $agentId not found');
     }
     return AgentEntity.fromMap(querySnapshot.docs.first.data());
   }

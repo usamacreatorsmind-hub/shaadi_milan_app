@@ -173,7 +173,7 @@ class MyProfileScreen extends ConsumerWidget {
                         .images
                         .aadharCardUrl
                         .isNotEmpty)
-                      _DetailRowWithAction(
+                      DetailRowWithAction(
                         label: "Aadhar Card",
                         value: "View PDF",
                         onTap: () {
@@ -567,12 +567,12 @@ class PhotoPreviewDialog extends StatelessWidget {
   }
 }
 
-class _DetailRowWithAction extends StatelessWidget {
+class DetailRowWithAction extends StatelessWidget {
   final String label;
   final String value;
   final VoidCallback onTap;
 
-  const _DetailRowWithAction({
+  const DetailRowWithAction({
     required this.label,
     required this.value,
     required this.onTap,
