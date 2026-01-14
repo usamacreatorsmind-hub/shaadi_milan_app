@@ -1,19 +1,20 @@
-import 'package:arvika_marriage_bureau/core/env/app_env_config.dart';
-import 'package:riverpod/legacy.dart';
-
-import '../../../../auth/domain/states/agent_state.dart';
-import '../../data/repositories_impl/agent_repository_impl.dart';
-import '../../data/repositories_impl/user_repo_impl.dart';
-import '../controllers/user_status_controller.dart';
-import '../../widgets/agent_bottom_sheet.dart';
-
-import '../../../../../app/router/app_router.dart';
-import '../../data/repositories_impl/matrimony_repository_impl.dart';
-import '../../domain/states/metrimony_profile_view_model.dart';
-import '../../../../auth/presentation/providers/auth_providers.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/animated_app_bar.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/contact_us_screen.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/user_drawer.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
+import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 final userProfileScreenProvider =
     StreamProvider.family<MetrimonyProfileViewModel, String>((ref, userId) {
@@ -59,7 +60,9 @@ class UserProfileScreen extends ConsumerWidget {
     final profileAsync = ref.watch(userProfileScreenProvider(userId));
     final theme = Theme.of(context);
 
+    final currentUserAsync = ref.watch(currentUserProvider);
     return Scaffold(
+      drawer: UserDrawer(userAsync: currentUserAsync),
       backgroundColor: Colors.grey[100],
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -71,6 +74,20 @@ class UserProfileScreen extends ConsumerWidget {
         data: (profile) {
           return CustomScrollView(
             slivers: [
+              MinimalAppBar(
+                title: "My Profile",
+                showShadow: false,
+                // Modern icon for drawer
+                leading: IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.black),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                ),
+
+                backgroundColor: Colors.grey[100],
+              ),
+
               // SliverAppBar(
               //   backgroundColor: Colors.grey[100],
               //   expandedHeight: 120,
@@ -92,27 +109,27 @@ class UserProfileScreen extends ConsumerWidget {
               //     ),
               //   ),
               // ),
-              SliverAppBar(
-                backgroundColor: Colors.grey[100],
-                expandedHeight: 120,
-                floating: false,
-                pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  centerTitle: false,
-                  title: Text(
-                    "My Profile",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                ),
-              ),
+              // SliverAppBar(
+              //   backgroundColor: Colors.grey[100],
+              //   expandedHeight: 120,
+              //   floating: false,
+              //   pinned: true,
+              //   flexibleSpace: FlexibleSpaceBar(
+              //     titlePadding: const EdgeInsets.symmetric(
+              //       horizontal: 16,
+              //       vertical: 10,
+              //     ),
+              //     centerTitle: false,
+              //     title: Text(
+              //       "My Profile",
+              //       style: TextStyle(
+              //         fontSize: 24,
+              //         fontWeight: FontWeight.bold,
+              //         color: theme.primaryColor,
+              //       ),
+              //     ),
+              //   ),
+              // ),
               SliverToBoxAdapter(child: _ProfileHeaderCard(profile: profile)),
 
               SliverPadding(
@@ -301,65 +318,6 @@ class UserProfileScreen extends ConsumerWidget {
                           },
                         ),
 
-                        // Privacy Policy
-                        _SettingsTile(
-                          icon: Icons.policy_outlined,
-                          title: "Privacy Policy",
-                          onTap: () {
-                            AutoRouter.of(
-                              context,
-                            ).push(const PrivacyPolicyRoute());
-                          },
-                        ),
-
-                        // Terms & Conditions
-                        _SettingsTile(
-                          icon: Icons.description_outlined,
-                          title: "Terms & Conditions",
-                          onTap: () {
-                            AutoRouter.of(
-                              context,
-                            ).push(const TermsAndConditionsRoute());
-                          },
-                        ),
-                        // help and support
-                        _SettingsTile(
-                          icon: Icons.info_outline,
-                          title: "About Us",
-                          onTap: () {
-                            AutoRouter.of(context).push(const AboutUsRoute());
-                          },
-                        ),
-
-                        // 🔹 APP PREFERENCES SECTION
-                        _SectionTitle(title: "App Preferences"),
-                        _SettingsTile(
-                          icon: Icons.notifications_active_outlined,
-                          title: "Push Notifications",
-                          trailing: Switch(value: true, onChanged: (v) {}),
-                        ),
-                        _SettingsTile(
-                          icon: Icons.email_outlined,
-                          title: "Email Notifications",
-                          trailing: Switch(value: false, onChanged: (v) {}),
-                        ),
-                        // _SettingsTile(
-                        //   icon: Icons.dark_mode_outlined,
-                        //   title: "Dark Mode",
-                        //   trailing: Switch(
-                        //     value: ref.watch(themeProvider) == ThemeMode.dark,
-                        //     onChanged: (value) {
-                        //       ref
-                        //           .read(themeProvider.notifier)
-                        //           .setTheme(value ? ThemeMode.dark : ThemeMode.light);
-
-                        //       // print selected theme
-                        //       print('Selected theme: ${value ? 'Dark' : 'Light'}');
-                        //     },
-                        //   ),
-                        // ),
-
-                        // 🔹 LOGOUT
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
@@ -414,57 +372,175 @@ class UserProfileScreen extends ConsumerWidget {
 class _ProfileHeaderCard extends StatelessWidget {
   final MetrimonyProfileViewModel profile;
 
-  const _ProfileHeaderCard({required this.profile});
+  _ProfileHeaderCard({required this.profile});
+
+  bool get hasImage => profile.userProfile.profileImageUrl.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
 
     return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
-      child: Center(
-        child: Column(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.12),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: Stack(
           children: [
-            // 👤 Avatar
-            CircleAvatar(
-              radius: MediaQuery.of(context).size.width * 0.15,
-              backgroundColor: theme.primaryColor.withOpacity(0.15),
-              backgroundImage: (profile.images.primaryImageUrl.isNotEmpty)
-                  ? NetworkImage(profile.images.primaryImageUrl)
-                  : null,
-              child: (profile.images.primaryImageUrl.isEmpty)
-                  ? Icon(Icons.person, size: 50, color: theme.primaryColor)
-                  : null,
-            ),
-
-            // 📝 Name (unchanged data)
-            Text(
-              profile.user.fullName ?? 'N/A',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-
-              style: TextStyle(
-                fontSize: 30,
-
-                color: Theme.of(context).primaryColor,
-
-                fontWeight: FontWeight.bold,
+            // 1. Decorative Background Element
+            Positioned(
+              right: -50,
+              top: -50,
+              child: CircleAvatar(
+                radius: 80,
+                backgroundColor: primaryColor.withOpacity(0.05),
               ),
             ),
-            Text(
-              profile.user.email ?? 'N/A',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
+
+            // 2. Main Content
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+              child: Column(
+                children: [
+                  // --- Avatar with Status Indicator ---
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: primaryColor.withOpacity(0.1),
+                            width: 4,
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          radius: 55,
+                          backgroundColor: primaryColor.withOpacity(0.1),
+                          backgroundImage: hasImage
+                              ? NetworkImage(
+                                  profile.userProfile.profileImageUrl,
+                                )
+                              : null,
+                          child: !hasImage
+                              ? Text(
+                                  profile.userProfile.fullName.isNotEmpty
+                                      ? profile.userProfile.fullName[0]
+                                            .toUpperCase()
+                                      : '?',
+                                  style: TextStyle(
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.bold,
+                                    color: primaryColor,
+                                  ),
+                                )
+                              : null,
+                        ),
+                      ),
+                      // Verification Badge
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // --- Name & Badge ---
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          profile.user.fullName ?? 'N/A',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF1A1A1A),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.stars_rounded,
+                        color: Colors.amber[700],
+                        size: 20,
+                      ),
+                    ],
+                  ),
+
+                  // --- Subtitle (Email/Role) ---
+                  Text(
+                    profile.user.email?.toLowerCase() ?? 'N/A',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+                  const Divider(height: 1, thickness: 0.5),
+                  const SizedBox(height: 20),
+
+                  // --- Profile Stats Row ---
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildStatColumn("Profile", "85%"),
+                      _buildVerticalDivider(),
+                      _buildStatColumn("Status", "Active"),
+                      _buildVerticalDivider(),
+                      _buildStatColumn("Trust Score", "4.8"),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildStatColumn(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+      ],
+    );
+  }
+
+  Widget _buildVerticalDivider() {
+    return Container(height: 30, width: 1, color: Colors.grey[200]);
   }
 }
 
@@ -618,45 +694,51 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
     final selectedTab = ref.watch(agentSetupProvider);
     final agentDetail = ref.watch(agentDetailProvider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const _SectionTitle(title: "Agent Setup"),
-        const SizedBox(height: 12),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _SectionTitle(title: "Agent Setup"),
+          const SizedBox(height: 12),
 
-        Row(
-          children: [
-            Expanded(
-              child: _ActionTab(
-                icon: Icons.person_add_alt_1_outlined,
-                title: "Enter Agent ID",
-                isSelected: selectedTab == 1,
-                onTap: () {
-                  ref.read(agentSetupProvider.notifier).state = 1;
-                },
+          Row(
+            children: [
+              const SizedBox(width: 20),
+              Expanded(
+                child: _ActionTab(
+                  icon: Icons.person_add_alt_1_outlined,
+                  title: "Enter Agent ID",
+                  isSelected: selectedTab == 1,
+                  onTap: () {
+                    ref.read(agentSetupProvider.notifier).state = 1;
+                  },
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _ActionTab(
-                icon: Icons.contact_phone_outlined,
-                title: "Contact Support",
-                isSelected: selectedTab == 2,
+              const SizedBox(width: 12),
+              Expanded(
+                child: _ActionTab(
+                  icon: Icons.contact_phone_outlined,
+                  title: "Contact Support",
+                  isSelected: selectedTab == 2,
 
-                onTap: () {
-                  ref.read(agentSetupProvider.notifier).state = 2;
-                },
+                  onTap: () {
+                    ref.read(agentSetupProvider.notifier).state = 2;
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
 
-        if (selectedTab == 1)
-          _buildAgentForm()
-        else
-          _buildContactAndSupportForm(),
-      ],
+              const SizedBox(width: 20),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          if (selectedTab == 1)
+            _buildAgentForm()
+          else
+            _buildContactAndSupportForm(),
+        ],
+      ),
     );
   }
 
@@ -800,7 +882,6 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "If you don't have an Agent ID, you can contact our support team for assistance.",
@@ -811,21 +892,78 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
           ),
           const SizedBox(height: 20),
           SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                AutoRouter.of(context).push(const ContactUsRoute());
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            child: Column(
+              children: [
+                Row(children: [Text("Contact Us")]),
+                Text("Full Name"),
+                AppTextField(
+                  prefixIcon: Icons.person,
+
+                  iconColor: Theme.of(context).primaryColor,
+                  label: "Full Name",
+                  hint: "Enter your full name",
+                  obscureText: false,
+                  keyboardType: TextInputType.name,
                 ),
-              ),
-              child: const Text(
-                "Contact Support",
-                style: TextStyle(fontSize: 16),
-              ),
+                const SizedBox(height: 16),
+                Text("Email Address"),
+                AppTextField(
+                  prefixIcon: Icons.email,
+
+                  iconColor: Theme.of(context).primaryColor,
+                  label: "Email Address",
+                  hint: "Enter your email address",
+                  obscureText: false,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 16),
+                Text("Phone Number"),
+                AppTextField(
+                  prefixIcon: Icons.phone,
+                  iconColor: Theme.of(context).primaryColor,
+                  label: "Phone Number",
+                  hint: "Enter your phone number",
+                  obscureText: false,
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 16),
+                Text("Message"),
+                AppTextField(
+                  prefixIcon: Icons.message,
+                  iconColor: Theme.of(context).primaryColor,
+                  label: "Message",
+                  hint: "Enter your message",
+                  obscureText: false,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Your request has been submitted. Our team will contact you shortly.",
+                          ),
+                        ),
+                      );
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "Submit Request",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

@@ -1,3 +1,6 @@
+import 'package:arvika_marriage_bureau/features/widgets/marquee.dart';
+import 'package:sizer/sizer.dart';
+
 import '../../../../auth/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart'
     show agentFirestoreDsProvider;
@@ -131,7 +134,10 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             MediaQuery.of(context).size.height * 0.50,
                         backgroundColor: Colors.black,
                         flexibleSpace: FlexibleSpaceBar(
-                          background: CustomCarouselSlider(imageUrls: images),
+                          background: Hero(
+                            tag: 'user-image-${widget.uid}',
+                            child: CustomCarouselSlider(imageUrls: images),
+                          ),
                         ),
                       ),
 
@@ -139,71 +145,76 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                       SliverAppBar(
                         pinned: true,
                         automaticallyImplyLeading: false,
+
                         // APPLY THEME COLOR HERE
                         backgroundColor: Theme.of(context).canvasColor,
 
                         elevation: 0,
 
                         // 🔑 IMPORTANT
-                        toolbarHeight: 120,
+                        toolbarHeight: 15.h,
                         centerTitle: true,
-                        collapsedHeight: 120,
-
-                        expandedHeight: 120,
+                        collapsedHeight: 15.h,
+                        expandedHeight: 15.h,
 
                         titleSpacing: 0,
                         title: ProfileHeaderCard(viewModel: viewModel),
                       ),
 
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                child: Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: [
-                                    _infoChip(
-                                      profile.employment.jobType ?? '',
-                                      Icons.work_outline,
-                                    ),
-
-                                    _infoChip(
-                                      "${profile.identity.age} yrs",
-                                      Icons.cake_outlined,
-                                    ),
-                                    _infoChip(
-                                      profile.identity.gender ?? '',
-                                      Icons.person_outline,
-                                    ),
-                                    _infoChip(
-                                      profile.address.city ?? '',
-                                      Icons.location_on_outlined,
-                                    ),
-
-                                    _infoChip(
-                                      profile.cultural.religion ?? '',
-                                      Icons.temple_hindu,
-                                    ),
-
-                                    _infoChip(
-                                      "${profile.physical.height} cm" ?? '',
-                                      Icons.height_outlined,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                     SliverPadding(
+  padding: const EdgeInsets.only(
+    left: 16,
+    right: 16,
+    top: 8,
+    bottom: 16,
+  ),
+  sliver: SliverToBoxAdapter(
+    child: Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          _infoChip(
+            profile.employment.jobType ?? 'N/A',
+            Icons.work_outline,
+          ),
+          _infoChip(
+            "${profile.identity.age ?? 'N/A'} yrs",
+            Icons.cake_outlined,
+          ),
+          _infoChip(
+            profile.identity.gender ?? 'N/A',
+            Icons.person_outline,
+          ),
+          _infoChip(
+            profile.address.city ?? 'N/A',
+            Icons.location_on_outlined,
+          ),
+          _infoChip(
+            profile.cultural.religion ?? 'N/A',
+            Icons.temple_hindu,
+          ),
+          _infoChip(
+            "${profile.physical.height ?? 'N/A'} cm",
+            Icons.height_outlined,
+          ),
+        ],
+      ),
+    ),
+  ),
+),
 
                       SliverPersistentHeader(
                         delegate: _SliverAppBarDelegate(
@@ -281,18 +292,15 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   ),
                                 ],
                               ),
-
                               _InfoCard(
                                 title: 'About Me',
-                                icon: Icons.description,
-                                children: const [
+                                icon: Icons.info_outline,
+                                children: [
                                   Text(
+                                    profile.identity.aboutMe ??
+                                        "No description available.",
                                     textAlign: TextAlign.justify,
-                                    softWrap: true,
-                                    overflow: TextOverflow.clip,
-                                    "I am a simple, caring, and family-oriented person. "
-                                    "I believe in mutual respect, honesty, and understanding "
-                                    "in a relationship.",
+                                    style: TextStyle(color: Colors.grey[700]),
                                   ),
                                 ],
                               ),
@@ -871,33 +879,35 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) => false;
 }
+Widget _infoChip(String label, IconData icon) {
+  if (label.isEmpty) return const SizedBox.shrink();
 
-Widget _infoChip(String value, IconData icon) {
-  if (value.isEmpty || value == 'N/A') return const SizedBox.shrink();
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: Colors.grey.shade100,
       borderRadius: BorderRadius.circular(30),
       border: Border.all(color: Colors.grey.shade300),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 16, color: Colors.redAccent),
+        Icon(icon, size: 16, color: Colors.grey.shade700),
         const SizedBox(width: 6),
         Text(
-          value,
-          style: const TextStyle(
-            color: Colors.black87,
+          label,
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
+            color: Colors.grey.shade800,
           ),
         ),
       ],
     ),
   );
 }
+
+ 
 
 class _InfoCard extends StatelessWidget {
   final String title;
@@ -1058,65 +1068,82 @@ class ProfileHeaderCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        // apply same colors a sliveer app bar color
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+
+        borderRadius: BorderRadius.circular(18),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // NAME + VERIFIED
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Text(
+          /// PROFILE IMAGE
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.grey.shade200,
+            backgroundImage: profile.images.primaryImageUrl.isNotEmpty
+                ? NetworkImage(profile.images.primaryImageUrl)
+                : null,
+            child: profile.images.primaryImageUrl.isEmpty
+                ? Icon(Icons.person, size: 42, color: Colors.grey.shade400)
+                : null,
+          ),
+
+          const SizedBox(width: 16),
+
+          /// USER INFO
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// NAME
+                Text(
                   viewModel.user?.fullName ?? 'N/A',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 30,
+                    fontSize: 22,
                     fontWeight: FontWeight.w700,
                     color: Colors.black87,
-
-                    letterSpacing: 0.2,
                   ),
                 ),
-              ),
-            ],
-          ),
 
-          const SizedBox(height: 6),
+                const SizedBox(height: 6),
 
-          // AGE + OCCUPATION
-          Text(
-            '${profile.identity.age ?? 'N/A'} yrs, ${profile.employment.designation ?? 'N/A'}',
-            style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
-          ),
-
-          const SizedBox(height: 8),
-
-          // LOCATION
-          Row(
-            children: [
-              Icon(
-                Icons.location_on_outlined,
-                size: 18,
-                color: theme.primaryColor,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  '${profile.address.city ?? 'N/A'}, ${profile.address.state ?? 'N/A'}',
-                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                /// AGE + DESIGNATION
+                Text(
+                  '${profile.identity.age ?? 'N/A'} yrs • ${profile.employment.designation ?? 'N/A'}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 8),
+
+                /// LOCATION
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 18,
+                      color: theme.primaryColor,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Marquee(
+                        '${profile.address.city ?? 'N/A'}, ${profile.address.state ?? 'N/A'}',
+
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-
-          const SizedBox(height: 14),
-
-          // // DIVIDER (VERY IMPORTANT FOR VISUAL SEPARATION)
-          // Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
         ],
       ),
     );

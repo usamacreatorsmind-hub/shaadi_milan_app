@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/core/filters/home_filter_controller.dart';
+import '../../../../../core/filters/home_filter_controller.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../../app/custom/custom_widgets/widgets.dart';

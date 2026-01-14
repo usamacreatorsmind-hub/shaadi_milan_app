@@ -2,20 +2,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../domain/states/user_status_state.dart';
 
-
 class UserStatusFirestore {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// ---------------- FETCH (ONE TIME) ----------------
   Future<UserStatus> fetchUserStatus(String uid) async {
     try {
-      final doc = await _firestore.collection('userStatus').doc(uid).get();
-
-      if (!doc.exists) {
-        return const UserStatus.empty(); // default empty status
-      }
-
-      return UserStatus.fromMap(doc.data()!);
+      final doc = _firestore
+          .collection('userStatus')
+          .doc(uid)
+          .snapshots()
+          .map((snapshot) {
+            if (!snapshot.exists) {
+              return const UserStatus.empty(); // default empty status
+            }
+            return UserStatus.fromMap(snapshot.data()!);
+          });
+      return await doc.first;
     } catch (e) {
       throw Exception('Failed to fetch user status: $e');
     }

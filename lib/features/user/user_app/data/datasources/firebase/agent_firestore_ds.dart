@@ -39,13 +39,15 @@ class AgentFirestoreDs {
     final querySnapshot = await _firestore
         .collection(_collection)
         .doc(agentId)
-        .get();
-
-    if (!querySnapshot.exists) {
-      throw Exception('Agent with UID $agentId not found');
-    }
-
-    return AgentEntity.fromMap(querySnapshot.data()!);
+        .snapshots()
+        .map((snapshot) {
+          if (!snapshot.exists) {
+            throw Exception('Agent with UID $agentId not found');
+          }
+          return AgentEntity.fromMap(snapshot.data()!);
+        })
+        .first;
+    return querySnapshot;
   }
 
   // fetch agent doumetn using agent id
@@ -54,11 +56,19 @@ class AgentFirestoreDs {
         .collection(_collection)
         .where('agentId', isEqualTo: agentId)
         .limit(1)
-        .get();
+        .snapshots()
+        .map((snapshot) {
+          if (snapshot.docs.isEmpty) {
+            throw Exception('Agent with ID $agentId not found');
+          }
+          return AgentEntity.fromMap(snapshot.docs.first.data());
+        })
+        .first;
 
-    if (querySnapshot.docs.isEmpty) {
-      // throw Exception('Agent with ID $agentId not found');
-    }
-    return AgentEntity.fromMap(querySnapshot.docs.first.data());
+    return querySnapshot;
+
+
+
+    
   }
 }

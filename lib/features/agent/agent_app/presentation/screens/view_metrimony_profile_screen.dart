@@ -1,7 +1,7 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/image_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/my_profile_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
+import '../../../../user/user_app/domain/states/image_state.dart';
+import '../../../../user/user_app/domain/states/metrimony_profile_view_model.dart';
+import '../../../../user/user_app/presentation/screens/my_profile_screen.dart';
+import '../../../../user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -301,17 +301,20 @@ class _UserInfoCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundImage: profile.images.primaryImageUrl.isNotEmpty
-                  ? NetworkImage(profile.images.primaryImageUrl)
-                  : NetworkImage(
-                      "https://firebasestorage.googleapis.com/v0/b/fir-app-e3a53.firebasestorage.app/o/company_files%2Ficon-7797704_640.png?alt=media&token=90d1d7fc-9dd9-4ab9-8dfc-480646f5777f",
-                    ),
-              // onBackgroundImageError: (_, __) {},
-              child: profile.images.primaryImageUrl.isEmpty
-                  ? const Icon(Icons.person, size: 1)
-                  : null,
+            Hero(
+              tag: 'user-avatar-${profile.user.uid}',
+              child: CircleAvatar(
+                radius: 40,
+                backgroundImage: profile.images.primaryImageUrl.isNotEmpty
+                    ? NetworkImage(profile.images.primaryImageUrl)
+                    : const NetworkImage(
+                        "https://firebasestorage.googleapis.com/v0/b/fir-app-e3a53.firebasestorage.app/o/company_files%2Ficon-7797704_640.png?alt=media&token=90d1d7fc-9dd9-4ab9-8dfc-480646f5777f",
+                      ),
+                // onBackgroundImageError: (_, __) {},
+                child: profile.images.primaryImageUrl.isEmpty
+                    ? const Icon(Icons.person, size: 1)
+                    : null,
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(

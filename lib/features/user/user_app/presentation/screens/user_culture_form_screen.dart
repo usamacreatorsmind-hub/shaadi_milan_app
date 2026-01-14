@@ -1,11 +1,12 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../core/enums/enum.dart';
 import '../../domain/states/cultural_state.dart';
 import '../../domain/states/religion_state.dart';
 import '../controllers/user_cultural_controllers.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 @RoutePage()
 class UserCultureFormScreen extends ConsumerStatefulWidget {

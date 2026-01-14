@@ -72,7 +72,7 @@ class UserFirestoreDS {
   }
 
   Future<void> updateProfilePhoto(String uid, String profilePhotoUrl) async {
-    await _users.doc(uid).update({'profilePhoto': profilePhotoUrl});
+    await _users.doc(uid).update({'profileImageUrl': profilePhotoUrl});
   }
 
   // implement add to wishlist  in user collection

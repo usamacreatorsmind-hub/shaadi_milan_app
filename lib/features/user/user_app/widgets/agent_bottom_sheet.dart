@@ -1,6 +1,7 @@
-import '../../../auth/domain/states/agent_state.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../auth/domain/states/agent_state.dart';
 
 class AgentBottomSheet extends StatelessWidget {
   final AgentEntity agent;

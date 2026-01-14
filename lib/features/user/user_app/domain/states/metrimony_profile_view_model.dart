@@ -1,4 +1,5 @@
 import '../../../../auth/domain/states/agent_state.dart';
+import '../../../../auth/domain/states/user_state.dart';
 import 'address_state.dart';
 import 'cultural_state.dart';
 import 'education_state.dart';
@@ -8,7 +9,6 @@ import 'identity_state.dart';
 import 'image_state.dart';
 import 'metrimony_state.dart';
 import 'physical_state.dart';
-import '../../../../auth/domain/states/user_state.dart';
 
 class MetrimonyProfileViewModel {
   final MatrimonyProfile metrimonyProfile;

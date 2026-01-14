@@ -1,8 +1,8 @@
-import '../../../../auth/domain/states/agent_state.dart';
-
-import '../datasources/firebase/agent_firestore_ds.dart';
-import '../../domain/repositories/agent_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../auth/domain/states/agent_state.dart';
+import '../../domain/repositories/agent_repository.dart';
+import '../datasources/firebase/agent_firestore_ds.dart';
 
 final agentRepositoryProvider = Provider<AgentRepository>((ref) {
   return AgentRepositoryImpl(ref.watch(agentFirestoreDsProvider));

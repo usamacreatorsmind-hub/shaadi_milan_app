@@ -1,7 +1,6 @@
-import '../datasources/user_firestore.dart';
-import '../../domain/repositories/user_repository.dart';
 import '../../../../auth/domain/states/user_state.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../domain/repositories/user_repository.dart';
+import '../datasources/user_firestore.dart';
 
 class UserRepositoryImpl implements UserRepository {
   final UserFirestore userFirestore;

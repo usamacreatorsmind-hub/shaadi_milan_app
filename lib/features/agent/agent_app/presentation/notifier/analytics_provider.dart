@@ -1,7 +1,7 @@
-import 'package:arvika_marriage_bureau/core/filters/revenue_filter_controller.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/domain/states/analytics_state.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/user_nofier.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
+import '../../../../../core/filters/revenue_filter_controller.dart';
+import '../../domain/states/analytics_state.dart';
+import 'user_nofier.dart';
+import '../../../../user/user_razorpay/domain/states/payment.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final analyticsProvider = Provider<AsyncValue<AnalyticsState>>((ref) {

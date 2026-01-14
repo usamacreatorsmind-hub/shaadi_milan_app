@@ -120,5 +120,36 @@ class UserRouter {
       page: UserPaymentSuccessRoute.page,
       guards: [AuthGuard(ref), UserGuard(ref)],
     ),
+    AutoRoute(
+      page: AgentContactRoute.page,
+      guards: [AuthGuard(ref), UserGuard(ref)],
+    ),
+
+    AutoRoute(
+      page: AgentSettingsRoute.page,
+      guards: [AuthGuard(ref), UserGuard(ref)],
+    ),
+
+    AutoRoute(
+      page: SupportTicketsRoute.page,
+      guards: [AuthGuard(ref), UserGuard(ref)],
+    ),
+    AutoRoute(
+      page: SupportTicketDetailRoute.page,
+      guards: [AuthGuard(ref), UserGuard(ref)],
+    ),
+    AutoRoute(
+      page: SupportTicketFormRoute.page,
+      guards: [AuthGuard(ref), UserGuard(ref)],
+    ),
+    AutoRoute(
+      page: ReviewFormRoute.page,
+      guards: [AuthGuard(ref), UserGuard(ref)],
+    ),
+
+    AutoRoute(
+      page: ReviewDetailsRoute.page,
+      guards: [AuthGuard(ref), UserGuard(ref)],
+    ),
   ];
 }

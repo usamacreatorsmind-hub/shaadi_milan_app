@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/core/filters/home_filter_state.dart';
-import 'package:arvika_marriage_bureau/core/filters/revenue_filter_state.dart';
+import 'home_filter_state.dart';
+import 'revenue_filter_state.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 /// =======================

@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+import '../../router/app_router.dart';
+import '../../../features/auth/domain/states/user_state.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:riverpod/src/framework.dart';

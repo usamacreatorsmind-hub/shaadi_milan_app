@@ -1,6 +1,3 @@
-import '../../../../app/custom/custom_widgets/widgets.dart';
-import '../../../../app/router/app_router.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 

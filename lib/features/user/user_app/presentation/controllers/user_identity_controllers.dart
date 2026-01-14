@@ -24,6 +24,7 @@ class UserIdentityController extends StateNotifier<IdentityState> {
     required DateTime dob,
     required int age,
     required String aadhar,
+    required String aboutMe,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -33,6 +34,7 @@ class UserIdentityController extends StateNotifier<IdentityState> {
       dob: dob,
       age: age,
       aadhar: aadhar,
+      aboutMe: aboutMe,
     );
 
     try {
@@ -59,15 +61,18 @@ class UserIdentityController extends StateNotifier<IdentityState> {
     required DateTime dob,
     required int age,
     required String aadhar,
+    required String aboutMe,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     final identityProfile = IdentityProfile(
       profileId: _uid,
 
+      aboutMe: aboutMe,
       gender: gender,
       dob: dob,
       age: age,
+
       aadhar: aadhar,
     );
 

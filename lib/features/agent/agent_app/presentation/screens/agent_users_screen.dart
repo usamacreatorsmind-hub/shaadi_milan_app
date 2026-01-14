@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/drawer.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
+import '../../../../../app/custom/custom_widgets/drawer.dart';
+import 'agen_profile.screen.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../../app/router/app_router.dart';
@@ -43,11 +43,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      drawer: AppDrawer(
-      
-        agentAsync: ref.watch(agentProvider(widget.agentId)),
-
-      ),
+      drawer: AppDrawer(agentAsync: ref.watch(agentProvider(widget.agentId))),
 
       body: CustomScrollView(
         slivers: [
@@ -217,33 +213,36 @@ class UserCard extends StatelessWidget {
             Row(
               children: [
                 /// Avatar
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: theme.colorScheme.primary.withOpacity(0.1),
-                    image: imageUrl.isNotEmpty
-                        ? DecorationImage(
-                            image: NetworkImage(imageUrl),
-                            fit: BoxFit.cover,
+                Hero(
+                  tag: 'user-avatar-${user.uid}',
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      image: imageUrl.isNotEmpty
+                          ? DecorationImage(
+                              image: NetworkImage(imageUrl),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: imageUrl.isEmpty
+                        ? Center(
+                            child: Text(
+                              user.fullName.isNotEmpty
+                                  ? user.fullName[0].toUpperCase()
+                                  : '?',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
                           )
                         : null,
                   ),
-                  child: imageUrl.isEmpty
-                      ? Center(
-                          child: Text(
-                            user.fullName.isNotEmpty
-                                ? user.fullName[0].toUpperCase()
-                                : '?',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                        )
-                      : null,
                 ),
 
                 const SizedBox(width: 16),
@@ -272,65 +271,61 @@ class UserCard extends StatelessWidget {
                     ],
                   ),
                 ),
-              ],
-            ),
 
-            const SizedBox(height: 12),
-            const Divider(height: 1),
-            const SizedBox(height: 12),
+                /// ================= STATUS ROW =================
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 30.w,
+                      child: _InfoTile(
+                        label: 'Phone',
+                        value: user.phone.isNotEmpty ? user.phone : 'N/A',
+                      ),
+                    ),
+                    Container(
+                      width: 25.w,
+                      child: _StatusTile(
+                        label: 'Profile',
+                        value: user.isProfileCreated ? 'Created' : 'Pending',
+                        isActive: user.isProfileCreated,
+                      ),
+                    ),
+                    Container(
+                      width: 26.w,
+                      child: _StatusTile(
+                        label: 'Payment',
+                        value: paymentStatus ?? 'Not Started',
+                        isActive: paymentStatus?.toUpperCase() == 'PAID',
+                      ),
+                    ),
+                  ],
+                ),
 
-            /// ================= STATUS ROW =================
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  width: 30.w,
-                  child: _InfoTile(
-                    label: 'Phone',
-                    value: user.phone.isNotEmpty ? user.phone : 'N/A',
-                  ),
-                ),
-                Container(
-                  width: 25.w,
-                  child: _StatusTile(
-                    label: 'Profile',
-                    value: user.isProfileCreated ? 'Created' : 'Pending',
-                    isActive: user.isProfileCreated,
-                  ),
-                ),
-                Container(
-                  width: 26.w,
-                  child: _StatusTile(
-                    label: 'Payment',
-                    value: paymentStatus ?? 'Not Started',
-                    isActive: paymentStatus?.toUpperCase() == 'PAID',
-                  ),
-                ),
-              ],
-            ),
+                const SizedBox(height: 8),
+                const Divider(height: 1),
+                const SizedBox(height: 8),
 
-            const SizedBox(height: 8),
-            const Divider(height: 1),
-            const SizedBox(height: 8),
-
-            /// ================= ACTION ROW =================
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _ActionButton(
-                  icon: Icons.person_outline,
-                  label: 'View Profile',
-                  onTap: onViewUserProfile,
-                ),
-                _ActionButton(
-                  icon: Icons.favorite_border,
-                  label: 'View Matrimony',
-                  onTap: onViewMatrimonyProfile,
-                ),
-                _ActionButton(
-                  icon: Icons.payments_outlined,
-                  label: 'Payment',
-                  onTap: onViewPayment,
+                /// ================= ACTION ROW =================
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _ActionButton(
+                      icon: Icons.person_outline,
+                      label: 'View Profile',
+                      onTap: onViewUserProfile,
+                    ),
+                    _ActionButton(
+                      icon: Icons.favorite_border,
+                      label: 'View Matrimony',
+                      onTap: onViewMatrimonyProfile,
+                    ),
+                    _ActionButton(
+                      icon: Icons.payments_outlined,
+                      label: 'Payment',
+                      onTap: onViewPayment,
+                    ),
+                  ],
                 ),
               ],
             ),

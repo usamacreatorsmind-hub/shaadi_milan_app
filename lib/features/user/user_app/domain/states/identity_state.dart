@@ -3,14 +3,18 @@ class IdentityProfile {
   final String gender;
   final DateTime dob;
   final int age;
-  final String aadhar; 
+  final String aboutMe;
+  final String aadhar;
 
   IdentityProfile({
     required this.profileId,
     required this.gender,
+
+    required this.aboutMe,
+
     required this.dob,
     required this.age,
-    required this.aadhar, 
+    required this.aadhar,
   });
 
   Map<String, dynamic> toMap() {
@@ -19,24 +23,27 @@ class IdentityProfile {
       'gender': gender,
       'dob': dob.toIso8601String(),
       'age': age,
-      'aadhar': aadhar, 
+      'aadhar': aadhar,
+      'aboutMe': aboutMe,
     };
   }
 
   @override
   String toString() {
-    return 'Gender: $gender, DOB: ${dob.toLocal().toString().split(' ')[0]}, Age: $age, Aadhar: $aadhar';
+    return 'Gender: $gender,  aboutMe: $aboutMe,    DOB: ${dob.toLocal().toString().split(' ')[0]}, Age: $age, Aadhar: $aadhar';
   }
 
   factory IdentityProfile.fromMap(Map<String, dynamic> map) {
     return IdentityProfile(
+      aboutMe: map['aboutMe'] as String? ?? '',
+
       profileId: map['profileId'] as String? ?? '',
       gender: map['gender'] as String? ?? '',
       dob: map['dob'] != null
           ? DateTime.tryParse(map['dob'].toString()) ?? DateTime(1900)
           : DateTime(1900),
       age: map['age'] as int? ?? 0,
-      aadhar: map['aadhar'] as String? ?? '', 
+      aadhar: map['aadhar'] as String? ?? '',
     );
   }
 
@@ -44,10 +51,15 @@ class IdentityProfile {
     String? profileId,
     String? gender,
     DateTime? dob,
+    String? aboutMe,
+
+    String? profileImageUrl,
+
     int? age,
     String? aadhar,
   }) {
-    return IdentityProfile( 
+    return IdentityProfile(
+      aboutMe: aboutMe ?? this.aboutMe,
 
       profileId: profileId ?? this.profileId,
       gender: gender ?? this.gender,
@@ -60,7 +72,8 @@ class IdentityProfile {
 
   factory IdentityProfile.empty() {
     return IdentityProfile(
-    
+      aboutMe: '',
+
       profileId: '',
       gender: '',
       dob: DateTime(1900),

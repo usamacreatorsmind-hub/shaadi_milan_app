@@ -1,4 +1,9 @@
-import 'package:arvika_marriage_bureau/core/filters/home_filter_controller.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/animated_app_bar.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/user_drawer.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:arvika_marriage_bureau/features/widgets/marquee.dart';
+
+import '../../../../../core/filters/home_filter_controller.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../../app/router/app_router.dart';
@@ -10,8 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:ui';
 
-
-
 /// =======================
 /// USER HOME SCREEN
 /// =======================
@@ -21,6 +24,9 @@ class UserHomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // current user provider
+    final currentUserAsync = ref.watch(currentUserProvider);
+
     final homeState = ref.watch(homeControllerProvider);
     final filter = ref.watch(homeFilterProvider);
 
@@ -40,112 +46,18 @@ class UserHomeScreen extends ConsumerWidget {
     }
 
     return Scaffold(
+      drawer: UserDrawer(userAsync: currentUserAsync),
+      appBar: AppBar(
+        toolbarHeight: 0,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        // This ensures the app bar doesn't take up any space
+      ),
+
       body: CustomScrollView(
         slivers: [
-          /// ================= APP BAR =================
-          SliverAppBar(
-            pinned: true,
-
-            snap: false,
-            stretch: true,
-            elevation: 0,
-            toolbarHeight: 88,
-            titleSpacing: 0,
-
-            flexibleSpace: ClipRRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.95),
-                        Colors.pink.shade50.withOpacity(0.9),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            title: Row(
-              children: [
-                // 🌸 Glowing logo
-                SizedBox(
-                  height: 100,
-                  width: 100,
-
-                  child: Padding(
-                    padding: const EdgeInsets.all(3),
-                    child: ClipRRect(
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            const Icon(Icons.favorite, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(width: 16),
-
-                // 🌹 Brand typography
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ShaderMask(
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: [
-                          Theme.of(context).primaryColor,
-                          Colors.pinkAccent,
-                        ],
-                      ).createShader(bounds),
-
-                      child: const Text(
-                        'Arvika Marriage Bureau',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    const Text(
-                      'Find your perfect match',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black54,
-                        letterSpacing: 0.8,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(1),
-              child: Container(
-                height: 1,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      Colors.pinkAccent.withOpacity(0.3),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+          const MinimalAppBar(title: "Home", showShadow: true),
+          // other slivers...
 
           /// ================= LOCATION BAR =================
           SliverToBoxAdapter(
@@ -291,111 +203,6 @@ class UserHomeScreen extends ConsumerWidget {
             },
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// =======================
-/// MARQUEE WIDGET
-/// =======================
-class Marquee extends StatefulWidget {
-  final String text;
-  final TextStyle style;
-  final Duration pauseDuration;
-  final double velocity;
-
-  const Marquee(
-    this.text, {
-    super.key,
-    required this.style,
-    this.pauseDuration = const Duration(seconds: 2),
-    this.velocity = 30.0, // pixels per second
-  });
-
-  @override
-  State<Marquee> createState() => _MarqueeState();
-}
-
-class _MarqueeState extends State<Marquee> {
-  final ScrollController _scrollController = ScrollController();
-  bool _isDisposed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scroll());
-  }
-
-  @override
-  void didUpdateWidget(Marquee oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.text != oldWidget.text) {
-      // When text changes, reset and the loop will restart with new dimensions.
-      if (_scrollController.hasClients) {
-        _scrollController.jumpTo(0);
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _isDisposed = true;
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _scroll() async {
-    while (!_isDisposed) {
-      // Wait for controller to be attached
-      if (!_scrollController.hasClients) {
-        await Future.delayed(const Duration(milliseconds: 100));
-        continue;
-      }
-
-      // Only scroll if there's overflow
-      if (_scrollController.position.maxScrollExtent > 0) {
-        final scrollDuration = Duration(
-          milliseconds:
-              (_scrollController.position.maxScrollExtent /
-                      widget.velocity *
-                      1000)
-                  .toInt(),
-        );
-
-        await Future.delayed(widget.pauseDuration);
-        if (_isDisposed) break;
-
-        await _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: scrollDuration,
-          curve: Curves.linear,
-        );
-        if (_isDisposed) break;
-
-        await Future.delayed(widget.pauseDuration);
-        if (_isDisposed) break;
-
-        if (_scrollController.hasClients) {
-          _scrollController.jumpTo(0);
-        }
-      } else {
-        await Future.delayed(const Duration(seconds: 1));
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      controller: _scrollController,
-      scrollDirection: Axis.horizontal,
-      physics: const NeverScrollableScrollPhysics(),
-      child: Text(
-        widget.text,
-        style: widget.style,
-        softWrap: false,
-        maxLines: 1,
       ),
     );
   }
@@ -644,7 +451,16 @@ class ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        //  gradient color
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary.withOpacity(0.05),
+            Theme.of(context).cardColor,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(

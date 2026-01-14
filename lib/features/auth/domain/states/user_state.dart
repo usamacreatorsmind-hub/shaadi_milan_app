@@ -65,7 +65,7 @@ class UserEntity {
   /// ------------------ MAP ------------------
   Map<String, dynamic> toMap() {
     return {
-      "photoUrl": profileImageUrl,
+      "profileImageUrl": profileImageUrl,
       'uid': uid,
       'email': email,
       'fullName': fullName,
@@ -95,9 +95,7 @@ class UserEntity {
     }
 
     return UserEntity(
-      profileImageUrl:
-          map['photoUrl'] ??
-          "https://firebasestorage.googleapis.com/v0/b/fir-app-e3a53.firebasestorage.app/o/company_files%2Ficon-7797704_640.png?alt=media&token=90d1d7fc-9dd9-4ab9-8dfc-480646f5777f",
+      profileImageUrl: map['profileImageUrl'] ?? '',
       uid: map['uid'] ?? '',
       email: map['email'] ?? '',
       fullName: map['fullName'] ?? '',

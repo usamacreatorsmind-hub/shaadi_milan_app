@@ -1,7 +1,8 @@
-import '../../../auth/domain/states/user_state.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../auth/domain/states/user_state.dart';
 
 @RoutePage()
 class MyProfileDetailScreen extends ConsumerStatefulWidget {

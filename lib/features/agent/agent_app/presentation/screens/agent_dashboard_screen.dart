@@ -1,7 +1,7 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/drawer.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/analytics_provider.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/user_nofier.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
+import '../../../../../app/custom/custom_widgets/drawer.dart';
+import '../notifier/analytics_provider.dart';
+import '../notifier/user_nofier.dart';
+import 'agen_profile.screen.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

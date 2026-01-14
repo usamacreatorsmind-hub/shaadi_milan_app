@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/core/filters/revenue_filter_controller.dart';
+import '../../../../../core/filters/revenue_filter_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

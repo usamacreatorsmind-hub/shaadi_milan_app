@@ -89,21 +89,24 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                         children: [
                           // Positioned(child: child),
                           // Avatar
-                          Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              image: user.profileImageUrl.isNotEmpty
-                                  ? DecorationImage(
-                                      image: NetworkImage(user.profileImageUrl),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                              border: Border.all(color: Colors.white, width: 4),
+                          Hero(
+                            tag: 'user-avatar-${user.uid}',
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                image: user.profileImageUrl.isNotEmpty
+                                    ? DecorationImage(
+                                        image: NetworkImage(user.profileImageUrl),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                                border: Border.all(color: Colors.white, width: 4),
+                              ),
+                              child: Center(),
                             ),
-                            child: Center(),
                           ),
                           const SizedBox(height: 16),
                           // Name

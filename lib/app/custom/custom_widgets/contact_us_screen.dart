@@ -1,7 +1,10 @@
 // define a beautiful screen
 
+import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -72,21 +75,26 @@ class ContactUsScreen extends StatelessWidget {
               onTap: () => _launchUrl('https://wa.me/919876543210'),
             ),
             const SizedBox(height: 20),
+
+            // a card to send message
             _buildContactCard(
               context,
-              icon: Icons.chat_bubble_outline,
-              title: "Live Chat",
-              subtitle: "Chat with us now",
+              icon: Icons.message_outlined,
+              title: "Send us a message",
+              subtitle: "We'll get back to you shortly",
               onTap: () {
-                // Implement live chat functionality or navigate to a chat screen
+                context.pushRoute(const SupportTicketFormRoute());
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text("Live chat coming soon!"),
-                    behavior: SnackBarBehavior.floating,
+                    content: Text(
+                      "Opening message interface... (Not implemented)",
+                    ),
                   ),
                 );
               },
             ),
+
             const SizedBox(height: 40),
             Text(
               "Our support team is available from 9 AM to 6 PM (IST), Monday to Friday.",

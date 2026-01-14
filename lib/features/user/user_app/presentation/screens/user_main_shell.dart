@@ -36,8 +36,8 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
       routes: [
         const UserHomeRoute(),
         UserWishListRoute(userId: uid),
-        ReviewRoute(),
 
+        ReviewRoute(),
         UserProfileRoute(userId: uid),
       ],
       transitionBuilder: (context, child, animation) =>

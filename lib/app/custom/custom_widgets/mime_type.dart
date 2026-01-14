@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
+import '../../../features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
+import '../../../features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';

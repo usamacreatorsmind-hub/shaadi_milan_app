@@ -70,6 +70,7 @@ class _UserBiodataCheckScreenState
             ),
             _infoRow('Age', '${profile.identity.age} Years'),
             _infoRow('Aadhar', profile.identity.aadhar),
+            _infoRow('About me ', profile.identity.aboutMe),
           ]),
 
           _section('Physical', Icons.accessibility_new, [

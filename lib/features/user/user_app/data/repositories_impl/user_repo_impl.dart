@@ -1,10 +1,10 @@
-import '../../domain/states/user_status_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../auth/domain/states/user_state.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../domain/states/address_state.dart';
-import '../../../../auth/domain/states/user_state.dart';
+import '../../domain/states/user_status_state.dart';
 import '../datasources/firebase/user_firestore_ds.dart';
 
 class UserRepositoryImpl implements UserRepository {

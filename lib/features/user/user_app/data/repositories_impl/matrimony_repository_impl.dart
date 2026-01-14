@@ -1,6 +1,4 @@
- 
 import '../../../../auth/domain/states/agent_state.dart';
-
 import '../../domain/states/address_state.dart';
 import '../../domain/states/cultural_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,7 +8,6 @@ import '../../domain/states/family_state.dart';
 import '../../domain/states/identity_state.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/physical_state.dart';
-
 import '../datasources/firebase/metrimony_firestore.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

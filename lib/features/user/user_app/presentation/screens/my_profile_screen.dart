@@ -1,17 +1,17 @@
-import '../../../../../app/router/app_router.dart';
-import '../../../../auth/domain/states/agent_state.dart';
-import '../../data/repositories_impl/agent_repository_impl.dart';
-import '../../data/repositories_impl/user_repo_impl.dart';
-import '../../../../../core/enums/enum.dart';
-import '../../domain/states/metrimony_profile_view_model.dart';
-import '../../widgets/pdf_viewer_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
 import '../../../../../app/custom/shimmer.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../../../../core/enums/enum.dart';
+import '../../../../auth/domain/states/agent_state.dart';
+import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/repositories_impl/user_repo_impl.dart';
+import '../../domain/states/metrimony_profile_view_model.dart';
+import '../../widgets/pdf_viewer_bottomsheet.dart';
 
 final matrimonyProfileProvider =
     StreamProvider.family<MetrimonyProfileViewModel, String>((ref, uid) {

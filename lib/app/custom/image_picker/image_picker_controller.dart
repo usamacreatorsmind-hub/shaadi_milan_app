@@ -1,12 +1,13 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../../../features/user/user_app/data/repositories_impl/user_image_repo_impl.dart';
 import '../../../features/user/user_app/domain/states/image_state.dart';
 import '../../../features/user/user_app/presentation/controllers/metrimony_profile_controller.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
 
 final uploadProgressProvider = StateProvider<double>((ref) => 0.0);
 

@@ -1,14 +1,14 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../../../../auth/domain/states/user_state.dart';
+import '../../../../user/user_razorpay/domain/states/payment.dart';
 import '../../data/datasources/user_firestore.dart';
 import '../../data/datasources/user_payments_ds.dart';
 import '../../data/repositories_impl/user_payment_repository_impl.dart';
 import '../../data/repositories_impl/user_repository_impl.dart';
 import '../../domain/repositories/user_payments_repository.dart';
 import '../../domain/repositories/user_repository.dart';
-import '../../../../auth/domain/states/user_state.dart';
-import '../../../../user/user_razorpay/domain/states/payment.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// ==========================================
 /// Data Source Provider

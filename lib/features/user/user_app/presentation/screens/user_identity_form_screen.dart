@@ -33,6 +33,7 @@ class _UserIdentityFormScreenState
     extends ConsumerState<UserIdentityFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _aadharController = TextEditingController();
+  final _aboutMeController = TextEditingController();
 
   // prefile controlles
 
@@ -132,6 +133,13 @@ class _UserIdentityFormScreenState
     //       aadhar: _aadharController.text.trim(),
     //     );
 
+    // print all data
+    print('Gender: $_gender');
+    print('DOB: $_selectedDate');
+    print('Age: $_age');
+    print('Aadhar: ${_aadharController.text.trim()}');
+    print('About Me: ${_aboutMeController.text.trim()}');
+
     final notifier = ref.read(identityControllerProvider.notifier);
 
     if (widget.mode == FormMode.create) {
@@ -140,6 +148,7 @@ class _UserIdentityFormScreenState
         dob: _selectedDate!,
         age: _age!,
         aadhar: _aadharController.text.trim(),
+        aboutMe: _aboutMeController.text.trim(),
       );
     } else {
       // Update logic (using saveIdentity as upsert)
@@ -148,6 +157,8 @@ class _UserIdentityFormScreenState
         dob: _selectedDate!,
         age: _age!,
         aadhar: _aadharController.text.trim(),
+
+        aboutMe: _aboutMeController.text.trim(),
       );
     }
   }
@@ -193,6 +204,19 @@ class _UserIdentityFormScreenState
               const SizedBox(height: 12),
 
               const SizedBox(height: 12),
+              // about me field
+              AppTextField(
+                controller: _aboutMeController,
+                prefixIcon: Icons.person_outline,
+                iconColor: Theme.of(context).colorScheme.primary,
+                label: "About Me",
+                hint: "Tell us about yourself",
+                obscureText: false,
+                keyboardType: TextInputType.multiline,
+                maxLines: 3,
+                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: 16),
 
               // ----------------------------
               // AADHAR
@@ -218,7 +242,7 @@ class _UserIdentityFormScreenState
               ),
               const SizedBox(height: 12),
 
-              // Widget for Aadhar upload 
+              // Widget for Aadhar upload
 
               // ----------------------------
               // GENDER

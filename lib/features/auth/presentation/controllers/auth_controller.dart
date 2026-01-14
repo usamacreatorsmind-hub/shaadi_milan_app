@@ -24,7 +24,6 @@ class AuthController extends StateNotifier<User?> {
 
   Stream<Either<AgentEntity, UserEntity>?> authStateChanges() =>
       _authRepository.authStateChanges();
- 
 
   Future<void> signUpWithEmail(
     String fullName,
@@ -49,6 +48,8 @@ class AuthController extends StateNotifier<User?> {
 
   Future<void> signOut() async {
     await _authRepository.signOut();
+
+    // navigate to onboarding
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
@@ -67,6 +68,10 @@ class AuthController extends StateNotifier<User?> {
 
   Stream<bool> get isAuthenticated =>
       _authRepository.authStateChanges().map((user) => user != null);
+
+  void logout() {
+    _authRepository.signOut();
+  }
 }
 
 final authControllerProvider = StateNotifierProvider<AuthController, User?>((

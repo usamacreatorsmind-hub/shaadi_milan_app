@@ -1,90 +1,161 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/review_state.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/animated_app_bar.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/drawer.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/user_drawer.dart';
+import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/review_notifiers.dart';
+
+import '../../domain/states/review_state.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 @RoutePage()
-class ReviewScreen extends ConsumerWidget {
+class ReviewScreen extends ConsumerStatefulWidget {
   const ReviewScreen({super.key});
 
-  static final List<ReviewModel> reviews = [
-    ReviewModel(
-      userName: 'Alice Smith',
-      rating: 5,
-      comment: 'Excellent service! Highly recommend.',
-      date: '26 Oct 2023',
-      userImage: 'https://randomuser.me/api/portraits/women/1.jpg',
-    ),
-    ReviewModel(
-      userName: 'Bob Johnson',
-      rating: 4,
-      comment: 'Good experience overall, minor delay.',
-      date: '25 Oct 2023',
-      userImage: 'https://randomuser.me/api/portraits/men/1.jpg',
-    ),
-    ReviewModel(
-      userName: 'Charlie Brown',
-      rating: 5,
-      comment: 'Very professional and helpful.',
-      date: '24 Oct 2023',
-      userImage: 'https://randomuser.me/api/portraits/men/2.jpg',
-    ),
-  ];
+  @override
+  ConsumerState<ReviewScreen> createState() => _ReviewScreenState();
+}
+
+class _ReviewScreenState extends ConsumerState<ReviewScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(allReviewsNotifierProvider.notifier).watchAllReviews();
+    });
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final width = MediaQuery.of(context).size.width;
 
+    final currentUserAsync = ref.watch(currentUserProvider);
+    final allReviewsAsync = ref.watch(allReviewsNotifierProvider);
+
     int crossAxisCount = 2;
     if (width > 1200) {
       crossAxisCount = 4;
     } else if (width > 900) {
       crossAxisCount = 3;
-    } else if (width > 600) {
-      crossAxisCount = 2;
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Reviews"),
-        backgroundColor: theme.primaryColor,
-        foregroundColor: theme.colorScheme.onPrimary,
-      ),
-      body: reviews.isEmpty
-          ? Center(
-              child: Text("No reviews yet", style: theme.textTheme.titleMedium),
-            )
-          : GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 0.85,
-              ),
-              itemCount: reviews.length,
-              itemBuilder: (context, index) {
-                return ReviewCard(
-                  review: reviews[index],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            ReviewDetailsScreen(review: reviews[index]),
+      drawer: UserDrawer(userAsync: currentUserAsync),
+      body: allReviewsAsync.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : allReviewsAsync.error != null
+          ? Center(child: Text('Error: ${allReviewsAsync.error}'))
+          : CustomScrollView(
+              slivers: [
+                const MinimalAppBar(title: "Reviews"),
+
+                /// HEADER
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 16),
+                        Text(
+                          "What our users say about us",
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Read genuine reviews from our happy customers.",
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              context.pushRoute(const ReviewFormRoute());
+                            },
+                            icon: const Icon(Icons.edit_note),
+                            label: const Text("Write a Review"),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
+                ),
+
+                /// EMPTY STATE
+                if (allReviewsAsync.reviews.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.rate_review_outlined,
+                            size: 80,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "No reviews yet!",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Be the first to leave a review!",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                );
-              },
+                    ),
+                  )
+                else
+                  /// GRID
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.9,
+                      ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final review = allReviewsAsync.reviews[index];
+                        return ReviewCard(
+                          review: review,
+                          onTap: () {
+                            context.pushRoute(
+                              ReviewDetailsRoute(review: review),
+                            );
+                          },
+                        );
+                      }, childCount: allReviewsAsync.reviews.length),
+                    ),
+                  ),
+              ],
             ),
     );
   }
 }
 
 class ReviewCard extends StatelessWidget {
-  final ReviewModel review;
+  final Review review;
   final VoidCallback onTap;
 
   const ReviewCard({super.key, required this.review, required this.onTap});
@@ -106,18 +177,20 @@ class ReviewCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Hero(
-                    tag: review.userImage,
-                    child: CircleAvatar(
-                      radius: 22,
-                      backgroundImage: NetworkImage(review.userImage),
-                    ),
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundImage: review.userProfileImg.isNotEmpty
+                        ? NetworkImage(review.userProfileImg)
+                        : null,
+                    child: review.userProfileImg.isEmpty
+                        ? const Icon(Icons.person)
+                        : null,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       review.userName,
-                      style: theme.textTheme.titleSmall?.copyWith(
+                      style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -131,21 +204,12 @@ class ReviewCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   review.comment,
-                  maxLines: 4,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall,
+                  style: theme.textTheme.bodyMedium,
                 ),
               ),
               const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Text(
-                  review.date,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
             ],
           ),
         ),
@@ -175,7 +239,7 @@ class RatingStars extends StatelessWidget {
 
 @RoutePage()
 class ReviewDetailsScreen extends StatelessWidget {
-  final ReviewModel review;
+  final Review review;
   const ReviewDetailsScreen({super.key, required this.review});
 
   @override
@@ -188,51 +252,81 @@ class ReviewDetailsScreen extends StatelessWidget {
         backgroundColor: theme.primaryColor,
         foregroundColor: theme.colorScheme.onPrimary,
       ),
-      body: SingleChildScrollView(
+      body: ListView(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Column(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  Hero(
-                    tag: review.userImage,
-                    child: CircleAvatar(
-                      radius: 48,
-                      backgroundImage: NetworkImage(review.userImage),
-                    ),
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: review.userProfileImg.isNotEmpty
+                        ? NetworkImage(review.userProfileImg)
+                        : null,
+                    child: review.userProfileImg.isEmpty
+                        ? const Icon(Icons.person, size: 30)
+                        : null,
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    review.userName,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  RatingStars(rating: review.rating),
-                  const SizedBox(height: 6),
-                  Text(
-                    review.date,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          review.userName,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Reviewed on ${review.createdAt.day}/${review.createdAt.month}/${review.createdAt.year}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              "Review",
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 16),
+              Center(child: RatingStars(rating: review.rating)),
+              const SizedBox(height: 24),
+              if (review.title.isNotEmpty) ...[
+                Text(
+                  "Title",
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  review.title,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+              Text(
+                "Comment",
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(review.comment, style: theme.textTheme.bodyMedium),
-          ],
-        ),
+              const SizedBox(height: 8),
+              Text(
+                review.comment,
+                style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

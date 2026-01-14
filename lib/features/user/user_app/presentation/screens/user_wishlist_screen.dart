@@ -1,3 +1,7 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/animated_app_bar.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/drawer.dart';
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/user_drawer.dart';
+
 import '../../../../../app/custom/shimmer.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
@@ -24,6 +28,7 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> {
     final profileAsync = ref.watch(currentUserProfileProvider);
 
     return Scaffold(
+      drawer: UserDrawer(userAsync: profileAsync),
       backgroundColor: Colors.grey[100],
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -33,27 +38,8 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> {
         data: (profile) {
           return CustomScrollView(
             slivers: [
-              SliverAppBar(
-                backgroundColor: Colors.grey[100],
-                expandedHeight: 120,
-                floating: false,
-                pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  centerTitle: false,
-                  title: Text(
-                    "My Wishlist",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                ),
-              ),
+              const MinimalAppBar(title: "My WishList"),
+
               SliverPadding(
                 padding: const EdgeInsets.all(16.0),
                 sliver:
@@ -235,38 +221,41 @@ class UserCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: imageUrl.isEmpty
-                      ? Container(
-                          color: Colors.grey.shade200,
-                          child: Center(
-                            child: Icon(
-                              Icons.person,
-                              size: 50,
-                              color: Colors.grey.shade400,
-                            ),
-                          ),
-                        )
-                      : Image.network(
-                          imageUrl,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
+                  child: Hero(
+                    tag: 'user-image-$uid',
+                    child: imageUrl.isEmpty
+                        ? Container(
                             color: Colors.grey.shade200,
                             child: Center(
                               child: Icon(
-                                Icons.broken_image,
+                                Icons.person,
                                 size: 50,
                                 color: Colors.grey.shade400,
                               ),
                             ),
+                          )
+                        : Image.network(
+                            imageUrl,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: Colors.grey.shade200,
+                              child: Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  size: 50,
+                                  color: Colors.grey.shade400,
+                                ),
+                              ),
+                            ),
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            },
                           ),
-                          loadingBuilder: (context, child, progress) {
-                            if (progress == null) return child;
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          },
-                        ),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
