@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 /// =======================
@@ -13,6 +12,7 @@ class Marquee extends StatefulWidget {
   const Marquee(
     this.text, {
     super.key,
+
     required this.style,
     this.pauseDuration = const Duration(seconds: 2),
     this.velocity = 30.0, // pixels per second

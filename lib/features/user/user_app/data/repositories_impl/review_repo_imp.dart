@@ -1,6 +1,6 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/review_firestore.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/review_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/review_state.dart';
+import '../datasources/firebase/review_firestore.dart';
+import '../../domain/repositories/review_repository.dart';
+import '../../domain/states/review_state.dart';
 
 class ReviewRepoImp implements ReviewRepository {
   final ReviewFirestore _reviewFirestore;

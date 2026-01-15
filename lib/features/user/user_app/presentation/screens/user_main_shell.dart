@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
 import 'package:flutter/rendering.dart';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';
@@ -65,7 +66,14 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
               children: [
                 CustomBottomNavBar(
                   currentIndex: tabsRouter.activeIndex,
-                  onTap: tabsRouter.setActiveIndex,
+                  onTap: (index) {
+                    _handleTabTap(
+                      context: context,
+                      ref: ref,
+                      tabsRouter: tabsRouter,
+                      index: index,
+                    );
+                  },
                 ),
               ],
             ),
@@ -165,5 +173,42 @@ class CustomBottomNavBar extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+void _handleTabTap({
+  required BuildContext context,
+  required WidgetRef ref,
+  required TabsRouter tabsRouter,
+  required int index,
+}) {
+  final userStatus = ref.read(userStatusControllerProvider);
+
+  /// Tabs that REQUIRE subscription
+  const restrictedTabs = {3};
+
+  // Always allow Home tab
+  if (!restrictedTabs.contains(index)) {
+    tabsRouter.setActiveIndex(index);
+    return;
+  }
+
+  // Allow if subscribed
+  if (userStatus.userStatus.isPaymentDone) {
+    tabsRouter.setActiveIndex(index);
+    return;
+  }
+
+  // ❌ BLOCK TAB SWITCH
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Please subscribe to access this feature')),
+  );
+
+  // Redirect to payment
+  final authState = ref.read(authStateProvider);
+  final userId = authState.value?.fold((_) => null, (u) => u.uid);
+
+  if (userId != null) {
+    context.router.push(UserPaymentRoute(userId: userId));
   }
 }

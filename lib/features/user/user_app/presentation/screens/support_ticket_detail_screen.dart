@@ -160,14 +160,16 @@ class SupportTicketDetailScreen extends ConsumerWidget {
 
   Color _getStatusColor(TicketStatus status) {
     switch (status) {
-      case TicketStatus.open:
-        return Colors.blue;
-      case TicketStatus.inProgress:
-        return Colors.orange;
-      case TicketStatus.resolved:
+      // get updated
+      case TicketStatus.pending:
         return Colors.green;
+      case TicketStatus.resolved:
+        return Colors.orange;
+
       case TicketStatus.closed:
-        return Colors.grey;
+        return Colors.red;
+      case TicketStatus.rejected:
+        return Colors.red;
     }
   }
 

@@ -119,6 +119,26 @@ class AppDrawer extends StatelessWidget {
                       },
                     ),
                     DrawerItem(
+                      icon: Icons.reviews_outlined,
+                      title: "Reviews",
+                      onTap: () {
+                        context.popRoute();
+                        context.pushRoute(const ReviewRoute());
+                      },
+                    ),
+
+                    DrawerItem(
+                      icon: Icons.support_agent,
+                      title: "Support Tickets",
+                      onTap: () {
+                        context.popRoute();
+                        context.pushRoute(
+                          AgentSupportRoute(agentId: data.agentId),
+                        );
+                      },
+                    ),
+
+                    DrawerItem(
                       icon: Icons.description_outlined,
                       title: "Documents",
                       onTap: () {

@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/animated_app_bar.dart';
+import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/support_ticket.dart'
     show TicketPriority;
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/support_notifier.dart';
@@ -63,6 +63,9 @@ class _CreateSupportTicketScreenState
           userEmail: userEntity.email,
           category: _selectedCategory,
           priority: _selectedPriority,
+          agentId: userEntity.agentId.isEmpty ? "1234" : userEntity.agentId,
+
+          
         );
 
     final state = ref.read(supportNotifierProvider);

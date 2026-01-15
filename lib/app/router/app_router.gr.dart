@@ -99,6 +99,16 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const AgentSettingsScreen(),
       );
     },
+    AgentSupportRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentSupportRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentSupportScreen(
+          key: args.key,
+          agentId: args.agentId,
+        ),
+      );
+    },
     AgentUserRoute.name: (routeData) {
       final args = routeData.argsAs<AgentUserRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -393,7 +403,7 @@ abstract class _$AppRouter extends RootStackRouter {
         routeData: routeData,
         child: UserPaymentScreen(
           key: args.key,
-          metrimonyProfileViewModel: args.metrimonyProfileViewModel,
+          userId: args.userId,
         ),
       );
     },
@@ -429,16 +439,6 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
-    // UserProfileRouteOptimized.name: (routeData) {
-    //   final args = routeData.argsAs<UserProfileRouteOptimizedArgs>();
-    //   return AutoRoutePage<dynamic>(
-    //     routeData: routeData,
-    //     child: UserProfileScreenOptimized(
-    //       key: args.key,
-    //       userId: args.userId,
-    //     ),
-    //   );
-    // },
     UserRegisterRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -768,6 +768,44 @@ class AgentSettingsRoute extends PageRouteInfo<void> {
   static const String name = 'AgentSettingsRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [AgentSupportScreen]
+class AgentSupportRoute extends PageRouteInfo<AgentSupportRouteArgs> {
+  AgentSupportRoute({
+    Key? key,
+    required String agentId,
+    List<PageRouteInfo>? children,
+  }) : super(
+          AgentSupportRoute.name,
+          args: AgentSupportRouteArgs(
+            key: key,
+            agentId: agentId,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'AgentSupportRoute';
+
+  static const PageInfo<AgentSupportRouteArgs> page =
+      PageInfo<AgentSupportRouteArgs>(name);
+}
+
+class AgentSupportRouteArgs {
+  const AgentSupportRouteArgs({
+    this.key,
+    required this.agentId,
+  });
+
+  final Key? key;
+
+  final String agentId;
+
+  @override
+  String toString() {
+    return 'AgentSupportRouteArgs{key: $key, agentId: $agentId}';
+  }
 }
 
 /// generated route for
@@ -1701,13 +1739,13 @@ class UserPaymentOrderHistoryRoute extends PageRouteInfo<void> {
 class UserPaymentRoute extends PageRouteInfo<UserPaymentRouteArgs> {
   UserPaymentRoute({
     Key? key,
-    required MetrimonyProfileViewModel metrimonyProfileViewModel,
+    required String userId,
     List<PageRouteInfo>? children,
   }) : super(
           UserPaymentRoute.name,
           args: UserPaymentRouteArgs(
             key: key,
-            metrimonyProfileViewModel: metrimonyProfileViewModel,
+            userId: userId,
           ),
           initialChildren: children,
         );
@@ -1721,16 +1759,16 @@ class UserPaymentRoute extends PageRouteInfo<UserPaymentRouteArgs> {
 class UserPaymentRouteArgs {
   const UserPaymentRouteArgs({
     this.key,
-    required this.metrimonyProfileViewModel,
+    required this.userId,
   });
 
   final Key? key;
 
-  final MetrimonyProfileViewModel metrimonyProfileViewModel;
+  final String userId;
 
   @override
   String toString() {
-    return 'UserPaymentRouteArgs{key: $key, metrimonyProfileViewModel: $metrimonyProfileViewModel}';
+    return 'UserPaymentRouteArgs{key: $key, userId: $userId}';
   }
 }
 
@@ -1856,45 +1894,6 @@ class UserProfileRouteArgs {
   @override
   String toString() {
     return 'UserProfileRouteArgs{key: $key, userId: $userId}';
-  }
-}
-
-/// generated route for
-/// [UserProfileScreenOptimized]
-class UserProfileRouteOptimized
-    extends PageRouteInfo<UserProfileRouteOptimizedArgs> {
-  UserProfileRouteOptimized({
-    Key? key,
-    required String userId,
-    List<PageRouteInfo>? children,
-  }) : super(
-          UserProfileRouteOptimized.name,
-          args: UserProfileRouteOptimizedArgs(
-            key: key,
-            userId: userId,
-          ),
-          initialChildren: children,
-        );
-
-  static const String name = 'UserProfileRouteOptimized';
-
-  static const PageInfo<UserProfileRouteOptimizedArgs> page =
-      PageInfo<UserProfileRouteOptimizedArgs>(name);
-}
-
-class UserProfileRouteOptimizedArgs {
-  const UserProfileRouteOptimizedArgs({
-    this.key,
-    required this.userId,
-  });
-
-  final Key? key;
-
-  final String userId;
-
-  @override
-  String toString() {
-    return 'UserProfileRouteOptimizedArgs{key: $key, userId: $userId}';
   }
 }
 

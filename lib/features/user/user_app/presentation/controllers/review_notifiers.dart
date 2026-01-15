@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:arvika_marriage_bureau/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/review_firestore.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/review_repo_imp.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/review_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/review_state.dart';
+import '../../../../auth/presentation/controllers/auth_controller.dart';
+import '../../data/datasources/firebase/review_firestore.dart';
+import '../../data/repositories_impl/review_repo_imp.dart';
+import '../../domain/repositories/review_repository.dart';
+import '../../domain/states/review_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';

@@ -1,3 +1,8 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_profile_screen.dart';
+
 import '../../../user_app/domain/states/metrimony_profile_view_model.dart';
 import '../../domain/states/payment.dart';
 import '../notifier/payment_api_notifier.dart';
@@ -11,8 +16,9 @@ import '../notifier/amount_notifier.dart';
 
 @RoutePage()
 class UserPaymentScreen extends ConsumerStatefulWidget {
-  final MetrimonyProfileViewModel metrimonyProfileViewModel;
-  const UserPaymentScreen({super.key, required this.metrimonyProfileViewModel});
+  final String userId;
+
+  const UserPaymentScreen({super.key, required this.userId});
 
   @override
   ConsumerState<UserPaymentScreen> createState() => _UserPaymentScreenState();
@@ -20,6 +26,12 @@ class UserPaymentScreen extends ConsumerStatefulWidget {
 
 class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
   int _currentIndex = 1; // Default Premium
+  late MetrimonyProfileViewModel metrimonyProfileViewModel =
+      MetrimonyProfileViewModel(
+        metrimonyProfile: MatrimonyProfile(),
+        userProfile: UserEntity.empty(),
+        agentEntity: AgentEntity.empty(),
+      );
 
   @override
   void initState() {
@@ -28,7 +40,7 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
       ref
           .read(
             paymentNotifierProvider(
-              widget.metrimonyProfileViewModel.user.uid,
+              metrimonyProfileViewModel.user.uid,
             ).notifier,
           )
           .fetchUserPayment();
@@ -225,8 +237,8 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
 
                         // ✅ Extract all user profile data
                         final profile =
-                            widget.metrimonyProfileViewModel.metrimonyProfile;
-                        final user = widget.metrimonyProfileViewModel.user;
+                            metrimonyProfileViewModel.metrimonyProfile;
+                        final user = metrimonyProfileViewModel.user;
 
                         debugPrint("Profile: $profile");
 

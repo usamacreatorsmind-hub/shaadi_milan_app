@@ -15,8 +15,8 @@ class UserStatusScreen extends ConsumerWidget {
 
     final userStatus = userStatusState.userStatus;
 
-    return Scaffold( 
-      appBar:  CustomAppBar(title: 'User Status'),
+    return Scaffold(
+      appBar: CustomAppBar(title: 'User Status'),
       body: userStatusState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : userStatusState.error != null
@@ -26,8 +26,6 @@ class UserStatusScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-             
-
                   _buildStatusRow(
                     context,
                     'Payment Done:',
@@ -38,8 +36,8 @@ class UserStatusScreen extends ConsumerWidget {
                   _buildStatusRow(
                     context,
                     'Subscription Active:',
-                    userStatus.subscriptionActive ? 'Yes' : 'No',
-                    userStatus.subscriptionActive ? Colors.green : Colors.red,
+                    userStatus.isPaymentDone ? 'Yes' : 'No',
+                    userStatus.isPaymentDone ? Colors.green : Colors.red,
                   ),
 
                   const SizedBox(height: 10),

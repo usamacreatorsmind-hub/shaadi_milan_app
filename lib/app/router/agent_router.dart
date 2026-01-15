@@ -20,8 +20,6 @@ class AgentRouter {
           page: AgentEntityRoute.page,
           guards: [AuthGuard(ref), AgentGuard(ref)],
         ),
-
-        // AutoRoute(page: AgentActivitiesRoute.page),
       ],
     ),
     AutoRoute(
@@ -50,7 +48,8 @@ class AgentRouter {
     AutoRoute(
       page: AgentSettingsRoute.page,
       guards: [AuthGuard(ref), AgentGuard(ref)],
-    ),  
+    ),
 
+    AutoRoute(page: AgentSupportRoute.page),
   ];
 }

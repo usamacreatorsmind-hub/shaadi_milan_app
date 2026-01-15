@@ -1,7 +1,8 @@
-import '../notifier/user_nofier.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../notifier/user_nofier.dart';
 
 @RoutePage()
 class ViewPaymentDetailScreen extends ConsumerStatefulWidget {

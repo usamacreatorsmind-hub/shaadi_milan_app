@@ -51,7 +51,7 @@ class Review {
       'title': title,
       'userId': userId,
       'userName': userName,
-      'userProfileImg': userProfileImg,         
+      'userProfileImg': userProfileImg,
       'comment': comment,
       'rating': rating,
       'createdAt': FieldValue.serverTimestamp(),
@@ -103,7 +103,6 @@ class AllReviewsState {
 
   factory AllReviewsState.initial() => const AllReviewsState();
 
- 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -115,6 +114,4 @@ class AllReviewsState {
 
   @override
   int get hashCode => reviews.hashCode ^ isLoading.hashCode ^ error.hashCode;
-  
-
 }

@@ -19,7 +19,7 @@ class _MyProfileCardState extends ConsumerState<MyProfileDetailScreen> {
     // what should i make this class dialogg boc or page
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Profile'), centerTitle: true),
+      appBar: AppBar(title: Text('My Profile'), centerTitle: true),
       body: SingleChildScrollView(
         child: Column(
           children: [

@@ -1,49 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum TicketStatus {
-  open,
-  inProgress,
+  pending,
   resolved,
+  rejected,
   closed;
 
+  /// UI text (must be UNIQUE)
   String get displayName {
     switch (this) {
-      case TicketStatus.open:
-        return 'Open';
-      case TicketStatus.inProgress:
-        return 'In Progress';
+      case TicketStatus.pending:
+        return 'Pending';
       case TicketStatus.resolved:
         return 'Resolved';
+      case TicketStatus.rejected:
+        return 'Rejected';
       case TicketStatus.closed:
         return 'Closed';
     }
   }
 
-  String get value {
-    switch (this) {
-      case TicketStatus.open:
-        return 'open';
-      case TicketStatus.inProgress:
-        return 'in_progress';
-      case TicketStatus.resolved:
-        return 'resolved';
-      case TicketStatus.closed:
-        return 'closed';
-    }
-  }
+  /// Firestore value (stable & lowercase)
+  String get value => name;
 
   static TicketStatus fromString(String status) {
-    switch (status.toLowerCase()) {
-      case 'in_progress':
-      case 'inprogress':
-        return TicketStatus.inProgress;
-      case 'resolved':
-        return TicketStatus.resolved;
-      case 'closed':
-        return TicketStatus.closed;
-      default:
-        return TicketStatus.open;
-    }
+    return TicketStatus.values.firstWhere(
+      (e) => e.name == status.toLowerCase(),
+      orElse: () => TicketStatus.pending,
+    );
   }
 }
 
@@ -53,30 +37,13 @@ enum TicketPriority {
   high,
   urgent;
 
-  String get displayName {
-    switch (this) {
-      case TicketPriority.low:
-        return 'Low';
-      case TicketPriority.medium:
-        return 'Medium';
-      case TicketPriority.high:
-        return 'High';
-      case TicketPriority.urgent:
-        return 'Urgent';
-    }
-  }
+  String get displayName => name[0].toUpperCase() + name.substring(1);
 
   static TicketPriority fromString(String priority) {
-    switch (priority.toLowerCase()) {
-      case 'high':
-        return TicketPriority.high;
-      case 'urgent':
-        return TicketPriority.urgent;
-      case 'low':
-        return TicketPriority.low;
-      default:
-        return TicketPriority.medium;
-    }
+    return TicketPriority.values.firstWhere(
+      (e) => e.name == priority.toLowerCase(),
+      orElse: () => TicketPriority.medium,
+    );
   }
 }
 
@@ -95,7 +62,7 @@ class SupportTicket {
   final DateTime? updatedAt;
   final DateTime? resolvedAt;
   final String? adminResponse;
-  final String? assignedToId;
+  final String agentId;
 
   const SupportTicket({
     required this.id,
@@ -104,7 +71,7 @@ class SupportTicket {
     required this.userEmail,
     required this.subject,
     required this.description,
-    this.status = TicketStatus.open,
+    this.status = TicketStatus.pending,
     this.priority = TicketPriority.medium,
     this.category,
     this.attachments = const [],
@@ -112,7 +79,7 @@ class SupportTicket {
     this.updatedAt,
     this.resolvedAt,
     this.adminResponse,
-    this.assignedToId,
+    required this.agentId,
   });
 
   Map<String, dynamic> toMap() {
@@ -131,7 +98,7 @@ class SupportTicket {
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
       'resolvedAt': resolvedAt != null ? Timestamp.fromDate(resolvedAt!) : null,
       'adminResponse': adminResponse,
-      'assignedToId': assignedToId,
+      'agentId': agentId,
     };
   }
 
@@ -144,14 +111,17 @@ class SupportTicket {
       subject: map['subject'] as String? ?? '',
       description: map['description'] as String? ?? '',
       status: TicketStatus.fromString(map['status'] as String? ?? 'open'),
-      priority: TicketPriority.fromString(map['priority'] as String? ?? 'medium'),
+      priority: TicketPriority.fromString(
+        map['priority'] as String? ?? 'medium',
+      ),
       category: map['category'] as String?,
       attachments: List<String>.from(map['attachments'] ?? []),
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (map['updatedAt'] as Timestamp?)?.toDate(),
       resolvedAt: (map['resolvedAt'] as Timestamp?)?.toDate(),
       adminResponse: map['adminResponse'] as String?,
-      assignedToId: map['assignedToId'] as String?,
+
+      agentId: map['agentId'] as String? ?? '',
     );
   }
 
@@ -170,7 +140,7 @@ class SupportTicket {
     DateTime? updatedAt,
     DateTime? resolvedAt,
     String? adminResponse,
-    String? assignedToId,
+    String? agentId,
   }) {
     return SupportTicket(
       id: id ?? this.id,
@@ -187,31 +157,35 @@ class SupportTicket {
       updatedAt: updatedAt ?? this.updatedAt,
       resolvedAt: resolvedAt ?? this.resolvedAt,
       adminResponse: adminResponse ?? this.adminResponse,
-      assignedToId: assignedToId ?? this.assignedToId,
+      agentId: agentId ?? this.agentId,
     );
   }
 }
 
-class SupportState {
+class SupportTicketState {
   final SupportTicket? supportTicket;
   final bool isLoading;
   final String? error;
 
-  const SupportState({this.supportTicket, this.isLoading = false, this.error});
+  const SupportTicketState({
+    this.supportTicket,
+    this.isLoading = false,
+    this.error,
+  });
 
-  SupportState copyWith({
+  SupportTicketState copyWith({
     SupportTicket? supportTicket,
     bool? isLoading,
     String? error,
   }) {
-    return SupportState(
+    return SupportTicketState(
       supportTicket: supportTicket ?? this.supportTicket,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
     );
   }
 
-  factory SupportState.initial() => const SupportState();
+  factory SupportTicketState.initial() => const SupportTicketState();
 }
 
 class AllSupportTicketsState {

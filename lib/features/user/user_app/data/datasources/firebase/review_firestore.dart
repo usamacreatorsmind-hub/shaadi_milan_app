@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/review_state.dart';
+import '../../../domain/states/review_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // export provider
 

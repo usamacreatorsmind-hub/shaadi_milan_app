@@ -1,9 +1,10 @@
-import 'revenue_filter_controller.dart';
-import '../../features/user/user_app/domain/states/religion_state.dart';
-import '../../features/user/user_app/domain/states/state_city.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+
+import '../../features/user/user_app/domain/states/religion_state.dart';
+import '../../features/user/user_app/domain/states/state_city.dart';
+import 'revenue_filter_controller.dart';
 
 class RevenueFilterRightSheet extends ConsumerWidget {
   const RevenueFilterRightSheet({super.key});

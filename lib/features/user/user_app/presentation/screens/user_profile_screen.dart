@@ -1,15 +1,15 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/animated_app_bar.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/contact_us_screen.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/user_drawer.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
+import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
+import '../../../../../app/custom/custom_widgets/contact_us_screen.dart';
+import '../../../../../app/custom/custom_widgets/user_drawer.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../../../auth/domain/states/agent_state.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
+import '../../data/repositories_impl/agent_repository_impl.dart';
+import '../../data/repositories_impl/matrimony_repository_impl.dart';
+import '../../data/repositories_impl/user_repo_impl.dart';
+import '../../domain/states/metrimony_profile_view_model.dart';
+import '../controllers/user_status_controller.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -74,19 +74,7 @@ class UserProfileScreen extends ConsumerWidget {
         data: (profile) {
           return CustomScrollView(
             slivers: [
-              MinimalAppBar(
-                title: "My Profile",
-                showShadow: false,
-                // Modern icon for drawer
-                leading: IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.black),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                ),
-
-                backgroundColor: Colors.grey[100],
-              ),
+              MinimalAppBar(title: "My Profile"),
 
               // SliverAppBar(
               //   backgroundColor: Colors.grey[100],
@@ -157,7 +145,7 @@ class UserProfileScreen extends ConsumerWidget {
                                 child: CircularProgressIndicator(),
                               );
                             }
-                            if (userStatusState.userStatus.subscriptionActive) {
+                            if (userStatusState.userStatus.isPaymentDone) {
                               return GestureDetector(
                                 onTap: () => AutoRouter.of(context).push(
                                   UserPaymentSuccessRoute(user: profile.user),
@@ -581,7 +569,7 @@ class _PremiumCard extends StatelessWidget {
 
           AutoRouter.of(
             context,
-          ).push(UserPaymentRoute(metrimonyProfileViewModel: profile!));
+          ).push(UserPaymentRoute(userId: profile!.userProfile.uid));
         }
       },
       child: Container(

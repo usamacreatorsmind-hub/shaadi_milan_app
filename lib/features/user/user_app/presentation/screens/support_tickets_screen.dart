@@ -35,7 +35,11 @@ class SupportTicketsScreen extends ConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
+                      ),
                       const SizedBox(height: 16),
                       Text('Error: $error'),
                     ],
@@ -44,9 +48,7 @@ class SupportTicketsScreen extends ConsumerWidget {
               ),
               data: (tickets) {
                 if (tickets.isEmpty) {
-                  return const SliverFillRemaining(
-                    child: _EmptyState(),
-                  );
+                  return const SliverFillRemaining(child: _EmptyState());
                 }
 
                 return SliverList(
@@ -111,7 +113,10 @@ class _TicketCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 if (ticket.category != null) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(12),
@@ -158,11 +163,11 @@ class _StatusIcon extends StatelessWidget {
     IconData icon;
 
     switch (status) {
-      case TicketStatus.open:
+      case TicketStatus.pending:
         color = Colors.blue;
         icon = Icons.info_outline;
         break;
-      case TicketStatus.inProgress:
+      case TicketStatus.pending:
         color = Colors.orange;
         icon = Icons.pending_outlined;
         break;
@@ -173,6 +178,10 @@ class _StatusIcon extends StatelessWidget {
       case TicketStatus.closed:
         color = Colors.grey;
         icon = Icons.cancel_outlined;
+        break;
+      case TicketStatus.rejected:
+        color = Colors.red;
+        icon = Icons.do_not_disturb_on_outlined;
         break;
     }
 

@@ -17,11 +17,15 @@ class SupportFirestoreDS {
   /// Create a new support ticket
   Future<String> createTicket(SupportTicket ticket) async {
     try {
+      print(ticket.toMap().toString());
+
       final docRef = _tickets.doc();
       final ticketWithId = ticket.copyWith(id: docRef.id);
       await docRef.set(ticketWithId.toMap());
       return docRef.id;
     } catch (e) {
+      print(e.toString());
+
       throw Exception('Failed to create support ticket: $e');
     }
   }
@@ -97,7 +101,7 @@ class SupportFirestoreDS {
     try {
       await _tickets.doc(ticketId).update({
         'adminResponse': response,
-        'status': TicketStatus.inProgress.value,
+        'status': TicketStatus.pending.value,
         'updatedAt': Timestamp.now(),
       });
     } catch (e) {
@@ -167,7 +171,7 @@ class SupportFirestoreDS {
     try {
       final querySnapshot = await _tickets
           .where('userId', isEqualTo: userId)
-          .where('status', isEqualTo: TicketStatus.open.value)
+          .where('status', isEqualTo: TicketStatus.pending.value)
           .count()
           .get();
       return querySnapshot.count ?? 0;

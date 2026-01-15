@@ -1,12 +1,14 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/support_ticket.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/repositories_impl/support_repo_impl.dart';
 import '../../domain/repositories/support_repository.dart';
+import '../../domain/states/support_ticket.dart';
 
-class SupportNotifier extends Notifier<SupportState> {
+class SupportNotifier extends Notifier<SupportTicketState> {
   @override
-  SupportState build() => SupportState.initial();
+  SupportTicketState build() {
+    return SupportTicketState.initial();
+  }
 
   SupportRepository get _supportRepository =>
       ref.read(supportRepositoryProvider);
@@ -17,7 +19,9 @@ class SupportNotifier extends Notifier<SupportState> {
     required String userId,
     required String userName,
     required String userEmail,
+
     String? category,
+    required String agentId,
     TicketPriority priority = TicketPriority.medium,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
@@ -26,6 +30,7 @@ class SupportNotifier extends Notifier<SupportState> {
         id: '', // Will be set by Firestore
         userId: userId,
         userName: userName,
+        agentId: agentId,
         userEmail: userEmail,
         subject: subject,
         description: description,
@@ -52,26 +57,23 @@ class SupportNotifier extends Notifier<SupportState> {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
-
-  void resetState() {
-    state = SupportState.initial();
-  }
 }
 
-final supportNotifierProvider = NotifierProvider<SupportNotifier, SupportState>(
-  () => SupportNotifier(),
-);
+final supportNotifierProvider =
+    NotifierProvider<SupportNotifier, SupportTicketState>(
+      () => SupportNotifier(),
+    );
 
 // Stream provider for real-time support tickets
 final userSupportTicketsStreamProvider =
     StreamProvider.family<List<SupportTicket>, String>((ref, userId) {
-  final repository = ref.watch(supportRepositoryProvider);
-  return repository.watchUserTickets(userId);
-});
+      final repository = ref.watch(supportRepositoryProvider);
+      return repository.watchUserTickets(userId);
+    });
 
 // Stream provider for single ticket
 final supportTicketStreamProvider =
     StreamProvider.family<SupportTicket, String>((ref, ticketId) {
-  final repository = ref.watch(supportRepositoryProvider);
-  return repository.watchTicket(ticketId);
-});
+      final repository = ref.watch(supportRepositoryProvider);
+      return repository.watchTicket(ticketId);
+    });

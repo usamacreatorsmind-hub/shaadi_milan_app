@@ -1,3 +1,5 @@
+import 'package:arvika_marriage_bureau/features/onboarding/presentation/screens/splash_screen.dart';
+
 import 'app_router.dart';
 import '../../features/auth/domain/states/agent_state.dart';
 import '../../features/auth/domain/states/user_state.dart';
@@ -92,29 +94,7 @@ class _AuthWrapperScreenState extends ConsumerState<AuthWrapperScreen> {
       },
     );
 
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 20),
-            Text(
-              authState.when(
-                data: (_) => 'Authenticating...',
-                loading: () {
-                  return 'Checking authentication...';
-                },
-
-                error: (e, st) => 'Auth error, redirecting...',
-              ),
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      ),
-    );
+    return SplashScreen();
   }
 }
 

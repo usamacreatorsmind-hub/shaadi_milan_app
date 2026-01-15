@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/widgets/marquee.dart';
+import '../../../../widgets/marquee.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../auth/domain/states/agent_state.dart';

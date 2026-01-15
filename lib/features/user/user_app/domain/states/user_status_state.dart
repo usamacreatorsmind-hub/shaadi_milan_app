@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserStatus {
   final bool isPaymentDone;
-  final bool subscriptionActive;
   final String uid;
   final String? paymentId;
   final DateTime? paymentAt;
@@ -11,7 +10,6 @@ class UserStatus {
     required this.uid,
 
     required this.isPaymentDone,
-    required this.subscriptionActive,
     required this.paymentId,
     required this.paymentAt,
   });
@@ -23,7 +21,6 @@ class UserStatus {
       uid: map['uid'] as String? ?? '',
 
       isPaymentDone: map['isPaymentDone'] as bool? ?? false,
-      subscriptionActive: map['subscriptionActive'] as bool? ?? false,
       paymentId: map['paymentId'] as String?,
       paymentAt: map['paymentAt'] != null
           ? (map['paymentAt'] as Timestamp).toDate()
@@ -36,7 +33,6 @@ class UserStatus {
       'uid': uid,
 
       'isPaymentDone': isPaymentDone,
-      'subscriptionActive': subscriptionActive,
       'paymentId': paymentId,
       'paymentAt': paymentAt != null ? Timestamp.fromDate(paymentAt!) : null,
     };
@@ -44,8 +40,7 @@ class UserStatus {
 
   @override
   String toString() {
-    return 'UserStatus(paymentDone: $isPaymentDone, uid: $uid, paymentId: $paymentId, paymentAt: $paymentAt, '
-        'subscriptionActive: $subscriptionActive)';
+    return 'UserStatus(paymentDone: $isPaymentDone, uid: $uid, paymentId: $paymentId, paymentAt: $paymentAt, ';
   }
 
   UserStatus copyWith({
@@ -60,7 +55,6 @@ class UserStatus {
       uid: uid ?? this.uid,
 
       isPaymentDone: isPaymentDone ?? this.isPaymentDone,
-      subscriptionActive: subscriptionActive ?? this.subscriptionActive,
       paymentId: paymentId ?? this.paymentId,
       paymentAt: paymentAt ?? this.paymentAt,
     );
@@ -68,7 +62,7 @@ class UserStatus {
 
   const UserStatus.empty()
     : isPaymentDone = false,
-      subscriptionActive = false,
+
       uid = '',
       paymentId = null,
       paymentAt = null;
@@ -97,5 +91,5 @@ class UserStatusState {
     );
   }
 
-  static const initial = UserStatusState();
+  static const initial = UserStatusState(isLoading: true);
 }

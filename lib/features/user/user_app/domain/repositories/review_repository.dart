@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/review_state.dart';
+import '../states/review_state.dart';
 
 abstract class ReviewRepository {
   /// Add a new review

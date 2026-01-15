@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import '../../../features/auth/presentation/controllers/auth_controller.dart';
+import '../../../features/auth/presentation/providers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:share_plus/share_plus.dart';
@@ -335,20 +335,20 @@ class _LogoutButton extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: SizedBox(
         width: double.infinity,
-        child: ElevatedButton.icon(
-          icon: const Icon(Icons.logout),
-          label: const Text("Logout"),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.redAccent,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 14),
+        child: OutlinedButton.icon(
+          icon: const Icon(Icons.logout, size: 20),
+          label: const Text("Logout", style: TextStyle(fontSize: 16)),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.error,
+            side: BorderSide(color: Theme.of(context).colorScheme.error),
+            padding: const EdgeInsets.symmetric(vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
           ),
           onPressed: () {
-            ref.read(authControllerProvider.notifier).logout();
-            context.router.replaceAll([const OnboardingRoute()]);
+            ref.read(authControllerProvider.notifier).signOut();
+            context.router.replace(const UserLoginRoute());
           },
         ),
       ),

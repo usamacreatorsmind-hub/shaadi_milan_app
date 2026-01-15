@@ -1,7 +1,10 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/animated_app_bar.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/user_drawer.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/widgets/marquee.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
+
+import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
+import '../../../../../app/custom/custom_widgets/user_drawer.dart';
+import '../../data/repositories_impl/user_repo_impl.dart';
+import '../../../../widgets/marquee.dart';
 
 import '../../../../../core/filters/home_filter_controller.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -27,6 +30,8 @@ class UserHomeScreen extends ConsumerWidget {
     // current user provider
     final currentUserAsync = ref.watch(currentUserProvider);
 
+    final userStatus = ref.read(userStatusControllerProvider);
+
     final homeState = ref.watch(homeControllerProvider);
     final filter = ref.watch(homeFilterProvider);
 
@@ -47,163 +52,170 @@ class UserHomeScreen extends ConsumerWidget {
 
     return Scaffold(
       drawer: UserDrawer(userAsync: currentUserAsync),
-      appBar: AppBar(
-        toolbarHeight: 0,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        // This ensures the app bar doesn't take up any space
-      ),
 
-      body: CustomScrollView(
-        slivers: [
-          const MinimalAppBar(title: "Home", showShadow: true),
-          // other slivers...
+      body: userStatus.userStatus.isPaymentDone
+          ? CustomScrollView(
+              slivers: [
+                const MinimalAppBar(title: "Home", showShadow: true),
+                // other slivers...
 
-          /// ================= LOCATION BAR =================
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.grey.shade300),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.location_on,
-                            color: Theme.of(context).primaryColor,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Marquee(
-                              pauseDuration: Duration(milliseconds: 500),
-                              velocity: 50,
+                /// ================= LOCATION BAR =================
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  color: Theme.of(context).primaryColor,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Marquee(
+                                    pauseDuration: Duration(milliseconds: 500),
+                                    velocity: 50,
 
-                              filterText.isEmpty ? 'All Profiles' : filterText,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
+                                    filterText.isEmpty
+                                        ? 'All Profiles'
+                                        : filterText,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.filter_list),
+                          onPressed: () {
+                            showGeneralDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              barrierLabel: 'Filter',
+                              transitionDuration: const Duration(
+                                milliseconds: 400,
+                              ),
+                              pageBuilder: (_, __, ___) =>
+                                  const FilterRightSheet(),
+                              transitionBuilder: (_, animation, __, child) {
+                                return SlideTransition(
+                                  position: Tween(
+                                    begin: const Offset(1, 0),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.filter_list),
-                    onPressed: () {
-                      showGeneralDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        barrierLabel: 'Filter',
-                        transitionDuration: const Duration(milliseconds: 400),
-                        pageBuilder: (_, __, ___) => const FilterRightSheet(),
-                        transitionBuilder: (_, animation, __, child) {
-                          return SlideTransition(
-                            position: Tween(
-                              begin: const Offset(1, 0),
-                              end: Offset.zero,
-                            ).animate(animation),
-                            child: child,
-                          );
-                        },
+                ),
+
+                /// ================= PROFILES LIST =================
+                homeState.metrimonyProfiles.when(
+                  loading: () => const SliverToBoxAdapter(
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (e, _) {
+                    print('Error loading profiles: $e');
+
+                    print(e);
+
+                    return SliverToBoxAdapter(
+                      child: Center(child: Text(e.toString())),
+                    );
+                  },
+                  data: (profiles) {
+                    final filteredProfiles = profiles.where((viewModel) {
+                      final profile = viewModel.profile;
+
+                      // If no state is selected, or if state matches
+                      final stateMatch =
+                          filter.state.isEmpty ||
+                          (profile.address.state == filter.state);
+                      // If no city is selected, or if city matches
+                      final cityMatch =
+                          filter.city.isEmpty ||
+                          (profile.address.city == filter.city);
+
+                      // If no religion is selected, or if religion matches
+                      final religionMatch =
+                          filter.religion.isEmpty ||
+                          (profile.cultural.religion == filter.religion);
+
+                      // If no caste is selected, or if caste matches
+                      final casteMatch =
+                          filter.caste.isEmpty ||
+                          (profile.cultural.caste == filter.caste);
+
+                      return stateMatch &&
+                          cityMatch &&
+                          religionMatch &&
+                          casteMatch;
+                    }).toList();
+
+                    if (filteredProfiles.isEmpty) {
+                      return const SliverToBoxAdapter(
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(32.0),
+                            child: Text('No profiles match your filter.'),
+                          ),
+                        ),
                       );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
+                    }
 
-          /// ================= PROFILES LIST =================
-          homeState.metrimonyProfiles.when(
-            loading: () => const SliverToBoxAdapter(
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            error: (e, _) {
-              print('Error loading profiles: $e');
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final viewModel = filteredProfiles[index];
+                        final profile = viewModel.profile;
+                        final user = viewModel.user;
 
-              print(e);
-
-              return SliverToBoxAdapter(
-                child: Center(child: Text(e.toString())),
-              );
-            },
-            data: (profiles) {
-              final filteredProfiles = profiles.where((viewModel) {
-                final profile = viewModel.profile;
-
-                // If no state is selected, or if state matches
-                final stateMatch =
-                    filter.state.isEmpty ||
-                    (profile.address.state == filter.state);
-                // If no city is selected, or if city matches
-                final cityMatch =
-                    filter.city.isEmpty ||
-                    (profile.address.city == filter.city);
-
-                // If no religion is selected, or if religion matches
-                final religionMatch =
-                    filter.religion.isEmpty ||
-                    (profile.cultural.religion == filter.religion);
-
-                // If no caste is selected, or if caste matches
-                final casteMatch =
-                    filter.caste.isEmpty ||
-                    (profile.cultural.caste == filter.caste);
-
-                return stateMatch && cityMatch && religionMatch && casteMatch;
-              }).toList();
-
-              if (filteredProfiles.isEmpty) {
-                return const SliverToBoxAdapter(
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(32.0),
-                      child: Text('No profiles match your filter.'),
-                    ),
-                  ),
-                );
-              }
-
-              return SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final viewModel = filteredProfiles[index];
-                  final profile = viewModel.profile;
-                  final user = viewModel.user;
-
-                  debugPrint(profile.images.secondaryImageUrls.toString());
-                  debugPrint(profile.images.primaryImageUrl.toString());
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: ProfileCard(
-                      uid: profile.userId,
-                      name: user?.fullName ?? 'N/A',
-                      age: profile.identity.age ?? 0,
-                      designation: profile.employment.designation ?? "N/A",
-                      imageUrl: profile.images.primaryImageUrl ?? "",
-                    ),
-                  );
-                }, childCount: filteredProfiles.length),
-              );
-            },
-          ),
-        ],
-      ),
+                        debugPrint(
+                          profile.images.secondaryImageUrls.toString(),
+                        );
+                        debugPrint(profile.images.primaryImageUrl.toString());
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: ProfileCard(
+                            uid: profile.userId,
+                            name: user?.fullName ?? 'N/A',
+                            age: profile.identity.age ?? 0,
+                            designation:
+                                profile.employment.designation ?? "N/A",
+                            imageUrl: profile.images.primaryImageUrl ?? "",
+                          ),
+                        );
+                      }, childCount: filteredProfiles.length),
+                    );
+                  },
+                ),
+              ],
+            )
+          : UserPaymentScreen(userId: currentUserAsync.value?.uid ?? "N/A"),
     );
   }
 }
@@ -451,7 +463,17 @@ class ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        //  gradient color
+        color: Theme.of(context).cardColor,
+
+        border: Border.all(
+          // theme color
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+
+          strokeAlign: BorderSide.strokeAlignCenter,
+
+          width: 3,
+        ),
+
         gradient: LinearGradient(
           colors: [
             Theme.of(context).colorScheme.primary.withOpacity(0.05),
@@ -478,7 +500,7 @@ class ProfileCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(10),
+                top: Radius.circular(20),
                 bottom: Radius.circular(10),
               ),
               child: imageUrl.isEmpty
@@ -513,15 +535,62 @@ class ProfileCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text('$age years', style: TextStyle(color: Colors.grey[700])),
-                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const SizedBox(height: 4),
+                      Text(
+                        '$age years',
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                      const SizedBox(width: 40),
 
-                  Text(designation, style: TextStyle(color: Colors.grey[700])),
+                      Text(
+                        designation,
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
+                      style: ButtonStyle(
+                        foregroundColor: WidgetStateProperty.all(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                        side: WidgetStateProperty.all(
+                          BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        backgroundColor: WidgetStateProperty.all(
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.05),
+                        ),
+                        elevation: WidgetStateProperty.all(0),
+
+                        overlayColor: WidgetStateProperty.resolveWith<Color?>((
+                          Set<WidgetState> states,
+                        ) {
+                          if (states.contains(WidgetState.pressed)) {
+                            return Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.1);
+                          }
+                          return null; // Defer to the widget's default.
+                        }),
+
+                        shape: WidgetStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        padding: WidgetStateProperty.all(
+                          const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+
                       onPressed: () {
                         context.router.push(UserDetailRoute(uid: uid));
                       },

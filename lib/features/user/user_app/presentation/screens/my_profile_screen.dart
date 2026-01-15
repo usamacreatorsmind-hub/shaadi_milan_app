@@ -666,14 +666,8 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
               child: Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      theme.canvasColor,
-                      theme.primaryColor.withOpacity(0.04),
-                    ],
-                  ),
+                  color: theme.canvasColor,
+
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
                     color: theme.primaryColor.withOpacity(0.1),

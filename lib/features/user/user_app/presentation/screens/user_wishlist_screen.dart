@@ -1,6 +1,9 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/animated_app_bar.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/drawer.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/user_drawer.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
+
+import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
+import '../../../../../app/custom/custom_widgets/drawer.dart';
+import '../../../../../app/custom/custom_widgets/user_drawer.dart';
 
 import '../../../../../app/custom/shimmer.dart';
 import '../../../../../app/router/app_router.dart';
@@ -25,162 +28,191 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final currentUserAsync = ref.watch(currentUserProvider);
+
+    final userStatus = ref.read(userStatusControllerProvider);
     final profileAsync = ref.watch(currentUserProfileProvider);
 
     return Scaffold(
       drawer: UserDrawer(userAsync: profileAsync),
       backgroundColor: Colors.grey[100],
-      body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(
-          child: Text('Error: $err', style: const TextStyle(color: Colors.red)),
-        ),
-        data: (profile) {
-          return CustomScrollView(
-            slivers: [
-              const MinimalAppBar(title: "My WishList"),
 
-              SliverPadding(
-                padding: const EdgeInsets.all(16.0),
-                sliver:
-                    (profile?.wishlists != null &&
-                        profile!.wishlists!.isNotEmpty)
-                    ? SliverGrid(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                              childAspectRatio: 0.7,
-                            ),
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          final wishlistedProfileId = profile.wishlists![index];
+      body: userStatus.userStatus.isPaymentDone
+          ? profileAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, _) => Center(
+                child: Text(
+                  'Error: $err',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+              data: (profile) {
+                return CustomScrollView(
+                  slivers: [
+                    const MinimalAppBar(title: "My WishList"),
 
-                          return Consumer(
-                            builder: (context, ref, child) {
-                              final wishlistedProfileAsync = ref.watch(
-                                matrimonyProfileProvider(wishlistedProfileId),
-                              );
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16.0),
+                      sliver:
+                          (profile?.wishlists != null &&
+                              profile!.wishlists!.isNotEmpty)
+                          ? SliverGrid(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 16,
+                                    mainAxisSpacing: 16,
+                                    childAspectRatio: 0.7,
+                                  ),
+                              delegate: SliverChildBuilderDelegate((
+                                context,
+                                index,
+                              ) {
+                                final wishlistedProfileId =
+                                    profile.wishlists![index];
 
-                              return wishlistedProfileAsync.when(
-                                loading: () => const ShimmerLoading.rectangular(
-                                  height: 250,
-                                ),
-                                error: (e, st) => Card(
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Could not load profile.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.red.shade300,
+                                return Consumer(
+                                  builder: (context, ref, child) {
+                                    final wishlistedProfileAsync = ref.watch(
+                                      matrimonyProfileProvider(
+                                        wishlistedProfileId,
+                                      ),
+                                    );
+
+                                    return wishlistedProfileAsync.when(
+                                      loading: () =>
+                                          const ShimmerLoading.rectangular(
+                                            height: 250,
+                                          ),
+                                      error: (e, st) => Card(
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              'Could not load profile.',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: Colors.red.shade300,
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                data: (wishlistedProfile) {
-                                  return UserCard(
-                                    onLongPress: () async {
-                                      // show dialog box
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text(
-                                              "Remove from Wishlist?",
-                                            ),
-                                            content: const Text(
-                                              "Are you sure you want to remove this profile from your wishlist?",
-                                            ),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: const Text("Cancel"),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                              TextButton(
-                                                child: const Text("Remove"),
-                                                onPressed: () async {
-                                                  await ref
-                                                      .read(
-                                                        userRepositoryProvider,
-                                                      )
-                                                      .removeWishlist(
-                                                        uid: widget.userId,
-                                                        profileId:
-                                                            wishlistedProfileId,
-                                                      );
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    },
+                                      data: (wishlistedProfile) {
+                                        return UserCard(
+                                          onLongPress: () async {
+                                            // show dialog box
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: const Text(
+                                                    "Remove from Wishlist?",
+                                                  ),
+                                                  content: const Text(
+                                                    "Are you sure you want to remove this profile from your wishlist?",
+                                                  ),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      child: const Text(
+                                                        "Cancel",
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pop();
+                                                      },
+                                                    ),
+                                                    TextButton(
+                                                      child: const Text(
+                                                        "Remove",
+                                                      ),
+                                                      onPressed: () async {
+                                                        await ref
+                                                            .read(
+                                                              userRepositoryProvider,
+                                                            )
+                                                            .removeWishlist(
+                                                              uid:
+                                                                  widget.userId,
+                                                              profileId:
+                                                                  wishlistedProfileId,
+                                                            );
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pop();
+                                                      },
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
 
-                                    uid: wishlistedProfile.user.uid ?? '',
-                                    name:
-                                        wishlistedProfile.user.fullName ??
-                                        'N/A',
-                                    age: wishlistedProfile.identity.age ?? 0,
-                                    occupation:
-                                        wishlistedProfile.employment.jobType ??
-                                        'N/A',
-                                    location:
-                                        '${wishlistedProfile.address.city ?? ''}, ${wishlistedProfile.address.state ?? ''}',
-                                    imageUrl:
-                                        wishlistedProfile
-                                            .images
-                                            .primaryImageUrl ??
-                                        '',
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        }, childCount: profile.wishlists!.length),
-                      )
-                    : SliverFillRemaining(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.favorite_border,
-                                size: 80,
-                                color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                "Your wishlist is empty!",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey[600],
+                                          uid: wishlistedProfile.user.uid ?? '',
+                                          name:
+                                              wishlistedProfile.user.fullName ??
+                                              'N/A',
+                                          age:
+                                              wishlistedProfile.identity.age ??
+                                              0,
+                                          occupation:
+                                              wishlistedProfile
+                                                  .employment
+                                                  .jobType ??
+                                              'N/A',
+                                          location:
+                                              '${wishlistedProfile.address.city ?? ''}, ${wishlistedProfile.address.state ?? ''}',
+                                          imageUrl:
+                                              wishlistedProfile
+                                                  .images
+                                                  .primaryImageUrl ??
+                                              '',
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              }, childCount: profile.wishlists!.length),
+                            )
+                          : SliverFillRemaining(
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.favorite_border,
+                                      size: 80,
+                                      color: Colors.grey[400],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      "Your wishlist is empty!",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "Start adding profiles to your wishlist to see them here.",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey[500],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Start adding profiles to your wishlist to see them here.",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[500],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-              ),
-            ],
-          );
-        },
-      ),
+                            ),
+                    ),
+                  ],
+                );
+              },
+            )
+          : UserPaymentScreen(userId: currentUserAsync.value?.uid ?? "N/A"),
     );
   }
 }

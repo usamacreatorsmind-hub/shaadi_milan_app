@@ -1,6 +1,6 @@
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../../../auth/domain/states/user_state.dart';
- 
+
 import 'image_state.dart';
 import '../../presentation/screens/metrimony_flow_screen.dart';
 
@@ -52,7 +52,16 @@ class MatrimonyProfile {
        physical = physical ?? PhysicalProfile.empty(),
        images = images ?? ProfileImages.empty();
 
-  factory MatrimonyProfile.empty() => MatrimonyProfile();
+  factory MatrimonyProfile.empty() => MatrimonyProfile(
+    identity: IdentityProfile.empty(),
+    address: AddressProfile.empty(),
+    cultural: CulturalProfile.empty(),
+    education: EducationProfile.empty(),
+    employment: EmploymentProfile.empty(),
+    family: FamilyProfile.empty(),
+    physical: PhysicalProfile.empty(),
+    images: ProfileImages.empty(),
+  );
 
   /// ---------------- COPY WITH ----------------
 

@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../../../user/user_app/domain/states/metrimony_profile_view_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class MetrimonyFirestoreDs {
   Future<Map<String, dynamic>> getMetrimonyProfile(String userId);

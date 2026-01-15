@@ -1,9 +1,9 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/animated_app_bar.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/drawer.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/user_drawer.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/review_notifiers.dart';
+import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
+import '../../../../../app/custom/custom_widgets/drawer.dart';
+import '../../../../../app/custom/custom_widgets/user_drawer.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../data/repositories_impl/user_repo_impl.dart';
+import '../controllers/review_notifiers.dart';
 
 import '../../domain/states/review_state.dart';
 import 'package:auto_route/auto_route.dart';
@@ -28,7 +28,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final width = MediaQuery.of(context).size.width;
 
@@ -50,7 +50,23 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
           ? Center(child: Text('Error: ${allReviewsAsync.error}'))
           : CustomScrollView(
               slivers: [
-                const MinimalAppBar(title: "Reviews"),
+                MinimalAppBar(
+                  title: "Reviews",
+                  actions: [
+                    IconButton(
+                      icon: Icon(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+
+                        Icons.add_comment_outlined,
+                      ),
+                      onPressed: () {
+                        context.pushRoute(const ReviewFormRoute());
+                      },
+                    ),
+
+                    const SizedBox(width: 20),
+                  ],
+                ),
 
                 /// HEADER
                 SliverToBoxAdapter(
@@ -74,16 +90,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              context.pushRoute(const ReviewFormRoute());
-                            },
-                            icon: const Icon(Icons.edit_note),
-                            label: const Text("Write a Review"),
-                          ),
-                        ),
+
                         const SizedBox(height: 24),
                       ],
                     ),

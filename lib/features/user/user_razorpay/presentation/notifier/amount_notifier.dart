@@ -1,9 +1,9 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../../data/firestore/amount_firestore.dart';
-import '../../domain/states/amount.dart';
 import '../../domain/repository/amount_repository.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../domain/states/amount.dart';
 
 class AmountNotifier extends StateNotifier<AmountState> {
   final AmountRepository _amountRepository;

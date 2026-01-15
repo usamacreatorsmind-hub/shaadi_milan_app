@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/app/router/usr_subscription_guard.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,12 +21,12 @@ class UserRouter {
 
         AutoRoute(
           page: UserWishListRoute.page,
-          guards: [AuthGuard(ref), UserGuard(ref)],
+          guards: [AuthGuard(ref), UserSubscriptionGuard(ref), UserGuard(ref)],
         ),
 
         AutoRoute(
           page: UserChatRoute.page,
-          guards: [AuthGuard(ref), UserGuard(ref)],
+          guards: [AuthGuard(ref), UserSubscriptionGuard(ref), UserGuard(ref)],
         ),
         AutoRoute(
           page: ReviewRoute.page,
