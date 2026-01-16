@@ -1,3 +1,5 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
+
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 import '../../../../../app/custom/custom_widgets/drawer.dart';
 import '../../../../../app/custom/custom_widgets/user_drawer.dart';
@@ -51,17 +53,21 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
           : CustomScrollView(
               slivers: [
                 MinimalAppBar(
-                  title: "Reviews",
+                  title: "Review",
                   actions: [
-                    IconButton(
-                      icon: Icon(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-
-                        Icons.add_comment_outlined,
-                      ),
-                      onPressed: () {
-                        context.pushRoute(const ReviewFormRoute());
-                      },
+                    AppActionChip(
+                      label: "Write a review",
+                      onTap: () =>
+                          // if agetn id is empty then no
+                          currentUserAsync.value?.agentId == null
+                          ? ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "You can't write a review without an agent",
+                                ),
+                              ),
+                            )
+                          : context.pushRoute(const ReviewFormRoute()),
                     ),
 
                     const SizedBox(width: 20),

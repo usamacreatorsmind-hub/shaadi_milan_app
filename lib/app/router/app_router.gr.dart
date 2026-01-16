@@ -25,40 +25,28 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<AgentActivitiesRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentActivitiesScreen(
-          agentId: args.agentId,
-          key: args.key,
-        ),
+        child: AgentActivitiesScreen(agentId: args.agentId, key: args.key),
       );
     },
     AgentContactRoute.name: (routeData) {
       final args = routeData.argsAs<AgentContactRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentContactScreen(
-          key: args.key,
-          agentId: args.agentId,
-        ),
+        child: AgentContactScreen(key: args.key, agentId: args.agentId),
       );
     },
     AgentDashboardRoute.name: (routeData) {
       final args = routeData.argsAs<AgentDashboardRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentDashboardScreen(
-          agentId: args.agentId,
-          key: args.key,
-        ),
+        child: AgentDashboardScreen(agentId: args.agentId, key: args.key),
       );
     },
     AgentEntityRoute.name: (routeData) {
       final args = routeData.argsAs<AgentEntityRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentEntityScreen(
-          key: args.key,
-          uid: args.uid,
-        ),
+        child: AgentEntityScreen(key: args.key, uid: args.uid),
       );
     },
     AgentHomeRoute.name: (routeData) {
@@ -77,20 +65,14 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<AgentMainShellRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentMainShellScreen(
-          agentId: args.agentId,
-          key: args.key,
-        ),
+        child: AgentMainShellScreen(agentId: args.agentId, key: args.key),
       );
     },
     AgentRevenueRoute.name: (routeData) {
       final args = routeData.argsAs<AgentRevenueRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentRevenueScreen(
-          key: args.key,
-          agentId: args.agentId,
-        ),
+        child: AgentRevenueScreen(key: args.key, agentId: args.agentId),
       );
     },
     AgentSettingsRoute.name: (routeData) {
@@ -103,20 +85,14 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<AgentSupportRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentSupportScreen(
-          key: args.key,
-          agentId: args.agentId,
-        ),
+        child: AgentSupportScreen(key: args.key, agentId: args.agentId),
       );
     },
     AgentUserRoute.name: (routeData) {
       final args = routeData.argsAs<AgentUserRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: AgentUserScreen(
-          key: args.key,
-          agentId: args.agentId,
-        ),
+        child: AgentUserScreen(key: args.key, agentId: args.agentId),
       );
     },
     AuthWrapperRoute.name: (routeData) {
@@ -147,30 +123,27 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<MetrimonyProfileRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: MetrimonyProfileScreen(
-          key: args.key,
-          userId: args.userId,
-        ),
+        child: MetrimonyProfileScreen(key: args.key, userId: args.userId),
       );
     },
     MyProfileDetailRoute.name: (routeData) {
       final args = routeData.argsAs<MyProfileDetailRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: MyProfileDetailScreen(
-          key: args.key,
-          user: args.user,
-        ),
+        child: MyProfileDetailScreen(key: args.key, user: args.user),
       );
     },
     MyProfileRoute.name: (routeData) {
       final args = routeData.argsAs<MyProfileRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: MyProfileScreen(
-          key: args.key,
-          uid: args.uid,
-        ),
+        child: MyProfileScreen(key: args.key, uid: args.uid),
+      );
+    },
+    MyReviewRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const MyReviewScreen(),
       );
     },
     OnboardingRoute.name: (routeData) {
@@ -195,10 +168,7 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<ReviewDetailsRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: ReviewDetailsScreen(
-          key: args.key,
-          review: args.review,
-        ),
+        child: ReviewDetailsScreen(key: args.key, review: args.review),
       );
     },
     ReviewFormRoute.name: (routeData) {
@@ -251,10 +221,7 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<SupportTicketsRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: SupportTicketsScreen(
-          key: args.key,
-          userId: args.userId,
-        ),
+        child: SupportTicketsScreen(key: args.key, userId: args.userId),
       );
     },
     TermsAndConditionsRoute.name: (routeData) {
@@ -279,10 +246,7 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<UserBiodataCheckRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserBiodataCheckScreen(
-          key: args.key,
-          isAgreed: args.isAgreed,
-        ),
+        child: UserBiodataCheckScreen(key: args.key, isAgreed: args.isAgreed),
       );
     },
     UserChatRoute.name: (routeData) {
@@ -307,10 +271,7 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<UserDetailRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserDetailScreen(
-          key: args.key,
-          uid: args.uid,
-        ),
+        child: UserDetailScreen(key: args.key, uid: args.uid),
       );
     },
     UserEducationFormRoute.name: (routeData) {
@@ -401,20 +362,14 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<UserPaymentRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserPaymentScreen(
-          key: args.key,
-          userId: args.userId,
-        ),
+        child: UserPaymentScreen(key: args.key, userId: args.userId),
       );
     },
     UserPaymentSuccessRoute.name: (routeData) {
       final args = routeData.argsAs<UserPaymentSuccessRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserPaymentSuccessScreen(
-          key: args.key,
-          user: args.user,
-        ),
+        child: UserPaymentSuccessScreen(key: args.key, user: args.user),
       );
     },
     UserPhysicalFormRoute.name: (routeData) {
@@ -433,10 +388,7 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<UserProfileRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserProfileScreen(
-          key: args.key,
-          userId: args.userId,
-        ),
+        child: UserProfileScreen(key: args.key, userId: args.userId),
       );
     },
     UserRegisterRoute.name: (routeData) {
@@ -455,10 +407,7 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<UserWishListRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: UserWishListScreen(
-          key: args.key,
-          userId: args.userId,
-        ),
+        child: UserWishListScreen(key: args.key, userId: args.userId),
       );
     },
     ViewPaymentDetailRoute.name: (routeData) {
@@ -490,10 +439,7 @@ abstract class _$AppRouter extends RootStackRouter {
 /// [AboutUsScreen]
 class AboutUsRoute extends PageRouteInfo<void> {
   const AboutUsRoute({List<PageRouteInfo>? children})
-      : super(
-          AboutUsRoute.name,
-          initialChildren: children,
-        );
+    : super(AboutUsRoute.name, initialChildren: children);
 
   static const String name = 'AboutUsRoute';
 
@@ -508,13 +454,10 @@ class AgentActivitiesRoute extends PageRouteInfo<AgentActivitiesRouteArgs> {
     Key? key,
     List<PageRouteInfo>? children,
   }) : super(
-          AgentActivitiesRoute.name,
-          args: AgentActivitiesRouteArgs(
-            agentId: agentId,
-            key: key,
-          ),
-          initialChildren: children,
-        );
+         AgentActivitiesRoute.name,
+         args: AgentActivitiesRouteArgs(agentId: agentId, key: key),
+         initialChildren: children,
+       );
 
   static const String name = 'AgentActivitiesRoute';
 
@@ -523,10 +466,7 @@ class AgentActivitiesRoute extends PageRouteInfo<AgentActivitiesRouteArgs> {
 }
 
 class AgentActivitiesRouteArgs {
-  const AgentActivitiesRouteArgs({
-    required this.agentId,
-    this.key,
-  });
+  const AgentActivitiesRouteArgs({required this.agentId, this.key});
 
   final String agentId;
 
@@ -546,13 +486,10 @@ class AgentContactRoute extends PageRouteInfo<AgentContactRouteArgs> {
     required String agentId,
     List<PageRouteInfo>? children,
   }) : super(
-          AgentContactRoute.name,
-          args: AgentContactRouteArgs(
-            key: key,
-            agentId: agentId,
-          ),
-          initialChildren: children,
-        );
+         AgentContactRoute.name,
+         args: AgentContactRouteArgs(key: key, agentId: agentId),
+         initialChildren: children,
+       );
 
   static const String name = 'AgentContactRoute';
 
@@ -561,10 +498,7 @@ class AgentContactRoute extends PageRouteInfo<AgentContactRouteArgs> {
 }
 
 class AgentContactRouteArgs {
-  const AgentContactRouteArgs({
-    this.key,
-    required this.agentId,
-  });
+  const AgentContactRouteArgs({this.key, required this.agentId});
 
   final Key? key;
 
@@ -584,13 +518,10 @@ class AgentDashboardRoute extends PageRouteInfo<AgentDashboardRouteArgs> {
     Key? key,
     List<PageRouteInfo>? children,
   }) : super(
-          AgentDashboardRoute.name,
-          args: AgentDashboardRouteArgs(
-            agentId: agentId,
-            key: key,
-          ),
-          initialChildren: children,
-        );
+         AgentDashboardRoute.name,
+         args: AgentDashboardRouteArgs(agentId: agentId, key: key),
+         initialChildren: children,
+       );
 
   static const String name = 'AgentDashboardRoute';
 
@@ -599,10 +530,7 @@ class AgentDashboardRoute extends PageRouteInfo<AgentDashboardRouteArgs> {
 }
 
 class AgentDashboardRouteArgs {
-  const AgentDashboardRouteArgs({
-    required this.agentId,
-    this.key,
-  });
+  const AgentDashboardRouteArgs({required this.agentId, this.key});
 
   final String agentId;
 
@@ -622,13 +550,10 @@ class AgentEntityRoute extends PageRouteInfo<AgentEntityRouteArgs> {
     required String uid,
     List<PageRouteInfo>? children,
   }) : super(
-          AgentEntityRoute.name,
-          args: AgentEntityRouteArgs(
-            key: key,
-            uid: uid,
-          ),
-          initialChildren: children,
-        );
+         AgentEntityRoute.name,
+         args: AgentEntityRouteArgs(key: key, uid: uid),
+         initialChildren: children,
+       );
 
   static const String name = 'AgentEntityRoute';
 
@@ -637,10 +562,7 @@ class AgentEntityRoute extends PageRouteInfo<AgentEntityRouteArgs> {
 }
 
 class AgentEntityRouteArgs {
-  const AgentEntityRouteArgs({
-    this.key,
-    required this.uid,
-  });
+  const AgentEntityRouteArgs({this.key, required this.uid});
 
   final Key? key;
 
@@ -656,10 +578,7 @@ class AgentEntityRouteArgs {
 /// [AgentHomeScreen]
 class AgentHomeRoute extends PageRouteInfo<void> {
   const AgentHomeRoute({List<PageRouteInfo>? children})
-      : super(
-          AgentHomeRoute.name,
-          initialChildren: children,
-        );
+    : super(AgentHomeRoute.name, initialChildren: children);
 
   static const String name = 'AgentHomeRoute';
 
@@ -670,10 +589,7 @@ class AgentHomeRoute extends PageRouteInfo<void> {
 /// [AgentLoginScreen]
 class AgentLoginRoute extends PageRouteInfo<void> {
   const AgentLoginRoute({List<PageRouteInfo>? children})
-      : super(
-          AgentLoginRoute.name,
-          initialChildren: children,
-        );
+    : super(AgentLoginRoute.name, initialChildren: children);
 
   static const String name = 'AgentLoginRoute';
 
@@ -688,13 +604,10 @@ class AgentMainShellRoute extends PageRouteInfo<AgentMainShellRouteArgs> {
     Key? key,
     List<PageRouteInfo>? children,
   }) : super(
-          AgentMainShellRoute.name,
-          args: AgentMainShellRouteArgs(
-            agentId: agentId,
-            key: key,
-          ),
-          initialChildren: children,
-        );
+         AgentMainShellRoute.name,
+         args: AgentMainShellRouteArgs(agentId: agentId, key: key),
+         initialChildren: children,
+       );
 
   static const String name = 'AgentMainShellRoute';
 
@@ -703,10 +616,7 @@ class AgentMainShellRoute extends PageRouteInfo<AgentMainShellRouteArgs> {
 }
 
 class AgentMainShellRouteArgs {
-  const AgentMainShellRouteArgs({
-    required this.agentId,
-    this.key,
-  });
+  const AgentMainShellRouteArgs({required this.agentId, this.key});
 
   final String agentId;
 
@@ -726,13 +636,10 @@ class AgentRevenueRoute extends PageRouteInfo<AgentRevenueRouteArgs> {
     required String agentId,
     List<PageRouteInfo>? children,
   }) : super(
-          AgentRevenueRoute.name,
-          args: AgentRevenueRouteArgs(
-            key: key,
-            agentId: agentId,
-          ),
-          initialChildren: children,
-        );
+         AgentRevenueRoute.name,
+         args: AgentRevenueRouteArgs(key: key, agentId: agentId),
+         initialChildren: children,
+       );
 
   static const String name = 'AgentRevenueRoute';
 
@@ -741,10 +648,7 @@ class AgentRevenueRoute extends PageRouteInfo<AgentRevenueRouteArgs> {
 }
 
 class AgentRevenueRouteArgs {
-  const AgentRevenueRouteArgs({
-    this.key,
-    required this.agentId,
-  });
+  const AgentRevenueRouteArgs({this.key, required this.agentId});
 
   final Key? key;
 
@@ -760,10 +664,7 @@ class AgentRevenueRouteArgs {
 /// [AgentSettingsScreen]
 class AgentSettingsRoute extends PageRouteInfo<void> {
   const AgentSettingsRoute({List<PageRouteInfo>? children})
-      : super(
-          AgentSettingsRoute.name,
-          initialChildren: children,
-        );
+    : super(AgentSettingsRoute.name, initialChildren: children);
 
   static const String name = 'AgentSettingsRoute';
 
@@ -778,13 +679,10 @@ class AgentSupportRoute extends PageRouteInfo<AgentSupportRouteArgs> {
     required String agentId,
     List<PageRouteInfo>? children,
   }) : super(
-          AgentSupportRoute.name,
-          args: AgentSupportRouteArgs(
-            key: key,
-            agentId: agentId,
-          ),
-          initialChildren: children,
-        );
+         AgentSupportRoute.name,
+         args: AgentSupportRouteArgs(key: key, agentId: agentId),
+         initialChildren: children,
+       );
 
   static const String name = 'AgentSupportRoute';
 
@@ -793,10 +691,7 @@ class AgentSupportRoute extends PageRouteInfo<AgentSupportRouteArgs> {
 }
 
 class AgentSupportRouteArgs {
-  const AgentSupportRouteArgs({
-    this.key,
-    required this.agentId,
-  });
+  const AgentSupportRouteArgs({this.key, required this.agentId});
 
   final Key? key;
 
@@ -816,25 +711,20 @@ class AgentUserRoute extends PageRouteInfo<AgentUserRouteArgs> {
     required String agentId,
     List<PageRouteInfo>? children,
   }) : super(
-          AgentUserRoute.name,
-          args: AgentUserRouteArgs(
-            key: key,
-            agentId: agentId,
-          ),
-          initialChildren: children,
-        );
+         AgentUserRoute.name,
+         args: AgentUserRouteArgs(key: key, agentId: agentId),
+         initialChildren: children,
+       );
 
   static const String name = 'AgentUserRoute';
 
-  static const PageInfo<AgentUserRouteArgs> page =
-      PageInfo<AgentUserRouteArgs>(name);
+  static const PageInfo<AgentUserRouteArgs> page = PageInfo<AgentUserRouteArgs>(
+    name,
+  );
 }
 
 class AgentUserRouteArgs {
-  const AgentUserRouteArgs({
-    this.key,
-    required this.agentId,
-  });
+  const AgentUserRouteArgs({this.key, required this.agentId});
 
   final Key? key;
 
@@ -850,10 +740,7 @@ class AgentUserRouteArgs {
 /// [AuthWrapperScreen]
 class AuthWrapperRoute extends PageRouteInfo<void> {
   const AuthWrapperRoute({List<PageRouteInfo>? children})
-      : super(
-          AuthWrapperRoute.name,
-          initialChildren: children,
-        );
+    : super(AuthWrapperRoute.name, initialChildren: children);
 
   static const String name = 'AuthWrapperRoute';
 
@@ -864,10 +751,7 @@ class AuthWrapperRoute extends PageRouteInfo<void> {
 /// [ChangePasswordScreen]
 class ChangePasswordRoute extends PageRouteInfo<void> {
   const ChangePasswordRoute({List<PageRouteInfo>? children})
-      : super(
-          ChangePasswordRoute.name,
-          initialChildren: children,
-        );
+    : super(ChangePasswordRoute.name, initialChildren: children);
 
   static const String name = 'ChangePasswordRoute';
 
@@ -878,10 +762,7 @@ class ChangePasswordRoute extends PageRouteInfo<void> {
 /// [ContactUsScreen]
 class ContactUsRoute extends PageRouteInfo<void> {
   const ContactUsRoute({List<PageRouteInfo>? children})
-      : super(
-          ContactUsRoute.name,
-          initialChildren: children,
-        );
+    : super(ContactUsRoute.name, initialChildren: children);
 
   static const String name = 'ContactUsRoute';
 
@@ -892,10 +773,7 @@ class ContactUsRoute extends PageRouteInfo<void> {
 /// [MatrimonyFormFlowScreen]
 class MatrimonyFormFlowRoute extends PageRouteInfo<void> {
   const MatrimonyFormFlowRoute({List<PageRouteInfo>? children})
-      : super(
-          MatrimonyFormFlowRoute.name,
-          initialChildren: children,
-        );
+    : super(MatrimonyFormFlowRoute.name, initialChildren: children);
 
   static const String name = 'MatrimonyFormFlowRoute';
 
@@ -910,13 +788,10 @@ class MetrimonyProfileRoute extends PageRouteInfo<MetrimonyProfileRouteArgs> {
     required String userId,
     List<PageRouteInfo>? children,
   }) : super(
-          MetrimonyProfileRoute.name,
-          args: MetrimonyProfileRouteArgs(
-            key: key,
-            userId: userId,
-          ),
-          initialChildren: children,
-        );
+         MetrimonyProfileRoute.name,
+         args: MetrimonyProfileRouteArgs(key: key, userId: userId),
+         initialChildren: children,
+       );
 
   static const String name = 'MetrimonyProfileRoute';
 
@@ -925,10 +800,7 @@ class MetrimonyProfileRoute extends PageRouteInfo<MetrimonyProfileRouteArgs> {
 }
 
 class MetrimonyProfileRouteArgs {
-  const MetrimonyProfileRouteArgs({
-    this.key,
-    required this.userId,
-  });
+  const MetrimonyProfileRouteArgs({this.key, required this.userId});
 
   final Key? key;
 
@@ -948,13 +820,10 @@ class MyProfileDetailRoute extends PageRouteInfo<MyProfileDetailRouteArgs> {
     required UserEntity user,
     List<PageRouteInfo>? children,
   }) : super(
-          MyProfileDetailRoute.name,
-          args: MyProfileDetailRouteArgs(
-            key: key,
-            user: user,
-          ),
-          initialChildren: children,
-        );
+         MyProfileDetailRoute.name,
+         args: MyProfileDetailRouteArgs(key: key, user: user),
+         initialChildren: children,
+       );
 
   static const String name = 'MyProfileDetailRoute';
 
@@ -963,10 +832,7 @@ class MyProfileDetailRoute extends PageRouteInfo<MyProfileDetailRouteArgs> {
 }
 
 class MyProfileDetailRouteArgs {
-  const MyProfileDetailRouteArgs({
-    this.key,
-    required this.user,
-  });
+  const MyProfileDetailRouteArgs({this.key, required this.user});
 
   final Key? key;
 
@@ -981,30 +847,22 @@ class MyProfileDetailRouteArgs {
 /// generated route for
 /// [MyProfileScreen]
 class MyProfileRoute extends PageRouteInfo<MyProfileRouteArgs> {
-  MyProfileRoute({
-    Key? key,
-    required String uid,
-    List<PageRouteInfo>? children,
-  }) : super(
-          MyProfileRoute.name,
-          args: MyProfileRouteArgs(
-            key: key,
-            uid: uid,
-          ),
-          initialChildren: children,
-        );
+  MyProfileRoute({Key? key, required String uid, List<PageRouteInfo>? children})
+    : super(
+        MyProfileRoute.name,
+        args: MyProfileRouteArgs(key: key, uid: uid),
+        initialChildren: children,
+      );
 
   static const String name = 'MyProfileRoute';
 
-  static const PageInfo<MyProfileRouteArgs> page =
-      PageInfo<MyProfileRouteArgs>(name);
+  static const PageInfo<MyProfileRouteArgs> page = PageInfo<MyProfileRouteArgs>(
+    name,
+  );
 }
 
 class MyProfileRouteArgs {
-  const MyProfileRouteArgs({
-    this.key,
-    required this.uid,
-  });
+  const MyProfileRouteArgs({this.key, required this.uid});
 
   final Key? key;
 
@@ -1017,13 +875,21 @@ class MyProfileRouteArgs {
 }
 
 /// generated route for
+/// [MyReviewScreen]
+class MyReviewRoute extends PageRouteInfo<void> {
+  const MyReviewRoute({List<PageRouteInfo>? children})
+    : super(MyReviewRoute.name, initialChildren: children);
+
+  static const String name = 'MyReviewRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [OnboardingScreen]
 class OnboardingRoute extends PageRouteInfo<void> {
   const OnboardingRoute({List<PageRouteInfo>? children})
-      : super(
-          OnboardingRoute.name,
-          initialChildren: children,
-        );
+    : super(OnboardingRoute.name, initialChildren: children);
 
   static const String name = 'OnboardingRoute';
 
@@ -1034,10 +900,7 @@ class OnboardingRoute extends PageRouteInfo<void> {
 /// [PrivacyPolicyScreen]
 class PrivacyPolicyRoute extends PageRouteInfo<void> {
   const PrivacyPolicyRoute({List<PageRouteInfo>? children})
-      : super(
-          PrivacyPolicyRoute.name,
-          initialChildren: children,
-        );
+    : super(PrivacyPolicyRoute.name, initialChildren: children);
 
   static const String name = 'PrivacyPolicyRoute';
 
@@ -1048,10 +911,7 @@ class PrivacyPolicyRoute extends PageRouteInfo<void> {
 /// [ResetPasswordScreen]
 class ResetPasswordRoute extends PageRouteInfo<void> {
   const ResetPasswordRoute({List<PageRouteInfo>? children})
-      : super(
-          ResetPasswordRoute.name,
-          initialChildren: children,
-        );
+    : super(ResetPasswordRoute.name, initialChildren: children);
 
   static const String name = 'ResetPasswordRoute';
 
@@ -1066,13 +926,10 @@ class ReviewDetailsRoute extends PageRouteInfo<ReviewDetailsRouteArgs> {
     required Review review,
     List<PageRouteInfo>? children,
   }) : super(
-          ReviewDetailsRoute.name,
-          args: ReviewDetailsRouteArgs(
-            key: key,
-            review: review,
-          ),
-          initialChildren: children,
-        );
+         ReviewDetailsRoute.name,
+         args: ReviewDetailsRouteArgs(key: key, review: review),
+         initialChildren: children,
+       );
 
   static const String name = 'ReviewDetailsRoute';
 
@@ -1081,10 +938,7 @@ class ReviewDetailsRoute extends PageRouteInfo<ReviewDetailsRouteArgs> {
 }
 
 class ReviewDetailsRouteArgs {
-  const ReviewDetailsRouteArgs({
-    this.key,
-    required this.review,
-  });
+  const ReviewDetailsRouteArgs({this.key, required this.review});
 
   final Key? key;
 
@@ -1100,10 +954,7 @@ class ReviewDetailsRouteArgs {
 /// [ReviewFormScreen]
 class ReviewFormRoute extends PageRouteInfo<void> {
   const ReviewFormRoute({List<PageRouteInfo>? children})
-      : super(
-          ReviewFormRoute.name,
-          initialChildren: children,
-        );
+    : super(ReviewFormRoute.name, initialChildren: children);
 
   static const String name = 'ReviewFormRoute';
 
@@ -1114,10 +965,7 @@ class ReviewFormRoute extends PageRouteInfo<void> {
 /// [ReviewScreen]
 class ReviewRoute extends PageRouteInfo<void> {
   const ReviewRoute({List<PageRouteInfo>? children})
-      : super(
-          ReviewRoute.name,
-          initialChildren: children,
-        );
+    : super(ReviewRoute.name, initialChildren: children);
 
   static const String name = 'ReviewRoute';
 
@@ -1128,10 +976,7 @@ class ReviewRoute extends PageRouteInfo<void> {
 /// [RoleSelectionScreen]
 class RoleSelectionRoute extends PageRouteInfo<void> {
   const RoleSelectionRoute({List<PageRouteInfo>? children})
-      : super(
-          RoleSelectionRoute.name,
-          initialChildren: children,
-        );
+    : super(RoleSelectionRoute.name, initialChildren: children);
 
   static const String name = 'RoleSelectionRoute';
 
@@ -1142,10 +987,7 @@ class RoleSelectionRoute extends PageRouteInfo<void> {
 /// [SearchScreen]
 class SearchRoute extends PageRouteInfo<void> {
   const SearchRoute({List<PageRouteInfo>? children})
-      : super(
-          SearchRoute.name,
-          initialChildren: children,
-        );
+    : super(SearchRoute.name, initialChildren: children);
 
   static const String name = 'SearchRoute';
 
@@ -1156,10 +998,7 @@ class SearchRoute extends PageRouteInfo<void> {
 /// [SplashScreen]
 class SplashRoute extends PageRouteInfo<void> {
   const SplashRoute({List<PageRouteInfo>? children})
-      : super(
-          SplashRoute.name,
-          initialChildren: children,
-        );
+    : super(SplashRoute.name, initialChildren: children);
 
   static const String name = 'SplashRoute';
 
@@ -1175,13 +1014,10 @@ class SupportTicketDetailRoute
     required String ticketId,
     List<PageRouteInfo>? children,
   }) : super(
-          SupportTicketDetailRoute.name,
-          args: SupportTicketDetailRouteArgs(
-            key: key,
-            ticketId: ticketId,
-          ),
-          initialChildren: children,
-        );
+         SupportTicketDetailRoute.name,
+         args: SupportTicketDetailRouteArgs(key: key, ticketId: ticketId),
+         initialChildren: children,
+       );
 
   static const String name = 'SupportTicketDetailRoute';
 
@@ -1190,10 +1026,7 @@ class SupportTicketDetailRoute
 }
 
 class SupportTicketDetailRouteArgs {
-  const SupportTicketDetailRouteArgs({
-    this.key,
-    required this.ticketId,
-  });
+  const SupportTicketDetailRouteArgs({this.key, required this.ticketId});
 
   final Key? key;
 
@@ -1209,10 +1042,7 @@ class SupportTicketDetailRouteArgs {
 /// [SupportTicketFormScreen]
 class SupportTicketFormRoute extends PageRouteInfo<void> {
   const SupportTicketFormRoute({List<PageRouteInfo>? children})
-      : super(
-          SupportTicketFormRoute.name,
-          initialChildren: children,
-        );
+    : super(SupportTicketFormRoute.name, initialChildren: children);
 
   static const String name = 'SupportTicketFormRoute';
 
@@ -1227,13 +1057,10 @@ class SupportTicketsRoute extends PageRouteInfo<SupportTicketsRouteArgs> {
     required String userId,
     List<PageRouteInfo>? children,
   }) : super(
-          SupportTicketsRoute.name,
-          args: SupportTicketsRouteArgs(
-            key: key,
-            userId: userId,
-          ),
-          initialChildren: children,
-        );
+         SupportTicketsRoute.name,
+         args: SupportTicketsRouteArgs(key: key, userId: userId),
+         initialChildren: children,
+       );
 
   static const String name = 'SupportTicketsRoute';
 
@@ -1242,10 +1069,7 @@ class SupportTicketsRoute extends PageRouteInfo<SupportTicketsRouteArgs> {
 }
 
 class SupportTicketsRouteArgs {
-  const SupportTicketsRouteArgs({
-    this.key,
-    required this.userId,
-  });
+  const SupportTicketsRouteArgs({this.key, required this.userId});
 
   final Key? key;
 
@@ -1261,10 +1085,7 @@ class SupportTicketsRouteArgs {
 /// [TermsAndConditionsScreen]
 class TermsAndConditionsRoute extends PageRouteInfo<void> {
   const TermsAndConditionsRoute({List<PageRouteInfo>? children})
-      : super(
-          TermsAndConditionsRoute.name,
-          initialChildren: children,
-        );
+    : super(TermsAndConditionsRoute.name, initialChildren: children);
 
   static const String name = 'TermsAndConditionsRoute';
 
@@ -1281,15 +1102,15 @@ class UserAddressFormRoute extends PageRouteInfo<UserAddressFormRouteArgs> {
     void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-          UserAddressFormRoute.name,
-          args: UserAddressFormRouteArgs(
-            key: key,
-            mode: mode,
-            existingAddressProfile: existingAddressProfile,
-            registerSubmit: registerSubmit,
-          ),
-          initialChildren: children,
-        );
+         UserAddressFormRoute.name,
+         args: UserAddressFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingAddressProfile: existingAddressProfile,
+           registerSubmit: registerSubmit,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserAddressFormRoute';
 
@@ -1327,13 +1148,10 @@ class UserBiodataCheckRoute extends PageRouteInfo<UserBiodataCheckRouteArgs> {
     required bool isAgreed,
     List<PageRouteInfo>? children,
   }) : super(
-          UserBiodataCheckRoute.name,
-          args: UserBiodataCheckRouteArgs(
-            key: key,
-            isAgreed: isAgreed,
-          ),
-          initialChildren: children,
-        );
+         UserBiodataCheckRoute.name,
+         args: UserBiodataCheckRouteArgs(key: key, isAgreed: isAgreed),
+         initialChildren: children,
+       );
 
   static const String name = 'UserBiodataCheckRoute';
 
@@ -1342,10 +1160,7 @@ class UserBiodataCheckRoute extends PageRouteInfo<UserBiodataCheckRouteArgs> {
 }
 
 class UserBiodataCheckRouteArgs {
-  const UserBiodataCheckRouteArgs({
-    this.key,
-    required this.isAgreed,
-  });
+  const UserBiodataCheckRouteArgs({this.key, required this.isAgreed});
 
   final Key? key;
 
@@ -1361,10 +1176,7 @@ class UserBiodataCheckRouteArgs {
 /// [UserChatScreen]
 class UserChatRoute extends PageRouteInfo<void> {
   const UserChatRoute({List<PageRouteInfo>? children})
-      : super(
-          UserChatRoute.name,
-          initialChildren: children,
-        );
+    : super(UserChatRoute.name, initialChildren: children);
 
   static const String name = 'UserChatRoute';
 
@@ -1381,15 +1193,15 @@ class UserCultureFormRoute extends PageRouteInfo<UserCultureFormRouteArgs> {
     void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-          UserCultureFormRoute.name,
-          args: UserCultureFormRouteArgs(
-            key: key,
-            mode: mode,
-            existingCulturalProfile: existingCulturalProfile,
-            registerSubmit: registerSubmit,
-          ),
-          initialChildren: children,
-        );
+         UserCultureFormRoute.name,
+         args: UserCultureFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingCulturalProfile: existingCulturalProfile,
+           registerSubmit: registerSubmit,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserCultureFormRoute';
 
@@ -1427,13 +1239,10 @@ class UserDetailRoute extends PageRouteInfo<UserDetailRouteArgs> {
     required String uid,
     List<PageRouteInfo>? children,
   }) : super(
-          UserDetailRoute.name,
-          args: UserDetailRouteArgs(
-            key: key,
-            uid: uid,
-          ),
-          initialChildren: children,
-        );
+         UserDetailRoute.name,
+         args: UserDetailRouteArgs(key: key, uid: uid),
+         initialChildren: children,
+       );
 
   static const String name = 'UserDetailRoute';
 
@@ -1442,10 +1251,7 @@ class UserDetailRoute extends PageRouteInfo<UserDetailRouteArgs> {
 }
 
 class UserDetailRouteArgs {
-  const UserDetailRouteArgs({
-    this.key,
-    required this.uid,
-  });
+  const UserDetailRouteArgs({this.key, required this.uid});
 
   final Key? key;
 
@@ -1467,15 +1273,15 @@ class UserEducationFormRoute extends PageRouteInfo<UserEducationFormRouteArgs> {
     void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-          UserEducationFormRoute.name,
-          args: UserEducationFormRouteArgs(
-            key: key,
-            mode: mode,
-            existingEducationProfile: existingEducationProfile,
-            registerSubmit: registerSubmit,
-          ),
-          initialChildren: children,
-        );
+         UserEducationFormRoute.name,
+         args: UserEducationFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingEducationProfile: existingEducationProfile,
+           registerSubmit: registerSubmit,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserEducationFormRoute';
 
@@ -1516,15 +1322,15 @@ class UserEmploymentFormRoute
     void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-          UserEmploymentFormRoute.name,
-          args: UserEmploymentFormRouteArgs(
-            key: key,
-            mode: mode,
-            existingEmploymentProfile: existingEmploymentProfile,
-            registerSubmit: registerSubmit,
-          ),
-          initialChildren: children,
-        );
+         UserEmploymentFormRoute.name,
+         args: UserEmploymentFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingEmploymentProfile: existingEmploymentProfile,
+           registerSubmit: registerSubmit,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserEmploymentFormRoute';
 
@@ -1564,15 +1370,15 @@ class UserFamilyFormRoute extends PageRouteInfo<UserFamilyFormRouteArgs> {
     void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-          UserFamilyFormRoute.name,
-          args: UserFamilyFormRouteArgs(
-            key: key,
-            mode: mode,
-            existingFamilyProfile: existingFamilyProfile,
-            registerSubmit: registerSubmit,
-          ),
-          initialChildren: children,
-        );
+         UserFamilyFormRoute.name,
+         args: UserFamilyFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingFamilyProfile: existingFamilyProfile,
+           registerSubmit: registerSubmit,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserFamilyFormRoute';
 
@@ -1606,10 +1412,7 @@ class UserFamilyFormRouteArgs {
 /// [UserHomeScreen]
 class UserHomeRoute extends PageRouteInfo<void> {
   const UserHomeRoute({List<PageRouteInfo>? children})
-      : super(
-          UserHomeRoute.name,
-          initialChildren: children,
-        );
+    : super(UserHomeRoute.name, initialChildren: children);
 
   static const String name = 'UserHomeRoute';
 
@@ -1626,15 +1429,15 @@ class UserIdentityFormRoute extends PageRouteInfo<UserIdentityFormRouteArgs> {
     void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-          UserIdentityFormRoute.name,
-          args: UserIdentityFormRouteArgs(
-            key: key,
-            mode: mode,
-            existingIdentityProfile: existingIdentityProfile,
-            registerSubmit: registerSubmit,
-          ),
-          initialChildren: children,
-        );
+         UserIdentityFormRoute.name,
+         args: UserIdentityFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingIdentityProfile: existingIdentityProfile,
+           registerSubmit: registerSubmit,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserIdentityFormRoute';
 
@@ -1668,10 +1471,7 @@ class UserIdentityFormRouteArgs {
 /// [UserImageFormScreen]
 class UserImageFormRoute extends PageRouteInfo<void> {
   const UserImageFormRoute({List<PageRouteInfo>? children})
-      : super(
-          UserImageFormRoute.name,
-          initialChildren: children,
-        );
+    : super(UserImageFormRoute.name, initialChildren: children);
 
   static const String name = 'UserImageFormRoute';
 
@@ -1682,10 +1482,7 @@ class UserImageFormRoute extends PageRouteInfo<void> {
 /// [UserLoginScreen]
 class UserLoginRoute extends PageRouteInfo<void> {
   const UserLoginRoute({List<PageRouteInfo>? children})
-      : super(
-          UserLoginRoute.name,
-          initialChildren: children,
-        );
+    : super(UserLoginRoute.name, initialChildren: children);
 
   static const String name = 'UserLoginRoute';
 
@@ -1696,10 +1493,7 @@ class UserLoginRoute extends PageRouteInfo<void> {
 /// [UserMainShellScreen]
 class UserMainShellRoute extends PageRouteInfo<void> {
   const UserMainShellRoute({List<PageRouteInfo>? children})
-      : super(
-          UserMainShellRoute.name,
-          initialChildren: children,
-        );
+    : super(UserMainShellRoute.name, initialChildren: children);
 
   static const String name = 'UserMainShellRoute';
 
@@ -1710,10 +1504,7 @@ class UserMainShellRoute extends PageRouteInfo<void> {
 /// [UserNotificationScreen]
 class UserNotificationRoute extends PageRouteInfo<void> {
   const UserNotificationRoute({List<PageRouteInfo>? children})
-      : super(
-          UserNotificationRoute.name,
-          initialChildren: children,
-        );
+    : super(UserNotificationRoute.name, initialChildren: children);
 
   static const String name = 'UserNotificationRoute';
 
@@ -1724,10 +1515,7 @@ class UserNotificationRoute extends PageRouteInfo<void> {
 /// [UserPaymentOrderHistoryScreen]
 class UserPaymentOrderHistoryRoute extends PageRouteInfo<void> {
   const UserPaymentOrderHistoryRoute({List<PageRouteInfo>? children})
-      : super(
-          UserPaymentOrderHistoryRoute.name,
-          initialChildren: children,
-        );
+    : super(UserPaymentOrderHistoryRoute.name, initialChildren: children);
 
   static const String name = 'UserPaymentOrderHistoryRoute';
 
@@ -1742,13 +1530,10 @@ class UserPaymentRoute extends PageRouteInfo<UserPaymentRouteArgs> {
     required String userId,
     List<PageRouteInfo>? children,
   }) : super(
-          UserPaymentRoute.name,
-          args: UserPaymentRouteArgs(
-            key: key,
-            userId: userId,
-          ),
-          initialChildren: children,
-        );
+         UserPaymentRoute.name,
+         args: UserPaymentRouteArgs(key: key, userId: userId),
+         initialChildren: children,
+       );
 
   static const String name = 'UserPaymentRoute';
 
@@ -1757,10 +1542,7 @@ class UserPaymentRoute extends PageRouteInfo<UserPaymentRouteArgs> {
 }
 
 class UserPaymentRouteArgs {
-  const UserPaymentRouteArgs({
-    this.key,
-    required this.userId,
-  });
+  const UserPaymentRouteArgs({this.key, required this.userId});
 
   final Key? key;
 
@@ -1781,13 +1563,10 @@ class UserPaymentSuccessRoute
     required UserEntity user,
     List<PageRouteInfo>? children,
   }) : super(
-          UserPaymentSuccessRoute.name,
-          args: UserPaymentSuccessRouteArgs(
-            key: key,
-            user: user,
-          ),
-          initialChildren: children,
-        );
+         UserPaymentSuccessRoute.name,
+         args: UserPaymentSuccessRouteArgs(key: key, user: user),
+         initialChildren: children,
+       );
 
   static const String name = 'UserPaymentSuccessRoute';
 
@@ -1796,10 +1575,7 @@ class UserPaymentSuccessRoute
 }
 
 class UserPaymentSuccessRouteArgs {
-  const UserPaymentSuccessRouteArgs({
-    this.key,
-    required this.user,
-  });
+  const UserPaymentSuccessRouteArgs({this.key, required this.user});
 
   final Key? key;
 
@@ -1821,15 +1597,15 @@ class UserPhysicalFormRoute extends PageRouteInfo<UserPhysicalFormRouteArgs> {
     void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
-          UserPhysicalFormRoute.name,
-          args: UserPhysicalFormRouteArgs(
-            key: key,
-            mode: mode,
-            existingPhysicalProfile: existingPhysicalProfile,
-            registerSubmit: registerSubmit,
-          ),
-          initialChildren: children,
-        );
+         UserPhysicalFormRoute.name,
+         args: UserPhysicalFormRouteArgs(
+           key: key,
+           mode: mode,
+           existingPhysicalProfile: existingPhysicalProfile,
+           registerSubmit: registerSubmit,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'UserPhysicalFormRoute';
 
@@ -1867,13 +1643,10 @@ class UserProfileRoute extends PageRouteInfo<UserProfileRouteArgs> {
     required String userId,
     List<PageRouteInfo>? children,
   }) : super(
-          UserProfileRoute.name,
-          args: UserProfileRouteArgs(
-            key: key,
-            userId: userId,
-          ),
-          initialChildren: children,
-        );
+         UserProfileRoute.name,
+         args: UserProfileRouteArgs(key: key, userId: userId),
+         initialChildren: children,
+       );
 
   static const String name = 'UserProfileRoute';
 
@@ -1882,10 +1655,7 @@ class UserProfileRoute extends PageRouteInfo<UserProfileRouteArgs> {
 }
 
 class UserProfileRouteArgs {
-  const UserProfileRouteArgs({
-    this.key,
-    required this.userId,
-  });
+  const UserProfileRouteArgs({this.key, required this.userId});
 
   final Key? key;
 
@@ -1901,10 +1671,7 @@ class UserProfileRouteArgs {
 /// [UserRegisterScreen]
 class UserRegisterRoute extends PageRouteInfo<void> {
   const UserRegisterRoute({List<PageRouteInfo>? children})
-      : super(
-          UserRegisterRoute.name,
-          initialChildren: children,
-        );
+    : super(UserRegisterRoute.name, initialChildren: children);
 
   static const String name = 'UserRegisterRoute';
 
@@ -1915,10 +1682,7 @@ class UserRegisterRoute extends PageRouteInfo<void> {
 /// [UserStatusScreen]
 class UserStatusRoute extends PageRouteInfo<void> {
   const UserStatusRoute({List<PageRouteInfo>? children})
-      : super(
-          UserStatusRoute.name,
-          initialChildren: children,
-        );
+    : super(UserStatusRoute.name, initialChildren: children);
 
   static const String name = 'UserStatusRoute';
 
@@ -1933,13 +1697,10 @@ class UserWishListRoute extends PageRouteInfo<UserWishListRouteArgs> {
     required String userId,
     List<PageRouteInfo>? children,
   }) : super(
-          UserWishListRoute.name,
-          args: UserWishListRouteArgs(
-            key: key,
-            userId: userId,
-          ),
-          initialChildren: children,
-        );
+         UserWishListRoute.name,
+         args: UserWishListRouteArgs(key: key, userId: userId),
+         initialChildren: children,
+       );
 
   static const String name = 'UserWishListRoute';
 
@@ -1948,10 +1709,7 @@ class UserWishListRoute extends PageRouteInfo<UserWishListRouteArgs> {
 }
 
 class UserWishListRouteArgs {
-  const UserWishListRouteArgs({
-    this.key,
-    required this.userId,
-  });
+  const UserWishListRouteArgs({this.key, required this.userId});
 
   final Key? key;
 
@@ -1972,14 +1730,14 @@ class ViewPaymentDetailRoute extends PageRouteInfo<ViewPaymentDetailRouteArgs> {
     required String agentId,
     List<PageRouteInfo>? children,
   }) : super(
-          ViewPaymentDetailRoute.name,
-          args: ViewPaymentDetailRouteArgs(
-            key: key,
-            userId: userId,
-            agentId: agentId,
-          ),
-          initialChildren: children,
-        );
+         ViewPaymentDetailRoute.name,
+         args: ViewPaymentDetailRouteArgs(
+           key: key,
+           userId: userId,
+           agentId: agentId,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'ViewPaymentDetailRoute';
 
@@ -2015,19 +1773,16 @@ class ViewUserRoute extends PageRouteInfo<ViewUserRouteArgs> {
     required String userId,
     List<PageRouteInfo>? children,
   }) : super(
-          ViewUserRoute.name,
-          args: ViewUserRouteArgs(
-            key: key,
-            agentId: agentId,
-            userId: userId,
-          ),
-          initialChildren: children,
-        );
+         ViewUserRoute.name,
+         args: ViewUserRouteArgs(key: key, agentId: agentId, userId: userId),
+         initialChildren: children,
+       );
 
   static const String name = 'ViewUserRoute';
 
-  static const PageInfo<ViewUserRouteArgs> page =
-      PageInfo<ViewUserRouteArgs>(name);
+  static const PageInfo<ViewUserRouteArgs> page = PageInfo<ViewUserRouteArgs>(
+    name,
+  );
 }
 
 class ViewUserRouteArgs {

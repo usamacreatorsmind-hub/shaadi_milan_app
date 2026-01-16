@@ -47,16 +47,27 @@ class _UserIdentityFormScreenState
     if (widget.mode == FormMode.edit &&
         widget.existingIdentityProfile != null) {
       _aadharController.text = widget.existingIdentityProfile!.aadhar;
-      _gender = widget.existingIdentityProfile!.gender;
+      _aboutMeController.text = widget.existingIdentityProfile!.aboutMe ?? '';
+
+      final gender = widget.existingIdentityProfile!.gender;
+      if (gender != null) {
+        const items = ['Male', 'Female', 'Other'];
+        final match = items.where(
+          (element) => element.toLowerCase() == gender.toLowerCase(),
+        );
+        _gender = match.isNotEmpty ? match.first : null;
+      }
+
       _selectedDate = widget.existingIdentityProfile!.dob;
     }
   }
 
-  // @override
-  // void dispose() {
-  //   _aadharController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    _aadharController.dispose();
+    _aboutMeController.dispose();
+    super.dispose();
+  }
 
   // ----------------------------
   // DATE PICKER

@@ -1,6 +1,5 @@
 import '../../../../../app/custom/custom_widgets/drawer.dart';
 import 'agen_profile.screen.dart';
-import 'package:sizer/sizer.dart';
 
 import '../../../../../app/router/app_router.dart';
 import '../notifier/user_nofier.dart';
@@ -155,9 +154,19 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                         );
                       },
                       onViewMatrimonyProfile: () {
-                        context.router.push(
-                          MetrimonyProfileRoute(userId: user.uid),
-                        );
+                        if (user.isProfileCreated) {
+                          context.router.push(
+                            MetrimonyProfileRoute(userId: user.uid),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Matrimony profile not created yet",
+                              ),
+                            ),
+                          );
+                        }
                       },
                       onViewPayment: () {
                         context.router.push(
@@ -200,148 +209,188 @@ class UserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrl = user.profileImageUrl;
     final theme = Theme.of(context);
+    final isProfileCreated = user.isProfileCreated;
 
     return Card(
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            /// ================= HEADER =================
-            Row(
-              children: [
-                /// Avatar
-                Hero(
-                  tag: 'user-avatar-${user.uid}',
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: theme.colorScheme.primary.withOpacity(0.1),
-                      image: imageUrl.isNotEmpty
-                          ? DecorationImage(
-                              image: NetworkImage(imageUrl),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                    ),
-                    child: imageUrl.isEmpty
-                        ? Center(
-                            child: Text(
-                              user.fullName.isNotEmpty
-                                  ? user.fullName[0].toUpperCase()
-                                  : '?',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                          )
-                        : null,
-                  ),
-                ),
-
-                const SizedBox(width: 16),
-
-                /// Name & Email
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user.fullName,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+      elevation: 0,
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          // Header
+          ListTile(
+            contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            leading: Hero(
+              tag: 'user-avatar-${user.uid}',
+              child: CircleAvatar(
+                radius: 30,
+                backgroundImage: imageUrl.isNotEmpty
+                    ? NetworkImage(imageUrl)
+                    : null,
+                backgroundColor: theme.colorScheme.primaryContainer,
+                child: imageUrl.isEmpty
+                    ? Text(
+                        user.fullName.isNotEmpty
+                            ? user.fullName[0].toUpperCase()
+                            : '?',
+                        style: TextStyle(
+                          color: theme.colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      )
+                    : null,
+              ),
+            ),
+            title: Text(
+              user.fullName,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(
+              user.email,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: _StatusBadge(
+              label: isProfileCreated ? 'Active' : 'Pending',
+              color: isProfileCreated ? Colors.green : Colors.orange,
+            ),
+          ),
+
+          // Info Row
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                // Phone
+                Icon(Icons.phone_outlined, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text(
+                  user.phone.isNotEmpty ? user.phone : 'N/A',
+                  style: const TextStyle(fontSize: 13),
+                ),
+                const Spacer(),
+                // Payment Status
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _getPaymentColor(paymentStatus).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.payments_outlined,
+                        size: 14,
+                        color: _getPaymentColor(paymentStatus),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(width: 4),
                       Text(
-                        user.email,
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        paymentStatus ?? 'N/A',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: _getPaymentColor(paymentStatus),
+                        ),
                       ),
                     ],
                   ),
                 ),
-
-                /// ================= STATUS ROW =================
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: 30.w,
-                      child: _InfoTile(
-                        label: 'Phone',
-                        value: user.phone.isNotEmpty ? user.phone : 'N/A',
-                      ),
-                    ),
-                    Container(
-                      width: 25.w,
-                      child: _StatusTile(
-                        label: 'Profile',
-                        value: user.isProfileCreated ? 'Created' : 'Pending',
-                        isActive: user.isProfileCreated,
-                      ),
-                    ),
-                    Container(
-                      width: 26.w,
-                      child: _StatusTile(
-                        label: 'Payment',
-                        value: paymentStatus ?? 'Not Started',
-                        isActive: paymentStatus?.toUpperCase() == 'PAID',
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 8),
-                const Divider(height: 1),
-                const SizedBox(height: 8),
-
-                /// ================= ACTION ROW =================
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _ActionButton(
-                      icon: Icons.person_outline,
-                      label: 'View Profile',
-                      onTap: onViewUserProfile,
-                    ),
-                    _ActionButton(
-                      icon: Icons.favorite_border,
-                      label: 'View Matrimony',
-                      onTap: onViewMatrimonyProfile,
-                    ),
-                    _ActionButton(
-                      icon: Icons.payments_outlined,
-                      label: 'Payment',
-                      onTap: onViewPayment,
-                    ),
-                  ],
-                ),
               ],
             ),
-          ],
+          ),
+
+          const Divider(height: 1, thickness: 0.5),
+
+          // Actions
+          Row(
+            children: [
+              Expanded(
+                child: _TextActionButton(
+                  icon: Icons.person_outline,
+                  label: 'Profile',
+                  onTap: onViewUserProfile,
+                ),
+              ),
+              Container(width: 1, height: 30, color: Colors.grey.shade200),
+              Expanded(
+                child: _TextActionButton(
+                  icon: Icons.favorite_border,
+                  label: 'Matrimony',
+                  onTap: onViewMatrimonyProfile,
+                ),
+              ),
+              Container(width: 1, height: 30, color: Colors.grey.shade200),
+              Expanded(
+                child: _TextActionButton(
+                  icon: Icons.receipt_long_outlined,
+                  label: 'Payment',
+                  onTap: onViewPayment,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getPaymentColor(String? status) {
+    switch (status?.toUpperCase()) {
+      case 'PAID':
+      case 'SUCCESS':
+        return Colors.green;
+      case 'PENDING':
+        return Colors.orange;
+      case 'FAILED':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _StatusBadge({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: color,
         ),
       ),
     );
   }
 }
 
-class _ActionButton extends StatelessWidget {
+class _TextActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
-  const _ActionButton({
+  const _TextActionButton({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -349,146 +398,26 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(2),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-        child: Container(
-          width: 26.w,
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withOpacity(0.05),
-
-            border: Border.all(
-              color: theme.colorScheme.primary.withOpacity(0.2),
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: theme.colorScheme.primary),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// =======================================================
-/// INFO TILE
-/// =======================================================
-class _InfoTile extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _InfoTile({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        SizedBox(width: 4.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                label,
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
-                    width: 1,
-                  ),
-
-                  color: Colors.transparent,
-                ),
-                child: Container(
-                  padding: EdgeInsets.all(5),
-                  child: Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// =======================================================
-/// STATUS TILE
-/// =======================================================
-class _StatusTile extends StatelessWidget {
-  final String label;
-  final String value;
-  final bool isActive;
-
-  const _StatusTile({
-    required this.label,
-    required this.value,
-    required this.isActive,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Determine color based on payment status
-    Color statusColor = Colors.grey;
-    if (value.toUpperCase() == 'PAID') {
-      statusColor = Colors.green;
-    } else if (value.toUpperCase() == 'PENDING') {
-      statusColor = Colors.orange;
-    } else if (value.toUpperCase() == 'FAILED') {
-      statusColor = Colors.red;
-    } else if (value.toUpperCase() == 'NOT STARTED') {
-      statusColor = Colors.grey;
-    }
-
-    return Column(
-      children: [
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-        Container(
-          width: 20.w,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: statusColor.withOpacity(0.3), width: 1),
-          ),
-          child: Center(
-            child: Text(
-              value,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 16, color: Colors.grey.shade700),
+            const SizedBox(width: 6),
+            Text(
+              label,
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: statusColor,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade800,
               ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -504,12 +433,27 @@ class _EmptyView extends StatelessWidget {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.people_outline, size: 80, color: Colors.grey),
-          SizedBox(height: 16),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.people_outline,
+              size: 48,
+              color: Colors.grey.shade400,
+            ),
+          ),
+          const SizedBox(height: 16),
           Text(
             'No Clients Found',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade600,
+            ),
           ),
         ],
       ),

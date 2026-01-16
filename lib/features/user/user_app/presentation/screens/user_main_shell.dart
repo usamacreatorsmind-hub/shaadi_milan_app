@@ -1,4 +1,5 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:flutter/rendering.dart';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';
@@ -112,7 +113,7 @@ class CustomBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
@@ -182,10 +183,22 @@ void _handleTabTap({
   required TabsRouter tabsRouter,
   required int index,
 }) {
-  final userStatus = ref.read(userStatusControllerProvider);
+  // Get current user ID
+  final authState = ref.read(authStateProvider);
+  final userId = authState.value?.fold((_) => null, (u) => u.uid);
+
+  if (userId == null) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('User not authenticated')));
+    return;
+  }
+
+  // Watch payment status asynchronously
+  final paymentState = ref.read(paymentNotifierProvider(userId));
 
   /// Tabs that REQUIRE subscription
-  const restrictedTabs = {3};
+  const restrictedTabs = {0, 1, 2, 3};
 
   // Always allow Home tab
   if (!restrictedTabs.contains(index)) {
@@ -193,8 +206,8 @@ void _handleTabTap({
     return;
   }
 
-  // Allow if subscribed
-  if (userStatus.userStatus.isPaymentDone) {
+  // Allow if subscribed (payment status is success)
+  if (paymentState.status == PayStatus.success) {
     tabsRouter.setActiveIndex(index);
     return;
   }
@@ -205,10 +218,5 @@ void _handleTabTap({
   );
 
   // Redirect to payment
-  final authState = ref.read(authStateProvider);
-  final userId = authState.value?.fold((_) => null, (u) => u.uid);
-
-  if (userId != null) {
-    context.router.push(UserPaymentRoute(userId: userId));
-  }
+  context.router.push(UserPaymentRoute(userId: userId));
 }

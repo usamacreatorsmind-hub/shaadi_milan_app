@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
@@ -26,23 +27,13 @@ class UserPaymentScreen extends ConsumerStatefulWidget {
 
 class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
   int _currentIndex = 1; // Default Premium
-  late MetrimonyProfileViewModel metrimonyProfileViewModel =
-      MetrimonyProfileViewModel(
-        metrimonyProfile: MatrimonyProfile(),
-        userProfile: UserEntity.empty(),
-        agentEntity: AgentEntity.empty(),
-      );
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
-          .read(
-            paymentNotifierProvider(
-              metrimonyProfileViewModel.user.uid,
-            ).notifier,
-          )
+          .read(paymentNotifierProvider(widget.userId).notifier)
           .fetchUserPayment();
     });
   }
@@ -52,6 +43,12 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
     final theme = Theme.of(context);
     final amountState = ref.watch(amountNotifierProvider);
     final paymentState = ref.watch(paymentProvider);
+    final existingPaymentState = ref.watch(
+      paymentNotifierProvider(widget.userId),
+    );
+    final userProfileAsync = ref.watch(
+      userProfileScreenProvider(widget.userId),
+    );
     // fetch metrimony profile also
 
     // Listen for payment success/failure to handle navigation/dialogs
@@ -89,242 +86,296 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
 
     // fetch all data   from app user
 
+    // if (existingPaymentState.status == PayStatus.success) {
+    //   return Scaffold(
+    //     body: Center(
+    //       child: Column(
+    //         mainAxisAlignment: MainAxisAlignment.center,
+    //         children: [
+    //           Icon(Icons.verified, size: 100, color: theme.primaryColor),
+    //           const SizedBox(height: 20),
+    //           Text(
+    //             "You are already a Premium Member",
+    //             style: theme.textTheme.headlineSmall,
+    //           ),
+    //           const SizedBox(height: 20),
+    //           ElevatedButton(
+    //             onPressed: () =>
+    //                 context.router.replaceAll([const UserMainShellRoute()]),
+    //             child: const Text("Go to Home"),
+    //           ),
+    //         ],
+    //       ),
+    //     ),
+    //   );
+    // }
+
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              theme.primaryColor.withOpacity(0.12),
-              theme.primaryColor.withOpacity(0.04),
-              Colors.white,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // 🔹 Title
-                Text(
-                  "Go Premium",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                // 🔹 Subtitle
-                Text(
-                  "Get better matches & faster connections",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                ),
-
-                const SizedBox(height: 20),
-
-                // ⭐ Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.primaryColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    "MOST POPULAR",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                // 💎 Subscription Card
-                if (amountState.isLoading)
-                  const Padding(
-                    padding: EdgeInsets.all(32.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (paymentState.status == PayStatus.loading)
-                  const Padding(
-                    padding: EdgeInsets.all(32.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (amountState.error != null)
-                  Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          "Failed to load price",
-                          style: TextStyle(color: Colors.red[700]),
-                        ),
-                        TextButton(
-                          onPressed: () => ref
-                              .read(amountNotifierProvider.notifier)
-                              .fetchAmount(),
-                          child: const Text("Retry"),
-                        ),
-                      ],
-                    ),
-                  )
-                else
-                  SizedBox(
-                    height: 420,
-                    child: PageView.builder(
-                      controller: PageController(viewportFraction: 0.88),
-                      itemCount: plans.length,
-                      onPageChanged: (index) {
-                        setState(() => _currentIndex = index);
-                      },
-                      itemBuilder: (context, index) {
-                        final plan = plans[index];
-                        final isSelected = index == _currentIndex;
-
-                        return AnimatedScale(
-                          scale: isSelected ? 1 : 0.94,
-                          duration: const Duration(milliseconds: 300),
-                          child: MatrimonySubscriptionCard(
-                            planName: plan.name,
-                            amount: "₹${amountState.amount!.amount}",
-                            duration: "One Time",
-                            features: plan.features,
-                            isPopular: plan.isPopular,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.primaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: () {
-                        final selectedPlan = plans[_currentIndex];
-
-                        debugPrint("Selected Plan: ${selectedPlan.name}");
-
-                        // ✅ Extract all user profile data
-                        final profile =
-                            metrimonyProfileViewModel.metrimonyProfile;
-                        final user = metrimonyProfileViewModel.user;
-
-                        debugPrint("Profile: $profile");
-
-                        // Extract Address Data (Region/District/State)
-                        final region = profile.address.state.trim().isEmpty
-                            ? "Not Provided"
-                            : profile.address.state;
-
-                        final district = profile.address.city.trim().isEmpty
-                            ? "Not Provided"
-                            : profile.address.city;
-
-                        // Extract Identity Data (Gender)
-                        final gender = profile.identity.gender.trim().isEmpty
-                            ? "Not Provided"
-                            : profile.identity.gender;
-
-                        // Extract Phone (user or address)
-
-                        // Log all extracted data
-                        debugPrint("\n=== 📋 PAYMENT DATA ===");
-                        debugPrint("User UID: ${user.uid}");
-                        debugPrint("Full Name: ${user.fullName}");
-                        debugPrint("Email: ${user.email}");
-                        debugPrint("Phone: $user.phone");
-                        debugPrint("Agent ID: ${user.agentId}");
-                        debugPrint("Region/State: $region");
-                        debugPrint("District/City: $district");
-                        debugPrint("Gender: $gender");
-                        debugPrint("Amount: ${amountState.amount?.amount}");
-                        debugPrint("======================\n");
-
-                        // Validate required fields
-                        if (gender == "Not Provided") {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "⚠️ Please complete your identity form (Gender required)",
-                              ),
-                              backgroundColor: Colors.orange,
-                            ),
-                          );
-                          return;
-                        }
-
-                        if (district == "Not Provided") {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "⚠️ Please complete your address form (City required)",
-                              ),
-                              backgroundColor: Colors.orange,
-                            ),
-                          );
-                          return;
-                        }
-
-                        ref
-                            .read(paymentProvider.notifier)
-                            .startOneTimePayment(
-                              amount: amountState.amount!.amount.toDouble(),
-                              uid: user.uid,
-                              email: user.email ?? "N/A",
-                              fullName: user.fullName ?? "N/A",
-                              phone: user.phone,
-                              agentId: user.agentId,
-                              region: region,
-                              district: district,
-                              gender: gender,
-                            );
-                      },
-                      child: const Text("Pay Once & Unlock Premium"),
-                    ),
-                  ),
-                ),
-
-                // 🔒 Footer Note
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Text(
-                    "Secure payment • Cancel anytime • No hidden charges",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                  ),
-                ),
+      body: userProfileAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text("Error: $err")),
+        data: (data) => Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                theme.primaryColor.withOpacity(0.12),
+                theme.primaryColor.withOpacity(0.04),
+                Colors.white,
               ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // 🔹 Title
+                  Text(
+                    "Go Premium",
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: theme.primaryColor,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // 🔹 Subtitle
+                  Text(
+                    "Get better matches & faster connections",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // ⭐ Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      "MOST POPULAR",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // 💎 Subscription Card
+                  if (amountState.isLoading)
+                    const Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (paymentState.status == PayStatus.loading)
+                    const Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (amountState.error != null)
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            "Failed to load price",
+                            style: TextStyle(color: Colors.red[700]),
+                          ),
+                          TextButton(
+                            onPressed: () => ref
+                                .read(amountNotifierProvider.notifier)
+                                .fetchAmount(),
+                            child: const Text("Retry"),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    SizedBox(
+                      height: 420,
+                      child: PageView.builder(
+                        controller: PageController(viewportFraction: 0.88),
+                        itemCount: plans.length,
+                        onPageChanged: (index) {
+                          setState(() => _currentIndex = index);
+                        },
+                        itemBuilder: (context, index) {
+                          final plan = plans[index];
+                          final isSelected = index == _currentIndex;
+
+                          return AnimatedScale(
+                            scale: isSelected ? 1 : 0.94,
+                            duration: const Duration(milliseconds: 300),
+                            child: MatrimonySubscriptionCard(
+                              planName: plan.name,
+                              amount: "₹${amountState.amount!.amount}",
+                              duration: "One Time",
+                              features: plan.features,
+                              isPopular: plan.isPopular,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          final selectedPlan = plans[_currentIndex];
+
+                          debugPrint("Selected Plan: ${selectedPlan.name}");
+
+                          // ✅ Extract all user profile data
+                          final profile = data.metrimonyProfile;
+                          final user = data.user;
+
+                          if (user.agentId.isEmpty) {
+                            // create a model bottom sheet  to take user id or  show contact details if he does not know
+                            print(" inside bottom sheet");
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20),
+                                ),
+                              ),
+
+                              constraints: BoxConstraints(
+                                maxHeight:
+                                    MediaQuery.of(context).size.height * 0.9,
+                              ),
+                              // theme color
+                              backgroundColor: theme.canvasColor,
+                              builder: (BuildContext context) {
+                                return AgentFormWidget();
+                              },
+                            );
+
+                            return;
+                          }
+
+                          debugPrint("Profile: $profile");
+
+                          // Extract Address Data (Region/District/State)
+                          final region = profile.address.state.trim().isEmpty
+                              ? "Not Provided"
+                              : profile.address.state;
+
+                          final district = profile.address.city.trim().isEmpty
+                              ? "Not Provided"
+                              : profile.address.city;
+
+                          // Extract Identity Data (Gender)
+                          final gender = profile.identity.gender.trim().isEmpty
+                              ? "Not Provided"
+                              : profile.identity.gender;
+
+                          // Extract Phone (user or address)
+
+                          // Log all extracted data
+                          debugPrint("\n=== 📋 PAYMENT DATA ===");
+                          debugPrint("User UID: ${user.uid}");
+                          debugPrint("Full Name: ${user.fullName}");
+                          debugPrint("Email: ${user.email}");
+                          debugPrint("Phone: $user.phone");
+                          debugPrint("Agent ID: ${user.agentId}");
+                          debugPrint("Region/State: $region");
+                          debugPrint("District/City: $district");
+                          debugPrint("Gender: $gender");
+                          debugPrint("Amount: ${amountState.amount?.amount}");
+                          debugPrint("======================\n");
+
+                          // Validate required fields
+                          if (gender == "Not Provided") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "⚠️ Please complete your identity form (Gender required)",
+                                ),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
+                            return;
+                          }
+
+                          if (district == "Not Provided") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "⚠️ Please complete your address form (City required)",
+                                ),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
+                            return;
+                          }
+
+                          ref
+                              .read(paymentProvider.notifier)
+                              .startOneTimePayment(
+                                amount: amountState.amount!.amount.toDouble(),
+                                uid: user.uid,
+                                email: user.email ?? "N/A",
+                                fullName: user.fullName ?? "N/A",
+                                phone: user.phone,
+                                agentId: user.agentId,
+                                region: region,
+                                district: district,
+                                gender: gender,
+                              );
+                        },
+                        child: const Text("Pay Once & Unlock Premium"),
+                      ),
+                    ),
+                  ),
+
+                  // 🔒 Footer Note
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      "Secure payment • Cancel anytime • No hidden charges",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

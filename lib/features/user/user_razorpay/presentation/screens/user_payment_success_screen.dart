@@ -118,6 +118,8 @@ class _UserPaymentSuccessScreenState
                   const Divider(height: 24),
                   _buildDetailRow('Amount', '₹${payment.amount}'),
                   const Divider(height: 24),
+                  _buildDetailRow('Status', payment.status),
+                  const Divider(height: 24),
                   _buildDetailRow(
                     'Date',
                     DateFormat(

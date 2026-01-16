@@ -1,16 +1,19 @@
+import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../router/app_router.dart';
 import '../../../features/auth/domain/states/user_state.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:riverpod/src/framework.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends ConsumerWidget {
   AsyncValue<dynamic> agentAsync;
 
   AppDrawer({super.key, required this.agentAsync});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return Drawer(
@@ -73,10 +76,10 @@ class AppDrawer extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Agent ID: $data.agentId",
+                      "Agent ID: ${data.agentId}",
                       style: const TextStyle(
                         color: Colors.white70,
-                        fontSize: 12,
+                        fontSize: 13,
                       ),
                     ),
                   ],
@@ -104,13 +107,7 @@ class AppDrawer extends StatelessWidget {
                         context.popRoute();
                       },
                     ),
-                    DrawerItem(
-                      icon: Icons.favorite_border,
-                      title: "Matches",
-                      onTap: () {
-                        context.popRoute();
-                      },
-                    ),
+
                     DrawerItem(
                       icon: Icons.bar_chart_outlined,
                       title: "Analytics",
@@ -154,6 +151,23 @@ class AppDrawer extends StatelessWidget {
                         context.pushRoute(const AgentSettingsRoute());
                       },
                     ),
+
+                    DrawerItem(
+                      icon: Icons.person_outline,
+                      title: "My Profile",
+                      onTap: () {
+                        context.popRoute();
+                        context.pushRoute(AgentEntityRoute(uid: data.agentId));
+                      },
+                    ),
+                    DrawerItem(
+                      icon: Icons.reviews_outlined,
+                      title: "My Reviews",
+                      onTap: () {
+                        context.popRoute();
+                        context.pushRoute(const MyReviewRoute());
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -176,6 +190,8 @@ class AppDrawer extends StatelessWidget {
                     ),
                     onPressed: () {
                       // TODO: clear auth + navigate to login
+                      ref.read(authRepositoryProvider).signOut();
+                      context.router.replace(const AgentLoginRoute());
                     },
                   ),
                 ),

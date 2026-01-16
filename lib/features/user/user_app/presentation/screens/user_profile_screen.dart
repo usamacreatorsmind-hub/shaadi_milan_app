@@ -9,7 +9,8 @@ import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
-import '../controllers/user_status_controller.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -29,12 +30,12 @@ final userProfileScreenProvider =
 
         // fetch AgentEntity
         AgentEntity? agent;
-        if (matrimonyProfile.agentId.isNotEmpty) {
+        if (user.agentId.isNotEmpty) {
           try {
-            agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
+            agent = await agentRepo.fetchAgent(user.agentId);
           } catch (e) {
             debugPrint(
-              'Error fetching agent with ID: ${matrimonyProfile.agentId}, Error: $e',
+              'Error fetching agent with ID: ${user.agentId}, Error: $e',
             );
             agent = null;
           }
@@ -137,15 +138,17 @@ class UserProfileScreen extends ConsumerWidget {
                         //  check for payments collection if status is success then show premium card
                         Consumer(
                           builder: (context, ref, child) {
-                            final userStatusState = ref.watch(
-                              userStatusControllerProvider,
+                            final paymentState = ref.watch(
+                              paymentNotifierProvider(userId),
                             );
-                            if (userStatusState.isLoading) {
+                            if (paymentState.status == PayStatus.loading) {
                               return const Center(
                                 child: CircularProgressIndicator(),
                               );
                             }
-                            if (userStatusState.userStatus.isPaymentDone) {
+                            if (paymentState.status == PayStatus.success) {
+                              print(" this  is payment status");
+                              print(paymentState.status);
                               return GestureDetector(
                                 onTap: () => AutoRouter.of(context).push(
                                   UserPaymentSuccessRoute(user: profile.user),
@@ -271,6 +274,16 @@ class UserProfileScreen extends ConsumerWidget {
                           },
                         ),
 
+                        // user Review
+                        _SettingsTile(
+                          icon: Icons.verified_user_outlined,
+                          title: "My Review",
+                          onTap: () {
+                            // navigate to user status screen
+                            AutoRouter.of(context).push(const MyReviewRoute());
+                          },
+                        ),
+
                         // Contact Support
                         // stting tile
                         _SettingsTile(
@@ -360,7 +373,7 @@ class UserProfileScreen extends ConsumerWidget {
 class _ProfileHeaderCard extends StatelessWidget {
   final MetrimonyProfileViewModel profile;
 
-  _ProfileHeaderCard({required this.profile});
+  const _ProfileHeaderCard({required this.profile});
 
   bool get hasImage => profile.userProfile.profileImageUrl.isNotEmpty;
 

@@ -68,8 +68,8 @@ class HomeController extends StateNotifier<HomeState> {
           );
 
           AgentEntity? agent;
-          if (profile.agentId.isNotEmpty) {
-            agent = await _agentRepository.fetchAgent(profile.agentId);
+          if (user.agentId.isNotEmpty) {
+            agent = await _agentRepository.fetchAgent(user.agentId);
           }
 
           return MatrimonyProfileViewModel(

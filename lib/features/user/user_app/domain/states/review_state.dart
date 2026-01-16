@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/src/widgets/basic.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -7,6 +8,7 @@ class Review {
   final String id;
   final String title;
   final String comment;
+  final String agentId; 
   final int rating;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -15,6 +17,7 @@ class Review {
   final String userProfileImg;
 
   Review({
+    required this.agentId, 
     required this.id,
     required this.title,
     required this.comment,
@@ -29,6 +32,8 @@ class Review {
   factory Review.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return Review(
+      agentId: data['agentId'] ?? '',
+      
       id: doc.id,
       userId: data['userId'] ?? '',
       userName: data['userName'] ?? '',
@@ -37,8 +42,10 @@ class Review {
 
       comment: data['comment'],
       rating: data['rating'],
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: data['updatedAt'] != null
+      createdAt: data['createdAt'] is Timestamp
+          ? (data['createdAt'] as Timestamp).toDate()
+          : DateTime.now(),
+      updatedAt: data['updatedAt'] is Timestamp
           ? (data['updatedAt'] as Timestamp).toDate()
           : null,
     );
@@ -47,6 +54,7 @@ class Review {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'agentId': agentId, 
 
       'title': title,
       'userId': userId,

@@ -142,6 +142,7 @@ class AppTextField extends ConsumerStatefulWidget {
   final TextInputType keyboardType;
   final VoidCallback? ontap;
   final String? Function(String?)? validator;
+  final List<String>? autofillHints;
 
   // 🔹 Word count options
   final bool showWordCount;
@@ -166,6 +167,8 @@ class AppTextField extends ConsumerStatefulWidget {
     this.showWordCount = false,
     this.maxLimit, // Unified max limit
     this.maxLines = 1,
+
+    this.autofillHints = const [],
   });
 
   @override
@@ -229,6 +232,7 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
           maxLength: widget.counterType == CounterType.characters
               ? widget.maxLimit
               : null, // Pass maxLength only for character count
+          autofillHints: widget.autofillHints,
           cursorColor: Theme.of(context).colorScheme.primary,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           onChanged: (value) {
@@ -401,7 +405,7 @@ class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
           ),
         ),
       ),
-      value: widget.value,
+      value: widget.items.contains(widget.value) ? widget.value : null,
 
       dropdownStyleData: DropdownStyleData(
         isOverButton: true,

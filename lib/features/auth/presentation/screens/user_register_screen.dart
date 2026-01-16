@@ -1,8 +1,10 @@
-import '../providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../providers/auth_providers.dart';
 
 import '../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../app/router/app_router.dart';
@@ -82,8 +84,14 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
         ),
       );
 
+      TextInput.finishAutofillContext(); // ✅ triggers save prompt
+
       final user = authRepo.currentUser;
       if (user != null) {
+        // Invalidate auth state to ensure latest data is loaded
+        ref.invalidate(authStateProvider);
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (!mounted) return;
         context.router.replace(AuthWrapperRoute());
       }
     } on FirebaseAuthException catch (e) {
@@ -193,90 +201,77 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                       ),
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      AppTextField(
-                        iconColor: theme.colorScheme.primary,
-                        obscureText: false,
-                        controller: nameCtrl,
-                        prefixIcon: Icons.person_outline_rounded,
-                        label: "Full Name",
-                        hint: "John Doe",
-                        keyboardType: TextInputType.name,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        controller: emailCtrl,
-                        prefixIcon: Icons.alternate_email_rounded,
-                        label: "Email",
-                        hint: "example@mail.com",
-                        keyboardType: TextInputType.emailAddress,
-                        iconColor: theme.colorScheme.primary,
-                        obscureText: false,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        controller: phoneCtrl,
-                        prefixIcon: Icons.phone_android_rounded,
-                        label: "Phone",
-                        hint: "+1 234 567 890",
-                        keyboardType: TextInputType.phone,
-                        obscureText: false,
-                        iconColor: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        obscureText: true,
-                        iconColor: theme.colorScheme.primary,
-
-                        controller: pwCtrl,
-                        prefixIcon: Icons.lock_outline_rounded,
-                        label: "Password",
-                        hint: "••••••••",
-                        keyboardType: TextInputType.visiblePassword,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        controller: confirmPwCtrl,
-                        prefixIcon: Icons.verified_user_outlined,
-                        label: "Confirm Password",
-                        hint: "••••••••",
-                        obscureText: true,
-
-                        keyboardType: TextInputType.visiblePassword,
-                        iconColor: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 24),
-
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: isLoading
-                              ? null
-                              : () => _register(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: isLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : const Text(
-                                  "Create Profile",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                  child: AutofillGroup(
+                    child: Column(
+                      children: [
+                        AppTextField(
+                          autofillHints: const [AutofillHints.name],
+                          iconColor: theme.colorScheme.primary,
+                          obscureText: false,
+                          controller: nameCtrl,
+                          prefixIcon: Icons.person_outline_rounded,
+                          label: "Full Name",
+                          hint: "John Doe",
+                          keyboardType: TextInputType.name,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          autofillHints: const [AutofillHints.email],
+                          controller: emailCtrl,
+                          prefixIcon: Icons.alternate_email_rounded,
+                          label: "Email",
+                          hint: "example@mail.com",
+                          keyboardType: TextInputType.emailAddress,
+                          iconColor: theme.colorScheme.primary,
+                          obscureText: false,
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          autofillHints: const [AutofillHints.telephoneNumber],
+                          controller: phoneCtrl,
+                          prefixIcon: Icons.phone_android_rounded,
+                          label: "Phone",
+                          hint: "+1 234 567 890",
+                          keyboardType: TextInputType.phone,
+                          obscureText: false,
+                          iconColor: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          autofillHints: const [AutofillHints.newPassword],
+                          obscureText: true,
+                          iconColor: theme.colorScheme.primary,
+
+                          controller: pwCtrl,
+                          prefixIcon: Icons.lock_outline_rounded,
+                          label: "Password",
+                          hint: "••••••••",
+                          keyboardType: TextInputType.visiblePassword,
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          autofillHints: const [AutofillHints.newPassword],
+                          controller: confirmPwCtrl,
+                          prefixIcon: Icons.verified_user_outlined,
+                          label: "Confirm Password",
+                          hint: "••••••••",
+                          obscureText: true,
+
+                          keyboardType: TextInputType.visiblePassword,
+                          iconColor: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(height: 24),
+
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: AppButton(
+                            text: isLoading ? "Registering..." : "Register",
+                            onPressed: () => _register(context),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 

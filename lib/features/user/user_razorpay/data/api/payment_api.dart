@@ -1,12 +1,9 @@
-
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/api/payment_api._firestore.dart';
 import 'package:dio/dio.dart';
 
 class PaymentApi {
   final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: "https://parade-johnston-nvidia-harris.trycloudflare.com",
-      headers: {"Content-Type": "application/json"},
-    ),
+    BaseOptions(headers: {"Content-Type": "application/json"}),
   );
 
   Future<Map<String, dynamic>> createOrder({
@@ -22,7 +19,7 @@ class PaymentApi {
   }) async {
     try {
       final response = await _dio.post(
-        "/create-order", // Replace with your actual endpoint
+        await fetchBaseUrl(), // Replace with your actual endpoint
         data: {
           "amount": amount, // Razorpay expects amount in paisa
           "uid": uid,
@@ -39,5 +36,16 @@ class PaymentApi {
     } on DioException catch (e) {
       throw Exception("Failed to create order: ${e.message}");
     }
+  }
+
+  Future<String> fetchBaseUrl() async {
+    final paymentApiFirestore = PaymentApiFirestore();
+    final firestoreBaseUrl = await paymentApiFirestore.getUrl();
+
+    print("this is base url");
+
+    _dio.options.baseUrl = firestoreBaseUrl ?? "No url";
+
+    return _dio.options.baseUrl;
   }
 }

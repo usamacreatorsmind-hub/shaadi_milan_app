@@ -17,8 +17,7 @@ import 'physical_state.dart';
 /// ============================================================
 
 class MatrimonyProfile {
-  final String userId;
-  final String agentId;
+  final String userId; 
   final String metrimonyId;
   final IdentityProfile identity;
   final AddressProfile address;
@@ -32,8 +31,7 @@ class MatrimonyProfile {
 
   MatrimonyProfile({
     this.metrimonyId = "",
-    this.userId = '',
-    this.agentId = '',
+    this.userId = '', 
 
     IdentityProfile? identity,
     AddressProfile? address,
@@ -68,8 +66,7 @@ class MatrimonyProfile {
   MatrimonyProfile copyWith({
     String? metrimonyId,
 
-    String? userId,
-    String? agentId,
+    String? userId, 
     IdentityProfile? identity,
     AddressProfile? address,
     CulturalProfile? cultural,
@@ -82,8 +79,7 @@ class MatrimonyProfile {
     return MatrimonyProfile(
       metrimonyId: metrimonyId ?? this.metrimonyId,
 
-      userId: userId ?? this.userId,
-      agentId: agentId ?? this.agentId,
+      userId: userId ?? this.userId, 
       identity: identity ?? this.identity,
       address: address ?? this.address,
       cultural: cultural ?? this.cultural,
@@ -101,8 +97,7 @@ class MatrimonyProfile {
     return {
       "metrimonyId": metrimonyId,
 
-      'userId': userId,
-      'agentId': agentId,
+      'userId': userId, 
       'identity': identity.toMap(),
       'address': address.toMap(),
       'cultural': cultural.toMap(),
@@ -121,8 +116,7 @@ class MatrimonyProfile {
       return MatrimonyProfile(
         metrimonyId: map['metrimonyId'] ?? '',
 
-        userId: map['userId'] ?? '',
-        agentId: map['agentId'] ?? '',
+        userId: map['userId'] ?? '', 
 
         identity: map['identity'] != null
             ? IdentityProfile.fromMap(
@@ -177,8 +171,7 @@ class MatrimonyProfile {
 MatrimonyProfile(
  
   metrimonyId: $metrimonyId,
-  userId: $userId,
-  agentId: $agentId,
+  userId: $userId, 
   identity: $identity,
   address: $address,
   cultural: $cultural,

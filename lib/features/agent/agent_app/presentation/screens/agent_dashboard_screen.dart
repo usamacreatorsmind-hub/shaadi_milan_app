@@ -89,7 +89,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                     children: [
                       const SizedBox(height: 30),
                       Text(
-                        'Welcome back,',
+                        'Welcome,',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.9),
                           fontSize: 16,
@@ -305,7 +305,11 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           label: 'Add Client',
           color: Theme.of(context).primaryColor,
           onTap: () {
-            context.navigateTo(AgentUserRoute(agentId: widget.agentId));
+            // this feature comming soon
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("This feature is coming soon!")),
+            );
           },
         ),
         _buildActionButton(

@@ -26,19 +26,7 @@ class UserStatusScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildStatusRow(
-                    context,
-                    'Payment Done:',
-                    userStatus.isPaymentDone ? 'Yes' : 'No',
-                    userStatus.isPaymentDone ? Colors.green : Colors.red,
-                  ),
                   const SizedBox(height: 10),
-                  _buildStatusRow(
-                    context,
-                    'Subscription Active:',
-                    userStatus.isPaymentDone ? 'Yes' : 'No',
-                    userStatus.isPaymentDone ? Colors.green : Colors.red,
-                  ),
 
                   const SizedBox(height: 10),
                   _buildStatusRow(

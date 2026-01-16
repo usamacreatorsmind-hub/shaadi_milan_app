@@ -61,15 +61,16 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     }
   }
 
-  // @override
-  // void dispose() {
-  //   _atController.dispose();
-  //   _postController.dispose();
-  //   _districtController.dispose();
-  //   _stateController.dispose();
-  //   _pinController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    _atController.dispose();
+    _postController.dispose();
+    _policeStationController.dispose();
+    _districtController.dispose();
+    _stateController.dispose();
+    _pinController.dispose();
+    super.dispose();
+  }
 
   void _submitForm() {
     if (!_formKey.currentState!.validate()) return;
@@ -192,7 +193,9 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                         _buildDropdown(
                           context: context,
                           label: 'State',
-                          value: location.state.isEmpty ? null : location.state,
+                          value: stateNames.contains(location.state)
+                              ? location.state
+                              : null,
                           items: stateNames,
                           onChanged: (val) {
                             if (val != null) {
@@ -209,7 +212,9 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                         _buildDropdown(
                           context: context,
                           label: 'District',
-                          value: location.city.isEmpty ? null : location.city,
+                          value: selectedState.cities.contains(location.city)
+                              ? location.city
+                              : null,
                           items: selectedState.cities,
                           onChanged: (val) {
                             if (val != null) {

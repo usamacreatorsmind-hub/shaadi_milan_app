@@ -26,12 +26,12 @@ final matrimonyProfileProvider =
 
         final AgentEntity agent;
 
-        if (matrimonyProfile.agentId.isNotEmpty) {
+        if (user.agentId.isNotEmpty) {
           // print agetn id
           print("This is agent id");
-          print(matrimonyProfile.agentId);
+          print(user.agentId);
 
-          agent = await agentRepo.fetchAgent(matrimonyProfile.agentId);
+          agent = await agentRepo.fetchAgent(user.agentId);
         } else {
           agent = AgentEntity.empty();
         }
@@ -55,6 +55,17 @@ class MyProfileScreen extends ConsumerWidget {
     print("inside my profile view");
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("My Profile"),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => AutoRouter.of(context).pop(),
+        ),
+      ),
+
       backgroundColor: Colors.grey[100],
 
       body: profileAsync.when(
@@ -84,7 +95,9 @@ class MyProfileScreen extends ConsumerWidget {
                   actionChip: AppChip(
                     label: "Upload",
                     icon: Icons.upload,
-                    onTap: () {},
+                    onTap: () {
+                      // AutoRouter.of(context).push(UserImageFormRoute());
+                    },
                   ),
                   children: [
                     profile.images.secondaryImageUrls.isNotEmpty
@@ -207,11 +220,17 @@ class MyProfileScreen extends ConsumerWidget {
                   actionChip: AppChip(
                     label: "Edit",
                     icon: Icons.edit,
-                    onTap: () {},
+                    onTap: () => AutoRouter.of(context).push(
+                      UserIdentityFormRoute(
+                        mode: FormMode.edit,
+                        existingIdentityProfile: profile.identity,
+                      ),
+                    ),
                   ),
+
                   children: [
                     Text(
-                      "No description available.",
+                      profile.identity.aboutMe ?? "No description available.",
                       textAlign: TextAlign.justify,
                       style: TextStyle(color: Colors.grey[700]),
                     ),
@@ -616,6 +635,7 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
   late AnimationController _hoverController;
   late Animation<double> _elevationAnimation;
 
+  bool get hasImage => widget.profile.userProfile.profileImageUrl.isNotEmpty;
   @override
   void initState() {
     super.initState();
@@ -682,36 +702,43 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
                         // Profile Image with Badge
                         GestureDetector(
                           onTap: () => showPhotoDialogBox(
-                            photoUrl: widget.profile.images.primaryImageUrl,
+                            photoUrl:
+                                widget.profile.userProfile.profileImageUrl,
                             context: context,
                           ),
                           child: Stack(
                             children: [
                               CircleAvatar(
-                                radius: 54,
+                                radius: 55,
                                 backgroundColor: theme.primaryColor.withOpacity(
-                                  0.15,
+                                  0.1,
                                 ),
-                                backgroundImage:
-                                    (widget
-                                        .profile
-                                        .images
-                                        .primaryImageUrl
-                                        .isNotEmpty)
+                                backgroundImage: hasImage
                                     ? NetworkImage(
-                                        widget.profile.images.primaryImageUrl,
+                                        widget
+                                            .profile
+                                            .userProfile
+                                            .profileImageUrl,
                                       )
                                     : null,
-                                child:
-                                    (widget
-                                        .profile
-                                        .images
-                                        .primaryImageUrl
-                                        .isEmpty)
-                                    ? Icon(
-                                        Icons.person_outline,
-                                        size: 52,
-                                        color: theme.primaryColor,
+                                child: !hasImage
+                                    ? Text(
+                                        widget
+                                                .profile
+                                                .userProfile
+                                                .fullName
+                                                .isNotEmpty
+                                            ? widget
+                                                  .profile
+                                                  .userProfile
+                                                  .fullName[0]
+                                                  .toUpperCase()
+                                            : '?',
+                                        style: TextStyle(
+                                          fontSize: 40,
+                                          fontWeight: FontWeight.bold,
+                                          color: theme.primaryColor,
+                                        ),
                                       )
                                     : null,
                               ),

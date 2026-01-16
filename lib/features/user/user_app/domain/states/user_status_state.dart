@@ -1,15 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserStatus {
-  final bool isPaymentDone;
   final String uid;
   final String? paymentId;
   final DateTime? paymentAt;
 
   const UserStatus({
     required this.uid,
-
-    required this.isPaymentDone,
     required this.paymentId,
     required this.paymentAt,
   });
@@ -20,7 +17,6 @@ class UserStatus {
     return UserStatus(
       uid: map['uid'] as String? ?? '',
 
-      isPaymentDone: map['isPaymentDone'] as bool? ?? false,
       paymentId: map['paymentId'] as String?,
       paymentAt: map['paymentAt'] != null
           ? (map['paymentAt'] as Timestamp).toDate()
@@ -32,7 +28,6 @@ class UserStatus {
     return {
       'uid': uid,
 
-      'isPaymentDone': isPaymentDone,
       'paymentId': paymentId,
       'paymentAt': paymentAt != null ? Timestamp.fromDate(paymentAt!) : null,
     };
@@ -40,7 +35,7 @@ class UserStatus {
 
   @override
   String toString() {
-    return 'UserStatus(paymentDone: $isPaymentDone, uid: $uid, paymentId: $paymentId, paymentAt: $paymentAt, ';
+    return 'UserStatus(  uid: $uid, paymentId: $paymentId, paymentAt: $paymentAt, ';
   }
 
   UserStatus copyWith({
@@ -54,18 +49,12 @@ class UserStatus {
     return UserStatus(
       uid: uid ?? this.uid,
 
-      isPaymentDone: isPaymentDone ?? this.isPaymentDone,
       paymentId: paymentId ?? this.paymentId,
       paymentAt: paymentAt ?? this.paymentAt,
     );
   }
 
-  const UserStatus.empty()
-    : isPaymentDone = false,
-
-      uid = '',
-      paymentId = null,
-      paymentAt = null;
+  const UserStatus.empty() : uid = '', paymentId = null, paymentAt = null;
 }
 
 class UserStatusState {

@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 import '../../../../../app/custom/custom_widgets/user_drawer.dart';
@@ -13,6 +13,7 @@ import '../../../../../app/router/app_router.dart';
 import '../../domain/states/religion_state.dart';
 import '../../domain/states/state_city.dart';
 import '../controllers/home_controller.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,8 +30,6 @@ class UserHomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // current user provider
     final currentUserAsync = ref.watch(currentUserProvider);
-
-    final userStatus = ref.read(userStatusControllerProvider);
 
     final homeState = ref.watch(homeControllerProvider);
     final filter = ref.watch(homeFilterProvider);
@@ -53,8 +52,24 @@ class UserHomeScreen extends ConsumerWidget {
     return Scaffold(
       drawer: UserDrawer(userAsync: currentUserAsync),
 
-      body: userStatus.userStatus.isPaymentDone
-          ? CustomScrollView(
+      body: currentUserAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (user) {
+          if (user == null) return const Center(child: Text("User not found"));
+
+          // Watch the payment status directly for this user.
+          // The PaymentNotifier fetches the status from Firebase.
+          final paymentState = ref.watch(paymentNotifierProvider(user.uid));
+
+          if (paymentState.status == PayStatus.loading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // If payment is successful, show the home content.
+          // Otherwise, show the payment screen.
+          if (paymentState.status == PayStatus.success) {
+            return CustomScrollView(
               slivers: [
                 const MinimalAppBar(title: "Home", showShadow: true),
                 // other slivers...
@@ -214,8 +229,12 @@ class UserHomeScreen extends ConsumerWidget {
                   },
                 ),
               ],
-            )
-          : UserPaymentScreen(userId: currentUserAsync.value?.uid ?? "N/A"),
+            );
+          } else {
+            return UserPaymentScreen(userId: user.uid);
+          }
+        },
+      ),
     );
   }
 }
@@ -462,6 +481,7 @@ class ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
 
@@ -535,68 +555,30 @@ class ProfileCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      const SizedBox(height: 4),
+                      Icon(Icons.cake_outlined,
+                          size: 18, color: Colors.grey[700]),
+                      const SizedBox(width: 4),
                       Text(
                         '$age years',
                         style: TextStyle(color: Colors.grey[700]),
                       ),
-                      const SizedBox(width: 40),
-
-                      Text(
-                        designation,
-                        style: TextStyle(color: Colors.grey[700]),
+                      const SizedBox(width: 16),
+                      Icon(Icons.work_outline,
+                          size: 18, color: Colors.grey[700]),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          designation,
+                          style: TextStyle(color: Colors.grey[700]),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      style: ButtonStyle(
-                        foregroundColor: WidgetStateProperty.all(
-                          Theme.of(context).colorScheme.primary,
-                        ),
-                        side: WidgetStateProperty.all(
-                          BorderSide(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                        backgroundColor: WidgetStateProperty.all(
-                          Theme.of(
-                            context,
-                          ).colorScheme.primary.withOpacity(0.05),
-                        ),
-                        elevation: WidgetStateProperty.all(0),
-
-                        overlayColor: WidgetStateProperty.resolveWith<Color?>((
-                          Set<WidgetState> states,
-                        ) {
-                          if (states.contains(WidgetState.pressed)) {
-                            return Theme.of(
-                              context,
-                            ).colorScheme.primary.withOpacity(0.1);
-                          }
-                          return null; // Defer to the widget's default.
-                        }),
-
-                        shape: WidgetStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        padding: WidgetStateProperty.all(
-                          const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-
-                      onPressed: () {
-                        context.router.push(UserDetailRoute(uid: uid));
-                      },
-                      child: const Text('View Profile'),
-                    ),
-                  ),
                 ],
               ),
             ),

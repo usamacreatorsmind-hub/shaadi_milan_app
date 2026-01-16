@@ -1,3 +1,6 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/drawer.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_details_screen.dart';
+
 import '../../../../../app/custom/custom_widgets/mime_type.dart';
 import '../../../../user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
@@ -23,118 +26,116 @@ class AgentEntityScreen extends ConsumerWidget {
     final agentAsync = ref.watch(agentProvider(uid));
     final theme = Theme.of(context);
 
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        body: agentAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text(e.toString())),
-          data: (agent) {
-            return CustomScrollView(
-              slivers: [
-                // ===== APP BAR + PROFILE + TABS =====
-                SliverAppBar(
-                  pinned: true,
-                  expandedHeight: 300,
-                  backgroundColor: theme.primaryColor,
-                  iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-                  title: SizedBox(
-                    height: 56,
-                    child: Center(
-                      child: Text(
-                        agent.agentName,
-                        style: TextStyle(
-                          color: theme.colorScheme.onPrimary,
-                          fontSize: 18,
+    return Scaffold(
+      drawer: AppDrawer(agentAsync: agentAsync),
+
+      body: agentAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text(e.toString())),
+        data: (agent) {
+          return DefaultTabController(
+            length: 4,
+            child: NestedScrollView(
+              floatHeaderSlivers: true,
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  // ===== APP BAR + PROFILE + TABS =====
+                  SliverAppBar(
+                    pinned: true,
+                    expandedHeight: 300,
+                    backgroundColor: theme.primaryColor,
+                    iconTheme: IconThemeData(
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                    title: SizedBox(
+                      height: 56,
+                      child: Center(
+                        child: Text(
+                          agent.agentName,
+                          style: TextStyle(
+                            color: theme.colorScheme.onPrimary,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    centerTitle: true,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Padding(
+                        padding: const EdgeInsets.only(top: 80),
+                        child: ProfileHeader(agent: agent),
+                      ),
+                    ),
+                  ),
+
+                  SliverPersistentHeader(
+                    delegate: _SliverAppBarDelegate(
+                      TabBar(
+                        labelColor: Theme.of(context).primaryColor,
+                        tabAlignment: TabAlignment.center,
+                        isScrollable: true,
+                        indicatorColor: Colors.transparent,
+                        unselectedLabelColor: Colors.grey,
+                        labelPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                        ),
+                        dividerColor: Colors.transparent,
+
+                        labelStyle: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        tabs: [
+                          TabWidget(label: 'Overview', icon: Icons.person),
+                          TabWidget(label: 'Media', icon: Icons.image),
+                          TabWidget(label: 'Contact', icon: Icons.contact_mail),
+                          TabWidget(label: 'Status', icon: Icons.verified_user),
+                        ],
                       ),
                     ),
+                    pinned: true,
                   ),
-                  centerTitle: true,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Padding(
-                      padding: const EdgeInsets.only(top: 80),
-                      child: ProfileHeader(agent: agent),
-                    ),
-                  ),
-
-                  bottom: PreferredSize(
-                    preferredSize: const Size.fromHeight(52),
-                    child: TabBar(
-                      isScrollable: true,
-                      indicatorSize: TabBarIndicatorSize.tab,
-
-                      labelStyle: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      unselectedLabelStyle: const TextStyle(fontSize: 13),
-
-                      indicator: BoxDecoration(
-                        color: theme.colorScheme.secondary,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(10),
-                        ),
-                      ),
-
-                      labelColor: theme.colorScheme.onPrimary,
-                      unselectedLabelColor: theme.colorScheme.onPrimary
-                          .withOpacity(0.7),
-
-                      tabs: const [
-                        SizedBox(
-                          height: 48,
-                          child: Tab(
-                            icon: Icon(Icons.dashboard_outlined),
-                            text: "Overview",
-                          ),
-                        ),
-                        SizedBox(
-                          height: 48,
-                          child: Tab(
-                            icon: Icon(Icons.image_outlined),
-                            text: "Media",
-                          ),
-                        ),
-                        SizedBox(
-                          height: 48,
-                          child: Tab(
-                            icon: Icon(Icons.call_outlined),
-                            text: "Contact",
-                          ),
-                        ),
-                        SizedBox(
-                          height: 48,
-                          child: Tab(
-                            icon: Icon(Icons.verified_outlined),
-                            text: "Status",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // ===== TAB CONTENT =====
-                SliverFillRemaining(
-                  child: TabBarView(
-                    children: [
-                      OverviewTab(agent: agent),
-                      MediaTab(agent: agent),
-                      ContactTab(agent: agent),
-                      StatusTab(agent: agent),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+                ];
+              },
+              body: TabBarView(
+                children: [
+                  OverviewTab(agent: agent),
+                  MediaTab(agent: agent),
+                  ContactTab(agent: agent),
+                  StatusTab(agent: agent),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
+
+  const _SliverAppBarDelegate(this._tabBar);
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(color: Colors.white, child: _tabBar);
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) => false;
 }
 
 class OverviewTab extends StatefulWidget {
@@ -196,6 +197,9 @@ class OverviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+
     final fullAddress =
         '${agent.agentAddress}, ${agent.agentCity}, ${agent.agentState} - ${agent.agentPincode}';
 
@@ -203,17 +207,68 @@ class OverviewCard extends StatelessWidget {
       icon: Icons.dashboard_customize_outlined,
       title: "Agent Overview",
       children: [
-        InfoTile("Agent ID", agent.agentId),
-        const SizedBox(height: 8),
-        InfoTile("Role", agent.role),
-        const SizedBox(height: 8),
-        InfoTile("UID", agent.uid),
-        const Divider(height: 24),
-        InfoTile("Mobile", agent.agentMobile),
-        const SizedBox(height: 8),
-        InfoTile("Email", agent.agentEmail),
-        const Divider(height: 24),
-        InfoTile("Address", fullAddress),
+        _ContactTile(
+          color: primary,
+          onTap: () {
+            launchUrl(Uri.parse('tel:${agent.agentMobile}'));
+          },
+          icon: Icons.phone_outlined,
+          label: "Mobile",
+          value: agent.agentMobile,
+        ),
+        SizedBox(height: 10),
+        _ContactTile(
+          color: primary,
+          onTap: () {
+            // You can add navigation to a map application or just display the address
+            // For now, let's just show a snackbar or copy to clipboard
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Agent ID: ${agent.agentId}')),
+            );
+          },
+          icon: Icons.person_outline,
+          label: "Agent ID",
+          value: agent.agentId,
+        ),
+        // build all with contact tile
+        SizedBox(height: 10),
+        _ContactTile(
+          color: primary,
+          onTap: () {
+            launchUrl(Uri.parse('mailto:${agent.agentEmail}'));
+          },
+          icon: Icons.email_outlined,
+          label: "Email",
+          value: agent.agentEmail,
+        ),
+        SizedBox(height: 10),
+        _ContactTile(
+          color: primary,
+          onTap: () {
+            // You can add navigation to a map application or just display the address
+            // For now, let's just show a snackbar or copy to clipboard
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Address: $fullAddress')));
+          },
+          icon: Icons.location_on_outlined,
+          label: "Address",
+          value: fullAddress,
+        ),
+        SizedBox(height: 10),
+        _ContactTile(
+          color: primary,
+          onTap: () {
+            // You can add navigation to a map application or just display the address
+            // For now, let's just show a snackbar or copy to clipboard
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Pincode: ${agent.agentPincode}')),
+            );
+          },
+          icon: Icons.location_pin,
+          label: "Pincode",
+          value: agent.agentPincode,
+        ),
       ],
     );
   }
@@ -254,7 +309,7 @@ class ContactTab extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          ContactInfoCard(agent: agent),
+          InfoCard(cardName: "Contact Information", agent: agent),
           const SizedBox(height: 20),
           ActionButtons(agent: agent),
         ],
@@ -271,7 +326,8 @@ class StatusTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: StatusInfoCard(agent: agent),
+
+      child: Column(children: [StatusInfoCard(agent: agent)]),
     );
   }
 }
@@ -324,22 +380,18 @@ class InfoSectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
+          colors: [primary.withOpacity(0.08), primary.withOpacity(0.02)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.white, Colors.grey.shade50],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: primary.withOpacity(0.15)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -349,33 +401,24 @@ class InfoSectionCard extends StatelessWidget {
             Row(
               children: [
                 if (icon != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Icon(icon, color: theme.primaryColor, size: 24),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.only(right: 12),
+                    decoration: BoxDecoration(
+                      color: primary.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: primary, size: 20),
                   ),
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    theme.primaryColor.withOpacity(0.3),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
             ...children,
           ],
         ),
@@ -425,20 +468,155 @@ class InfoTile extends StatelessWidget {
   }
 }
 
-class ContactInfoCard extends StatelessWidget {
+class InfoCard extends StatelessWidget {
   final AgentEntity agent;
-  const ContactInfoCard({super.key, required this.agent});
+  final String cardName;
+
+  const InfoCard({super.key, required this.cardName, required this.agent});
 
   @override
   Widget build(BuildContext context) {
-    return InfoSectionCard(
-      icon: Icons.contact_mail_outlined,
-      title: "Contact Info",
-      children: [
-        InfoTile("Mobile", agent.agentMobile),
-        const SizedBox(height: 8),
-        InfoTile("Email", agent.agentEmail),
-      ],
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [primary.withOpacity(0.08), primary.withOpacity(0.02)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: primary.withOpacity(0.15)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// ===== HEADER =====
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: primary.withOpacity(0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.contact_mail_outlined, color: primary),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                cardName,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          /// ===== PHONE =====
+          _ContactTile(
+            icon: Icons.phone_outlined,
+            label: "Mobile",
+            value: agent.agentMobile,
+            color: primary,
+            onTap: () {
+              // launchUrl(Uri.parse('tel:${agent.agentMobile}'));
+            },
+          ),
+
+          const SizedBox(height: 12),
+
+          /// ===== EMAIL =====
+          _ContactTile(
+            icon: Icons.email_outlined,
+            label: "Email",
+            value: agent.agentEmail,
+            color: primary,
+            onTap: () {
+              // launchUrl(Uri.parse('mailto:${agent.agentEmail}'));
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ContactTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ContactTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 20, color: color),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: Colors.grey[400],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -453,9 +631,23 @@ class StatusInfoCard extends StatelessWidget {
       icon: Icons.verified_outlined,
       title: "Status",
       children: [
-        InfoTile("Approved", agent.isApproved ? "✓ Yes" : "✗ No"),
+        _ContactTile(
+          color: Theme.of(context).colorScheme.primary,
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Agent is ${agent.isApproved ? "Approved" : "Not Approved"}',
+                ),
+              ),
+            );
+          },
+          icon: Icons.verified_user_outlined,
+          label: "Approved",
+          value: agent.isApproved ? "✓ Yes" : "✗ No",
+        ),
+
         const SizedBox(height: 8),
-        InfoTile("Rejected", agent.isRejected ? "✓ Yes" : "✗ No"),
       ],
     );
   }

@@ -1,3 +1,5 @@
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
+
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/review_state.dart';
@@ -30,7 +32,7 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
     super.dispose();
   }
 
-  void _submitReview() {
+  Future<void> _submitReview() async {
     if (!_formKey.currentState!.validate()) return;
 
     if (_rating == 0) {
@@ -45,18 +47,23 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
 
     final reviewNotifier = ref.read(reviewNotifierProvider.notifier);
 
-    reviewNotifier.addReview(
-      review: Review(
-        id: '',
-        userId: currentUser.value!.uid,
-        userName: currentUser.value!.fullName,
-        userProfileImg: currentUser.value!.profileImageUrl,
-        rating: _rating.toInt(),
-        title: _titleController.text.trim(),
-        comment: _descriptionController.text.trim(),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
+    // fetch agetn entity  from repository
+    ref
+        .read(agentRepositoryProvider)
+        .fetchAgent(currentUser.value!.agentId);
+
+    Review(
+      agentId: currentUser.value!.agentId,
+
+      id: '',
+      userId: currentUser.value!.uid,
+      userName: currentUser.value!.fullName,
+      userProfileImg: currentUser.value!.profileImageUrl,
+      rating: _rating.toInt(),
+      title: _titleController.text.trim(),
+      comment: _descriptionController.text.trim(),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
 
     final state = ref.read(reviewNotifierProvider);

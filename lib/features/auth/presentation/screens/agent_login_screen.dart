@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 import '../providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -57,6 +59,8 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+
+      TextInput.finishAutofillContext(); // ✅ triggers save prompt
 
       final user = authRepo.currentUser;
       if (user != null) {
@@ -170,56 +174,63 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                       ),
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      AppTextField(
-                        controller: emailCtrl,
-                        prefixIcon: Icons.alternate_email_rounded,
-                        label: "Work Email",
-                        hint: "agent@arvika.com",
-                        keyboardType: TextInputType.emailAddress,
-                        iconColor: theme.colorScheme.primary,
-                        obscureText: false,
-                      ),
-                      const SizedBox(height: 18),
-                      AppTextField(
-                        controller: pwCtrl,
-                        prefixIcon: Icons.lock_outline_rounded,
-                        label: "Password",
-                        hint: "••••••••",
-                        keyboardType: TextInputType.visiblePassword,
-                        obscureText: true,
-                        iconColor: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: AppButton(
-                          text: isLoading ? "Logging in..." : "Login",
-                          onPressed: () => _login(context),
+                  child: AutofillGroup(
+                    child: Column(
+                      children: [
+                        AppTextField(
+                          autofillHints: const [
+                            AutofillHints.username,
+                            AutofillHints.email,
+                          ],
+                          controller: emailCtrl,
+                          prefixIcon: Icons.alternate_email_rounded,
+                          label: "Work Email",
+                          hint: "agent@arvika.com",
+                          keyboardType: TextInputType.emailAddress,
+                          iconColor: theme.colorScheme.primary,
+                          obscureText: false,
                         ),
-                      ),
+                        const SizedBox(height: 18),
+                        AppTextField(
+                          autofillHints: const [AutofillHints.password],
+                          controller: pwCtrl,
+                          prefixIcon: Icons.lock_outline_rounded,
+                          label: "Password",
+                          hint: "••••••••",
+                          keyboardType: TextInputType.visiblePassword,
+                          obscureText: true,
+                          iconColor: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: AppButton(
+                            text: isLoading ? "Logging in..." : "Login",
+                            onPressed: () => _login(context),
+                          ),
+                        ),
 
-                      const SizedBox(height: 12),
+                        const SizedBox(height: 12),
 
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () =>
-                              context.navigateTo(const ResetPasswordRoute()),
-                          child: Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w600,
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () =>
+                                context.navigateTo(const ResetPasswordRoute()),
+                            child: Text(
+                              "Forgot Password?",
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
-                      const SizedBox(height: 12),
-                    ],
+                        const SizedBox(height: 12),
+                      ],
+                    ),
                   ),
                 ),
 

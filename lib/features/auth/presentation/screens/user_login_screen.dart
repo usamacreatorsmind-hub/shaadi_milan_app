@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/custom/custom_widgets/widgets.dart';
@@ -58,8 +59,14 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
         ),
       );
 
+      TextInput.finishAutofillContext(); // ✅ triggers save prompt
+
       final user = credential.user;
       if (user != null) {
+        // Invalidate auth state to ensure latest data is loaded
+        ref.invalidate(authStateProvider);
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (!mounted) return;
         context.router.replace(AuthWrapperRoute());
       }
     } on FirebaseAuthException catch (e) {
@@ -143,7 +150,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
 
                 // only name
                 Text(
-                  "Welcome Back!",
+                  "Welcome,",
                   style: theme.textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -177,75 +184,66 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                       ),
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      AppTextField(
-                        iconColor: theme.colorScheme.primary,
-                        obscureText: false,
+                  child: AutofillGroup(
+                    child: Column(
+                      children: [
+                        AppTextField(
+                          autofillHints: const [
+                            AutofillHints.username,
+                            AutofillHints.email,
+                          ],
 
-                        controller: emailCtrl,
-                        prefixIcon: Icons.email_outlined,
-                        label: "Email Address",
-                        hint: "name@example.com",
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: 20),
-                      AppTextField(
-                        iconColor: theme.colorScheme.primary,
-                        obscureText: false,
+                          iconColor: theme.colorScheme.primary,
+                          obscureText: false,
 
-                        controller: pwCtrl,
-                        prefixIcon: Icons.lock_open_rounded,
-                        label: "Password",
-                        hint: "••••••••",
+                          controller: emailCtrl,
+                          prefixIcon: Icons.email_outlined,
+                          label: "Email Address",
+                          hint: "name@example.com",
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 20),
+                        AppTextField(
+                          autofillHints: const [AutofillHints.password],
 
-                        keyboardType: TextInputType.visiblePassword,
-                      ),
+                          iconColor: theme.colorScheme.primary,
+                          obscureText: true,
 
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () =>
-                              context.navigateTo(const ResetPasswordRoute()),
-                          child: Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w600,
+                          controller: pwCtrl,
+                          prefixIcon: Icons.lock_open_rounded,
+                          label: "Password",
+                          hint: "••••••••",
+
+                          keyboardType: TextInputType.visiblePassword,
+                        ),
+
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () =>
+                                context.navigateTo(const ResetPasswordRoute()),
+                            child: Text(
+                              "Forgot Password?",
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
-                      const SizedBox(height: 10),
+                        const SizedBox(height: 10),
 
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: isLoading ? null : () => _login(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 0,
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: AppButton(
+                            text: isLoading ? "Logging in..." : "Login",
+                            onPressed: () => _login(context),
                           ),
-                          child: isLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : const Text(
-                                  "Login",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
 

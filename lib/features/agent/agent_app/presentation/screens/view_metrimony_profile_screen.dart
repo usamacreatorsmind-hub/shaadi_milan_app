@@ -55,6 +55,7 @@ class _ViewMetrimonyProfileScreenState
       ),
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
+
         error: (error, stackTrace) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -520,24 +521,12 @@ class _ImagesTabSection extends StatelessWidget {
                           _ImageViewer(imageUrl: entry.value, label: entry.key),
                     ),
 
-                    // Aadhar card tab
-                    if (images.aadharCardUrl.isNotEmpty)
-                      DetailRowWithAction(
-                        label: "Aadhar Card",
-                        value: "View PDF",
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => PdfViewerBottomsheet(
-                              source: images.aadharCardUrl,
-                              title: 'Aadhar PDF',
-                              isLocal: false,
-                            ),
-                          );
-                        },
-                      ),
+                    // // Aadhar card tab
+                    // if (images.aadharCardUrl.isNotEmpty)
+                    _DocumentViewer(
+                      documentUrl: images.aadharCardUrl,
+                      label: 'Aadhar Card',
+                    ),
                   ],
                 ),
               ),
@@ -722,20 +711,28 @@ class _DocumentViewer extends StatelessWidget {
   }
 
   void _openDocument(BuildContext context, bool isPdf) {
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        child: isPdf
-            ? const Padding(
-                padding: EdgeInsets.all(24),
-                child: Text('PDF viewer not implemented yet.'),
-              )
-            : Image.network(
-                documentUrl,
-                errorBuilder: (_, __, ___) => _ImageError(label: label),
-              ),
-      ),
-    );
+    if (isPdf) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => PdfViewerBottomsheet(
+          source: documentUrl,
+          title: label,
+          isLocal: false,
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (_) => Dialog(
+          child: Image.network(
+            documentUrl,
+            errorBuilder: (_, __, ___) => _ImageError(label: label),
+          ),
+        ),
+      );
+    }
   }
 
   String _shortFileName(String url) {

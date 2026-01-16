@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
 import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/support_ticket_notifier.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/support_ticket.dart';
@@ -158,24 +159,24 @@ class AgentSupportTicketDetailScreen extends ConsumerWidget {
                 _buildInfoRow('Status', ticket.status.displayName),
 
                 const Divider(),
-                ActionChip(
-                  label: const Text('Change Status'),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) =>
-                          _buildStatusChangeSheet(context, ref, ticket),
-                    );
-                  },
-                ),
+                // ActionChip(
+                //   label: const Text('Change Status'),
+                //   onPressed: () {
+                //     showModalBottomSheet(
+                //       context: context,
+                //       builder: (context) => _StatusChangeSheet(ticket: ticket),
+                //     );
+                //   },
+                // ),
                 const SizedBox(height: 8),
-                ActionChip(
-                  label: const Text('Add Admin Response'),
-                  onPressed: () {
+                AppChip(
+                  label: 'Add Admin Response',
+                  icon: Icons.admin_panel_settings_outlined,
+                  onTap: () {
                     showModalBottomSheet(
                       context: context,
-                      builder: (context) =>
-                          _buildAdminResponseSheet(context, ref, ticket),
+                      isScrollControlled: true,
+                      builder: (context) => _AdminResponseSheet(ticket: ticket),
                     );
                   },
                 ),
@@ -327,75 +328,111 @@ class AgentSupportTicketDetailScreen extends ConsumerWidget {
   }
 }
 
-Widget _buildStatusChangeSheet(
-  BuildContext context,
-  WidgetRef ref,
-  SupportTicket ticket,
-) {
-  TicketStatus? selectedStatus = ticket.status;
+class _StatusChangeSheet extends ConsumerStatefulWidget {
+  final SupportTicket ticket;
+  const _StatusChangeSheet({required this.ticket});
 
-  return StatefulBuilder(
-    builder: (BuildContext context, StateSetter setState) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Change Ticket Status',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            ...TicketStatus.values.map((status) {
-              return RadioListTile<TicketStatus>(
-                title: Text(status.displayName),
-                value: status,
-                groupValue: selectedStatus,
-                onChanged: (TicketStatus? value) {
-                  setState(() {
-                    selectedStatus = value;
-                  });
-                },
-              );
-            }).toList(),
-            const SizedBox(height: 16),
-
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  if (selectedStatus != null) {
-                    await ref.read(agentSupportTicketNotifierProvider.notifier);
-
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                    }
-                  }
-                },
-                child: const Text('Update Status'),
-              ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
+  @override
+  ConsumerState<_StatusChangeSheet> createState() => _StatusChangeSheetState();
 }
 
-Widget _buildAdminResponseSheet(
-  BuildContext context,
-  WidgetRef ref,
-  SupportTicket ticket,
-) {
-  return StatefulBuilder(
-    builder: (context, setState) {
-      TicketStatus? status = ticket.status;
-      final responseController = TextEditingController(
-        text: ticket.adminResponse ?? '',
-      );
-      bool isLoading = false;
+class _StatusChangeSheetState extends ConsumerState<_StatusChangeSheet> {
+  late TicketStatus _selectedStatus;
 
-      return SingleChildScrollView(
+  @override
+  void initState() {
+    super.initState();
+    _selectedStatus = widget.ticket.status;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Change Ticket Status',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 16),
+          ...TicketStatus.values.map((status) {
+            return RadioListTile<TicketStatus>(
+              title: Text(status.displayName),
+              value: status,
+              groupValue: _selectedStatus,
+              onChanged: (TicketStatus? value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedStatus = value;
+                  });
+                }
+              },
+            );
+          }).toList(),
+          const SizedBox(height: 16),
+          Center(
+            child: ElevatedButton(
+              onPressed: () async {
+                await ref
+                    .read(agentSupportTicketNotifierProvider.notifier)
+                    .updateTicketStatus(
+                      ticketId: widget.ticket.id,
+                      status: _selectedStatus,
+                      adminResponse: widget.ticket.adminResponse ?? '',
+                    );
+
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Update Status'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AdminResponseSheet extends ConsumerStatefulWidget {
+  final SupportTicket ticket;
+  const _AdminResponseSheet({required this.ticket});
+
+  @override
+  ConsumerState<_AdminResponseSheet> createState() =>
+      _AdminResponseSheetState();
+}
+
+class _AdminResponseSheetState extends ConsumerState<_AdminResponseSheet> {
+  late final TextEditingController _responseController;
+  late final GlobalKey<FormState> _formKey;
+  late TicketStatus _status;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _formKey = GlobalKey<FormState>();
+    _responseController = TextEditingController(
+      text: widget.ticket.adminResponse ?? '',
+    );
+    _status = widget.ticket.status;
+  }
+
+  @override
+  void dispose() {
+    _responseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.only(
             left: 16,
@@ -407,88 +444,97 @@ Widget _buildAdminResponseSheet(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Text(
                 'Add Admin Response',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 16),
 
-              /// RESPONSE
-              TextField(
-                controller: responseController,
-                maxLines: 5,
-                decoration: const InputDecoration(
-                  hintText: 'Enter admin response here...',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              /// STATUS DROPDOWN
-              DropdownButtonFormField<TicketStatus>(
-                value: status,
-                decoration: const InputDecoration(
-                  labelText: 'Change Status (Optional)',
-                  border: OutlineInputBorder(),
-                ),
-                items: TicketStatus.values
-                    .map(
-                      (s) => DropdownMenuItem(
-                        value: s,
-                        child: Text(s.displayName),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _responseController,
+                      maxLines: 5,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter admin response here...',
+                        border: OutlineInputBorder(),
                       ),
-                    )
-                    .toList(),
-                onChanged: (TicketStatus? newValue) {
-                  setState(() {
-                    status = newValue;
-                  });
-                },
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Admin response cannot be empty';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    DropdownButtonFormField<TicketStatus>(
+                      value: _status,
+                      decoration: const InputDecoration(
+                        labelText: 'Change Status',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: TicketStatus.values
+                          .map(
+                            (s) => DropdownMenuItem(
+                              value: s,
+                              child: Text(s.displayName),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (newValue) {
+                        if (newValue != null) {
+                          setState(() => _status = newValue);
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
 
               const SizedBox(height: 20),
 
-              /// SAVE BUTTON
               Center(
                 child: ElevatedButton(
-                  onPressed: isLoading
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                  ),
+
+                  onPressed: _isSaving
                       ? null
                       : () async {
-                          if (status == null) return;
+                          if (!_formKey.currentState!.validate()) return;
 
-                          setState(() => isLoading = true);
+                          setState(() => _isSaving = true);
 
                           await ref
                               .read(agentSupportTicketNotifierProvider.notifier)
                               .updateTicketStatus(
-                                adminResponse: responseController.text.trim(),
-                                status: status!,
-                                ticketId: ticket.id,
+                                adminResponse: _responseController.text.trim(),
+                                status: _status,
+                                ticketId: widget.ticket.id,
                               );
-
-                          responseController.dispose();
 
                           if (context.mounted) {
                             Navigator.pop(context);
                           }
                         },
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
+                  child: _isSaving
+                      ? const CircularProgressIndicator()
                       : const Text('Save Response'),
                 ),
               ),
-
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
             ],
           ),
         ),
-      );
-    },
-  );
+      ),
+    );
+  }
 }

@@ -1,4 +1,5 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/user_status_controller.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
@@ -29,15 +30,17 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> {
     final theme = Theme.of(context);
 
     final currentUserAsync = ref.watch(currentUserProvider);
-
-    final userStatus = ref.read(userStatusControllerProvider);
     final profileAsync = ref.watch(currentUserProfileProvider);
+
+    // Watch payment status asynchronously
+    final paymentState = ref.watch(paymentNotifierProvider(widget.userId));
+    
 
     return Scaffold(
       drawer: UserDrawer(userAsync: profileAsync),
       backgroundColor: Colors.grey[100],
 
-      body: userStatus.userStatus.isPaymentDone
+      body: paymentState.status == PayStatus.success
           ? profileAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, _) => Center(

@@ -120,9 +120,8 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     final metrimonyProfile = MatrimonyProfile(
       userId: uid,
       metrimonyId: uid,
-      // ✅ SAME AS UID
-      agentId: agentUid,
 
+      // ✅ SAME AS UID
       identity: IdentityProfile.empty(),
       address: AddressProfile.empty(),
       cultural: CulturalProfile.empty(),
@@ -156,11 +155,7 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     final fullName = userDoc.data()?['fullName'] ?? '';
     debugPrint('Fetched User Full Name: $fullName');
 
-    var profile = state.metrimony.copyWith(
-      userId: uid,
-      agentId: agentId,
-      metrimonyId: uid,
-    );
+    var profile = state.metrimony.copyWith(userId: uid, metrimonyId: uid);
 
     debugPrint('Profile submitted: ${profile.toMap()}');
 

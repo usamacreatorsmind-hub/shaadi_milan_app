@@ -1,22 +1,22 @@
-import '../../../../widgets/marquee.dart';
-import 'package:sizer/sizer.dart';
-
-import '../../../../auth/domain/states/agent_state.dart';
+import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart'
     show agentFirestoreDsProvider;
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_profile_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
-import 'package:auto_route/auto_route.dart';
-
-import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
-import '../../data/repositories_impl/matrimony_repository_impl.dart';
-import '../../domain/states/metrimony_state.dart';
 import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
+import '../../../../auth/domain/states/agent_state.dart';
+import '../../../../widgets/marquee.dart';
+import '../../data/repositories_impl/matrimony_repository_impl.dart';
+import '../../domain/states/metrimony_state.dart';
 
 // read profile from firebase
 
@@ -34,10 +34,10 @@ final matrimonyProfileProvider =
       print(user.toString());
 
       AgentEntity? agent;
-      if (matrimonyProfile.agentId.isNotEmpty) {
+      if (user.agentId.isNotEmpty) {
         agent = await ref
             .watch(agentFirestoreDsProvider)
-            .fetchAgentByUid(matrimonyProfile.agentId);
+            .fetchAgentByUid(user.agentId);
       }
       print(agent);
       print(agent);
@@ -51,6 +51,7 @@ final matrimonyProfileProvider =
 @RoutePage()
 class UserDetailScreen extends ConsumerStatefulWidget {
   final String uid;
+
   const UserDetailScreen({super.key, required this.uid});
 
   @override
@@ -161,60 +162,60 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                         title: ProfileHeaderCard(viewModel: viewModel),
                       ),
 
-                     SliverPadding(
-  padding: const EdgeInsets.only(
-    left: 16,
-    right: 16,
-    top: 8,
-    bottom: 16,
-  ),
-  sliver: SliverToBoxAdapter(
-    child: Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          _infoChip(
-            profile.employment.jobType ?? 'N/A',
-            Icons.work_outline,
-          ),
-          _infoChip(
-            "${profile.identity.age ?? 'N/A'} yrs",
-            Icons.cake_outlined,
-          ),
-          _infoChip(
-            profile.identity.gender ?? 'N/A',
-            Icons.person_outline,
-          ),
-          _infoChip(
-            profile.address.city ?? 'N/A',
-            Icons.location_on_outlined,
-          ),
-          _infoChip(
-            profile.cultural.religion ?? 'N/A',
-            Icons.temple_hindu,
-          ),
-          _infoChip(
-            "${profile.physical.height ?? 'N/A'} cm",
-            Icons.height_outlined,
-          ),
-        ],
-      ),
-    ),
-  ),
-),
+                      SliverPadding(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          top: 8,
+                          bottom: 16,
+                        ),
+                        sliver: SliverToBoxAdapter(
+                          child: Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.06),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children: [
+                                _infoChip(
+                                  profile.employment.jobType ?? 'N/A',
+                                  Icons.work_outline,
+                                ),
+                                _infoChip(
+                                  "${profile.identity.age ?? 'N/A'} yrs",
+                                  Icons.cake_outlined,
+                                ),
+                                _infoChip(
+                                  profile.identity.gender ?? 'N/A',
+                                  Icons.person_outline,
+                                ),
+                                _infoChip(
+                                  profile.address.city ?? 'N/A',
+                                  Icons.location_on_outlined,
+                                ),
+                                _infoChip(
+                                  profile.cultural.religion ?? 'N/A',
+                                  Icons.temple_hindu,
+                                ),
+                                _infoChip(
+                                  "${profile.physical.height ?? 'N/A'} cm",
+                                  Icons.height_outlined,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
 
                       SliverPersistentHeader(
                         delegate: _SliverAppBarDelegate(
@@ -259,6 +260,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                         ),
                         pinned: true,
                       ),
+              
+              
                     ];
                   },
                   body: Builder(
@@ -755,9 +758,151 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               ),
                             ),
                             onPressed: () {
-                              // create botton sheet here
+                              if (viewModel.user!.agentId.isEmpty) {
+                                // create a model bottom sheet  to take user id or  show contact details if he does not know
+                                print(" inside bottom sheet");
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
 
-                              showAgentBottomSheet(context, viewModel.agent!);
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20),
+                                    ),
+                                  ),
+
+                                  constraints: BoxConstraints(
+                                    maxHeight:
+                                        MediaQuery.of(context).size.height *
+                                        0.9,
+                                  ),
+                                  // theme color
+                                  builder: (BuildContext context) {
+                                    // no agent is associated with this user
+                                    return Container(
+                                      height: 40.h,
+                                      width: double.infinity,
+
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.sentiment_dissatisfied,
+                                              size: 50,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(height: 10),
+                                            const Text(
+                                              "No agent associated with this user.",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            const Text(
+                                              "Please contact the administrator for more details.",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+
+                                            // contact
+                                            Padding(
+                                              padding: const EdgeInsets.all(
+                                                16.0,
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: ElevatedButton.icon(
+                                                      onPressed: () {
+                                                        _makePhoneCall(
+                                                          "+919876543210",
+                                                        ); // Replace with actual admin number
+                                                      },
+                                                      icon: const Icon(
+                                                        Icons.call,
+                                                      ),
+                                                      label: const Text("Call"),
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor:
+                                                            Theme.of(
+                                                              context,
+                                                            ).primaryColor,
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 24,
+                                                              vertical: 12,
+                                                            ),
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                12,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 20),
+                                                  Expanded(
+                                                    child: ElevatedButton.icon(
+                                                      onPressed: () {
+                                                        _sendEmail(
+                                                          "admin@example.com",
+                                                        ); // Replace with actual admin email
+                                                      },
+                                                      icon: const Icon(
+                                                        Icons.email,
+                                                      ),
+                                                      label: const Text(
+                                                        "Email",
+                                                      ),
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor:
+                                                            Theme.of(
+                                                              context,
+                                                            ).primaryColor,
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 24,
+                                                              vertical: 12,
+                                                            ),
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                12,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+
+                                return;
+                              } else {
+                                showAgentBottomSheet(
+                                  context,
+                                  viewModel.agent ?? AgentEntity.empty(),
+                                );
+                              }
                             },
                           ),
                         ),
@@ -782,44 +927,22 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
     );
   }
 
-  Widget _infoTile(IconData icon, String title, String? subtitle) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 20, color: Theme.of(context).primaryColor),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle ?? 'N/A',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+  Widget _infoChip(String text, IconData icon) {
+    return Chip(
+      avatar: Icon(icon, size: 18, color: Theme.of(context).primaryColor),
+      label: Text(
+        text,
+        style: TextStyle(color: Theme.of(context).primaryColor),
       ),
+      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(
+          color: Theme.of(context).primaryColor.withOpacity(0.3),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return DateFormat('dd MMM yyyy').format(date);
   }
 }
 
@@ -860,10 +983,11 @@ class TabWidget extends StatelessWidget {
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar _tabBar;
 
-  _SliverAppBarDelegate(this._tabBar);
+  const _SliverAppBarDelegate(this._tabBar);
 
   @override
   double get minExtent => _tabBar.preferredSize.height;
+
   @override
   double get maxExtent => _tabBar.preferredSize.height;
 
@@ -879,35 +1003,6 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) => false;
 }
-Widget _infoChip(String label, IconData icon) {
-  if (label.isEmpty) return const SizedBox.shrink();
-
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    decoration: BoxDecoration(
-      color: Colors.grey.shade100,
-      borderRadius: BorderRadius.circular(30),
-      border: Border.all(color: Colors.grey.shade300),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 16, color: Colors.grey.shade700),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey.shade800,
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
- 
 
 class _InfoCard extends StatelessWidget {
   final String title;
@@ -924,25 +1019,16 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       clipBehavior: Clip.antiAlias,
-
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        border: BoxBorder.fromLTRB(
-          left:
-              // always apply them color
-              BorderSide(color: Theme.of(context).primaryColor, width: 4),
+        border: Border(
+          left: BorderSide(color: Theme.of(context).primaryColor, width: 4),
         ),
         borderRadius: BorderRadius.circular(20),
-        // gradient: LinearGradient(
-        //   colors: [Colors.white, Colors.white.withOpacity(0.95)],
-        //   begin: Alignment.topCenter,
-        //   end: Alignment.bottomCenter,
-        // ),
         color: Colors.white,
-
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
@@ -1002,11 +1088,9 @@ class _InfoTile extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).primaryColor.withOpacity(0.05),
-
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1017,7 +1101,6 @@ class _InfoTile extends StatelessWidget {
                 color: Theme.of(context).primaryColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(15),
               ),
-
               child: Icon(
                 icon,
                 color: Theme.of(context).primaryColor,
@@ -1025,7 +1108,6 @@ class _InfoTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-
             Expanded(
               flex: 2,
               child: Text(

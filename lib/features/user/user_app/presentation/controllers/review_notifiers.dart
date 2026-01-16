@@ -106,7 +106,6 @@ class AllReviewsNotifier extends StateNotifier<AllReviewsState> {
     );
   }
 
-
   Future<void> watchAllReviews() async {
     state = state.copyWith(isLoading: true, error: null);
     _reviewsSubscription?.cancel(); // Cancel previous subscription if any
@@ -120,8 +119,7 @@ class AllReviewsNotifier extends StateNotifier<AllReviewsState> {
         state = state.copyWith(isLoading: false, error: e.toString());
       },
     );
-  }     
-
+  }
 
   @override
   void dispose() {
@@ -134,4 +132,22 @@ final allReviewsNotifierProvider =
     StateNotifierProvider<AllReviewsNotifier, AllReviewsState>((ref) {
       final reviewRepository = ref.watch(reviewRepositoryProvider);
       return AllReviewsNotifier(reviewRepository);
+    });
+
+final allReviewsStreamProvider = StreamProvider.autoDispose<List<Review>>((
+  ref,
+) {
+  final reviewRepository = ref.watch(reviewRepositoryProvider);
+  return reviewRepository.watchAllReviews();
+});
+
+final userReviewsStreamProvider = StreamProvider.family
+    .autoDispose<List<Review>, String>((ref, userId) {
+      final reviewRepository = ref.watch(reviewRepositoryProvider);
+      return reviewRepository.watchReviewsForUser(userId);
+    });
+final reviewsByUserStreamProvider = StreamProvider.family
+    .autoDispose<List<Review>, String>((ref, reviewerId) {
+      final reviewRepository = ref.watch(reviewRepositoryProvider);
+      return reviewRepository.watchReviewsByUser(reviewerId);
     });

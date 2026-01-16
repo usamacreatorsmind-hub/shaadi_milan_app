@@ -44,21 +44,53 @@ class _UserPhysicalFormScreenState
       final profile = widget.existingPhysicalProfile!;
       _heightController.text = profile.height.toString();
       _weightController.text = profile.weight.toString();
-      _bodyTypeController.text = profile.bodyType;
-      _complexionController.text = profile.complexion;
+
+      const bodyTypes = [
+        'Slim',
+        'Athletic',
+        'Average',
+        'Heavy',
+        'Muscular',
+        'Obese',
+      ];
+      final bodyTypeMatch = bodyTypes.where(
+        (e) => e.toLowerCase() == profile.bodyType.toLowerCase(),
+      );
+      _bodyTypeController.text = bodyTypeMatch.isNotEmpty
+          ? bodyTypeMatch.first
+          : '';
+
+      const complexions = [
+        'Very Fair',
+        'Fair',
+        'Wheatish',
+        'Dark',
+        'Brown',
+        'Duskey',
+        'Dark Brown',
+        'Black',
+      ];
+      final complexionMatch = complexions.where(
+        (e) => e.toLowerCase() == profile.complexion.toLowerCase(),
+      );
+      _complexionController.text = complexionMatch.isNotEmpty
+          ? complexionMatch.first
+          : '';
+
       _physicallyChallenged = profile.physicallyChallenged;
       _disabilityDetailsController.text = profile.disabilityDetails ?? '';
     }
   }
 
-  // @override
-  // void dispose() {
-  //   _heightController.dispose();
-  //   _weightController.dispose();
-  //   _bodyTypeController.dispose();
-  //   _complexionController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    _heightController.dispose();
+    _weightController.dispose();
+    _bodyTypeController.dispose();
+    _complexionController.dispose();
+    _disabilityDetailsController.dispose();
+    super.dispose();
+  }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {

@@ -24,7 +24,7 @@ class ReviewFirestore {
   /// STREAM reviews for a user (latest first)
   Stream<List<Review>> watchReviewsForUser(String userId) {
     return _reviews
-        .where('reviewedUserId', isEqualTo: userId)
+        .where('userId', isEqualTo: userId)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs.map(Review.fromFirestore).toList());
@@ -33,7 +33,7 @@ class ReviewFirestore {
   /// STREAM reviews written by a user
   Stream<List<Review>> watchReviewsByUser(String reviewerId) {
     return _reviews
-        .where('reviewerId', isEqualTo: reviewerId)
+        .where('userId', isEqualTo: reviewerId)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs.map(Review.fromFirestore).toList());
@@ -59,13 +59,12 @@ class ReviewFirestore {
     if (!doc.exists) return null;
     return Review.fromFirestore(doc);
   }
+
   /// STREAM ALL REVIEWS
   Stream<List<Review>> watchAllReviews() {
     return _reviews
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs.map(Review.fromFirestore).toList());
-  }               
-
-
+  }
 }
