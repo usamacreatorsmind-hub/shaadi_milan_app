@@ -1,3 +1,5 @@
+import 'package:arvika_marriage_bureau/core/services/notification_service.dart';
+
 import '../../../../app/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
@@ -19,6 +21,8 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    NotificationService.init();
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),

@@ -1,6 +1,8 @@
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../../../../app/router/app_router.dart';
 import '../../../../../core/enums/enum.dart';
-import '../../data/datasources/firebase/user_image_firestore.dart';
 
 import '../../../../../app/custom/custom_widgets/validators.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
@@ -36,8 +38,6 @@ class _UserIdentityFormScreenState
   final _aboutMeController = TextEditingController();
 
   // prefile controlles
-
-  String? _gender;
   DateTime? _selectedDate;
 
   @override
@@ -46,17 +46,8 @@ class _UserIdentityFormScreenState
     widget.registerSubmit?.call(_submitForm);
     if (widget.mode == FormMode.edit &&
         widget.existingIdentityProfile != null) {
-      _aadharController.text = widget.existingIdentityProfile!.aadhar;
+      _aadharController.text = widget.existingIdentityProfile!.aadhar ?? '';
       _aboutMeController.text = widget.existingIdentityProfile!.aboutMe ?? '';
-
-      final gender = widget.existingIdentityProfile!.gender;
-      if (gender != null) {
-        const items = ['Male', 'Female', 'Other'];
-        final match = items.where(
-          (element) => element.toLowerCase() == gender.toLowerCase(),
-        );
-        _gender = match.isNotEmpty ? match.first : null;
-      }
 
       _selectedDate = widget.existingIdentityProfile!.dob;
     }
@@ -111,15 +102,39 @@ class _UserIdentityFormScreenState
   // ----------------------------
   // SUBMIT
   // ----------------------------
-  void _submitForm() {
-    if (!_formKey.currentState!.validate()) return;
+  Future<void> _submitForm() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
 
-    if (_gender == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please select gender')));
+    String gender = '';
+    try {
+      final user = await ref
+          .read(userRepositoryProvider)
+          .fetchUser(currentUser.uid);
+
+      if (!mounted) return;
+
+      gender = user.gender;
+      debugPrint(user.gender);
+      debugPrint(user.uid);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error fetching user data: $e')));
+      }
       return;
     }
+
+    if (gender.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Gender not found. Please update your profile.'),
+        ),
+      );
+      return;
+    }
+    if (!_formKey.currentState!.validate()) return;
 
     if (_selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -135,17 +150,7 @@ class _UserIdentityFormScreenState
       return;
     }
 
-    // ref
-    //     .read(identityControllerProvider.notifier)
-    //     .saveIdentity(
-    //       gender: _gender!,
-    //       dob: _selectedDate!,
-    //       age: _age!,
-    //       aadhar: _aadharController.text.trim(),
-    //     );
-
     // print all data
-    print('Gender: $_gender');
     print('DOB: $_selectedDate');
     print('Age: $_age');
     print('Aadhar: ${_aadharController.text.trim()}');
@@ -154,8 +159,11 @@ class _UserIdentityFormScreenState
     final notifier = ref.read(identityControllerProvider.notifier);
 
     if (widget.mode == FormMode.create) {
+      // fetch gender form user collection from firebase
+      //
+
       notifier.saveIdentity(
-        gender: _gender!,
+        gender: gender,
         dob: _selectedDate!,
         age: _age!,
         aadhar: _aadharController.text.trim(),
@@ -164,7 +172,8 @@ class _UserIdentityFormScreenState
     } else {
       // Update logic (using saveIdentity as upsert)
       notifier.updateIdentity(
-        gender: _gender!,
+        gender: gender,
+
         dob: _selectedDate!,
         age: _age!,
         aadhar: _aadharController.text.trim(),
@@ -222,6 +231,10 @@ class _UserIdentityFormScreenState
                 iconColor: Theme.of(context).colorScheme.primary,
                 label: "About Me",
                 hint: "Tell us about yourself",
+
+                showWordCount: true,
+                counterType: CounterType.words,
+
                 obscureText: false,
                 keyboardType: TextInputType.multiline,
                 maxLines: 3,
@@ -258,21 +271,6 @@ class _UserIdentityFormScreenState
               // ----------------------------
               // GENDER
               // ----------------------------
-              AppDropDown(
-                label: "Gender",
-                items: const ['Male', 'Female', 'Other'],
-                value: _gender,
-                onChanged: (value) {
-                  setState(() => _gender = value);
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select gender';
-                  }
-                  return null;
-                },
-              ),
-
               const SizedBox(height: 20),
 
               // ----------------------------

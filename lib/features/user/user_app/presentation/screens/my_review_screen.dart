@@ -55,9 +55,13 @@ class _MyReviewScreenState extends ConsumerState<MyReviewScreen> {
                   },
 
                   child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 35,
-                      backgroundImage: NetworkImage(review.userProfileImg),
+                    leading: Hero(
+                      tag: 'review_avatar_${review.id}',
+
+                      child: CircleAvatar(
+                        radius: 35,
+                        backgroundImage: NetworkImage(review.userProfileImg),
+                      ),
                     ),
                     title: Text(
                       review.comment,

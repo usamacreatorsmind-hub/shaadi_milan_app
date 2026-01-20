@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,7 +13,6 @@ class UserFirestoreDS {
 
   CollectionReference<Map<String, dynamic>> get _users =>
       _firestore.collection('users');
-
 
   Future<List<Map<String, dynamic>>> fetchUsers() async {
     final querySnapshot = await _users.get();
@@ -31,9 +31,6 @@ class UserFirestoreDS {
       return doc.data()!;
     });
   }
-
-
-
 
   Future<void> updateUser(String uid, Map<String, dynamic> updates) async {
     await _users.doc(uid).update(updates);
@@ -76,9 +73,9 @@ class UserFirestoreDS {
   }
 
   // implement add to wishlist  in user collection
-  Future<void> addWishlist(String uid, String profileId) async {
+  Future<void> addWishlist(String uid, WishListItem wishlistItem) async {
     await _users.doc(uid).update({
-      'wishlists': FieldValue.arrayUnion([profileId]),
+      'wishlists': FieldValue.arrayUnion([wishlistItem.toMap()]),
     });
   }
 
@@ -88,11 +85,36 @@ class UserFirestoreDS {
     });
   }
 
-  Future<void> updateUserStatus(String uid, Map<String, dynamic> userStatus) async {
+  Future<void> updateUserStatus(
+    String uid,
+    Map<String, dynamic> userStatus,
+  ) async {
     await _users.doc(uid).update({'userStatus': userStatus});
   }
+
   Future<void> updateRole(String uid, String role) async {
     await _users.doc(uid).update({'role': role});
   }
-  
+
+  Future<void> updateWishlistStatus({
+    required String parentUserId,
+    required String profileId,
+    required String newStatus,
+  }) async {
+    await _firestore.collection('users').doc(parentUserId).update({
+      'wishlists': FieldValue.arrayRemove([
+        {'profileId': profileId},
+      ]),
+    });
+
+    await _firestore.collection('users').doc(parentUserId).update({
+      'wishlists': FieldValue.arrayUnion([
+        {
+          'profileId': profileId,
+          'status': newStatus,
+          'updatedAt': DateTime.now().millisecondsSinceEpoch,
+        },
+      ]),
+    });
+  }
 }

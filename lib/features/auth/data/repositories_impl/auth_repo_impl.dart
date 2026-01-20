@@ -38,6 +38,8 @@ class AuthRepositoryImpl implements AuthRepository {
     // Default to a non-profile-created user state.
     return Right(
       UserEntity(
+        gender: '',
+
         uid: user.uid,
         email: user.email ?? '',
         fullName: '',
@@ -91,19 +93,27 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> signUpUserWithEmail({
     required String fullName,
+    required String gender,
+
     required String email,
     required String password,
     required String agentId,
     required String phone,
-    required List<dynamic> wishlists,
+    required List<WishListItem> wishlists,
   }) async {
+    // show aget page
+
+    // 3️⃣ create user (THIS WAS MISSING)
     await ds.signUpUserWithEmail(
+      gender: gender,
+      
       fullName: fullName,
       email: email,
       password: password,
-      agentId: agentId,
+      agentId: agentId, 
+
       phone: phone,
-      wishlists: const [],
+      wishlists: [],
     );
   }
 
@@ -111,9 +121,4 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() {
     return ds.logout();
   }
-
-  // @override
-  // Future<bool> checkAgentIfExists() async {
-  //   return await ds.checkAgentIfExists(uid: currentUser?.uid ?? '');
-  // }
 }

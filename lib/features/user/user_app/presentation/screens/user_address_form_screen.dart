@@ -1,3 +1,6 @@
+import 'package:arvika_marriage_bureau/app/providers/global_providers.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../../../../core/filters/home_filter_controller.dart';
 import 'package:flutter/services.dart';
 
@@ -271,6 +274,8 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                               onPressed: _submitForm,
                               text: 'Save Address',
                             )),
+                // logout
+                const SizedBox(height: 16),
               ],
             ),
           ),

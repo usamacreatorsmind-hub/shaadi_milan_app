@@ -1,5 +1,8 @@
 import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agent_support_screen.dart';
+import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/view_wishlist_user_screen.dart';
+import 'package:arvika_marriage_bureau/features/auth/presentation/screens/view_agent_profile.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/my_review_screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_after_marriage_payment_screen.dart';
 
 import '../../features/user/user_app/domain/states/review_state.dart';
 import '../../features/user/user_app/presentation/screens/review_form_screen.dart';
@@ -83,7 +86,7 @@ import 'user_router.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Screen,Route')
-class AppRouter extends _$AppRouter {
+class AppRouter extends RootStackRouter {
   final Ref ref;
   AppRouter(this.ref);
 
@@ -105,7 +108,8 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: ContactUsRoute.page),
     AutoRoute(page: PrivacyPolicyRoute.page),
     AutoRoute(page: TermsAndConditionsRoute.page),
-
+    AutoRoute(page: ViewAgentProfileRoute.page),
+    AutoRoute(page: ChangePasswordRoute.page),
     // ================= USER ROUTES =================
     ...UserRouter.routes(ref),
 

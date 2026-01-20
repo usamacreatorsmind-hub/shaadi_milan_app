@@ -190,15 +190,20 @@ class ReviewCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundImage: review.userProfileImg.isNotEmpty
-                        ? NetworkImage(review.userProfileImg)
-                        : null,
-                    child: review.userProfileImg.isEmpty
-                        ? const Icon(Icons.person)
-                        : null,
+                  // hero animation
+                  Hero(
+                    tag: 'review_avatar_${review.id}',
+                    child: CircleAvatar(
+                      radius: 24,
+                      backgroundImage: review.userProfileImg.isNotEmpty
+                          ? NetworkImage(review.userProfileImg)
+                          : null,
+                      child: review.userProfileImg.isEmpty
+                          ? const Icon(Icons.person, size: 24)
+                          : null,
+                    ),
                   ),
+
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -273,14 +278,18 @@ class ReviewDetailsScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: review.userProfileImg.isNotEmpty
-                        ? NetworkImage(review.userProfileImg)
-                        : null,
-                    child: review.userProfileImg.isEmpty
-                        ? const Icon(Icons.person, size: 30)
-                        : null,
+                  Hero(
+                    tag: 'review_avatar_${review.id}',
+
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundImage: review.userProfileImg.isNotEmpty
+                          ? NetworkImage(review.userProfileImg)
+                          : null,
+                      child: review.userProfileImg.isEmpty
+                          ? const Icon(Icons.person, size: 30)
+                          : null,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(

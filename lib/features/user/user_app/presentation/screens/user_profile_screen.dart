@@ -274,15 +274,15 @@ class UserProfileScreen extends ConsumerWidget {
                           },
                         ),
 
-                        // user Review
-                        _SettingsTile(
-                          icon: Icons.verified_user_outlined,
-                          title: "My Review",
-                          onTap: () {
-                            // navigate to user status screen
-                            AutoRouter.of(context).push(const MyReviewRoute());
-                          },
-                        ),
+                        // // user Review
+                        // _SettingsTile(
+                        //   icon: Icons.verified_user_outlined,
+                        //   title: "My Review",
+                        //   onTap: () {
+                        //     // navigate to user status screen
+                        //     AutoRouter.of(context).push(const MyReviewRoute());
+                        //   },
+                        // ),
 
                         // Contact Support
                         // stting tile
@@ -316,6 +316,16 @@ class UserProfileScreen extends ConsumerWidget {
                             AutoRouter.of(
                               context,
                             ).push(const UserPaymentOrderHistoryRoute());
+                          },
+                        ),
+
+                        _SettingsTile(
+                          icon: Icons.family_restroom_outlined,
+                          title: "Post Marriage Payment",
+                          onTap: () {
+                            AutoRouter.of(context).push(
+                              UserAfterMarriagePaymentRoute(userId: userId),
+                            );
                           },
                         ),
 

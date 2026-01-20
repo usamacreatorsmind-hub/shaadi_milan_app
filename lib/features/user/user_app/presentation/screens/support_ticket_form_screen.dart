@@ -64,8 +64,6 @@ class _CreateSupportTicketScreenState
           category: _selectedCategory,
           priority: _selectedPriority,
           agentId: userEntity.agentId.isEmpty ? "1234" : userEntity.agentId,
-
-          
         );
 
     final state = ref.read(supportNotifierProvider);
@@ -78,7 +76,7 @@ class _CreateSupportTicketScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ticket created successfully!')),
       );
-      context.router.pop();
+      context.router.maybePop();
     }
   }
 

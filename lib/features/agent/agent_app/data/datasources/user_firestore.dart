@@ -6,6 +6,16 @@ import 'package:flutter/material.dart';
 abstract class UserFirestore {
   Future<List<UserEntity>> getUsersForAgent(String agentId);
   Future<UserEntity> getUserById(String userId);
+
+  Future<void> updateUserStatus({
+    required String userId,
+    required String status,
+    String? reason,
+  });
+  Future<void> updateUserWishlist({
+    required String userId,
+    required List<Map<String, dynamic>> wishlists,
+  });
 }
 
 class UserFirestoreImpl implements UserFirestore {
@@ -23,7 +33,7 @@ class UserFirestoreImpl implements UserFirestore {
             final data = doc.data();
             data['uid'] = doc.id; // Add document ID as uid
             return UserEntity.fromMap(data);
-          }).toList();  
+          }).toList();
         });
     for (var user in users) {
       debugPrint(user.toString());
@@ -40,6 +50,33 @@ class UserFirestoreImpl implements UserFirestore {
       }
       data['uid'] = doc.id; // Add document ID as uid
       return UserEntity.fromMap(data);
+    });
+  }
+
+  @override
+  Future<void> updateUserStatus({
+    required String userId,
+    required String status,
+    String? reason,
+  }) {
+    return firestore.collection('users').doc(userId).update({
+      'userStatus': {
+        'status': status,
+        'reason': reason,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+    });
+
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateUserWishlist({
+    required String userId,
+    required List<Map<String, dynamic>> wishlists,
+  }) {
+    return firestore.collection('users').doc(userId).update({
+      'wishlists': wishlists,
     });
   }
 }

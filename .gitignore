@@ -1,4 +1,6 @@
+# ===============================
 # Miscellaneous
+# ===============================
 *.class
 *.log
 *.pyc
@@ -12,34 +14,50 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# Windows reserved filenames
+nul
+**/nul
+
+# ===============================
+# Flutter / Dart
+# ===============================
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+
+# ===============================
+# IDEs & Editors
+# ===============================
+.idea/
+.vscode/
 *.iml
 *.ipr
 *.iws
-.idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# ===============================
+# Firebase Functions
+# ===============================
+functions/node_modules/
+functions/.runtimeconfig.json
+firebase-debug.log
+npm-debug.log*
 
-# Flutter/Dart/Pub related
+# ===============================
+# Flutter platform build outputs
+# ===============================
 **/doc/api/
 **/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
-/coverage/
 
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
+# Android build artifacts
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Symbolication
+app.*.symbols
+app.*.map.json

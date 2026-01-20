@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,7 +49,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
                   title: const Text('Change Password'),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
-                    // TODO: Navigate to change password screen
+                    context.pushRoute(ChangePasswordRoute());
                   },
                 ),
                 const Divider(height: 1),

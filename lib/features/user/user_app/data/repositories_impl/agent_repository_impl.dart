@@ -4,6 +4,13 @@ import '../../../../auth/domain/states/agent_state.dart';
 import '../../domain/repositories/agent_repository.dart';
 import '../datasources/firebase/agent_firestore_ds.dart';
 
+final agentByIdProvider = FutureProvider.family((ref, String agentId) async {
+  final repo = ref.read(agentRepositoryProvider);
+  return repo.fetchAgentEntitybyAgentId(agentId);
+});
+
+
+
 final agentRepositoryProvider = Provider<AgentRepository>((ref) {
   return AgentRepositoryImpl(ref.watch(agentFirestoreDsProvider));
 });

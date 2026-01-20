@@ -18,11 +18,14 @@ abstract class AuthRepository {
 
   Future<void> signUpUserWithEmail({
     required String fullName,
+    required String gender,
+    
+
     required String email,
     required String password,
     required String agentId,
     required String phone,
-    required List<dynamic> wishlists,
+    required List<WishListItem> wishlists,
   });
 
   Future<void> logout();

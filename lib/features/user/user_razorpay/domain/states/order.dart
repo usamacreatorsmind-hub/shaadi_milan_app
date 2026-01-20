@@ -11,6 +11,7 @@ class Order {
   final String? razorpaySignature;
   final String agentId;
   final String region;
+  final String paymentType;
   final String district;
   final String gender;
   final String religion;
@@ -23,6 +24,9 @@ class Order {
 
   Order({
     required this.orderId,
+
+    required this.paymentType,
+
     required this.razorpayOrderId,
     required this.religion,
     required this.caste,
@@ -47,6 +51,8 @@ class Order {
   // ---------------- FIRESTORE ----------------
   factory Order.fromMap(Map<String, dynamic> map) {
     return Order(
+      paymentType: map['paymentType'],
+
       religion: map['religion'],
       caste: map['caste'],
 
@@ -82,6 +88,8 @@ class Order {
       'religion': religion,
       'caste': caste,
       'orderId': orderId,
+      'paymentType': paymentType,
+
       'razorpayOrderId': razorpayOrderId,
       'userId': userId,
       'razorpayPaymentId': razorpayPaymentId,

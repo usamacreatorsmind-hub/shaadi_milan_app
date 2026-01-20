@@ -231,6 +231,13 @@ class UserHomeScreen extends ConsumerWidget {
               ],
             );
           } else {
+            // If payment is not successful, show the payment screen.
+            print(" Navigating to paymetn screen");
+            print(paymentState.status);
+
+            print(paymentState.status);
+
+            print(user.uid);
             return UserPaymentScreen(userId: user.uid);
           }
         },
@@ -558,16 +565,22 @@ class ProfileCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.cake_outlined,
-                          size: 18, color: Colors.grey[700]),
+                      Icon(
+                        Icons.cake_outlined,
+                        size: 18,
+                        color: Colors.grey[700],
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         '$age years',
                         style: TextStyle(color: Colors.grey[700]),
                       ),
                       const SizedBox(width: 16),
-                      Icon(Icons.work_outline,
-                          size: 18, color: Colors.grey[700]),
+                      Icon(
+                        Icons.work_outline,
+                        size: 18,
+                        color: Colors.grey[700],
+                      ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(

@@ -8,7 +8,7 @@ class Review {
   final String id;
   final String title;
   final String comment;
-  final String agentId; 
+  final String agentId;
   final int rating;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -17,7 +17,7 @@ class Review {
   final String userProfileImg;
 
   Review({
-    required this.agentId, 
+    required this.agentId,
     required this.id,
     required this.title,
     required this.comment,
@@ -33,7 +33,7 @@ class Review {
     final data = doc.data() as Map<String, dynamic>;
     return Review(
       agentId: data['agentId'] ?? '',
-      
+
       id: doc.id,
       userId: data['userId'] ?? '',
       userName: data['userName'] ?? '',
@@ -54,7 +54,7 @@ class Review {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'agentId': agentId, 
+      'agentId': agentId,
 
       'title': title,
       'userId': userId,

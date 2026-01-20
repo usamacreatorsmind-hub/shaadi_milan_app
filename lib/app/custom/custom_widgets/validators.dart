@@ -126,7 +126,7 @@ class Validators {
     }
     return null;
   }
-  
+
   static String? validateAadhar(String? value) {
     if (value == null || value.isEmpty) {
       return 'Aadhar number is required';

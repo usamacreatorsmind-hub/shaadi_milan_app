@@ -91,8 +91,8 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<void> addWishlist(String uid, String profileId) {
-    return _ds.addWishlist(uid, profileId);
+  Future<void> addWishlist(String uid, WishListItem wishlistItem) {
+    return _ds.addWishlist(uid,wishlistItem );
   }
 
   @override
@@ -119,6 +119,17 @@ class UserRepositoryImpl implements UserRepository {
     return _ds
         .watchUser(uid)
         .map((data) => UserStatus.fromMap(data['userStatus']));
+  }
+  
+  @override
+  Future<void> updateWishlistStatus({required String parentUserId, required String profileId, required String newStatus}) {
+    
+    return _ds.updateWishlistStatus(
+      parentUserId: parentUserId,
+      profileId: profileId,
+      newStatus: newStatus,
+    );              
+
   }
 }
 

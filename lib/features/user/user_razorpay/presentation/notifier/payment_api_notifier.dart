@@ -42,7 +42,7 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
   }
 
   /// ONE-TIME PAYMENT
-  Future<void> startOneTimePayment({
+  Future<void> startPayment({
     required double amount,
     required String uid,
     required String email,
@@ -50,23 +50,24 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
     required String phone,
     required String agentId,
     required String region,
+    required String paymentType,
     required String district,
     required String gender,
   }) async {
     try {
       state = state.copyWith(status: PayStatus.loading);
 
-      // print all data here 
+      // print all data here
       debugPrint("Amount: $amount");
       debugPrint("UID: $uid");
       debugPrint("Email: $email");
       debugPrint("FullName: $fullName");
       debugPrint("Phone: $phone");
       debugPrint("AgentId: $agentId");
+      debugPrint("PaymentType: $paymentType");
       debugPrint("Region: $region");
       debugPrint("District: $district");
-      debugPrint("Gender: $gender");          
-
+      debugPrint("Gender: $gender");
 
       // Razorpay expects amount in paisa (multiply by 100)
       final amountInPaisa = (amount * 100).toInt();
@@ -75,6 +76,8 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
         amount: amount, // API might expect INR or Paisa, check your backend.
         agentId: agentId,
         uid: uid,
+        paymentType: paymentType,
+
         email: email,
         fullName: fullName,
         phone: phone,
@@ -98,10 +101,7 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
         "notes": {"user_id": uid, "user_name": fullName},
       });
     } catch (e) {
-      state = state.copyWith(
-        status: PayStatus.failure,
-        message: e.toString(),
-      );
+      state = state.copyWith(status: PayStatus.failure);
     }
   }
 
@@ -111,7 +111,7 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
     // Backend verification should happen via Webhook as per your architecture.
     state = state.copyWith(
       status: PayStatus.success,
-      message: "Payment Successful",
+
       razorpayPaymentId: response.paymentId,
       razorpayOrderId: response.orderId,
       signature: response.signature,
@@ -119,10 +119,7 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
   }
 
   void _onError(PaymentFailureResponse response) {
-    state = state.copyWith(
-      status: PayStatus.failure,
-      message: response.message ?? "Payment Failed",
-    );
+    state = state.copyWith(status: PayStatus.failure);
   }
 
   void _onWallet(ExternalWalletResponse response) {}

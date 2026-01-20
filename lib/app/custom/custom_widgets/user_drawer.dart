@@ -41,8 +41,8 @@ class UserDrawer extends ConsumerWidget {
                       icon: Icons.dashboard_outlined,
                       title: "Dashboard",
                       onTap: () {
-                        context.popRoute();
-                        context.pushRoute(const UserMainShellRoute());
+                        context.maybePop();
+                        context.pushRoute(  UserMainShellRoute());
                       },
                     ),
 
@@ -50,7 +50,7 @@ class UserDrawer extends ConsumerWidget {
                       icon: Icons.person_outline,
                       title: "My Profile",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         context.pushRoute(MyProfileDetailRoute(user: user));
                       },
                     ),
@@ -59,7 +59,7 @@ class UserDrawer extends ConsumerWidget {
                       icon: Icons.favorite_border,
                       title: "Wishlist",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         context.pushRoute(UserWishListRoute(userId: user.uid));
                       },
                     ),
@@ -69,7 +69,7 @@ class UserDrawer extends ConsumerWidget {
                       title: "Notifications",
                       trailing: _NotificationBadge(count: 3),
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         context.pushRoute(const UserNotificationRoute());
                       },
                     ),
@@ -78,7 +78,7 @@ class UserDrawer extends ConsumerWidget {
                       icon: Icons.settings_outlined,
                       title: "Settings",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         // context.pushRoute(const UserSettingsRoute());
                       },
                     ),
@@ -89,7 +89,7 @@ class UserDrawer extends ConsumerWidget {
                       icon: Icons.description_outlined,
                       title: "Terms & Conditions",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         context.pushRoute(const TermsAndConditionsRoute());
                       },
                     ),
@@ -98,7 +98,7 @@ class UserDrawer extends ConsumerWidget {
                       icon: Icons.privacy_tip_outlined,
                       title: "Privacy Policy",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         context.pushRoute(const PrivacyPolicyRoute());
                       },
                     ),
@@ -107,7 +107,7 @@ class UserDrawer extends ConsumerWidget {
                       icon: Icons.info_outline,
                       title: "About Us",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         context.pushRoute(const AboutUsRoute());
                       },
                     ),
@@ -135,7 +135,7 @@ class UserDrawer extends ConsumerWidget {
                       icon: Icons.help_outline,
                       title: "Help & Support",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         context.pushRoute(const ContactUsRoute());
                       },
                     ),
@@ -145,7 +145,7 @@ class UserDrawer extends ConsumerWidget {
                       title: "Share App",
                       onTap: () async {
                         // 1. Close the drawer first
-                        context.popRoute();
+                        context.maybePop();
 
                         // 2. Define your app's Play Store link
                         const String packageName =
@@ -177,7 +177,7 @@ class UserDrawer extends ConsumerWidget {
                         }
 
                         // ignore: use_build_context_synchronously
-                        context.popRoute();
+                        context.maybePop();
                       },
                     ),
 
@@ -348,7 +348,7 @@ class _LogoutButton extends StatelessWidget {
           ),
           onPressed: () {
             ref.read(authControllerProvider.notifier).signOut();
-            context.router.replace(const UserLoginRoute());
+            context.router.replace( UserLoginRoute());
           },
         ),
       ),

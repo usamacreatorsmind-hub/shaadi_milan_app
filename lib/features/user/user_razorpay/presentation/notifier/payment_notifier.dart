@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/providers/providers.dart';
 import '../../domain/states/payment.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -15,15 +17,22 @@ final paymentNotifierProvider =
 class PaymentNotifier extends StateNotifier<PaymentState> {
   final PaymentRepository _paymentRepository;
   final String _uid;
+  StreamSubscription? _subscription;
 
   PaymentNotifier(this._paymentRepository, this._uid)
     : super(const PaymentState(status: PayStatus.loading)) {
     _watchUserPayment();
   }
 
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
   /// Watch payment data in real-time from Firestore
   void _watchUserPayment() {
-    _paymentRepository
+    _subscription = _paymentRepository
         .watchUserPayment(_uid)
         .listen(
           (payment) {
@@ -33,17 +42,18 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
                 payment: payment,
               );
             } else {
-              state = state.copyWith(
-                status: PayStatus.idle,
-                message: "No payment found",
-              );
+              state = state.copyWith(status: PayStatus.idle);
             }
           },
           onError: (e) {
-            state = state.copyWith(
-              status: PayStatus.failure,
-              message: e.toString(),
-            );
+            // Handle permission denied (document doesn't exist) as idle
+            if (e is FirebaseException && e.code == 'permission-denied' ||
+                e.toString().contains('permission-denied') ||
+                e.toString().contains('PERMISSION_DENIED')) {
+              state = state.copyWith(status: PayStatus.idle);
+            } else {
+              state = state.copyWith(status: PayStatus.failure);
+            }
           },
         );
   }
@@ -67,19 +77,24 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
     state = state.copyWith(status: PayStatus.loading);
     try {
       final payment = await _paymentRepository.getUserPayment(_uid);
+      if (!mounted) return;
       if (payment != null) {
         state = state.copyWith(
           status: _mapPaymentStatus(payment.status),
           payment: payment,
         );
       } else {
-        state = state.copyWith(
-          status: PayStatus.idle,
-          message: "No payment found",
-        );
+        state = state.copyWith(status: PayStatus.idle);
       }
     } catch (e) {
-      state = state.copyWith(status: PayStatus.failure, message: e.toString());
+      if (!mounted) return;
+      if (e is FirebaseException && e.code == 'permission-denied' ||
+          e.toString().contains('permission-denied') ||
+          e.toString().contains('PERMISSION_DENIED')) {
+        state = state.copyWith(status: PayStatus.idle);
+      } else {
+        state = state.copyWith(status: PayStatus.failure);
+      }
     }
   }
 }

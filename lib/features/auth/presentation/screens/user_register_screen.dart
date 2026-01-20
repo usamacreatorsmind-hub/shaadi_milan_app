@@ -1,13 +1,25 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/validators.dart';
+import 'package:arvika_marriage_bureau/core/services/notification_service.dart';
+import 'package:arvika_marriage_bureau/features/auth/data/repositories_impl/data_source/firebase_auth_ds.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_firestore.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:sizer/sizer.dart';
 
 import '../providers/auth_providers.dart';
 
 import '../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../app/router/app_router.dart';
+
+enum Gender { male, female }
+
+final genderProvider = StateProvider.autoDispose<String?>((ref) => null);
 
 @RoutePage()
 class UserRegisterScreen extends ConsumerStatefulWidget {
@@ -23,6 +35,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
   final phoneCtrl = TextEditingController();
   final pwCtrl = TextEditingController();
   final confirmPwCtrl = TextEditingController();
+  final agentIdCtrl = TextEditingController();
 
   bool isLoading = false;
 
@@ -33,10 +46,12 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     phoneCtrl.dispose();
     pwCtrl.dispose();
     confirmPwCtrl.dispose();
+    agentIdCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _register(BuildContext context) async {
+    String? agentUid;
     if (nameCtrl.text.isEmpty ||
         emailCtrl.text.isEmpty ||
         phoneCtrl.text.isEmpty ||
@@ -65,13 +80,56 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
 
     final authRepo = ref.watch(authRepositoryProvider);
 
+    // 2️⃣ check if agent exists
+    // 2️⃣ check if agent exists
+
+    final agentId = agentIdCtrl.text.trim();
+    final firestore = ref.read(agentFirestoreDsProvider);
+    bool agentExists = false;
+
+    if (agentId.isNotEmpty) {
+      try {
+        agentExists = await firestore.checkAgentExists(agentId: agentId);
+        if (agentExists) {
+          agentUid = await firestore.fetchAgentDocIdByAgentId(agentId: agentId);
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error checking agent ID: $e'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        setState(() => isLoading = false);
+        return;
+      }
+    }
+
+    if (agentId.isNotEmpty && !agentExists) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Agent ID does not exist. Please check the ID or leave it blank.',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      setState(() => isLoading = false);
+      return;
+    }
+
     try {
       await authRepo.signUpUserWithEmail(
         email: emailCtrl.text.trim(),
         password: pwCtrl.text.trim(),
         fullName: nameCtrl.text.trim(),
         phone: phoneCtrl.text.trim(),
-        agentId: '',
+        gender: ref.read(genderProvider) ?? "",
+
+        agentId: agentUid ?? "",
         wishlists: [],
       );
 
@@ -92,6 +150,8 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
         ref.invalidate(authStateProvider);
         await Future.delayed(const Duration(milliseconds: 500));
         if (!mounted) return;
+        NotificationService.saveUserTokenToFirestore(user.uid);
+
         context.router.replace(AuthWrapperRoute());
       }
     } on FirebaseAuthException catch (e) {
@@ -228,10 +288,21 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                         const SizedBox(height: 16),
                         AppTextField(
                           autofillHints: const [AutofillHints.telephoneNumber],
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          validator: (value) =>
+                              Validators.validatePhoneNumber(value),
+                          showWordCount: true,
+
+                          counterType: CounterType.characters,
+
                           controller: phoneCtrl,
+                          maxLimit: 10,
+
                           prefixIcon: Icons.phone_android_rounded,
                           label: "Phone",
-                          hint: "+1 234 567 890",
+                          hint: "1234 567 890",
                           keyboardType: TextInputType.phone,
                           obscureText: false,
                           iconColor: theme.colorScheme.primary,
@@ -241,6 +312,8 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                           autofillHints: const [AutofillHints.newPassword],
                           obscureText: true,
                           iconColor: theme.colorScheme.primary,
+                          validator: (value) =>
+                              Validators.validatePassword(value),
 
                           controller: pwCtrl,
                           prefixIcon: Icons.lock_outline_rounded,
@@ -252,16 +325,43 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                         AppTextField(
                           autofillHints: const [AutofillHints.newPassword],
                           controller: confirmPwCtrl,
+
+                          obscureText: true,
+                          iconColor: theme.colorScheme.primary,
+                          validator: (value) =>
+                              Validators.validateConfirmPassword(
+                                value,
+                                pwCtrl.text,
+                              ),
+
                           prefixIcon: Icons.verified_user_outlined,
                           label: "Confirm Password",
                           hint: "••••••••",
-                          obscureText: true,
 
+                          keyboardType: TextInputType.visiblePassword,
+                        ),
+
+                        // create gender
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          autofillHints: const [AutofillHints.newPassword],
+                          controller: agentIdCtrl,
+                          prefixIcon: Icons.verified_user_outlined,
+                          label: "Agent Id (Optional)",
+                          hint: "",
+                          obscureText: false,
                           keyboardType: TextInputType.visiblePassword,
                           iconColor: theme.colorScheme.primary,
                         ),
                         const SizedBox(height: 24),
-
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            genderCard(context, "Male", "male", ref),
+                            genderCard(context, "Female", "female", ref),
+                          ],
+                        ),
+                        SizedBox(height: 20),
                         SizedBox(
                           width: double.infinity,
                           height: 56,
@@ -298,6 +398,53 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget genderCard(
+    BuildContext context,
+    String title,
+
+    String genderValue,
+    WidgetRef ref,
+  ) {
+    final selectedGender = ref.watch(genderProvider);
+    final theme = Theme.of(context);
+
+    final isSelected = selectedGender == genderValue;
+
+    return InkWell(
+      onTap: () {
+        ref.read(genderProvider.notifier).state = genderValue;
+      },
+      child: Container(
+        height: 30,
+        width: 30.w,
+
+        decoration: BoxDecoration(
+          color: isSelected ? theme.primaryColor : Colors.grey[200],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? theme.primaryColor : Colors.grey.shade300,
+            width: 2,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: TextStyle(
+                color: isSelected
+                    ? theme.colorScheme.onPrimary
+                    : Colors.grey[700],
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -30,9 +30,12 @@ class AuthController extends StateNotifier<User?> {
     String email,
     String password,
     String agentId,
+    String gender,
     String phone,
   ) async {
     await _authRepository.signUpUserWithEmail(
+      gender: gender,
+      
       fullName: fullName,
       email: email,
       password: password,

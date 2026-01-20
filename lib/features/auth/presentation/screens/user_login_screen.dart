@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/core/services/notification_service.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -65,6 +66,8 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
       if (user != null) {
         // Invalidate auth state to ensure latest data is loaded
         ref.invalidate(authStateProvider);
+        NotificationService.saveUserTokenToFirestore(user.uid);
+
         await Future.delayed(const Duration(milliseconds: 500));
         if (!mounted) return;
         context.router.replace(AuthWrapperRoute());

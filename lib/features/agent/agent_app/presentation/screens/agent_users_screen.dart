@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/legacy.dart';
+
 import '../../../../../app/custom/custom_widgets/drawer.dart';
 import 'agen_profile.screen.dart';
 
@@ -8,6 +10,56 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../user/user_razorpay/domain/states/payment.dart';
+
+enum GenderFilter { male, female }
+
+final genderFilterProvider = StateProvider<GenderFilter>(
+  (ref) => GenderFilter.male,
+);
+
+class GenderFilterRow extends ConsumerWidget {
+  const GenderFilterRow({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(genderFilterProvider);
+    final theme = Theme.of(context);
+
+    Widget buildButton(String label, GenderFilter value,  ) {
+      final isSelected = selected == value;
+
+      return Expanded(
+        child: OutlinedButton.icon(
+      
+          label: Text(label),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: isSelected
+                ? theme.colorScheme.onPrimary
+                : theme.primaryColor,
+            backgroundColor: isSelected
+                ? theme.primaryColor
+                : Colors.transparent,
+            side: BorderSide(color: theme.primaryColor),
+          ),
+          onPressed: () {
+            ref.read(genderFilterProvider.notifier).state = value;
+          },
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
+        children: [
+          buildButton('Male', GenderFilter.male, ),
+          const SizedBox(width: 12),
+          buildButton('Female', GenderFilter.female,  ),
+        ],
+      ),
+    );
+  }
+}
 
 @RoutePage()
 class AgentUserScreen extends ConsumerStatefulWidget {
@@ -28,6 +80,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
       ref
           .read(agentUsersNotifierProvider.notifier)
           .getUsersForAgent(widget.agentId);
+
       ref
           .read(usersPaymentsNotifierProvider.notifier)
           .getUsersPayment(agentId: widget.agentId);
@@ -38,12 +91,11 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
   Widget build(BuildContext context) {
     final usersAsync = ref.watch(agentUsersNotifierProvider);
     final paymentsAsync = ref.watch(usersPaymentsNotifierProvider);
-
+    final genderFilter = ref.watch(genderFilterProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
       drawer: AppDrawer(agentAsync: ref.watch(agentProvider(widget.agentId))),
-
       body: CustomScrollView(
         slivers: [
           /// 🔹 APP BAR
@@ -53,33 +105,60 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
             pinned: true,
             backgroundColor: theme.primaryColor,
             foregroundColor: theme.colorScheme.onPrimary,
-            elevation: 0,
-            centerTitle: false,
           ),
 
-          /// 🔹 BODY
+          /// 🔹 GENDER FILTER ROW
+          SliverAppBar(
+            toolbarHeight: 30,
+            automaticallyImplyLeading: false,
+            pinned: true,
+            backgroundColor: theme.scaffoldBackgroundColor,
+
+            flexibleSpace: const GenderFilterRow(),
+          ),
+
+          /// 🔹 USER LIST
           usersAsync.when(
             loading: () => const SliverFillRemaining(
               child: Center(child: CircularProgressIndicator()),
             ),
 
-            error: (error, _) => SliverFillRemaining(
-              child: _ErrorView(
-                error: error.toString(),
-                onRetry: () {
-                  ref
-                      .read(agentUsersNotifierProvider.notifier)
-                      .getUsersForAgent(widget.agentId);
-                },
-              ),
-            ),
+            error: (error, stackTrace) {
+              debugPrint(stackTrace.toString());
+              debugPrint(error.toString());
+
+              return SliverFillRemaining(
+                child: _ErrorView(
+                  error: error.toString(),
+                  onRetry: () {
+                    ref
+                        .read(agentUsersNotifierProvider.notifier)
+                        .getUsersForAgent(widget.agentId);
+                  },
+                ),
+              );
+            },
 
             data: (users) {
               if (users.isEmpty) {
                 return const SliverFillRemaining(child: _EmptyView());
               }
 
-              // Get payments from async state
+              /// 🔹 FILTER USERS BY GENDER
+              final filteredUsers = users.where((user) {
+                final gender = user.gender?.toLowerCase() ?? '';
+                return genderFilter == GenderFilter.male
+                    ? gender == 'male'
+                    : gender == 'female';
+              }).toList();
+
+              if (filteredUsers.isEmpty) {
+                return const SliverFillRemaining(
+                  child: Center(child: Text('No users found')),
+                );
+              }
+
+              /// 🔹 PAYMENTS
               final payments = paymentsAsync.maybeWhen(
                 data: (data) => data,
                 orElse: () => const <Payment?>[],
@@ -89,69 +168,33 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 padding: const EdgeInsets.all(12),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
-                    final user = users[index];
-                    // print payments
+                    final user = filteredUsers[index];
 
-                    // Find all payments for this user
                     final userPayments = payments
                         .where((p) => p != null && p.userId == user.uid)
                         .toList();
 
-                    // debugPrint(
-                    //   'User ${user.fullName}: Payments: ${userPayments.map((p) => p?.status).toList()}',
-                    // );
+                    String statusToDisplay = 'Not Started';
 
-                    // Determine the payment status to display
-                    String? statusToDisplay;
-
-                    if (userPayments.isEmpty) {
-                      // No payments found for this user
-                      statusToDisplay = 'Not Started';
-                    } else {
-                      // Check for successful payments
-                      final hasSuccess = userPayments.any(
-                        (p) =>
-                            p != null &&
-                            [
-                              'SUCCESS',
-                              'PAID',
-                              'CAPTURED',
-                            ].contains(p.status.toUpperCase()),
-                      );
-
-                      if (hasSuccess) {
-                        statusToDisplay = 'PAID';
-                      } else {
-                        // Check for pending payments
-                        final hasPending = userPayments.any(
-                          (p) =>
-                              p != null && p.status.toUpperCase() == 'PENDING',
-                        );
-
-                        if (hasPending) {
-                          statusToDisplay = 'PENDING';
-                        } else {
-                          // Use the most recent payment status
-                          statusToDisplay =
-                              userPayments.isNotEmpty &&
-                                  userPayments.first != null
-                              ? userPayments.first!.status
-                              : 'Not Started';
-                        }
-                      }
+                    if (userPayments.any(
+                      (p) => [
+                        'SUCCESS',
+                        'PAID',
+                        'CAPTURED',
+                      ].contains(p?.status.toUpperCase()),
+                    )) {
+                      statusToDisplay = 'PAID';
+                    } else if (userPayments.any(
+                      (p) => p?.status.toUpperCase() == 'PENDING',
+                    )) {
+                      statusToDisplay = 'PENDING';
                     }
 
                     return UserCard(
                       user: user,
                       paymentStatus: statusToDisplay,
-
                       onViewUserProfile: () {
-                        context.router.push(
-                          ViewUserRoute(
-                            userId: user.uid,
-                            agentId: widget.agentId,
-                          ),
-                        );
+                        context.router.push(ViewUserRoute(userId: user.uid));
                       },
                       onViewMatrimonyProfile: () {
                         if (user.isProfileCreated) {
@@ -162,7 +205,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                "Matrimony profile not created yet",
+                                'Matrimony profile not created yet',
                               ),
                             ),
                           );
@@ -177,7 +220,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                         );
                       },
                     );
-                  }, childCount: users.length),
+                  }, childCount: filteredUsers.length),
                 ),
               );
             },

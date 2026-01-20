@@ -74,7 +74,7 @@ class _UserEmploymentFormScreenState
           jobType: _jobType!,
           company: null,
           designation: null,
-          annualIncome: int.tryParse(_annualIncomeController.text),
+          annualIncome: null,
           workLocation: null,
         );
       } else {
@@ -82,11 +82,11 @@ class _UserEmploymentFormScreenState
           jobType: _jobType!,
           company: null,
           designation: null,
-          annualIncome: int.tryParse(_annualIncomeController.text),
+          annualIncome: null,
           workLocation: null,
         );
       }
-      
+
       return;
     }
 
@@ -173,8 +173,6 @@ class _UserEmploymentFormScreenState
           ),
           const SizedBox(height: 16),
 
-          const SizedBox(height: 16),
-
           AppTextField(
             controller: _workLocationController,
             prefixIcon: Icons.location_on,
@@ -183,6 +181,20 @@ class _UserEmploymentFormScreenState
             hint: "Enter your work location",
             obscureText: false,
             keyboardType: TextInputType.text,
+          ),
+          const SizedBox(height: 16),
+
+          AppTextField(
+            controller: _annualIncomeController,
+
+            // indian currency
+            prefixIcon: Icons.currency_rupee,
+
+            iconColor: Theme.of(context).colorScheme.primary,
+            label: "Annual Income",
+            hint: "Enter your annual income",
+            obscureText: false,
+            keyboardType: TextInputType.number,
           ),
         ],
       );
@@ -208,7 +220,6 @@ class _UserEmploymentFormScreenState
                   'Government',
                   'Business',
                   'Defence',
-
                   'Self Employed',
                   'Not Working',
                 ],
@@ -221,18 +232,6 @@ class _UserEmploymentFormScreenState
               _jobType == "Not Working" ? SizedBox() : buildEmploymentForm(),
 
               SizedBox(height: 25),
-              AppTextField(
-                controller: _annualIncomeController,
-
-                // indian currency
-                prefixIcon: Icons.currency_rupee,
-
-                iconColor: Theme.of(context).colorScheme.primary,
-                label: "Annual Income",
-                hint: "Enter your annual income",
-                obscureText: false,
-                keyboardType: TextInputType.number,
-              ),
 
               const SizedBox(height: 20),
               if (employmentState.isLoading)

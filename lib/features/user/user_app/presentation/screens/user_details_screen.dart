@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart'
     show agentFirestoreDsProvider;
@@ -260,8 +261,6 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                         ),
                         pinned: true,
                       ),
-              
-              
                     ];
                   },
                   body: Builder(
@@ -712,14 +711,28 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   .read(authRepositoryProvider)
                                   .currentUser
                                   ?.uid;
-                              final profileId = viewModel.user?.uid;
 
-                              if (currentUserId != null && profileId != null) {
+                              final profileId = viewModel.user?.uid;
+                              final agentId = viewModel.user?.agentId;
+
+                              final status = "pending"; // Or any initial status
+                              final updatedAt = DateTime.now();
+
+                              WishListItem wishListItem = WishListItem(
+                                status: status,
+                                profileId: profileId ?? "",
+
+                                updatedAt: updatedAt,
+                              );
+
+                              if (currentUserId!.isNotEmpty &&
+                                  profileId!.isNotEmpty &&
+                                  agentId!.isNotEmpty) {
                                 // Add the profile's UID to the current user's wishlist
 
                                 ref
                                     .read(userRepositoryProvider)
-                                    .addWishlist(currentUserId, profileId);
+                                    .addWishlist(currentUserId, wishListItem);
 
                                 // Optionally, show a success message
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -733,7 +746,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
-                                      'Something went wrong. Please try again later.',
+                                      // user might not have agent id
+                                      'User ID or Profile ID or Agent ID is missing.',
                                     ),
                                     duration: Duration(seconds: 2),
                                   ),

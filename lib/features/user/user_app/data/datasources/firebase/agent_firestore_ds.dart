@@ -66,9 +66,20 @@ class AgentFirestoreDs {
         .first;
 
     return querySnapshot;
+  }
 
+  Future<bool> checkAgentExists({required String agentId}) async {
+    final agentDoc = await _firestore
+        .collection(_collection)
+        .where('agentId', isEqualTo: agentId)
+        .limit(1)
+        .get();
+    if (agentDoc.docs.isEmpty) {
+      debugPrint('❌ Agent with ID $agentId does not exist.');
+      return false;
+    }
 
-
-    
+    debugPrint('✅ Agent with ID $agentId exists.');
+    return true;
   }
 }

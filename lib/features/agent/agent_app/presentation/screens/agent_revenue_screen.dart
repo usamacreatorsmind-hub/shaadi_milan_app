@@ -122,7 +122,6 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                       ),
                     ],
                     bottom: PreferredSize(
-                      
                       preferredSize: const Size.fromHeight(52), // FIXED HEIGHT
                       child: RevenueDashboardTabbar(),
                     ),
@@ -711,7 +710,6 @@ class _RevenueRow extends StatelessWidget {
       children: [
         _RevenueCard('Total Revenue', analytics.totalRevenue),
         const SizedBox(width: 12),
-        _RevenueCard('Today', analytics.todayRevenue),
       ],
     );
   }

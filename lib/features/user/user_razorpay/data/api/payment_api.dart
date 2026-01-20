@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/api/payment_api._firestore.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
 import 'package:dio/dio.dart';
 
 class PaymentApi {
@@ -8,14 +8,16 @@ class PaymentApi {
 
   Future<Map<String, dynamic>> createOrder({
     required double amount,
+    
     required String uid,
     required String agentId,
     required String email,
     required String fullName,
     required String phone,
+    required String paymentType,
     required String region,
     required String district,
-    required String gender,
+    required String gender, 
   }) async {
     try {
       final response = await _dio.post(
@@ -27,6 +29,7 @@ class PaymentApi {
           "agentId": agentId,
           "fullName": fullName,
           "phone": phone,
+          "paymentType": paymentType,
           "region": region,
           "district": district,
           "gender": gender,

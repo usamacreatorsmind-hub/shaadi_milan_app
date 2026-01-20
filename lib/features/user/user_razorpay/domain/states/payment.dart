@@ -15,6 +15,7 @@ class Payment {
   final String email;
   final String phone;
   final String fullName;
+  final String paymentType;
   final String razorpayPaymentId;
   final String? razorpaySignature;
   final String agentId;
@@ -36,6 +37,7 @@ class Payment {
     required this.agentId,
     required this.region,
     required this.district,
+    required this.paymentType,
     required this.gender,
     required this.religion,
     required this.caste,
@@ -53,16 +55,26 @@ class Payment {
     this.updatedAt,
   });
 
+  static int _parseAmount(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
+  }
+
   factory Payment.fromMap(Map<String, dynamic> map) {
     return Payment(
       religion: map['religion'] ?? '',
       caste: map['caste'] ?? '',
       razorpayPaymentId: map['razorpayPaymentId'] ?? '',
+
+      paymentType: map['paymentType'] ?? '',
       razorpaySignature: map['razorpaySignature'],
-      agentId: map['agentId'],
-      region: map['region'],
-      district: map['district'],
-      gender: map['gender'],
+      agentId: map['agentId'] ?? '',
+      region: map['region'] ?? '',
+      district: map['district'] ?? '',
+      gender: map['gender'] ?? '',
 
       orderId: map['orderId'] ?? '',
       razorpayOrderId: map['razorpayOrderId'] ?? '',
@@ -70,7 +82,7 @@ class Payment {
       email: map['email'] ?? '',
       phone: map['phone'] ?? '',
       fullName: map['fullName'] ?? '',
-      amount: (map['amount'] as num?)?.toInt() ?? 0,
+      amount: _parseAmount(map['amount']),
       status: map['status'] ?? '',
       gateway: map['gateway'] ?? 'razorpay',
       createdAt: map['createdAt'] is Timestamp
@@ -92,6 +104,7 @@ class Payment {
       'region': region,
       'district': district,
       'gender': gender,
+      'paymentType': paymentType,
       'orderId': orderId,
       'razorpayOrderId': razorpayOrderId,
       'userId': userId,
@@ -109,14 +122,13 @@ class Payment {
 
 class PaymentState {
   final PayStatus status;
-  final String? message;
   final String? razorpayPaymentId;
   final String? razorpayOrderId;
   final String? signature;
   final Payment? payment;
   const PaymentState({
     this.status = PayStatus.idle,
-    this.message,
+
     this.razorpayPaymentId,
     this.razorpayOrderId,
     this.signature,
@@ -125,7 +137,7 @@ class PaymentState {
 
   PaymentState copyWith({
     PayStatus? status,
-    String? message,
+
     String? razorpayPaymentId,
     String? razorpayOrderId,
     String? signature,
@@ -133,7 +145,7 @@ class PaymentState {
   }) {
     return PaymentState(
       status: status ?? this.status,
-      message: message ?? this.message,
+
       razorpayPaymentId: razorpayPaymentId ?? this.razorpayPaymentId,
       razorpayOrderId: razorpayOrderId ?? this.razorpayOrderId,
       signature: signature ?? this.signature,

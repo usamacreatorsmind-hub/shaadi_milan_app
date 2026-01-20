@@ -214,16 +214,18 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           icon: Icons.people,
           color: Colors.blue,
         ),
+
         _buildStatCard(
-          title: 'Today\'s Revenue',
+          title: 'Success',
           value: analyticsAsync.when(
-            data: (data) => '₹${data.todayRevenue}',
+            data: (data) => '${data.successCount}',
             loading: () => '...',
             error: (_, __) => 'Error',
           ),
-          icon: Icons.today,
-          color: Colors.orange,
+          icon: Icons.check_circle,
+          color: Colors.green,
         ),
+
         _buildStatCard(
           title: 'Pending',
           value: analyticsAsync.when(
@@ -425,9 +427,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                   color: Colors.grey,
                 ),
                 onTap: () {
-                  context.router.push(
-                    ViewUserRoute(agentId: widget.agentId, userId: user.uid),
-                  );
+                  context.router.push(ViewUserRoute(userId: user.uid));
                 },
               ),
             );

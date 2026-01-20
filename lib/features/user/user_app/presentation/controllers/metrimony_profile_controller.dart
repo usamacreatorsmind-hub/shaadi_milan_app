@@ -1,3 +1,6 @@
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_firestore.dart';
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -153,20 +156,45 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
         .doc(uid)
         .get();
     final fullName = userDoc.data()?['fullName'] ?? '';
+    final email = userDoc.data()?['email'] ?? '';
+    final phone = userDoc.data()?['phone'] ?? '';
+
     debugPrint('Fetched User Full Name: $fullName');
 
     var profile = state.metrimony.copyWith(userId: uid, metrimonyId: uid);
 
     debugPrint('Profile submitted: ${profile.toMap()}');
 
+    PaymentFirestore().createEmptyPayment(
+      initialPaymentData: Payment(
+        razorpayPaymentId: '',
+        paymentType: '',
+        agentId: agentId,
+        region: profile.address.state,
+        district: profile.address.city,
+        gender: profile.identity.gender,
+        religion: profile.cultural.religion,
+        caste: profile.cultural.caste,
+        orderId: '',
+        razorpayOrderId: '',
+        userId: uid,
+        email: email,
+        phone: phone,
+        fullName: fullName,
+        amount: 0,
+        status: 'IDLE',
+        createdAt: DateTime.now(),
+      ),
+      uid: uid,
+    );
+
     await ref
         .read(matrimonyRepositoryProvider)
         .updateMatrimonyProfile(uid, profile);
-
     // Update profileImageUrl in users collection with profileImageUrl
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
-      'userStatus.isProfileCreated': true,
       'profileImageUrl': profile.images.profileImageUrl,
+      'isProfileCreated': true,
     });
   }
 }

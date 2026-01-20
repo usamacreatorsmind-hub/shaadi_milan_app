@@ -52,7 +52,7 @@ class _UserPaymentSuccessScreenState
             const Icon(Icons.error_outline, color: Colors.red, size: 64),
             const SizedBox(height: 16),
             Text(
-              'Error fetching payment: ${state.message}',
+              'Error fetching payment: ${state.status}',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),

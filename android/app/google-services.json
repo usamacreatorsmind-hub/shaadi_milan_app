@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "909636679466",
+    "project_id": "fir-app-e3a53",
+    "storage_bucket": "fir-app-e3a53.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:909636679466:android:70cb7ecbc456cfb2a39053",
+        "android_client_info": {
+          "package_name": "com.example.arvika_marriage_bureau_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnMC_xW5dnd1Z33orwFQkrxsVPlndbTTw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

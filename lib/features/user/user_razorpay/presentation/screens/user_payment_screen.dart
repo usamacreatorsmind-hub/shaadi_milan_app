@@ -1,4 +1,9 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:arvika_marriage_bureau/core/services/in_app_messaging_service.dart';
 import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
@@ -6,14 +11,9 @@ import 'package:arvika_marriage_bureau/features/user/user_app/presentation/scree
 
 import '../../../user_app/domain/states/metrimony_profile_view_model.dart';
 import '../../domain/states/payment.dart';
+import '../notifier/amount_notifier.dart';
 import '../notifier/payment_api_notifier.dart';
 import '../notifier/payment_notifier.dart';
-
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../notifier/amount_notifier.dart';
 
 @RoutePage()
 class UserPaymentScreen extends ConsumerStatefulWidget {
@@ -31,6 +31,9 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
   @override
   void initState() {
     super.initState();
+    // Suppress In-App Messages during payment flow to prevent interruptions
+    InAppMessagingService.setSuppressed(true);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(paymentNotifierProvider(widget.userId).notifier)
@@ -39,13 +42,18 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
   }
 
   @override
+  void dispose() {
+    // Re-enable In-App Messages when leaving the screen
+    InAppMessagingService.setSuppressed(false);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final amountState = ref.watch(amountNotifierProvider);
     final paymentState = ref.watch(paymentProvider);
-    final existingPaymentState = ref.watch(
-      paymentNotifierProvider(widget.userId),
-    );
+    ref.watch(paymentNotifierProvider(widget.userId));
     final userProfileAsync = ref.watch(
       userProfileScreenProvider(widget.userId),
     );
@@ -67,7 +75,7 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
               TextButton(
                 onPressed: () {
                   Navigator.of(ctx).pop(); // Close dialog
-                  context.router.pop(); // Go back to previous screen
+                  context.router.maybePop(); // Go back to previous screen
                 },
                 child: const Text("OK"),
               ),
@@ -77,7 +85,7 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
       } else if (next.status == PayStatus.failure) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.message ?? "Payment Failed"),
+            content: Text('Payment Failed:  '),
             backgroundColor: Colors.red,
           ),
         );
@@ -200,7 +208,7 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                           TextButton(
                             onPressed: () => ref
                                 .read(amountNotifierProvider.notifier)
-                                .fetchAmount(),
+                                .fetchRegistrationAmount(),
                             child: const Text("Retry"),
                           ),
                         ],
@@ -319,36 +327,12 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                           debugPrint("District/City: $district");
                           debugPrint("Gender: $gender");
                           debugPrint("Amount: ${amountState.amount?.amount}");
-                          debugPrint("======================\n");
-
-                          // Validate required fields
-                          if (gender == "Not Provided") {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  "⚠️ Please complete your identity form (Gender required)",
-                                ),
-                                backgroundColor: Colors.orange,
-                              ),
-                            );
-                            return;
-                          }
-
-                          if (district == "Not Provided") {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  "⚠️ Please complete your address form (City required)",
-                                ),
-                                backgroundColor: Colors.orange,
-                              ),
-                            );
-                            return;
-                          }
+                          debugPrint("=====================SA=\n");
 
                           ref
                               .read(paymentProvider.notifier)
-                              .startOneTimePayment(
+                              .startPayment(
+                                paymentType: amountState.amount!.paymentType,
                                 amount: amountState.amount!.amount.toDouble(),
                                 uid: user.uid,
                                 email: user.email ?? "N/A",

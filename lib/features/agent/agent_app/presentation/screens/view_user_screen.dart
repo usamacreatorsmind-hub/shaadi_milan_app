@@ -1,3 +1,6 @@
+import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -9,13 +12,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 @RoutePage()
 class ViewUserScreen extends ConsumerStatefulWidget {
   final String userId;
-  final String agentId;
 
-  const ViewUserScreen({
-    super.key,
-    required this.agentId,
-    required this.userId,
-  });
+  const ViewUserScreen({super.key, required this.userId});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ViewUserScreenState();
@@ -27,16 +25,15 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(agentUserNotifierProvider.notifier).fetchUserById(widget.userId);
-      ref
-          .read(userPaymentNotifierProvider.notifier)
-          .getUserPayment(agentId: widget.agentId, userId: widget.userId);
+      // ref
+      //     .read(userPaymentNotifierProvider.notifier)
+      //     .getUserPayment(agentId: widget.agentId, userId: widget.userId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(agentUserNotifierProvider);
-    final paymentAsync = ref.watch(userPaymentNotifierProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -97,13 +94,18 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                               decoration: BoxDecoration(
                                 image: user.profileImageUrl.isNotEmpty
                                     ? DecorationImage(
-                                        image: NetworkImage(user.profileImageUrl),
+                                        image: NetworkImage(
+                                          user.profileImageUrl,
+                                        ),
                                         fit: BoxFit.cover,
                                       )
                                     : null,
                                 shape: BoxShape.circle,
                                 color: Colors.white,
-                                border: Border.all(color: Colors.white, width: 4),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 4,
+                                ),
                               ),
                               child: Center(),
                             ),
@@ -175,16 +177,6 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                                 height: 50,
                                 color: Colors.grey[300],
                               ),
-                              _StatusItem(
-                                icon: Icons.payment,
-                                label: 'Payment',
-                                value: paymentAsync.value?.status == 'SUCCESS'
-                                    ? 'Paid'
-                                    : 'Pending',
-                                color: paymentAsync.value?.status == 'SUCCESS'
-                                    ? Colors.green
-                                    : Colors.orange,
-                              ),
                             ],
                           ),
                         ),
@@ -218,11 +210,6 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                       title: 'Account Information',
                       icon: Icons.account_box,
                       children: [
-                        _DetailRow(
-                          icon: Icons.badge,
-                          label: 'User ID',
-                          value: user.uid,
-                        ),
                         const Divider(height: 24),
                         _DetailRow(
                           icon: Icons.verified_user,
@@ -230,13 +217,6 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                           value: user.role.isNotEmpty ? user.role : 'User',
                         ),
                         const Divider(height: 24),
-                        _DetailRow(
-                          icon: Icons.category,
-                          label: 'User Type',
-                          value: user.userType.isNotEmpty
-                              ? user.userType
-                              : 'Not specified',
-                        ),
                       ],
                     ),
 
@@ -261,13 +241,6 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                               : 'Not assigned',
                         ),
                         const Divider(height: 24),
-                        _DetailRow(
-                          icon: Icons.supervisor_account,
-                          label: 'Agent ID',
-                          value: user.agentId.isNotEmpty
-                              ? user.agentId
-                              : 'Not assigned',
-                        ),
                       ],
                     ),
 
@@ -291,261 +264,6 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                     ),
 
                     // Payment Information
-                    paymentAsync.when(
-                      data: (payment) {
-                        if (payment == null) {
-                          return _SectionCard(
-                            title: 'Payment Information',
-                            icon: Icons.payment,
-                            children: [
-                              Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.receipt_long_outlined,
-                                        size: 48,
-                                        color: Colors.grey[400],
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        'No payment record found',
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-
-                        return _SectionCard(
-                          title: 'Payment Information',
-                          icon: Icons.payment,
-                          children: [
-                            _DetailRow(
-                              icon: Icons.receipt,
-                              label: 'Order ID',
-                              value: payment.orderId,
-                            ),
-                            const Divider(height: 24),
-                            _DetailRow(
-                              icon: Icons.confirmation_number,
-                              label: 'Razorpay Order ID',
-                              value: payment.razorpayOrderId,
-                            ),
-                            const Divider(height: 24),
-                            _DetailRow(
-                              icon: Icons.payment,
-                              label: 'Payment ID',
-                              value: payment.razorpayPaymentId.isNotEmpty
-                                  ? payment.razorpayPaymentId
-                                  : 'Not available',
-                            ),
-                            const Divider(height: 24),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.currency_rupee,
-                                  size: 20,
-                                  color: Colors.grey[600],
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Amount',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '₹${(payment.amount).toStringAsFixed(2)}',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Divider(height: 24),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.info_outline,
-                                  size: 20,
-                                  color: Colors.grey[600],
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Payment Status',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: payment.status == 'SUCCESS'
-                                              ? Colors.green.withValues(
-                                                  alpha: 0.1,
-                                                )
-                                              : payment.status == 'FAILED'
-                                              ? Colors.red.withValues(
-                                                  alpha: 0.1,
-                                                )
-                                              : Colors.orange.withValues(
-                                                  alpha: 0.1,
-                                                ),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          payment.status,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: payment.status == 'SUCCESS'
-                                                ? Colors.green
-                                                : payment.status == 'FAILED'
-                                                ? Colors.red
-                                                : Colors.orange,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Divider(height: 24),
-                            _DetailRow(
-                              icon: Icons.account_balance_wallet,
-                              label: 'Payment Gateway',
-                              value: payment.gateway.toUpperCase(),
-                            ),
-                            if (payment.region != null &&
-                                payment.region!.isNotEmpty) ...[
-                              const Divider(height: 24),
-                              _DetailRow(
-                                icon: Icons.location_on,
-                                label: 'Region',
-                                value: payment.region!,
-                              ),
-                            ],
-                            if (payment.district != null &&
-                                payment.district!.isNotEmpty) ...[
-                              const Divider(height: 24),
-                              _DetailRow(
-                                icon: Icons.place,
-                                label: 'District',
-                                value: payment.district!,
-                              ),
-                            ],
-                            const Divider(height: 24),
-                            _DetailRow(
-                              icon: Icons.calendar_today,
-                              label: 'Payment Date',
-                              value: _formatDateTime(payment.createdAt),
-                            ),
-                            if (payment.updatedAt != null) ...[
-                              const Divider(height: 24),
-                              _DetailRow(
-                                icon: Icons.update,
-                                label: 'Last Updated',
-                                value: _formatDateTime(payment.updatedAt!),
-                              ),
-                            ],
-                          ],
-                        );
-                      },
-                      error: (error, stackTrace) {
-                        print("this is error");
-                        print(stackTrace);
-                        return _SectionCard(
-                          title: 'Payment Information',
-                          icon: Icons.payment,
-                          children: [
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.error_outline,
-                                      size: 48,
-                                      color: Colors.red[400],
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      'Error loading payment',
-                                      style: TextStyle(
-                                        color: Colors.red[600],
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                      loading: () {
-                        return _SectionCard(
-                          title: 'Payment Information',
-                          icon: Icons.payment,
-                          children: [
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 24,
-                                ),
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation(
-                                    theme.primaryColor,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
 
                     // Wishlists Section
                     if (user.wishlists.isNotEmpty)
@@ -556,6 +274,7 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                           ...user.wishlists.asMap().entries.map((entry) {
                             final index = entry.key;
                             final wishlistId = entry.value;
+
                             return Padding(
                               padding: EdgeInsets.only(
                                 bottom: index < user.wishlists.length - 1
@@ -564,32 +283,31 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      color: theme.primaryColor.withOpacity(
-                                        0.1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        '${index + 1}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: theme.primaryColor,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
                                   const SizedBox(width: 12),
                                   Expanded(
-                                    child: Text(
-                                      wishlistId,
-                                      style: const TextStyle(fontSize: 14),
+                                    child: _WishlistUserTile(
+                                      profileId: wishlistId.profileId,
+                                      parentUserId: user.uid,
+
+                                      currentUserAgentId: user.agentId,
+                                      status: wishlistId.status,
+                                      updatedAt: wishlistId.updatedAt,
+                                      formatDateTime: _formatDateTime,
+                                      onTap: () {
+                                        context.router.push(
+                                          ViewWishListUserRoute(
+                                            userId: wishlistId.profileId,
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
+
+                                  // _DetailRow(
+                                  //   icon: Icons.person_add,
+                                  //   label: 'Wishlist Item ${index + 1}',
+                                  //   value: wishlistId.profileId,
+                                  // ),
                                 ],
                               ),
                             );
@@ -875,6 +593,575 @@ class _DetailRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ==========================================
+// Wishlist User Tile Widget
+// ==========================================
+class _WishlistUserTile extends ConsumerWidget {
+  final String profileId;
+  final String parentUserId;
+  final String status;
+  final DateTime updatedAt;
+  final String currentUserAgentId;
+
+  final String Function(DateTime) formatDateTime;
+  final VoidCallback onTap;
+
+  const _WishlistUserTile({
+    required this.profileId,
+    required this.parentUserId,
+
+    required this.currentUserAgentId,
+    required this.status,
+    required this.updatedAt,
+    required this.formatDateTime,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsync = ref.watch(wishlistUserProvider(profileId));
+    var isSameAgent = false;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: userAsync.when(
+        data: (user) {
+          if (user == null) {
+            return _buildPlaceholder('User not found');
+          }
+
+          isSameAgent = currentUserAgentId == user.agentId;
+
+          return Container(
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 245, 236, 236),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // User Info Row
+                Row(
+                  children: [
+                    // Profile Image
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Colors.grey[300],
+                      backgroundImage: user.profileImageUrl.isNotEmpty
+                          ? NetworkImage(user.profileImageUrl)
+                          : null,
+                      child: user.profileImageUrl.isEmpty
+                          ? Icon(Icons.person, color: Colors.grey[600])
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    // User Info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.fullName.isNotEmpty
+                                ? user.fullName
+                                : 'No Name',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.phone,
+                                size: 14,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                user.phone.isNotEmpty ? user.phone : 'No phone',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: _getStatusColor(
+                                    status,
+                                  ).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  status,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: _getStatusColor(status),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                formatDateTime(updatedAt),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right, color: Colors.grey[400]),
+                  ],
+                ),
+                // Agent Contact Button
+                if (user.agentId.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          final isSameAgent =
+                              currentUserAgentId == user.agentId;
+
+                          if (isSameAgent) {
+                            _showSameAgentDialog(context);
+                          } else {
+                            if (user.agentId.isNotEmpty) {
+                              showAgentDialog(context, ref, user.agentId);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Agent ID not available for this user.',
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        },
+
+                        icon: Icon(
+                          isSameAgent
+                              ? Icons.check_circle_outline
+                              : Icons.person,
+                        ),
+
+                        label: Text(
+                          isSameAgent ? 'Same Agent' : 'Contact Agent',
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: isSameAgent
+                              ? Colors.green
+                              : Colors.blue,
+                          side: BorderSide(
+                            color: isSameAgent ? Colors.green : Colors.blue,
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Update Status Button
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showStatusDialog(context, ref),
+                      icon: const Icon(Icons.edit_note),
+                      label: const Text('Update Status'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.orange,
+                        side: const BorderSide(color: Colors.orange),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+        loading: () => Row(
+          children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: Colors.grey[200],
+              child: const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 16,
+                    width: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    height: 12,
+                    width: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        error: (_, _) => _buildPlaceholder('Error loading user'),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder(String message) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 24,
+          backgroundColor: Colors.grey[300],
+          child: Icon(Icons.person_off, color: Colors.grey[600]),
+        ),
+        const SizedBox(width: 12),
+        Text(message, style: TextStyle(color: Colors.grey[600])),
+      ],
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return Colors.orange;
+      case 'contacted':
+        return Colors.blue;
+      case 'interested':
+        return Colors.green;
+      case 'notinterested':
+        return Colors.red;
+      case 'closed':
+        return Colors.grey;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  void _showStatusDialog(BuildContext context, WidgetRef ref) {
+    final statuses = [
+      'Pending',
+      'Contacted',
+      'Interested',
+      'NotInterested',
+      'Closed',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Update Status'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: statuses
+              .map(
+                (s) => ListTile(
+                  title: Text(s),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _updateStatus(ref, s, context);
+                  },
+                ),
+              )
+              .toList(),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _updateStatus(
+    WidgetRef ref,
+    String newStatus,
+    BuildContext context,
+  ) async {
+    try {
+    
+
+      await ref
+          .read(agentUserNotifierProvider.notifier)
+          .updateUserWishlistStatus(
+            userId: parentUserId,
+            profileId: profileId,
+            status: newStatus,
+          );
+      // Optionally, refresh the user data to reflect the change
+      ref.invalidate(agentUserNotifierProvider);
+      
+
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Status updated to $newStatus')),
+        );
+      } 
+
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to update status: $e')));
+      }
+    }
+  }
+
+  void _showSameAgentDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
+        title: const Text('Same Agent'),
+        content: const Text(
+          'This user is registered under the same agent. No need to contact another agent for the matrimony process.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showAgentDialog(BuildContext context, WidgetRef ref, String agentId) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => _AgentDialog(agentId: agentId),
+    );
+  }
+
+  Widget _buildAgentInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: Colors.grey[600]),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                ),
+                Text(
+                  value.isNotEmpty ? value : 'Not available',
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AgentDialog extends ConsumerWidget {
+  final String agentId;
+
+  const _AgentDialog({required this.agentId});
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: Colors.grey),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusChip(agent) {
+    if (agent.isApproved) {
+      return const Chip(
+        label: Text('Approved'),
+        backgroundColor: Colors.greenAccent,
+      );
+    }
+    if (agent.isRejected) {
+      return const Chip(
+        label: Text('Rejected'),
+        backgroundColor: Colors.redAccent,
+      );
+    }
+    return const Chip(
+      label: Text('Pending'),
+      backgroundColor: Colors.orangeAccent,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final agentAsync = ref.watch(agentProvider(agentId));
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      contentPadding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+      title: agentAsync.when(
+        data: (agent) => Row(
+          children: [
+            CircleAvatar(
+              radius: 22,
+              backgroundColor: Colors.blue.withOpacity(0.1),
+              backgroundImage: agent.profileImageUrl.isNotEmpty
+                  ? NetworkImage(agent.profileImageUrl)
+                  : null,
+              child: agent.profileImageUrl.isEmpty
+                  ? const Icon(Icons.support_agent, color: Colors.blue)
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                agent.agentName,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        loading: () => const Text('Agent Details'),
+        error: (_, __) => const Text('Agent Details'),
+      ),
+      content: agentAsync.when(
+        loading: () => const SizedBox(
+          height: 120,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+        error: (_, __) => const SizedBox(
+          height: 120,
+          child: Center(child: Text('Failed to load agent info')),
+        ),
+        data: (agent) => SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // _buildInfoRow(Icons.badge, 'Agent ID', agent.agentId),
+              _buildInfoRow(Icons.phone, 'Phone', agent.agentMobile),
+              const Divider(),
+              _buildInfoRow(Icons.email, 'Email', agent.agentEmail),
+              const Divider(),
+              _buildInfoRow(
+                Icons.location_on,
+                'Location',
+                '${agent.agentCity}, ${agent.agentState}',
+              ),
+              const Divider(),
+              _buildStatusChip(agent),
+            ],
+          ),
+        ),
+      ),
+      actions: agentAsync.when(
+        data: (agent) => [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          if (agent.agentMobile.isNotEmpty) ...[
+            TextButton.icon(
+              onPressed: () {
+                final number = agent.agentMobile.replaceAll(
+                  RegExp(r'[^0-9]'),
+                  '',
+                );
+                final url =
+                    'https://wa.me/$number?text=Hi, I am contacting you regarding a matrimony profile.';
+                launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+              },
+              icon: const Icon(Icons.message, size: 18),
+              label: const Text('WhatsApp'),
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                launchUrl(
+                  Uri.parse('tel:${agent.agentMobile}'),
+                  mode: LaunchMode.externalApplication,
+                );
+              },
+              icon: const Icon(Icons.phone, size: 18),
+              label: const Text('Call'),
+            ),
+          ],
+        ],
+        loading: () => [],
+        error: (_, __) => [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 }

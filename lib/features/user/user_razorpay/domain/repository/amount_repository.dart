@@ -10,11 +10,28 @@ class AmountRepository {
 
   // ------------------  METHODS ------------------
 
-  Future<Amount> getAmount() async {
+  Future<Amount> getRegistrationAmount() async {
     try {
-      return await _amountFirestoreDS.getAmount();
+      return await _amountFirestoreDS.getRegistrationAmount();
     } catch (e) {
       throw Exception('Failed to get amount: $e');
     }
   }
+
+  Future<Amount> getPostMarriageAmountforMale() async {
+    try {
+      return await _amountFirestoreDS.getPostMarriageAmountforMale();
+    } catch (e) {
+      throw Exception('Failed to get amount: $e');
+    }
+  }
+
+  Future<Amount> getPostMarriageAmountforFemale() async {
+    try {
+      return await _amountFirestoreDS.getPostMarriageAmountforFemale();
+    } catch (e) {
+      throw Exception('Failed to get amount: $e');
+    }
+  }         
+
 }

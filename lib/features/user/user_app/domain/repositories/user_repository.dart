@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../../../auth/domain/states/user_state.dart';
 import '../states/address_state.dart';
 
@@ -25,6 +27,30 @@ abstract class UserRepository {
 
   Future<void> updateProfilePhoto(String uid, String profilePhotoUrl);
 
-  Future<void> addWishlist(String uid, String profileId);
+  Future<void> addWishlist(String uid, WishListItem wishlistItem);
   Future<void> removeWishlist({required String uid, required String profileId});
+
+  Future<void> updateWishlistStatus({
+    required String parentUserId,
+    required String profileId,
+    required String newStatus,
+  }) async {
+    final firestore = FirebaseFirestore.instance;
+
+    await firestore.collection('users').doc(parentUserId).update({
+      'wishlists': FieldValue.arrayRemove([
+        {'profileId': profileId},
+      ]),
+    });
+
+    await firestore.collection('users').doc(parentUserId).update({
+      'wishlists': FieldValue.arrayUnion([
+        {
+          'profileId': profileId,
+          'status': newStatus,
+          'updatedAt': DateTime.now().millisecondsSinceEpoch,
+        },
+      ]),
+    });
+  }
 }

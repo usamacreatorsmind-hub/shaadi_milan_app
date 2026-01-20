@@ -17,7 +17,7 @@ class AgentGuard extends AutoRouteGuard {
       resolver.next(true);
     } else {
       // If not logged in, send to agent login.
-      router.replaceAll([const AgentLoginRoute()]);
+      router.replaceAll([AgentLoginRoute()]);
     }
   }
 }

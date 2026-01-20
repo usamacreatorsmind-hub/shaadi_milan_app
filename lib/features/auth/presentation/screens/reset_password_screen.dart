@@ -106,7 +106,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                             ),
                           );
 
-                          context.router.pop();
+                          context.router.maybePop();
                         } on FirebaseAuthException catch (e) {
                           if (!mounted) return;
 
@@ -178,7 +178,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
             // ---------------- BACK TO LOGIN ----------------
             TextButton(
               onPressed: () {
-                context.router.pop();
+                context.router.maybePop();
               },
               child: const Text(
                 "Back to Login",

@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/core/services/notification_service.dart';
 import 'package:flutter/services.dart';
 
 import '../providers/auth_providers.dart';
@@ -61,9 +62,13 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
       );
 
       TextInput.finishAutofillContext(); // ✅ triggers save prompt
+      // savetoken to firestore
 
       final user = authRepo.currentUser;
+
       if (user != null) {
+        NotificationService.saveAdminTokenToFirestore(user.uid);
+
         context.router.replace(AuthWrapperRoute());
       }
     } on FirebaseAuthException catch (e) {
@@ -217,7 +222,7 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () =>
-                                context.navigateTo(const ResetPasswordRoute()),
+                                context.navigateTo(ResetPasswordRoute()),
                             child: Text(
                               "Forgot Password?",
                               style: TextStyle(
@@ -245,8 +250,7 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                       style: TextStyle(color: Colors.grey.shade600),
                     ),
                     TextButton(
-                      onPressed: () =>
-                          context.router.replace(const UserLoginRoute()),
+                      onPressed: () => context.router.replace(UserLoginRoute()),
                       child: const Text(
                         "User Login",
                         style: TextStyle(fontWeight: FontWeight.bold),

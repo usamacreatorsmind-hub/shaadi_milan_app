@@ -9,20 +9,44 @@ class AmountNotifier extends StateNotifier<AmountState> {
   final AmountRepository _amountRepository;
 
   AmountNotifier(this._amountRepository) : super(AmountState.initial) {
-    fetchAmount();
+    fetchRegistrationAmount();
   }
 
-  Future<void> fetchAmount() async {
+  Future<void> fetchRegistrationAmount() async {
     // Set loading to true. We create a new state to ensure any previous error is cleared.
     state = AmountState(amount: state.amount, isLoading: true, error: null);
 
     try {
-      final amount = await _amountRepository.getAmount();
+      final amount = await _amountRepository.getRegistrationAmount();
       state = AmountState(amount: amount, isLoading: false, error: null);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
+
+  Future<void> fetchPostMarriageAmountMale() async {
+    state = AmountState(amount: state.amount, isLoading: true, error: null);
+
+    try {
+      final amount = await _amountRepository.getPostMarriageAmountforMale();
+      state = AmountState(amount: amount, isLoading: false, error: null);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> fetchPostMarriageAmountFemale() async {
+    state = AmountState(amount: state.amount, isLoading: true, error: null);
+
+    try {
+      final amount = await _amountRepository.getPostMarriageAmountforFemale();
+      state = AmountState(amount: amount, isLoading: false, error: null);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }         
+
+
 }
 
 final amountFirestoreDSProvider = Provider<AmountFirestore>((ref) {

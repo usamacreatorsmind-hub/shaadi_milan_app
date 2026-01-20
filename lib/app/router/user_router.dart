@@ -29,7 +29,7 @@ class UserRouter {
           guards: [AuthGuard(ref), UserGuard(ref)],
         ),
         AutoRoute(
-          page: ReviewRoute.page,
+          page: SupportTicketsRoute.page,
           guards: [AuthGuard(ref), UserGuard(ref)],
         ),
 
@@ -106,10 +106,6 @@ class UserRouter {
     ),
 
     AutoRoute(
-      page: ChangePasswordRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
-    ),
-    AutoRoute(
       page: UserStatusRoute.page,
       guards: [AuthGuard(ref), UserGuard(ref)],
     ),
@@ -155,6 +151,10 @@ class UserRouter {
 
     AutoRoute(
       page: MyReviewRoute.page,
+      guards: [AuthGuard(ref), UserGuard(ref)],
+    ),
+    AutoRoute(
+      page: UserAfterMarriagePaymentRoute.page,
       guards: [AuthGuard(ref), UserGuard(ref)],
     ),
   ];

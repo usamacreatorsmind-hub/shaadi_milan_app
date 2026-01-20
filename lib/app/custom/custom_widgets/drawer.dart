@@ -97,14 +97,14 @@ class AppDrawer extends ConsumerWidget {
                       icon: Icons.dashboard_outlined,
                       title: "Dashboard",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                       },
                     ),
                     DrawerItem(
                       icon: Icons.people_outline,
                       title: "My Clients",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                       },
                     ),
 
@@ -112,23 +112,23 @@ class AppDrawer extends ConsumerWidget {
                       icon: Icons.bar_chart_outlined,
                       title: "Analytics",
                       onTap: () {
-                        context.popRoute();
-                      },
-                    ),
-                    DrawerItem(
-                      icon: Icons.reviews_outlined,
-                      title: "Reviews",
-                      onTap: () {
-                        context.popRoute();
-                        context.pushRoute(const ReviewRoute());
+                        context.maybePop();
                       },
                     ),
 
+                    // DrawerItem(
+                    //   icon: Icons.reviews_outlined,
+                    //   title: "Reviews",
+                    //   onTap: () {
+                    //     context.maybePop();
+                    //     context.pushRoute(  ReviewRoute());
+                    //   },
+                    // ),
                     DrawerItem(
                       icon: Icons.support_agent,
                       title: "Support Tickets",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         context.pushRoute(
                           AgentSupportRoute(agentId: data.agentId),
                         );
@@ -139,7 +139,7 @@ class AppDrawer extends ConsumerWidget {
                       icon: Icons.description_outlined,
                       title: "Documents",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                       },
                     ),
                     const Divider(),
@@ -147,7 +147,7 @@ class AppDrawer extends ConsumerWidget {
                       icon: Icons.settings_outlined,
                       title: "Settings",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         context.pushRoute(const AgentSettingsRoute());
                       },
                     ),
@@ -156,18 +156,18 @@ class AppDrawer extends ConsumerWidget {
                       icon: Icons.person_outline,
                       title: "My Profile",
                       onTap: () {
-                        context.popRoute();
+                        context.maybePop();
                         context.pushRoute(AgentEntityRoute(uid: data.agentId));
                       },
                     ),
-                    DrawerItem(
-                      icon: Icons.reviews_outlined,
-                      title: "My Reviews",
-                      onTap: () {
-                        context.popRoute();
-                        context.pushRoute(const MyReviewRoute());
-                      },
-                    ),
+                    // DrawerItem(
+                    //   icon: Icons.reviews_outlined,
+                    //   title: "My Reviews",
+                    //   onTap: () {
+                    //     context.maybePop();
+                    //     context.pushRoute(MyReviewRoute());
+                    //   },
+                    // ),
                   ],
                 ),
               ),
@@ -191,7 +191,7 @@ class AppDrawer extends ConsumerWidget {
                     onPressed: () {
                       // TODO: clear auth + navigate to login
                       ref.read(authRepositoryProvider).signOut();
-                      context.router.replace(const AgentLoginRoute());
+                      context.router.replace(AgentLoginRoute());
                     },
                   ),
                 ),

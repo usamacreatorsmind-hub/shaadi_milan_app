@@ -26,6 +26,10 @@ class AgentRouter {
       page: ViewUserRoute.page,
       guards: [AuthGuard(ref), AgentGuard(ref)],
     ),
+    AutoRoute(
+      page: ViewWishListUserRoute.page,
+      guards: [AuthGuard(ref), AgentGuard(ref)],
+    ),
 
     AutoRoute(
       page: AgentContactRoute.page,

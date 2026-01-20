@@ -39,7 +39,7 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
         const UserHomeRoute(),
         UserWishListRoute(userId: uid),
 
-        ReviewRoute(),
+        SupportTicketsRoute(userId: uid),
         UserProfileRoute(userId: uid),
       ],
       transitionBuilder: (context, child, animation) =>
@@ -105,7 +105,7 @@ class CustomBottomNavBar extends StatelessWidget {
   static const List<BottomNavItem> items = [
     BottomNavItem(icon: Icons.home_outlined, label: 'Home'),
     BottomNavItem(icon: Icons.favorite_outline, label: 'WishList'),
-    BottomNavItem(icon: Icons.person_outline, label: 'Reviews'),
+    BottomNavItem(icon: Icons.support_agent_sharp, label: 'Support'),
     BottomNavItem(icon: Icons.person_outline, label: 'Profile'),
   ];
 

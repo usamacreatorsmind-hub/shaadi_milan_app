@@ -127,23 +127,43 @@ class RoleSelectionScreen extends StatelessWidget {
                         top: BorderSide(color: Colors.pink.withOpacity(0.1)),
                       ),
                     ),
-                    child: const Column(
+                    child: Column(
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
                           children: [
-                            Icon(
-                              Icons.verified_user,
-                              size: 14,
-                              color: Colors.green,
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.verified_user,
+                                  size: 14,
+                                  color: Colors.green,
+                                ),
+                                const SizedBox(width: 6),
+                                const Text(
+                                  "100% Verified & Secure Profiles",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(width: 6),
-                            Text(
-                              "100% Verified & Secure Profiles",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black54,
+                            const SizedBox(height: 10),
+                            GestureDetector(
+                              onTap: () {
+                                context.pushRoute(const ContactUsRoute());
+                              },
+                              child: Text(
+                                "Need Help ? Contact Us",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).primaryColor,
+                                  decoration: TextDecoration.underline,
+                                ),
                               ),
                             ),
                           ],
@@ -178,6 +198,7 @@ class _EnhancedRoleCard extends StatefulWidget {
     required this.endColor,
     required this.delay,
     required this.onTap,
+    l,
   });
 
   @override

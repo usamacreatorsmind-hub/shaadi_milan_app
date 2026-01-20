@@ -474,8 +474,7 @@ class _UserBiodataCheckScreenState
     await ref
         .read(metrimonyControllerProvider.notifier)
         .submitProfile(uid: user.uid, agentId: user.agentId);
-
-    if (context.mounted) {
+if (context.mounted) {
       context.router.replaceAll([const UserMainShellRoute()]);
     }
   }

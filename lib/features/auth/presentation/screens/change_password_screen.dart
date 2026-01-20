@@ -2,7 +2,7 @@ import '../../../../app/custom/custom_widgets/validators.dart';
 import '../providers/auth_providers.dart';
 
 import '../../../../app/router/app_router.dart';
-import '../../../../app/custom/custom_widgets/widgets.dart'; 
+import '../../../../app/custom/custom_widgets/widgets.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +63,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      context.router.pop();
+      context.router.maybePop();
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       String message;

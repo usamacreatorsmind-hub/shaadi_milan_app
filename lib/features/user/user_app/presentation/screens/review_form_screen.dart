@@ -48,9 +48,7 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
     final reviewNotifier = ref.read(reviewNotifierProvider.notifier);
 
     // fetch agetn entity  from repository
-    ref
-        .read(agentRepositoryProvider)
-        .fetchAgent(currentUser.value!.agentId);
+    ref.read(agentRepositoryProvider).fetchAgent(currentUser.value!.agentId);
 
     Review(
       agentId: currentUser.value!.agentId,
@@ -75,7 +73,7 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Review submitted successfully!')),
       );
-      context.router.pop();
+      context.router.maybePop();
     }
   }
 
@@ -91,7 +89,7 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.router.pop(),
+          onPressed: () => context.router.maybePop(),
         ),
       ),
 

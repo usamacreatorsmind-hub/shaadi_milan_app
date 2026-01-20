@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -17,9 +18,10 @@ abstract class FirebaseAuthDs {
     required String fullName,
     required String email,
     required String password,
+    required String gender,
     required String agentId,
     required String phone,
-    required List<String> wishlists,
+    required List<WishListItem> wishlists,
   });
 
   Future<bool> checkUserIfExists({required String uid});
@@ -50,11 +52,14 @@ class FirebaseAuthDS implements FirebaseAuthDs {
   @override
   Future<void> signUpUserWithEmail({
     required String fullName,
+
     required String email,
     required String password,
     required String agentId,
+    required String gender,
+
     required String phone,
-    required List<String> wishlists,
+    required List<WishListItem> wishlists,
   }) async {
     // Implement sign-up logic with Firebase Auth and Firestore
 
@@ -66,6 +71,8 @@ class FirebaseAuthDS implements FirebaseAuthDs {
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
         'fullName': fullName,
+        'gender': gender,
+
         'email': email,
         'phone': phone,
         'agentId': agentId,
