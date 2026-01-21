@@ -226,16 +226,13 @@ class _ViewPaymentDetailScreenState
                           value: payment.region!,
                           icon: Icons.map,
                         ),
-                      if (payment.region != null &&
-                          payment.region!.isNotEmpty &&
-                          payment.district != null &&
-                          payment.district!.isNotEmpty)
+                      if (payment.region.isNotEmpty &&
+                          payment.district.isNotEmpty)
                         const Divider(height: 24),
-                      if (payment.district != null &&
-                          payment.district!.isNotEmpty)
+                      if (payment.district.isNotEmpty)
                         _DetailItem(
                           label: 'District',
-                          value: payment.district!,
+                          value: payment.district,
                           icon: Icons.place,
                         ),
                     ],

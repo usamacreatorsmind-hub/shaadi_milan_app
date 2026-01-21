@@ -1,12 +1,34 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+// WishlistEntity.fromMapForViewer(
+//   doc.data(),
+//   viewerId: userId,
+//   role: WishlistViewerRole.senderUser,
+// );
 
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
+// WishlistEntity.fromMapForViewer(
+//   doc.data(),
+//   viewerId: userId,
+//   role: WishlistViewerRole.receiverUser,
+// );
 
-// status
-// wishlist status example
+// final role = resolveAgentRole(doc.data(), agentId);
+
+// WishlistEntity.fromMapForViewer(
+//   doc.data(),
+//   viewerId: agentId,
+//   role: role,
+// );
+
+WishlistViewerRole resolveAgentRole(Map<String, dynamic> map, String agentId) {
+  if (map['senderAgent'] == agentId) {
+    return WishlistViewerRole.senderAgent;
+  }
+  return WishlistViewerRole.receiverAgent;
+}
+
+enum WishlistViewerRole { senderUser, receiverUser, senderAgent, receiverAgent }
+
+// Wishlist status example
 enum WishlistStatus {
   pending, // User liked profile (agent not contacted yet)
   contacted, // Agent contacted user
@@ -15,51 +37,163 @@ enum WishlistStatus {
   closed, // Lead finished
 }
 
-class WishListItem {
-  final String profileId;
+class WishlistState {
+  WishlistEntity? wishlistEntity;
+  bool isLoading;
+  String? error;
 
+  WishlistState({this.wishlistEntity, this.isLoading = false, this.error});
+
+  WishlistState copyWith({
+    WishlistEntity? wishlistEntity,
+    bool? isLoading,
+    String? error,
+  }) {
+    return WishlistState(
+      wishlistEntity: wishlistEntity ?? this.wishlistEntity,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
+
+  static final initial = WishlistState(
+    wishlistEntity: null,
+    isLoading: false,
+    error: null,
+  );
+}
+
+class WishlistEntity {
+  final String id;
+  final String senderId;
+  final String receiverId;
+  final String receiverAgent;
+  final String senderAgent;
   final DateTime updatedAt;
   final String status;
-  WishListItem({
-    required this.status,
-    required this.profileId,
+
+  WishlistEntity({
+    this.id = '',
+    required this.senderId,
+    required this.receiverId,
+    required this.receiverAgent,
+    required this.senderAgent,
     required this.updatedAt,
+    required this.status,
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'profileId': profileId,
+      'id': id,
+      'senderId': senderId,
+      'receiverId': receiverId,
+      'receiverAgent': receiverAgent,
+      'senderAgent': senderAgent,
       'updatedAt': updatedAt.millisecondsSinceEpoch,
       'status': status,
     };
   }
 
-  factory WishListItem.fromMap(Map<String, dynamic> map) {
-    return WishListItem(
-      status: map['status'] ?? '',
-      profileId: map['profileId'] ?? '',
-      updatedAt: _parseDateTime(map['updatedAt']),
-    );
+  factory WishlistEntity.fromMapForViewer(
+    Map<String, dynamic> map, {
+    required String viewerId,
+    required WishlistViewerRole role,
+  }) {
+    final id = map['id'] ?? '';
+    final senderId = map['senderId'] ?? '';
+    final receiverId = map['receiverId'] ?? '';
+
+    final senderAgent = map['senderAgent'] ?? '';
+    final receiverAgent = map['receiverAgent'] ?? '';
+
+    final updatedAt = _parseDateTime(map['updatedAt']);
+    final status = map['status'] ?? WishlistStatus.pending.name;
+
+    switch (role) {
+      // ───── USER ─────
+      case WishlistViewerRole.senderUser:
+        return WishlistEntity(
+          id: id,
+          senderId: receiverId,
+          receiverId: senderId,
+          senderAgent: receiverAgent,
+          receiverAgent: senderAgent,
+          updatedAt: updatedAt,
+          status: status,
+        );
+
+      case WishlistViewerRole.receiverUser:
+        return WishlistEntity(
+          id: id,
+          senderId: senderId,
+          receiverId: receiverId,
+          senderAgent: senderAgent,
+          receiverAgent: receiverAgent,
+          updatedAt: updatedAt,
+          status: status,
+        );
+
+      // ───── AGENT ─────
+      case WishlistViewerRole.senderAgent:
+        // agent represents sender → sender is "me"
+        return WishlistEntity(
+          id: id,
+          senderId: receiverId,
+          receiverId: senderId,
+          senderAgent: receiverAgent,
+          receiverAgent: senderAgent,
+          updatedAt: updatedAt,
+          status: status,
+        );
+
+      case WishlistViewerRole.receiverAgent:
+        // agent represents receiver → receiver is "me"
+        return WishlistEntity(
+          id: id,
+          senderId: senderId,
+          receiverId: receiverId,
+          senderAgent: senderAgent,
+          receiverAgent: receiverAgent,
+          updatedAt: updatedAt,
+          status: status,
+        );
+    }
   }
 
   static DateTime _parseDateTime(dynamic value) {
-    if (value == null) return DateTime.fromMillisecondsSinceEpoch(0);
-    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    if (value == null) {
+      return DateTime.fromMillisecondsSinceEpoch(0);
+    }
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    }
     if (value is String) {
       final parsed = int.tryParse(value);
-      if (parsed != null) return DateTime.fromMillisecondsSinceEpoch(parsed);
+      if (parsed != null) {
+        return DateTime.fromMillisecondsSinceEpoch(parsed);
+      }
     }
-    if (value is Timestamp) return value.toDate();
+    if (value is Timestamp) {
+      return value.toDate();
+    }
     return DateTime.fromMillisecondsSinceEpoch(0);
   }
 
-  WishListItem copyWith({
-    String? profileId,
+  WishlistEntity copyWith({
+    String? id,
+    String? senderId,
+    String? receiverId,
+    String? receiverAgent,
+    String? senderAgent,
     DateTime? updatedAt,
     String? status,
   }) {
-    return WishListItem(
-      profileId: profileId ?? this.profileId,
+    return WishlistEntity(
+      id: id ?? this.id,
+      senderId: senderId ?? this.senderId,
+      receiverId: receiverId ?? this.receiverId,
+      receiverAgent: receiverAgent ?? this.receiverAgent,
+      senderAgent: senderAgent ?? this.senderAgent,
       updatedAt: updatedAt ?? this.updatedAt,
       status: status ?? this.status,
     );
@@ -67,7 +201,9 @@ class WishListItem {
 
   @override
   String toString() {
-    return 'WishListItem(profileId: $profileId, updatedAt: $updatedAt, status: $status,)';
+    return 'WishlistEntity(id: $id, senderId: $senderId, receiverId: $receiverId, '
+        'receiverAgent: $receiverAgent, senderAgent: $senderAgent, '
+        'updatedAt: $updatedAt, status: $status)';
   }
 }
 
@@ -86,8 +222,6 @@ class UserEntity {
   final String metrimonyId;
   final String profileId;
 
-  final List<WishListItem> wishlists;
-
   final DateTime createdAt;
   final DateTime lastSeen;
 
@@ -101,11 +235,10 @@ class UserEntity {
     required this.agentId,
     required this.userType,
     required this.role,
-    
+
     required this.isProfileCreated,
     required this.metrimonyId,
     required this.profileId,
-    required this.wishlists,
     required this.createdAt,
     required this.lastSeen,
   });
@@ -124,7 +257,6 @@ class UserEntity {
     isProfileCreated: false,
     metrimonyId: '',
     profileId: '',
-    wishlists: const [],
     createdAt: DateTime.fromMillisecondsSinceEpoch(0),
     lastSeen: DateTime.fromMillisecondsSinceEpoch(0),
   );
@@ -144,7 +276,6 @@ class UserEntity {
       'isProfileCreated': isProfileCreated,
       'metrimonyId': metrimonyId,
       'profileId': profileId,
-      'wishlists': wishlists.map((e) => e.toMap()).toList(),
       'createdAt': createdAt.millisecondsSinceEpoch,
       'lastSeen': lastSeen.millisecondsSinceEpoch,
     };
@@ -172,11 +303,7 @@ class UserEntity {
       isProfileCreated: map['isProfileCreated'] ?? false,
       metrimonyId: map['metrimonyId'] ?? '',
       profileId: map['profileId'] ?? '',
-      wishlists:
-          (map['wishlists'] as List<dynamic>?)
-              ?.map((e) => WishListItem.fromMap(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
+
       createdAt: parseDate(map['createdAt']),
       lastSeen: parseDate(map['lastSeen']),
     );
@@ -197,7 +324,6 @@ class UserEntity {
     bool? isProfileCreated,
     String? metrimonyId,
     String? profileId,
-    List<WishListItem>? wishlists,
     DateTime? createdAt,
     DateTime? lastSeen,
   }) {
@@ -214,7 +340,6 @@ class UserEntity {
       isProfileCreated: isProfileCreated ?? this.isProfileCreated,
       metrimonyId: metrimonyId ?? this.metrimonyId,
       profileId: profileId ?? this.profileId,
-      wishlists: wishlists ?? this.wishlists,
       createdAt: createdAt ?? this.createdAt,
       lastSeen: lastSeen ?? this.lastSeen,
     );

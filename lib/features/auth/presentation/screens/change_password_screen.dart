@@ -41,7 +41,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
     if (user == null) {
       if (!mounted) return;
-      context.router.replaceAll([const UserLoginRoute()]);
+      context.router.replaceAll([ UserLoginRoute()]);
       return;
     }
 

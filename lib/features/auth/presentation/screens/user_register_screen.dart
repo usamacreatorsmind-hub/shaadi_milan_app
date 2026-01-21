@@ -1,5 +1,5 @@
 import 'package:arvika_marriage_bureau/app/custom/custom_widgets/validators.dart';
-import 'package:arvika_marriage_bureau/core/services/notification_service.dart';
+import 'package:arvika_marriage_bureau/core/notification/notification_service.dart';
 import 'package:arvika_marriage_bureau/features/auth/data/repositories_impl/data_source/firebase_auth_ds.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_firestore.dart';
@@ -87,6 +87,8 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     final firestore = ref.read(agentFirestoreDsProvider);
     bool agentExists = false;
 
+    // check if phone is registered
+
     if (agentId.isNotEmpty) {
       try {
         agentExists = await firestore.checkAgentExists(agentId: agentId);
@@ -121,6 +123,39 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
       return;
     }
 
+    final isPhoneRegistered = await authRepo.checkPhoneAlreadyRegistered(
+      phoneCtrl.text.trim(),
+    );
+
+    final isEmailRegistered = await authRepo.checkUserExists(
+      phone: "",
+      email: emailCtrl.text.trim(),
+    );
+
+    if (isEmailRegistered) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("This email is already registered."),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      setState(() => isLoading = false);
+      return;
+    }
+
+    if (isPhoneRegistered) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("This phone number is already registered."),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      setState(() => isLoading = false);
+      return;
+    }
+
     try {
       await authRepo.signUpUserWithEmail(
         email: emailCtrl.text.trim(),
@@ -130,7 +165,6 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
         gender: ref.read(genderProvider) ?? "",
 
         agentId: agentUid ?? "",
-        wishlists: [],
       );
 
       if (!mounted) return;
@@ -358,6 +392,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             genderCard(context, "Male", "male", ref),
+                            Spacer(),
                             genderCard(context, "Female", "female", ref),
                           ],
                         ),
@@ -420,14 +455,16 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
         ref.read(genderProvider.notifier).state = genderValue;
       },
       child: Container(
-        height: 30,
+        height: 50,
         width: 30.w,
 
         decoration: BoxDecoration(
           color: isSelected ? theme.primaryColor : Colors.grey[200],
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(30),
           border: Border.all(
-            color: isSelected ? theme.primaryColor : Colors.grey.shade300,
+            color: isSelected
+                ? theme.primaryColor
+                : const Color.fromARGB(255, 218, 45, 45),
             width: 2,
           ),
         ),

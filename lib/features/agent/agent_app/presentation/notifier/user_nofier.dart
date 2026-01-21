@@ -103,31 +103,6 @@ class UserNotifier extends StateNotifier<AsyncValue<UserEntity?>> {
       state = AsyncValue.error('User not found', StackTrace.current);
       return;
     }
-
-    // Find the wishlist item to update
-    final updatedWishlists = currentUser.wishlists.map((wishlist) {
-      if (wishlist.profileId == profileId) {
-        return WishListItem(
-          profileId: wishlist.profileId,
-          status: status,
-          updatedAt: DateTime.now(),
-        );
-      }
-      return wishlist;
-    }).toList();
-
-    final updatedUser = currentUser.copyWith(wishlists: updatedWishlists);
-
-    try {
-      await _userRepository.updateUserWishlist(
-        userId: userId,
-        wishlists: updatedWishlists,
-      );
-      state = AsyncValue.data(updatedUser);
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
   }
 }
 

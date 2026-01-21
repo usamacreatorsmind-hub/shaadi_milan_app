@@ -36,7 +36,7 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
 
     return AutoTabsRouter(
       routes: [
-        const UserHomeRoute(),
+         UserHomeRoute(),
         UserWishListRoute(userId: uid),
 
         SupportTicketsRoute(userId: uid),

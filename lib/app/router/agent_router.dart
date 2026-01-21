@@ -17,6 +17,10 @@ class AgentRouter {
 
         AutoRoute(page: AgentRevenueRoute.page),
         AutoRoute(
+          page: AgentWishlistRoute.page,
+          guards: [AuthGuard(ref), AgentGuard(ref)],
+        ),
+        AutoRoute(
           page: AgentEntityRoute.page,
           guards: [AuthGuard(ref), AgentGuard(ref)],
         ),
@@ -51,6 +55,10 @@ class AgentRouter {
 
     AutoRoute(
       page: AgentSettingsRoute.page,
+      guards: [AuthGuard(ref), AgentGuard(ref)],
+    ),
+    AutoRoute(
+      page: AgentnotificationRoute.page,
       guards: [AuthGuard(ref), AgentGuard(ref)],
     ),
 

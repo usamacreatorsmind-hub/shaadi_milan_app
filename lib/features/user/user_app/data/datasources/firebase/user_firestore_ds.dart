@@ -19,6 +19,30 @@ class UserFirestoreDS {
     return querySnapshot.docs.map((doc) => doc.data()).toList();
   }
 
+  Stream<List<Map<String, dynamic>>> watchOppositeGenderUsers(String currentUid) async* {
+    // First get current user's gender
+    final currentUserDoc = await _users.doc(currentUid).get();
+    if (!currentUserDoc.exists) throw Exception('Current user not found');
+
+    final currentUserGender = (currentUserDoc.data()?['gender'] as String?)?.toLowerCase();
+    if (currentUserGender == null || currentUserGender.isEmpty) {
+      yield [];
+      return;
+    }
+
+    // Determine opposite gender
+    final oppositeGender = currentUserGender == 'male' ? 'Female' : 'Male';
+
+    // Watch users with opposite gender using snapshots
+    yield* _users
+        .where('gender', isEqualTo: oppositeGender)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .where((doc) => doc.id != currentUid)
+            .map((doc) => doc.data())
+            .toList());
+  }
+
   Future<Map<String, dynamic>> fetchUser(String uid) async {
     final doc = await _users.doc(uid).get();
     if (!doc.exists) throw Exception('User not found');
@@ -72,18 +96,7 @@ class UserFirestoreDS {
     await _users.doc(uid).update({'profileImageUrl': profilePhotoUrl});
   }
 
-  // implement add to wishlist  in user collection
-  Future<void> addWishlist(String uid, WishListItem wishlistItem) async {
-    await _users.doc(uid).update({
-      'wishlists': FieldValue.arrayUnion([wishlistItem.toMap()]),
-    });
-  }
-
-  Future<void> removeWishlist(String uid, String profileId) async {
-    await _users.doc(uid).update({
-      'wishlists': FieldValue.arrayRemove([profileId]),
-    });
-  }
+   
 
   Future<void> updateUserStatus(
     String uid,
@@ -95,26 +108,5 @@ class UserFirestoreDS {
   Future<void> updateRole(String uid, String role) async {
     await _users.doc(uid).update({'role': role});
   }
-
-  Future<void> updateWishlistStatus({
-    required String parentUserId,
-    required String profileId,
-    required String newStatus,
-  }) async {
-    await _firestore.collection('users').doc(parentUserId).update({
-      'wishlists': FieldValue.arrayRemove([
-        {'profileId': profileId},
-      ]),
-    });
-
-    await _firestore.collection('users').doc(parentUserId).update({
-      'wishlists': FieldValue.arrayUnion([
-        {
-          'profileId': profileId,
-          'status': newStatus,
-          'updatedAt': DateTime.now().millisecondsSinceEpoch,
-        },
-      ]),
-    });
-  }
+ 
 }

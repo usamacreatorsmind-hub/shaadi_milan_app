@@ -128,6 +128,15 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
               ),
             ),
             actions: [
+              // notificattion
+              IconButton(
+                icon: const Icon(Icons.notifications, color: Colors.white),
+                onPressed: () {
+                  context.router.push(const AgentnotificationRoute());
+                },
+              ),
+
+              SizedBox(width: 20),
               IconButton(
                 icon: const Icon(Icons.logout, color: Colors.white),
                 onPressed: () => _showLogoutDialog(context),

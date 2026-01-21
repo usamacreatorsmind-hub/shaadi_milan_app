@@ -118,15 +118,47 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
 
     final querySnapshot = await _profiles.get();
 
-    final List<MatrimonyProfile> profiles = querySnapshot.docs
+    final profiles = querySnapshot.docs
         .map((doc) => MatrimonyProfile.fromMap(doc.data()))
         .toList();
 
-    // 🔥 MANUAL FILTER
-    final List<MatrimonyProfile> profileData = profiles
+    // Exclude current user's profile
+    List<MatrimonyProfile> profileData = profiles
         .where((profile) => profile.userId != currentUid)
         .toList();
 
+    // Get current user's gender
+    final userDoc = await _firestore.collection('users').doc(currentUid).get();
+
+    final userGender = (userDoc.data()?['gender'] as String?)?.toLowerCase();
+
+    if (userGender == null) return profileData;
+
+    // Case-insensitive gender filter
+    if (userGender == 'male') {
+      profileData = profileData
+          .where((profile) => profile.identity.gender.toLowerCase() == 'female')
+          .toList();
+    } else if (userGender == 'female') {
+      profileData = profileData
+          .where((profile) => profile.identity.gender.toLowerCase() == 'male')
+          .toList();
+    }
+
     return profileData;
+  }
+
+  Stream<List<MatrimonyProfile>> watchMatrimonyProfilesForUsers(List<String> userIds) {
+    if (userIds.isEmpty) {
+      return Stream.value([]);
+    }
+
+    // Watch all matrimony profiles and filter by userIds
+    return _profiles.snapshots().map((snapshot) {
+      return snapshot.docs
+          .where((doc) => userIds.contains(doc.id))
+          .map((doc) => MatrimonyProfile.fromMap(doc.data()))
+          .toList();
+    });
   }
 }

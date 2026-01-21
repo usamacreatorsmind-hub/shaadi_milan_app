@@ -270,7 +270,7 @@ class UserProfileScreen extends ConsumerWidget {
                             // navigate to user status screen
                             AutoRouter.of(
                               context,
-                            ).push(const UserStatusRoute());
+                            ).push(  UserStatusRoute());
                           },
                         ),
 
@@ -304,7 +304,7 @@ class UserProfileScreen extends ConsumerWidget {
                             // navigate to change password screen
                             AutoRouter.of(
                               context,
-                            ).push(const ChangePasswordRoute());
+                            ).push( ChangePasswordRoute());
                           },
                         ),
 
@@ -315,7 +315,7 @@ class UserProfileScreen extends ConsumerWidget {
                           onTap: () {
                             AutoRouter.of(
                               context,
-                            ).push(const UserPaymentOrderHistoryRoute());
+                            ).push(  UserPaymentOrderHistoryRoute());
                           },
                         ),
 
@@ -358,7 +358,7 @@ class UserProfileScreen extends ConsumerWidget {
 
                               AutoRouter.of(
                                 context,
-                              ).replace(const UserLoginRoute());
+                              ).replace(  UserLoginRoute());
 
                               print("Logout button pressed");
                             },

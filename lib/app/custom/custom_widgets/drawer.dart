@@ -148,7 +148,7 @@ class AppDrawer extends ConsumerWidget {
                       title: "Settings",
                       onTap: () {
                         context.maybePop();
-                        context.pushRoute(const AgentSettingsRoute());
+                        context.pushRoute(AgentSettingsRoute());
                       },
                     ),
 
@@ -169,31 +169,6 @@ class AppDrawer extends ConsumerWidget {
                     //   },
                     // ),
                   ],
-                ),
-              ),
-
-              // ===== LOGOUT =====
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.logout),
-                    label: const Text("Logout"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      // TODO: clear auth + navigate to login
-                      ref.read(authRepositoryProvider).signOut();
-                      context.router.replace(AgentLoginRoute());
-                    },
-                  ),
                 ),
               ),
             ],

@@ -36,7 +36,7 @@ class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
         AgentDashboardRoute(agentId: widget.agentId),
         AgentUserRoute(agentId: widget.agentId),
         AgentRevenueRoute(agentId: widget.agentId),
-
+        AgentWishlistRoute(agentId: widget.agentId),
         AgentEntityRoute(uid: widget.agentId),
       ],
       transitionBuilder: (context, child, animation) =>
@@ -105,7 +105,10 @@ class CustomBottomNavBar extends StatelessWidget {
       icon: Icons.payments_outlined,
       label: 'Revenue', // Earnings & Commissions
     ),
-
+    BottomNavItem(
+      icon: Icons.favorite_outline,
+      label: 'Wishlist', // Wishlist
+    ),
     BottomNavItem(
       icon: Icons.person_outline,
       label: 'My Profile', // Tasks, Meetings, & Follow-ups
@@ -131,7 +134,7 @@ class CustomBottomNavBar extends StatelessWidget {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(items.length, (index) {
             final bool isSelected = index == currentIndex;
 
@@ -141,7 +144,7 @@ class CustomBottomNavBar extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
+                  horizontal: 10,
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(

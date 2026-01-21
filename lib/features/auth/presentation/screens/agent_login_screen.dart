@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/core/services/notification_service.dart';
+import 'package:arvika_marriage_bureau/core/notification/notification_service.dart';
 import 'package:flutter/services.dart';
 
 import '../providers/auth_providers.dart';
@@ -68,6 +68,8 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
 
       if (user != null) {
         NotificationService.saveAdminTokenToFirestore(user.uid);
+ 
+
 
         context.router.replace(AuthWrapperRoute());
       }

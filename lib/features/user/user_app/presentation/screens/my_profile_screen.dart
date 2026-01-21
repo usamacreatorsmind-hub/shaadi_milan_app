@@ -92,13 +92,13 @@ class MyProfileScreen extends ConsumerWidget {
                 // build Image card that display all images of user
                 _DetailSection(
                   title: "Photos",
-                  actionChip: AppChip(
-                    label: "Upload",
-                    icon: Icons.upload,
-                    onTap: () {
-                      // AutoRouter.of(context).push(UserImageFormRoute());
-                    },
-                  ),
+                  // actionChip: AppChip(
+                  //   label: "Upload",
+                  //   icon: Icons.upload,
+                  //   onTap: () {
+                  //     // AutoRouter.of(context).push(UserImageFormRoute());
+                  //   },
+                  // ),
                   children: [
                     profile.images.secondaryImageUrls.isNotEmpty
                         ? SizedBox(
@@ -168,18 +168,18 @@ class MyProfileScreen extends ConsumerWidget {
                 // show aadhar widget with file name and a download url and a button to view the pdf
                 _DetailSection(
                   title: "ID Cards",
-                  actionChip: AppChip(
-                    label: "Download",
-                    icon: Icons.download,
-                    onTap: () {
-                      // SHOW  snack bar
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Download functionality coming soon!"),
-                        ),
-                      );
-                    },
-                  ),
+                  // actionChip: AppChip(
+                  //   label: "Download",
+                  //   icon: Icons.download,
+                  //   onTap: () {
+                  //     // SHOW  snack bar
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       const SnackBar(
+                  //         content: Text("Download functionality coming soon!"),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   children: [
                     if (profile
                         .metrimonyProfile
@@ -217,17 +217,17 @@ class MyProfileScreen extends ConsumerWidget {
                 // 📝 ABOUT ME
                 _DetailSection(
                   title: "About Me",
-                  actionChip: AppChip(
-                    label: "Edit",
-                    icon: Icons.edit,
-                    onTap: () => AutoRouter.of(context).push(
-                      UserIdentityFormRoute(
-                        mode: FormMode.edit,
-                        existingIdentityProfile: profile.identity,
-                      ),
-                    ),
-                  ),
 
+                  // actionChip: AppChip(
+                  //   label: "Edit",
+                  //   icon: Icons.edit,
+                  //   onTap: () => AutoRouter.of(context).push(
+                  //     UserIdentityFormRoute(
+                  //       mode: FormMode.edit,
+                  //       existingIdentityProfile: profile.identity,
+                  //     ),
+                  //   ),
+                  // ),
                   children: [
                     Text(
                       profile.identity.aboutMe ?? "No description available.",
@@ -241,18 +241,17 @@ class MyProfileScreen extends ConsumerWidget {
                 _DetailSection(
                   title: "Basic Information",
 
-                  actionChip: AppChip(
-                    label: "Edit",
-                    icon: Icons.edit,
+                  // actionChip: AppChip(
+                  //   label: "Edit",
+                  //   icon: Icons.edit,
 
-                    onTap: () => AutoRouter.of(context).push(
-                      UserIdentityFormRoute(
-                        mode: FormMode.edit,
-                        existingIdentityProfile: profile.identity,
-                      ),
-                    ),
-                  ),
-
+                  //   onTap: () => AutoRouter.of(context).push(
+                  //     UserIdentityFormRoute(
+                  //       mode: FormMode.edit,
+                  //       existingIdentityProfile: profile.identity,
+                  //     ),
+                  //   ),
+                  // ),
                   children: [
                     _DetailRow(
                       "Aadhar",
@@ -273,17 +272,17 @@ class MyProfileScreen extends ConsumerWidget {
                 // 🎓 EDUCATION
                 _DetailSection(
                   title: "Education",
-                  actionChip: AppChip(
-                    label: "Edit",
-                    icon: Icons.edit,
-                    onTap: () => AutoRouter.of(context).push(
-                      UserEducationFormRoute(
-                        mode: FormMode.edit,
-                        existingEducationProfile: profile.education,
-                      ),
-                    ),
-                  ),
 
+                  // actionChip: AppChip(
+                  //   label: "Edit",
+                  //   icon: Icons.edit,
+                  //   onTap: () => AutoRouter.of(context).push(
+                  //     UserEducationFormRoute(
+                  //       mode: FormMode.edit,
+                  //       existingEducationProfile: profile.education,
+                  //     ),
+                  //   ),
+                  // ),
                   children: [
                     _DetailRow(
                       "Course",
@@ -317,16 +316,16 @@ class MyProfileScreen extends ConsumerWidget {
                     false)
                   _DetailSection(
                     title: "Additional Qualifications",
-                    actionChip: AppChip(
-                      label: "Edit",
-                      icon: Icons.edit,
-                      onTap: () => AutoRouter.of(context).push(
-                        UserEducationFormRoute(
-                          mode: FormMode.edit,
-                          existingEducationProfile: profile.education,
-                        ),
-                      ),
-                    ),
+                    // actionChip: AppChip(
+                    //   label: "Edit",
+                    //   icon: Icons.edit,
+                    //   onTap: () => AutoRouter.of(context).push(
+                    //     UserEducationFormRoute(
+                    //       mode: FormMode.edit,
+                    //       existingEducationProfile: profile.education,
+                    //     ),
+                    //   ),
+                    // ),
                     children: [
                       Wrap(
                         spacing: 10.0,
@@ -349,16 +348,16 @@ class MyProfileScreen extends ConsumerWidget {
                 // employement
                 _DetailSection(
                   title: "Employment",
-                  actionChip: AppChip(
-                    label: "Edit",
-                    icon: Icons.edit,
-                    onTap: () => AutoRouter.of(context).push(
-                      UserEmploymentFormRoute(
-                        mode: FormMode.edit,
-                        existingEmploymentProfile: profile.employment,
-                      ),
-                    ),
-                  ),
+                  // actionChip: AppChip(
+                  //   label: "Edit",
+                  //   icon: Icons.edit,
+                  //   onTap: () => AutoRouter.of(context).push(
+                  //     UserEmploymentFormRoute(
+                  //       mode: FormMode.edit,
+                  //       existingEmploymentProfile: profile.employment,
+                  //     ),
+                  //   ),
+                  // ),
                   children: [
                     _DetailRow("Company", profile.employment.company ?? "N/A"),
                     _DetailRow(
@@ -376,17 +375,17 @@ class MyProfileScreen extends ConsumerWidget {
                 // 🏠 ADDRESS
                 _DetailSection(
                   title: "Address",
-                  actionChip: AppChip(
-                    label: "Edit",
-                    onTap: () => AutoRouter.of(context).push(
-                      UserAddressFormRoute(
-                        mode: FormMode.edit,
-                        existingAddressProfile: profile.address,
-                      ),
-                    ),
-                    icon: Icons.edit,
-                  ),
 
+                  // actionChip: AppChip(
+                  //   label: "Edit",
+                  //   onTap: () => AutoRouter.of(context).push(
+                  //     UserAddressFormRoute(
+                  //       mode: FormMode.edit,
+                  //       existingAddressProfile: profile.address,
+                  //     ),
+                  //   ),
+                  //   icon: Icons.edit,
+                  // ),
                   children: [
                     _DetailRow("City", profile.address.city ?? "N/A"),
                     _DetailRow("State", profile.address.state ?? "N/A"),
@@ -396,18 +395,18 @@ class MyProfileScreen extends ConsumerWidget {
                 // 👪 FAMILY
                 _DetailSection(
                   title: "Family Details",
-                  actionChip: AppChip(
-                    label: "Edit",
-                    onTap: () => AutoRouter.of(context).push(
-                      UserFamilyFormRoute(
-                        mode: FormMode.edit,
-                        existingFamilyProfile: profile.family,
-                      ),
-                    ),
 
-                    icon: Icons.edit,
-                  ),
+                  // actionChip: AppChip(
+                  //   label: "Edit",
+                  //   onTap: () => AutoRouter.of(context).push(
+                  //     UserFamilyFormRoute(
+                  //       mode: FormMode.edit,
+                  //       existingFamilyProfile: profile.family,
+                  //     ),
+                  //   ),
 
+                  //   icon: Icons.edit,
+                  // ),
                   children: [
                     _DetailRow("Father", profile.family.fatherName ?? "N/A"),
                     _DetailRow("Mother", profile.family.motherName ?? "N/A"),
@@ -421,16 +420,16 @@ class MyProfileScreen extends ConsumerWidget {
                 //  physical details
                 _DetailSection(
                   title: "Physical Details",
-                  actionChip: AppChip(
-                    label: "Edit",
-                    onTap: () => AutoRouter.of(context).push(
-                      UserPhysicalFormRoute(
-                        mode: FormMode.edit,
-                        existingPhysicalProfile: profile.physical,
-                      ),
-                    ),
-                    icon: Icons.edit,
-                  ),
+                  // actionChip: AppChip(
+                  //   label: "Edit",
+                  //   onTap: () => AutoRouter.of(context).push(
+                  //     UserPhysicalFormRoute(
+                  //       mode: FormMode.edit,
+                  //       existingPhysicalProfile: profile.physical,
+                  //     ),
+                  //   ),
+                  //   icon: Icons.edit,
+                  // ),
                   children: [
                     _DetailRow("Height", "${profile.physical.height} cm"),
                     _DetailRow("Weight", "${profile.physical.weight} kg"),
@@ -457,17 +456,16 @@ class MyProfileScreen extends ConsumerWidget {
                 _DetailSection(
                   title: "Religious & Astrological",
 
-                  actionChip: AppChip(
-                    label: "Edit",
-                    icon: Icons.edit,
-                    onTap: () => AutoRouter.of(context).push(
-                      UserCultureFormRoute(
-                        mode: FormMode.edit,
-                        existingCulturalProfile: profile.cultural,
-                      ),
-                    ),
-                  ),
-
+                  // actionChip: AppChip(
+                  //   label: "Edit",
+                  //   icon: Icons.edit,
+                  //   onTap: () => AutoRouter.of(context).push(
+                  //     UserCultureFormRoute(
+                  //       mode: FormMode.edit,
+                  //       existingCulturalProfile: profile.cultural,
+                  //     ),
+                  //   ),
+                  // ),
                   children: [
                     _DetailRow("Religion", profile.cultural.religion ?? "N/A"),
                     _DetailRow("Caste", profile.cultural.caste ?? "N/A"),
@@ -966,12 +964,12 @@ class _DetailSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
 
-  final AppChip actionChip;
+  // final AppChip actionChip;
 
   const _DetailSection({
     required this.title,
     required this.children,
-    required this.actionChip,
+    // required this.actionChip,
   });
 
   @override
@@ -1006,8 +1004,7 @@ class _DetailSection extends StatelessWidget {
               //   adding chip or action chip
               const Spacer(),
 
-              actionChip,
-
+              // actionChip,
               const SizedBox(width: 8),
             ],
           ),

@@ -16,6 +16,33 @@ class AuthRepositoryImpl implements AuthRepository {
   User? get currentUser => ds.currentUser;
 
   @override
+  Future<dynamic> checkPhoneAlreadyRegistered(String phone) async {
+    final usersQuery = await firestore
+        .collection('users')
+        .where('phone', isEqualTo: phone)
+        .get();
+    if (usersQuery.docs.isNotEmpty) {
+      return true;
+    }
+
+    final agentsQuery = await firestore
+        .collection('agents')
+        .where('phone', isEqualTo: phone)
+        .get();
+    if (agentsQuery.docs.isNotEmpty) {
+      return true;
+    }
+
+    return false;
+  }
+
+
+  @override
+  Future<bool> checkUserExists({required String phone, required String email}) {
+    return ds.checkUserIfExists(phone: phone, email: email);
+  }           
+
+  @override
   Stream<Either<AgentEntity, UserEntity>?>
   authStateChanges() => ds.authStateChanges().asyncMap((user) async {
     if (user == null) return null;
@@ -48,7 +75,7 @@ class AuthRepositoryImpl implements AuthRepository {
         agentId: '',
         userType: '',
         isProfileCreated: false,
-        wishlists: const [],
+
         metrimonyId: '',
         profileId: '',
         createdAt: DateTime.now(),
@@ -99,21 +126,19 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required String agentId,
     required String phone,
-    required List<WishListItem> wishlists,
   }) async {
     // show aget page
 
     // 3️⃣ create user (THIS WAS MISSING)
     await ds.signUpUserWithEmail(
       gender: gender,
-      
+
       fullName: fullName,
       email: email,
       password: password,
-      agentId: agentId, 
+      agentId: agentId,
 
       phone: phone,
-      wishlists: [],
     );
   }
 

@@ -60,6 +60,7 @@ class _UserBiodataCheckScreenState
           _section('User Details', Icons.person, [
             _infoRow('Full Name', currentUser?.fullName),
             _infoRow('Phone', currentUser?.phone),
+            _infoRow('Email', currentUser?.email),
           ]),
 
           _section('Identity', Icons.badge, [
@@ -474,8 +475,8 @@ class _UserBiodataCheckScreenState
     await ref
         .read(metrimonyControllerProvider.notifier)
         .submitProfile(uid: user.uid, agentId: user.agentId);
-if (context.mounted) {
-      context.router.replaceAll([const UserMainShellRoute()]);
+    if (context.mounted) {
+      context.router.replaceAll([UserMainShellRoute()]);
     }
   }
 }

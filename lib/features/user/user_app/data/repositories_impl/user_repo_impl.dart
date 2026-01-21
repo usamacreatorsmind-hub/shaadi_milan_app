@@ -3,18 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../auth/domain/states/user_state.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../domain/repositories/user_repository.dart';
-import '../../domain/states/address_state.dart';
-import '../../domain/states/user_status_state.dart';
+import '../../domain/states/address_state.dart'; 
 import '../datasources/firebase/user_firestore_ds.dart';
 
 class UserRepositoryImpl implements UserRepository {
   final UserFirestoreDS _ds;
 
   UserRepositoryImpl(this._ds);
+
   @override
   Future<List<UserEntity>> fetchUsers() async {
     final data = await _ds.fetchUsers();
     return data.map((e) => UserEntity.fromMap(e)).toList();
+  }
+
+  @override
+  Stream<List<UserEntity>> watchOppositeGenderUsers(String currentUid) {
+    return _ds.watchOppositeGenderUsers(currentUid).map(
+      (data) => data.map((e) => UserEntity.fromMap(e)).toList(),
+    );
   }
 
   @override
@@ -90,47 +97,11 @@ class UserRepositoryImpl implements UserRepository {
     return _ds.updateField(uid, 'profilePhoto', profilePhotoUrl);
   }
 
-  @override
-  Future<void> addWishlist(String uid, WishListItem wishlistItem) {
-    return _ds.addWishlist(uid,wishlistItem );
-  }
-
-  @override
-  Future<void> removeWishlist({
-    required String uid,
-    required String profileId,
-  }) {
-    return _ds.removeWishlist(uid, profileId);
-  }
-
-  @override
-  Future<UserStatus> fetchUserStatus(String uid) async {
-    final data = await _ds.fetchUser(uid);
-    return UserStatus.fromMap(data['userStatus']);
-  }
-
-  @override
-  Future<void> updateUserStatus(String uid, UserStatus userStatus) {
-    return _ds.updateField(uid, 'userStatus', userStatus.toMap());
-  }
-
-  @override
-  Stream<UserStatus> watchUserStatus(String uid) {
-    return _ds
-        .watchUser(uid)
-        .map((data) => UserStatus.fromMap(data['userStatus']));
-  }
+   
+ 
+ 
   
-  @override
-  Future<void> updateWishlistStatus({required String parentUserId, required String profileId, required String newStatus}) {
-    
-    return _ds.updateWishlistStatus(
-      parentUserId: parentUserId,
-      profileId: profileId,
-      newStatus: newStatus,
-    );              
-
-  }
+   
 }
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {

@@ -152,4 +152,12 @@ class PaymentState {
       payment: payment ?? this.payment,
     );
   }
+
+  factory PaymentState.initial() => const PaymentState(
+    status: PayStatus.idle,
+    razorpayPaymentId: null,
+    razorpayOrderId: null,
+    signature: null,
+    payment: null,
+  );
 }

@@ -70,7 +70,7 @@ class SupportTicketsScreen extends ConsumerWidget {
 
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        onPressed: () => context.router.push(const SupportTicketFormRoute()),
+        onPressed: () => context.router.push(SupportTicketFormRoute()),
         icon: const Icon(Icons.add),
         label: const Text('New Ticket'),
       ),

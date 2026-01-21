@@ -40,8 +40,7 @@ class AuthController extends StateNotifier<User?> {
       email: email,
       password: password,
       agentId: agentId,
-      phone: phone,
-      wishlists: [],
+      phone: phone, 
     );
   }
 

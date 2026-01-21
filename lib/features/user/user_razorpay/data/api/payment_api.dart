@@ -45,7 +45,7 @@ class PaymentApi {
     final paymentApiFirestore = PaymentApiFirestore();
     final firestoreBaseUrl = await paymentApiFirestore.getUrl();
 
-    print("this is base url");
+    print("this is Pa");
 
     _dio.options.baseUrl = firestoreBaseUrl ?? "No url";
 

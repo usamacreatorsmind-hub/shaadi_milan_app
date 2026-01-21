@@ -501,15 +501,6 @@ class ProfileCard extends StatelessWidget {
           width: 3,
         ),
 
-        gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary.withOpacity(0.05),
-            Theme.of(context).cardColor,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(

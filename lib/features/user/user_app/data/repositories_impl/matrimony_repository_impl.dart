@@ -41,6 +41,11 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   }
 
   @override
+  Stream<List<MatrimonyProfile>> watchMatrimonyProfilesForUsers(List<String> userIds) {
+    return _remoteDS.watchMatrimonyProfilesForUsers(userIds);
+  }
+
+  @override
   Future<void> updateAddressProfile(String uid, AddressProfile address) {
     return _remoteDS.updateAddress(uid, address);
   }

@@ -370,6 +370,59 @@ class AgentUserRouteArgs {
 }
 
 /// generated route for
+/// [AgentWishlistScreen]
+class AgentWishlistRoute extends PageRouteInfo<AgentWishlistRouteArgs> {
+  AgentWishlistRoute({
+    Key? key,
+    required String agentId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         AgentWishlistRoute.name,
+         args: AgentWishlistRouteArgs(key: key, agentId: agentId),
+         initialChildren: children,
+       );
+
+  static const String name = 'AgentWishlistRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<AgentWishlistRouteArgs>();
+      return AgentWishlistScreen(key: args.key, agentId: args.agentId);
+    },
+  );
+}
+
+class AgentWishlistRouteArgs {
+  const AgentWishlistRouteArgs({this.key, required this.agentId});
+
+  final Key? key;
+
+  final String agentId;
+
+  @override
+  String toString() {
+    return 'AgentWishlistRouteArgs{key: $key, agentId: $agentId}';
+  }
+}
+
+/// generated route for
+/// [AgentnotificationScreen]
+class AgentnotificationRoute extends PageRouteInfo<void> {
+  const AgentnotificationRoute({List<PageRouteInfo>? children})
+    : super(AgentnotificationRoute.name, initialChildren: children);
+
+  static const String name = 'AgentnotificationRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AgentnotificationScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [AuthWrapperScreen]
 class AuthWrapperRoute extends PageRouteInfo<void> {
   const AuthWrapperRoute({List<PageRouteInfo>? children})
@@ -474,7 +527,7 @@ class MetrimonyProfileRouteArgs {
 /// [MyProfileDetailScreen]
 class MyProfileDetailRoute extends PageRouteInfo<MyProfileDetailRouteArgs> {
   MyProfileDetailRoute({
-    Key? key,
+    dynamic key,
     required UserEntity user,
     List<PageRouteInfo>? children,
   }) : super(
@@ -497,7 +550,7 @@ class MyProfileDetailRoute extends PageRouteInfo<MyProfileDetailRouteArgs> {
 class MyProfileDetailRouteArgs {
   const MyProfileDetailRouteArgs({this.key, required this.user});
 
-  final Key? key;
+  final dynamic key;
 
   final UserEntity user;
 

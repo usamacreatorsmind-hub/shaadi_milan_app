@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/core/services/notification_service.dart';
+import 'package:arvika_marriage_bureau/core/notification/notification_service.dart';
 
 import '../../../../app/router/app_router.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen>
   void _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
-      context.router.replace(const AuthWrapperRoute());
+      context.router.replace( AuthWrapperRoute());
     }
   }
 

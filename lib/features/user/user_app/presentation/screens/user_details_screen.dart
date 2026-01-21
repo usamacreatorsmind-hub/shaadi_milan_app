@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/wishlist_notifier.dart';
 import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart'
@@ -7,6 +8,7 @@ import 'package:arvika_marriage_bureau/features/user/user_app/presentation/scree
 import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bottom_sheet.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -702,7 +704,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               // add this user's id to user collection 's current id or user
 
                               // read user colleciton and then push id of current profile to current logged in user
@@ -718,9 +720,24 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               final status = "pending"; // Or any initial status
                               final updatedAt = DateTime.now();
 
-                              WishListItem wishListItem = WishListItem(
+                              // fetch current user's agent id
+
+                              final userRepo = ref.watch(
+                                userRepositoryProvider,
+                              );
+                              final currentUser = userRepo.fetchUser(
+                                currentUserId!,
+                              );
+
+                              final currentUserData = await currentUser;
+                              final senderAgent = currentUserData.agentId;
+
+                              WishlistEntity wishListItem = WishlistEntity(
+                                senderId: currentUserId!,
+                                receiverId: profileId!,
+                                receiverAgent: agentId!,
+                                senderAgent: senderAgent,
                                 status: status,
-                                profileId: profileId ?? "",
 
                                 updatedAt: updatedAt,
                               );
@@ -728,11 +745,9 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               if (currentUserId!.isNotEmpty &&
                                   profileId!.isNotEmpty &&
                                   agentId!.isNotEmpty) {
-                                // Add the profile's UID to the current user's wishlist
-
                                 ref
-                                    .read(userRepositoryProvider)
-                                    .addWishlist(currentUserId, wishListItem);
+                                    .read(wishlistRepositoryProvider)
+                                    .addWishlist(wishListItem);
 
                                 // Optionally, show a success message
                                 ScaffoldMessenger.of(context).showSnackBar(

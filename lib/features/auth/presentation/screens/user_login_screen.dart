@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/core/services/notification_service.dart';
+import 'package:arvika_marriage_bureau/core/notification/notification_service.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -224,7 +224,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () =>
-                                context.navigateTo(const ResetPasswordRoute()),
+                                context.navigateTo( ResetPasswordRoute()),
                             child: Text(
                               "Forgot Password?",
                               style: TextStyle(
@@ -262,7 +262,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                     const SizedBox(height: 4),
                     TextButton(
                       onPressed: () =>
-                          context.navigateTo(const UserRegisterRoute()),
+                          context.navigateTo( UserRegisterRoute()),
                       child: Text(
                         "Create a New Profile",
                         style: TextStyle(

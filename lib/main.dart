@@ -8,8 +8,8 @@ import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'app/app.dart';
 import 'core/env/app_env.dart';
 import 'core/env/app_env_config.dart';
-import 'core/services/notification_service.dart';
-import 'core/services/in_app_messaging_service.dart';
+import 'core/notification/notification_service.dart';
+import 'core/notification/in_app_messaging_service.dart';
 import 'firebase_options.dart';
 
 // Background handler - must be a top-level function

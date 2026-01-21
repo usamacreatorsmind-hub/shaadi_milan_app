@@ -7,6 +7,7 @@ abstract class UserRepository {
   Stream<UserEntity> watchUser(String uid);
   Future<UserEntity> fetchUser(String uid);
   Future<List<UserEntity>> fetchUsers();
+  Stream<List<UserEntity>> watchOppositeGenderUsers(String currentUid);
 
   Future<void> updateUser(String uid, UserEntity user);
   Future<void> updateField(String uid, String fieldPath, dynamic value);
@@ -26,31 +27,7 @@ abstract class UserRepository {
   Future<void> updateAddress(String uid, AddressProfile address);
 
   Future<void> updateProfilePhoto(String uid, String profilePhotoUrl);
+  
 
-  Future<void> addWishlist(String uid, WishListItem wishlistItem);
-  Future<void> removeWishlist({required String uid, required String profileId});
-
-  Future<void> updateWishlistStatus({
-    required String parentUserId,
-    required String profileId,
-    required String newStatus,
-  }) async {
-    final firestore = FirebaseFirestore.instance;
-
-    await firestore.collection('users').doc(parentUserId).update({
-      'wishlists': FieldValue.arrayRemove([
-        {'profileId': profileId},
-      ]),
-    });
-
-    await firestore.collection('users').doc(parentUserId).update({
-      'wishlists': FieldValue.arrayUnion([
-        {
-          'profileId': profileId,
-          'status': newStatus,
-          'updatedAt': DateTime.now().millisecondsSinceEpoch,
-        },
-      ]),
-    });
-  }
+  
 }

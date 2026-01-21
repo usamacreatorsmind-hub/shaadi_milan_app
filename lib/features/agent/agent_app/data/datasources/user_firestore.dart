@@ -66,8 +66,7 @@ class UserFirestoreImpl implements UserFirestore {
         'updatedAt': FieldValue.serverTimestamp(),
       },
     });
-
-    throw UnimplementedError();
+ 
   }
 
   @override

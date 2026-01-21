@@ -19,14 +19,20 @@ abstract class AuthRepository {
   Future<void> signUpUserWithEmail({
     required String fullName,
     required String gender,
-    
 
     required String email,
     required String password,
     required String agentId,
     required String phone,
-    required List<WishListItem> wishlists,
   });
 
   Future<void> logout();
+
+  Future<dynamic> checkPhoneAlreadyRegistered(String trim) async {}
+  Future<bool> checkUserExists({
+    required String phone,
+    required String email,
+  });
+
+
 }

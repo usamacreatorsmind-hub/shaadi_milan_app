@@ -34,11 +34,5 @@ class UserRepositoryImpl implements UserRepository {
     return userFirestore.getUserById(userId);
   }
 
-  @override
-  Future<void> updateUserWishlist({
-    required String userId,
-    required List<WishListItem> wishlists,
-  }) {
-    return userFirestore.updateUserWishlist(userId: userId, wishlists: wishlists.map((e) => e.toMap()).toList());
-  }
+  
 }

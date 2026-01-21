@@ -14,4 +14,12 @@ class PaymentRepository {
   Stream<Payment?> watchUserPayment(String uid) {
     return _paymentFirestore.watchUserPayment(uid);
   }
+
+
+  Future<Payment?> fetchUserPostMarriagePayment(String uid) async {
+    return _paymentFirestore.fetchUserPostMarriagePayment(uid);
+  }                 
+  
+  
+
 }

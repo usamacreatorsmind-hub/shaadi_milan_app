@@ -171,7 +171,9 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       final service = ref.read(imageUploadServiceProvider);
 
       final hasSecondary = state.secondaryImages.isNotEmpty;
-      final steps = hasSecondary ? 5 : 4; // primary, aadhar, imageWithAgent, profileImage + optional secondary
+      final steps = hasSecondary
+          ? 5
+          : 4; // primary, aadhar, imageWithAgent, profileImage + optional secondary
       final stepWeight = 1.0 / steps;
 
       void updateStepProgress(int stepIndex, double p) {

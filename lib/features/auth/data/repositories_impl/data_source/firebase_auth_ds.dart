@@ -21,10 +21,12 @@ abstract class FirebaseAuthDs {
     required String gender,
     required String agentId,
     required String phone,
-    required List<WishListItem> wishlists,
   });
 
-  Future<bool> checkUserIfExists({required String uid});
+  Future<bool> checkUserIfExists({
+    required String phone,
+    required String email,
+  });
   Future<bool> checkAgentIfExists({required String uid});
 }
 
@@ -59,7 +61,6 @@ class FirebaseAuthDS implements FirebaseAuthDs {
     required String gender,
 
     required String phone,
-    required List<WishListItem> wishlists,
   }) async {
     // Implement sign-up logic with Firebase Auth and Firestore
 
@@ -79,7 +80,6 @@ class FirebaseAuthDS implements FirebaseAuthDs {
         'role': 'user',
         'isProfileCreated': false,
         'createdAt': FieldValue.serverTimestamp(),
-        'wishlists': wishlists,
       });
     } on FirebaseAuthException catch (e) {
       // Handle Firebase Auth exceptions
@@ -91,9 +91,29 @@ class FirebaseAuthDS implements FirebaseAuthDs {
   }
 
   @override
-  Future<bool> checkUserIfExists({required String uid}) async {
-    final userDoc = await _firestore.collection('users').doc(uid).get();
-    return userDoc.exists;
+  Future<bool> checkUserIfExists({
+    required String phone,
+    required String email,
+  }) async {
+    // Check phone
+    final phoneQuery = await _firestore
+        .collection('users')
+        .where('phone', isEqualTo: phone)
+        .limit(1)
+        .get();
+
+    if (phoneQuery.docs.isNotEmpty) {
+      return true;
+    }
+
+    // Check email
+    final emailQuery = await _firestore
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    return emailQuery.docs.isNotEmpty;
   }
 
   @override

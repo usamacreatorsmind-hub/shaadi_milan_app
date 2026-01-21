@@ -29,6 +29,8 @@ abstract class MatrimonyRepository {
 
   Stream<MatrimonyProfile> watchMatrimonyProfile(String uid);
 
+  Stream<List<MatrimonyProfile>> watchMatrimonyProfilesForUsers(List<String> userIds);
+
   // ─────────────────────────────────────────────
   // UPDATE (SECTION-WISE)
   // ─────────────────────────────────────────────

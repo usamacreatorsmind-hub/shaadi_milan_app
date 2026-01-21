@@ -19,7 +19,7 @@ class UserpaymentsDSImpl implements UserPaymentDs {
   }) async {
     try {
       final querySnapshot = await firestore
-          .collection('payments')
+          .collection('registrationPayment')
           .where('userId', isEqualTo: userId)
           .where('agentId', isEqualTo: agentId)
           .limit(1)
@@ -42,7 +42,7 @@ class UserpaymentsDSImpl implements UserPaymentDs {
       print('Fetching payments for agent: $agentId');
 
       final querySnapshot = await firestore
-          .collection('payments')
+          .collection('registrationPayment')
           .where('agentId', isEqualTo: agentId)
           .get();
 

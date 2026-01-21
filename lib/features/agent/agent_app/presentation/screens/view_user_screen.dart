@@ -161,22 +161,6 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                                     ? Colors.green
                                     : Colors.orange,
                               ),
-                              Container(
-                                width: 1,
-                                height: 50,
-                                color: Colors.grey[300],
-                              ),
-                              _StatusItem(
-                                icon: Icons.favorite,
-                                label: 'Wishlists',
-                                value: user.wishlists.length.toString(),
-                                color: Colors.pink,
-                              ),
-                              Container(
-                                width: 1,
-                                height: 50,
-                                color: Colors.grey[300],
-                              ),
                             ],
                           ),
                         ),
@@ -262,58 +246,6 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                         ),
                       ],
                     ),
-
-                    // Payment Information
-
-                    // Wishlists Section
-                    if (user.wishlists.isNotEmpty)
-                      _SectionCard(
-                        title: 'Wishlists',
-                        icon: Icons.list,
-                        children: [
-                          ...user.wishlists.asMap().entries.map((entry) {
-                            final index = entry.key;
-                            final wishlistId = entry.value;
-
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                bottom: index < user.wishlists.length - 1
-                                    ? 12
-                                    : 0,
-                              ),
-                              child: Row(
-                                children: [
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: _WishlistUserTile(
-                                      profileId: wishlistId.profileId,
-                                      parentUserId: user.uid,
-
-                                      currentUserAgentId: user.agentId,
-                                      status: wishlistId.status,
-                                      updatedAt: wishlistId.updatedAt,
-                                      formatDateTime: _formatDateTime,
-                                      onTap: () {
-                                        context.router.push(
-                                          ViewWishListUserRoute(
-                                            userId: wishlistId.profileId,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-
-                                  // _DetailRow(
-                                  //   icon: Icons.person_add,
-                                  //   label: 'Wishlist Item ${index + 1}',
-                                  //   value: wishlistId.profileId,
-                                  // ),
-                                ],
-                              ),
-                            );
-                          }),
-                        ],
-                      ),
 
                     const SizedBox(height: 16),
                   ],
@@ -921,8 +853,6 @@ class _WishlistUserTile extends ConsumerWidget {
     BuildContext context,
   ) async {
     try {
-    
-
       await ref
           .read(agentUserNotifierProvider.notifier)
           .updateUserWishlistStatus(
@@ -932,15 +862,12 @@ class _WishlistUserTile extends ConsumerWidget {
           );
       // Optionally, refresh the user data to reflect the change
       ref.invalidate(agentUserNotifierProvider);
-      
-
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Status updated to $newStatus')),
-        );
-      } 
-
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Status updated to $newStatus')));
+      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(

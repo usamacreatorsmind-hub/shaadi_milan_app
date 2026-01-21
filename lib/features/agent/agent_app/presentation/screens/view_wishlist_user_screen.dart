@@ -164,14 +164,9 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                               ),
                               _StatusItem(
                                 icon: Icons.favorite,
-                                label: 'Wishlists',
-                                value: user.wishlists.length.toString(),
+                                label: 'Profile',
+                                value: user.isProfileCreated ? 'Active' : 'Pending',
                                 color: Colors.pink,
-                              ),
-                              Container(
-                                width: 1,
-                                height: 50,
-                                color: Colors.grey[300],
                               ),
                             ],
                           ),

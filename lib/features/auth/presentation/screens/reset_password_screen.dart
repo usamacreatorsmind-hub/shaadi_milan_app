@@ -166,7 +166,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
             //  going to password   screen
             TextButton(
               onPressed: () {
-                context.navigateTo(const ChangePasswordRoute());
+                context.navigateTo( ChangePasswordRoute());
               },
               child: const Text(
                 "Change Password",

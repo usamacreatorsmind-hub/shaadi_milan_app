@@ -9,9 +9,5 @@ abstract class UserRepository {
     required String userId,
     required String status,
     String? reason,
-  });
-  Future<void> updateUserWishlist({
-    required String userId,
-    required List<WishListItem> wishlists,
-  });
+  }); 
 }

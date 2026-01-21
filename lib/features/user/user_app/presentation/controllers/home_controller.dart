@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../../../auth/domain/states/agent_state.dart';
-import '../../domain/repositories/agent_repository.dart';
 import '../../../../auth/domain/states/user_state.dart';
+import '../../domain/repositories/agent_repository.dart';
 import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/repositories/user_repository.dart';
@@ -42,6 +46,10 @@ class HomeController extends StateNotifier<HomeState> {
   final MatrimonyRepository _matrimonyRepository;
   final UserRepository _userRepository;
   final AgentRepository _agentRepository;
+  StreamSubscription? _usersSubscription;
+  StreamSubscription? _profilesSubscription;
+
+  List<UserEntity> _currentUsers = [];
 
   HomeController({
     required MatrimonyRepository matrimonyRepository,
@@ -51,39 +59,82 @@ class HomeController extends StateNotifier<HomeState> {
        _userRepository = userRepository,
        _agentRepository = agentRepository,
        super(const HomeState()) {
-    _loadData();
+    _watchData();
   }
-  Future<void> _loadData() async {
-    try {
-      state = state.copyWith(metrimonyProfiles: const AsyncValue.loading());
 
-      final profiles = await _matrimonyRepository.getAllMatrimonyProfiles();
-      final users = await _userRepository.fetchUsers();
+  void _watchData() {
+    final currentUid = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUid == null) {
+      state = state.copyWith(metrimonyProfiles: const AsyncValue.data([]));
+      return;
+    }
 
-      final data = await Future.wait(
-        profiles.map((profile) async {
-          final user = users.firstWhere(
-            (u) => u.uid == profile.userId,
-            orElse: () => UserEntity.empty(),
-          );
+    state = state.copyWith(metrimonyProfiles: const AsyncValue.loading());
 
-          AgentEntity? agent;
-          if (user.agentId.isNotEmpty) {
-            agent = await _agentRepository.fetchAgent(user.agentId);
+    // Watch opposite gender users
+    _usersSubscription = _userRepository.watchOppositeGenderUsers(currentUid).listen(
+      (users) {
+        _currentUsers = users;
+        _watchProfiles(users.map((u) => u.uid).toList());
+      },
+      onError: (e, st) {
+        state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
+      },
+    );
+  }
+
+  void _watchProfiles(List<String> userIds) {
+    _profilesSubscription?.cancel();
+
+    if (userIds.isEmpty) {
+      state = state.copyWith(metrimonyProfiles: const AsyncValue.data([]));
+      return;
+    }
+
+    // Watch matrimony profiles for those users
+    _profilesSubscription = _matrimonyRepository.watchMatrimonyProfilesForUsers(userIds).listen(
+      (profiles) async {
+        try {
+          final data = <MatrimonyProfileViewModel>[];
+
+          for (final profile in profiles) {
+            final user = _currentUsers.firstWhere(
+              (u) => u.uid == profile.userId,
+              orElse: () => UserEntity.empty(),
+            );
+
+            if (user.uid.isEmpty) continue;
+
+            AgentEntity? agent;
+            if (user.agentId.isNotEmpty) {
+              try {
+                agent = await _agentRepository.fetchAgent(user.agentId);
+              } catch (_) {}
+            }
+
+            data.add(MatrimonyProfileViewModel(
+              profile: profile,
+              user: user,
+              agent: agent,
+            ));
           }
 
-          return MatrimonyProfileViewModel(
-            profile: profile,
-            user: user,
-            agent: agent,
-          );
-        }),
-      );
+          state = state.copyWith(metrimonyProfiles: AsyncValue.data(data));
+        } catch (e, st) {
+          state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
+        }
+      },
+      onError: (e, st) {
+        state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
+      },
+    );
+  }
 
-      state = state.copyWith(metrimonyProfiles: AsyncValue.data(data));
-    } catch (e, st) {
-      state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
-    }
+  @override
+  void dispose() {
+    _usersSubscription?.cancel();
+    _profilesSubscription?.cancel();
+    super.dispose();
   }
 
   Future<MatrimonyProfile> getMatrimonyProfile(String uid) {

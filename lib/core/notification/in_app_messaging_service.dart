@@ -31,6 +31,9 @@ class InAppMessagingService {
       _fiam.triggerEvent(eventName);
       debugPrint("🔔 FIAM Event Triggered: $eventName");
     } catch (e) {
+
+
+      
       debugPrint("❌ FIAM Event Error: $e");
     }
   }

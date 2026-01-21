@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/core/services/in_app_messaging_service.dart';
+import 'package:arvika_marriage_bureau/core/notification/in_app_messaging_service.dart';
 import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
 import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
@@ -70,8 +70,6 @@ class _UserPaymentScreenState
     final femaleAmountState = ref.watch(
       postMarriageAmountFemaleNotifierProvider,
     );
-
-    final currentUserProfileAsync = ref.watch(currentUserProfileProvider);
 
     final paymentState = ref.watch(paymentProvider);
     ref.watch(paymentNotifierProvider(widget.userId));
