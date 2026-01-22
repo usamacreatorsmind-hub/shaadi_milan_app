@@ -7,4 +7,7 @@ abstract class UserPaymentsRepository {
   });
 
   Future<List<Payment?>> getUsersPayment({required String agentId});
+
+  Future<List<Payment?>> getAfterMarriagePayments({required String agentId});
+  Future<Payment?> getAfterMarriagePaymentForUser({required String userId});
 }

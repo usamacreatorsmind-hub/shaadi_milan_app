@@ -16,10 +16,39 @@ abstract class UserFirestore {
     required String userId,
     required List<Map<String, dynamic>> wishlists,
   });
+
+  Future<void> closeMatrimonyProfile(String userId) async {}
 }
 
 class UserFirestoreImpl implements UserFirestore {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  @override
+  Future<void> closeMatrimonyProfile(String userId) async {
+    print("Closing  metrimony profile");
+    final userRef = firestore.collection('users').doc(userId);
+    final matrimonyRef = firestore.collection('metrimony_profiles').doc(userId);
+
+    await firestore.runTransaction((transaction) async {
+      final matrimonySnap = await transaction.get(matrimonyRef);
+      print("inside transaction");
+      if (!matrimonySnap.exists) {
+        throw Exception('Matrimony profile not found');
+      }
+
+      transaction.update(matrimonyRef, {
+        'profileStatus': 'closed',
+        'updatedAt': FieldValue.serverTimestamp(),
+        'updatedBy': 'agent',
+      });
+
+      transaction.update(userRef, {
+        'profileStatus': 'closed',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
   @override
   Future<List<UserEntity>> getUsersForAgent(String agentId) async {
     //fetch user from firestore where agentId matches
@@ -66,7 +95,6 @@ class UserFirestoreImpl implements UserFirestore {
         'updatedAt': FieldValue.serverTimestamp(),
       },
     });
- 
   }
 
   @override

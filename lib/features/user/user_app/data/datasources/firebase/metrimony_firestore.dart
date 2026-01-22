@@ -116,7 +116,10 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
   Future<List<MatrimonyProfile>> getAllMatrimonyProfiles() async {
     final currentUid = FirebaseAuth.instance.currentUser!.uid;
 
-    final querySnapshot = await _profiles.get();
+    // Fetch only active profiles from metrimony_profiles collection
+    final querySnapshot = await _profiles
+        .where('profileStatus', isEqualTo: 'active')
+        .get();
 
     final profiles = querySnapshot.docs
         .map((doc) => MatrimonyProfile.fromMap(doc.data()))
@@ -153,8 +156,11 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
       return Stream.value([]);
     }
 
-    // Watch all matrimony profiles and filter by userIds
-    return _profiles.snapshots().map((snapshot) {
+    // Watch only active matrimony profiles and filter by userIds
+    return _profiles
+        .where('profileStatus', isEqualTo: 'active')
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs
           .where((doc) => userIds.contains(doc.id))
           .map((doc) => MatrimonyProfile.fromMap(doc.data()))

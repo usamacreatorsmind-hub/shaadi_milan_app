@@ -19,12 +19,15 @@ class UserFirestoreDS {
     return querySnapshot.docs.map((doc) => doc.data()).toList();
   }
 
-  Stream<List<Map<String, dynamic>>> watchOppositeGenderUsers(String currentUid) async* {
+  Stream<List<Map<String, dynamic>>> watchOppositeGenderUsers(
+    String currentUid,
+  ) async* {
     // First get current user's gender
     final currentUserDoc = await _users.doc(currentUid).get();
     if (!currentUserDoc.exists) throw Exception('Current user not found');
 
-    final currentUserGender = (currentUserDoc.data()?['gender'] as String?)?.toLowerCase();
+    final currentUserGender = (currentUserDoc.data()?['gender'] as String?)
+        ?.toLowerCase();
     if (currentUserGender == null || currentUserGender.isEmpty) {
       yield [];
       return;
@@ -33,14 +36,17 @@ class UserFirestoreDS {
     // Determine opposite gender
     final oppositeGender = currentUserGender == 'male' ? 'Female' : 'Male';
 
-    // Watch users with opposite gender using snapshots
+    // Watch users with opposite gender and active profileStatus using snapshots
     yield* _users
         .where('gender', isEqualTo: oppositeGender)
+        .where('profileStatus', isEqualTo: 'active')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .where((doc) => doc.id != currentUid)
-            .map((doc) => doc.data())
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .where((doc) => doc.id != currentUid)
+              .map((doc) => doc.data())
+              .toList(),
+        );
   }
 
   Future<Map<String, dynamic>> fetchUser(String uid) async {
@@ -96,8 +102,6 @@ class UserFirestoreDS {
     await _users.doc(uid).update({'profileImageUrl': profilePhotoUrl});
   }
 
-   
-
   Future<void> updateUserStatus(
     String uid,
     Map<String, dynamic> userStatus,
@@ -108,5 +112,4 @@ class UserFirestoreDS {
   Future<void> updateRole(String uid, String role) async {
     await _users.doc(uid).update({'role': role});
   }
- 
 }

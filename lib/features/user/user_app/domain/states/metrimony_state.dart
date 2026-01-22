@@ -17,7 +17,7 @@ import 'physical_state.dart';
 /// ============================================================
 
 class MatrimonyProfile {
-  final String userId; 
+  final String userId;
   final String metrimonyId;
   final IdentityProfile identity;
   final AddressProfile address;
@@ -26,12 +26,15 @@ class MatrimonyProfile {
   final EmploymentProfile employment;
   final FamilyProfile family;
   final PhysicalProfile physical;
-
   final ProfileImages images;
+  final String profileStatus;
 
   MatrimonyProfile({
     this.metrimonyId = "",
-    this.userId = '', 
+
+    required this.profileStatus,
+
+    this.userId = '',
 
     IdentityProfile? identity,
     AddressProfile? address,
@@ -51,10 +54,15 @@ class MatrimonyProfile {
        images = images ?? ProfileImages.empty();
 
   factory MatrimonyProfile.empty() => MatrimonyProfile(
+    userId: '',
+    metrimonyId: '',
+    profileStatus: 'active',
+
     identity: IdentityProfile.empty(),
     address: AddressProfile.empty(),
     cultural: CulturalProfile.empty(),
     education: EducationProfile.empty(),
+
     employment: EmploymentProfile.empty(),
     family: FamilyProfile.empty(),
     physical: PhysicalProfile.empty(),
@@ -65,8 +73,9 @@ class MatrimonyProfile {
 
   MatrimonyProfile copyWith({
     String? metrimonyId,
+    String? profileStatus,
 
-    String? userId, 
+    String? userId,
     IdentityProfile? identity,
     AddressProfile? address,
     CulturalProfile? cultural,
@@ -78,8 +87,9 @@ class MatrimonyProfile {
   }) {
     return MatrimonyProfile(
       metrimonyId: metrimonyId ?? this.metrimonyId,
+      profileStatus: profileStatus ?? this.profileStatus,
 
-      userId: userId ?? this.userId, 
+      userId: userId ?? this.userId,
       identity: identity ?? this.identity,
       address: address ?? this.address,
       cultural: cultural ?? this.cultural,
@@ -96,8 +106,9 @@ class MatrimonyProfile {
   Map<String, dynamic> toMap() {
     return {
       "metrimonyId": metrimonyId,
+      "profileStatus": profileStatus,
 
-      'userId': userId, 
+      'userId': userId,
       'identity': identity.toMap(),
       'address': address.toMap(),
       'cultural': cultural.toMap(),
@@ -115,8 +126,9 @@ class MatrimonyProfile {
     try {
       return MatrimonyProfile(
         metrimonyId: map['metrimonyId'] ?? '',
+        profileStatus: map['profileStatus'] ?? 'active',
 
-        userId: map['userId'] ?? '', 
+        userId: map['userId'] ?? '',
 
         identity: map['identity'] != null
             ? IdentityProfile.fromMap(
@@ -168,8 +180,8 @@ class MatrimonyProfile {
   @override
   String toString() {
     return '''
-MatrimonyProfile(
- 
+MatrimonyProfile( 
+  profileStatus: $profileStatus, 
   metrimonyId: $metrimonyId,
   userId: $userId, 
   identity: $identity,

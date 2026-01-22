@@ -33,6 +33,13 @@ class UserRepositoryImpl implements UserRepository {
   Future<UserEntity> getUserById(String userId) {
     return userFirestore.getUserById(userId);
   }
+  
+  @override
+  Future<void> closeMatrimonyProfile(String userId) {
+    
+    return userFirestore.closeMatrimonyProfile(userId);           
+
+  }
 
   
 }

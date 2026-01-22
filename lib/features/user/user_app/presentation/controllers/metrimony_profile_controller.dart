@@ -123,6 +123,7 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     final metrimonyProfile = MatrimonyProfile(
       userId: uid,
       metrimonyId: uid,
+      profileStatus: 'active',
 
       // ✅ SAME AS UID
       identity: IdentityProfile.empty(),

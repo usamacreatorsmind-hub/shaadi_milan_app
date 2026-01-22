@@ -16,7 +16,7 @@ class Order {
   final String gender;
   final String religion;
   final String caste;
-  final int amount;
+  final double amount;
   final String status; // PENDING | SUCCESS | FAILED
   final String gateway;
   final DateTime createdAt;
@@ -70,7 +70,7 @@ class Order {
       email: map['email'] ?? '',
       phone: map['phone'] ?? '',
       fullName: map['fullName'] ?? '',
-      amount: (map['amount'] as num?)?.toInt() ?? 0,
+      amount: (map['amount'] as num?)?.toDouble() ?? 0.0,
 
       status: map['status'] ?? '',
       gateway: map['gateway'] ?? 'razorpay',

@@ -1,9 +1,9 @@
+import 'package:arvika_marriage_bureau/app/custom/custom_widgets/shimmer.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
-import '../../../../../app/custom/shimmer.dart';
+import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart'; 
 import '../../../../../app/router/app_router.dart';
 import '../../../../../core/enums/enum.dart';
 import '../../../../auth/domain/states/agent_state.dart';

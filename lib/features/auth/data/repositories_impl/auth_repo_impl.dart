@@ -66,7 +66,7 @@ class AuthRepositoryImpl implements AuthRepository {
     return Right(
       UserEntity(
         gender: '',
-
+        profileStatus: 'active',         
         uid: user.uid,
         email: user.email ?? '',
         fullName: '',

@@ -298,8 +298,6 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                             return;
                           }
 
-                          debugPrint("Profile: $profile");
-
                           // Extract Address Data (Region/District/State)
                           final region = profile.address.state.trim().isEmpty
                               ? "Not Provided"
@@ -314,29 +312,14 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                               ? "Not Provided"
                               : profile.identity.gender;
 
-                          // Extract Phone (user or address)
-
-                          // Log all extracted data
-                          debugPrint("\n=== 📋 PAYMENT DATA ===");
-                          debugPrint("User UID: ${user.uid}");
-                          debugPrint("Full Name: ${user.fullName}");
-                          debugPrint("Email: ${user.email}");
-                          debugPrint("Phone: $user.phone");
-                          debugPrint("Agent ID: ${user.agentId}");
-                          debugPrint("Region/State: $region");
-                          debugPrint("District/City: $district");
-                          debugPrint("Gender: $gender");
-                          debugPrint("Amount: ${amountState.amount?.amount}");
-                          debugPrint("=====================SA=\n");
-
                           ref
                               .read(paymentProvider.notifier)
                               .startPayment(
                                 paymentType: amountState.amount!.paymentType,
                                 amount: amountState.amount!.amount.toDouble(),
                                 uid: user.uid,
-                                email: user.email ?? "N/A",
-                                fullName: user.fullName ?? "N/A",
+                                email: user.email,
+                                fullName: user.fullName,
                                 phone: user.phone,
                                 agentId: user.agentId,
                                 region: region,

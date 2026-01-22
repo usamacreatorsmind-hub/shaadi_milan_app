@@ -3,7 +3,7 @@ import { onDocumentCreated,  onDocumentUpdated } from "firebase-functions/v2/fir
 import * as admin from "firebase-admin";
 import { logger } from "firebase-functions";
 
-setGlobalOptions({ maxInstances: 10 });
+setGlobalOptions({ maxInstances: 10, region: "us-central1" });
 
 admin.initializeApp();
 

@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
+import 'package:upgrader/upgrader.dart';
 
 import 'app/app.dart';
 import 'core/env/app_env.dart';
@@ -80,5 +81,5 @@ void main() async {
   await NotificationService.init();
   await InAppMessagingService.init();
 
-  runApp(const ProviderScope(child: App()));
+  runApp(UpgradeAlert(child: const ProviderScope(child: App())));
 }

@@ -1,5 +1,6 @@
 import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 abstract class WishlistFirestoreDS {
   /// Add a new wishlist entry to the 'wishlists' collection
@@ -58,7 +59,7 @@ class WishlistFirestoreDSImpl implements WishlistFirestoreDS {
     );
 
     if (existing != null) {
-      throw Exception('Wishlist already exists between these users');
+      //throw Exception('Wishlist already exists between these users');
     }
 
     final docRef = await _wishlistsCollection.add({
@@ -156,11 +157,13 @@ class WishlistFirestoreDSImpl implements WishlistFirestoreDS {
         .where('senderId', isEqualTo: userId)
         .orderBy('updatedAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              data['id'] = doc.id;
-              return _mapToWishlistEntity(data);
-            }).toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return _mapToWishlistEntity(data);
+          }).toList(),
+        );
   }
 
   @override
@@ -169,11 +172,13 @@ class WishlistFirestoreDSImpl implements WishlistFirestoreDS {
         .where('receiverId', isEqualTo: userId)
         .orderBy('updatedAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              data['id'] = doc.id;
-              return _mapToWishlistEntity(data);
-            }).toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return _mapToWishlistEntity(data);
+          }).toList(),
+        );
   }
 
   @override

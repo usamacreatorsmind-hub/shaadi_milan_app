@@ -36,7 +36,7 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
 
     return AutoTabsRouter(
       routes: [
-         UserHomeRoute(),
+        UserHomeRoute(),
         UserWishListRoute(userId: uid),
 
         SupportTicketsRoute(userId: uid),
@@ -198,7 +198,7 @@ void _handleTabTap({
   final paymentState = ref.read(paymentNotifierProvider(userId));
 
   /// Tabs that REQUIRE subscription
-  const restrictedTabs = {0, 1, 2, 3};
+  const restrictedTabs = {0, 1, 2};
 
   // Always allow Home tab
   if (!restrictedTabs.contains(index)) {

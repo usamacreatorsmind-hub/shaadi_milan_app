@@ -217,7 +217,7 @@ class UserEntity {
   final String userType;
   final String role;
   final String profileImageUrl;
-
+  final String profileStatus;
   final bool isProfileCreated;
   final String metrimonyId;
   final String profileId;
@@ -226,6 +226,7 @@ class UserEntity {
   final DateTime lastSeen;
 
   const UserEntity({
+    required this.profileStatus,
     required this.gender,
     required this.profileImageUrl,
     required this.uid,
@@ -245,6 +246,7 @@ class UserEntity {
 
   /// EMPTY
   factory UserEntity.empty() => UserEntity(
+    profileStatus: 'active',
     profileImageUrl: '',
     gender: "",
     uid: '',
@@ -291,6 +293,7 @@ class UserEntity {
     }
 
     return UserEntity(
+      profileStatus: map['profileStatus'] ?? 'active',
       profileImageUrl: map['profileImageUrl'] ?? '',
       uid: map['uid'] ?? '',
       gender: map['gender'],
@@ -315,7 +318,7 @@ class UserEntity {
     String? email,
     String? fullName,
     String? gender,
-
+    String? profileStatus,
     String? phone,
     String? agentId,
     String? userType,
@@ -328,6 +331,8 @@ class UserEntity {
     DateTime? lastSeen,
   }) {
     return UserEntity(
+      profileStatus: profileStatus ?? this.profileStatus,
+
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       uid: uid ?? this.uid,
       email: email ?? this.email,

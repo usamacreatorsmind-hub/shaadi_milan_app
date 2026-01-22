@@ -153,7 +153,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
 
                 // only name
                 Text(
-                  "Welcome,",
+                  "Welcome",
                   style: theme.textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,

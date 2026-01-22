@@ -104,6 +104,24 @@ class UserNotifier extends StateNotifier<AsyncValue<UserEntity?>> {
       return;
     }
   }
+
+  Future<void> closeMatrimonyProfile(String userId) async {
+    try {
+      final currentUser = state.value;
+      state = const AsyncValue.loading();
+      await _userRepository.closeMatrimonyProfile(userId);
+
+      // Update the local state if the operation was successful
+      if (currentUser != null) {
+        state = AsyncValue.data(currentUser.copyWith(profileStatus: 'closed'));
+      } else {
+        // Refetch the user if we didn't have their data
+        await fetchUserById(userId);
+      }
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
 }
 
 /// Provider for UserNotifier
@@ -198,4 +216,69 @@ final usersPaymentsNotifierProvider =
       ref,
     ) {
       return UsersPaymentsNotifier(ref.read(userPaymentsRepositoryProvider));
+    });
+
+class AfterMarriagePaymentsNotifier
+    extends StateNotifier<AsyncValue<List<Payment?>>> {
+  final UserPaymentsRepository _userPaymentsRepository;
+
+  AfterMarriagePaymentsNotifier(this._userPaymentsRepository)
+    : super(const AsyncValue.data([]));
+
+  /// Fetch all after marriage payments for an agent
+  Future<void> getAfterMarriagePayments({required String agentId}) async {
+    try {
+      state = const AsyncValue.loading();
+      final payments = await _userPaymentsRepository.getAfterMarriagePayments(
+        agentId: agentId,
+      );
+      // Filter out null values and keep valid payments
+      final validPayments = payments.where((p) => p != null).toList();
+      state = AsyncValue.data(validPayments);
+    } catch (error, stackTrace) {
+      print('Error fetching after marriage payments: $error');
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
+}
+
+final afterMarriagePaymentsNotifierProvider =
+    StateNotifierProvider<
+      AfterMarriagePaymentsNotifier,
+      AsyncValue<List<Payment?>>
+    >((ref) {
+      return AfterMarriagePaymentsNotifier(
+        ref.read(userPaymentsRepositoryProvider),
+      );
+    });
+
+class AfterMarriagePaymentsForUserNotifier
+    extends StateNotifier<AsyncValue<Payment?>> {
+  final UserPaymentsRepository _userPaymentsRepository;
+
+  AfterMarriagePaymentsForUserNotifier(this._userPaymentsRepository)
+    : super(const AsyncValue.data(null));
+
+  /// Fetch all after marriage payments for a specific user
+  Future<void> getAfterMarriagePaymentForUser({required String userId}) async {
+    try {
+      state = const AsyncValue.loading();
+      final payment = await _userPaymentsRepository
+          .getAfterMarriagePaymentForUser(userId: userId);
+      state = AsyncValue.data(payment);
+    } catch (error, stackTrace) {
+      print('Error fetching after marriage payments for user: $error');
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
+}
+
+final afterMarriagePaymentsForUserNotifierProvider =
+    StateNotifierProvider<
+      AfterMarriagePaymentsForUserNotifier,
+      AsyncValue<Payment?>
+    >((ref) {
+      return AfterMarriagePaymentsForUserNotifier(
+        ref.read(userPaymentsRepositoryProvider),
+      );
     });

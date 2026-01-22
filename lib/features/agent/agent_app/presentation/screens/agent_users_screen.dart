@@ -25,12 +25,11 @@ class GenderFilterRow extends ConsumerWidget {
     final selected = ref.watch(genderFilterProvider);
     final theme = Theme.of(context);
 
-    Widget buildButton(String label, GenderFilter value,  ) {
+    Widget buildButton(String label, GenderFilter value) {
       final isSelected = selected == value;
 
       return Expanded(
         child: OutlinedButton.icon(
-      
           label: Text(label),
           style: OutlinedButton.styleFrom(
             foregroundColor: isSelected
@@ -52,9 +51,9 @@ class GenderFilterRow extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
-          buildButton('Male', GenderFilter.male, ),
+          buildButton('Male', GenderFilter.male),
           const SizedBox(width: 12),
-          buildButton('Female', GenderFilter.female,  ),
+          buildButton('Female', GenderFilter.female),
         ],
       ),
     );
@@ -254,6 +253,8 @@ class UserCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isProfileCreated = user.isProfileCreated;
 
+    final profileStatus = user.profileStatus;
+
     return Card(
       elevation: 0,
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
@@ -298,9 +299,15 @@ class UserCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            trailing: _StatusBadge(
-              label: isProfileCreated ? 'Active' : 'Pending',
-              color: isProfileCreated ? Colors.green : Colors.orange,
+            trailing: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _StatusBadge(
+                  label: isProfileCreated ? 'Created' : 'Pending',
+
+                  color: isProfileCreated ? Colors.green : Colors.orange,
+                ),
+              ],
             ),
           ),
 
@@ -341,7 +348,40 @@ class UserCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
+
                           color: _getPaymentColor(paymentStatus),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _getprofileStatusColor(
+                      paymentStatus,
+                    ).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.person_pin,
+                        size: 14,
+                        color: _getprofileStatusColor(profileStatus),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        profileStatus.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: _getprofileStatusColor(profileStatus),
                         ),
                       ),
                     ],
@@ -395,6 +435,18 @@ class UserCard extends StatelessWidget {
         return Colors.orange;
       case 'FAILED':
         return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Color _getprofileStatusColor(String? status) {
+    switch (status?.toUpperCase()) {
+      case 'ACTIVE':
+        return Colors.green;
+      case 'CLOSED':
+        return const Color.fromARGB(255, 211, 8, 19);
+
       default:
         return Colors.grey;
     }

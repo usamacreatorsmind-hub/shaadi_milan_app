@@ -1,6 +1,8 @@
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:riverpod/src/framework.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -31,18 +33,124 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
     });
   }
 
+  Future<void> _closeProfile(
+    WidgetRef ref,
+    BuildContext context,
+    String userId,
+  ) async {
+    try {
+      // fetch registratin  amount
+      final registrationPayment = await ref
+          .read(userPaymentDsProvider)
+          .getUserPayment(
+            userId: userId,
+            agentId: FirebaseAuth.instance.currentUser!.uid,
+          );
+
+      if (registrationPayment == null ||
+          registrationPayment.status != 'SUCCESS') {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Cannot close profile: User has not completed registration payment.',
+              ),
+            ),
+          );
+        }
+        return;
+      }
+
+      final payments = await ref
+          .read(userPaymentDsProvider)
+          .getAfterMarriagePaymentForUser(userId: userId);
+
+      if (payments == null) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Cannot close profile: No after-marriage payment record found.',
+              ),
+            ),
+          );
+        }
+        return;
+      }
+
+      final hasSuccessPayment =
+          payments != null && payments.status == 'SUCCESS';
+      if (!hasSuccessPayment) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Cannot close profile: No successful after-marriage payment found.',
+              ),
+            ),
+          );
+        }
+        return;
+      }
+
+      await ref
+          .read(agentUserNotifierProvider.notifier)
+          .closeMatrimonyProfile(userId);
+
+      ref.invalidate(agentUserNotifierProvider);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile closed successfully')),
+        );
+      }
+      context.router.maybePop();
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to close profile: $e')));
+      }
+    }
+  }
+
+  void _showCloseProfileDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String userId,
+  ) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Close Matrimony Profile'),
+        content: const Text(
+          'Are you sure you want to close this matrimony profile?\n\n'
+          'This user will not appear in search or receive interests.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(context);
+              await _closeProfile(ref, context, userId);
+            },
+            child: const Text('Close Profile'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(agentUserNotifierProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('User Details'),
-        elevation: 0,
-        backgroundColor: theme.primaryColor,
-        foregroundColor: theme.colorScheme.onPrimary,
-      ),
       body: userAsync.when(
         data: (user) {
           if (user == null) {
@@ -65,259 +173,316 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
             );
           }
 
-          return Stack(
-            children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 100),
-                child: Column(
-                  children: [
-                    // Header Section with Avatar
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor,
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(30),
-                          bottomRight: Radius.circular(30),
+          return Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  backgroundColor: theme.primaryColor,
+                  title: Text(
+                    'User Profile',
+                    style: TextStyle(color: theme.colorScheme.onPrimary),
+                  ),
+                  pinned: true,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                    onPressed: () => context.router.maybePop(),
+                  ),
+                  actions: [
+                    if (user.profileStatus == 'active')
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            235,
+                            227,
+                            227,
+                          ),
                         ),
+                        onPressed: () {
+                          _showCloseProfileDialog(context, ref, user.uid);
+                        },
+                        child: Text("Close Profile"),
                       ),
-                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                      child: Column(
-                        children: [
-                          // Positioned(child: child),
-                          // Avatar
-                          Hero(
-                            tag: 'user-avatar-${user.uid}',
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                image: user.profileImageUrl.isNotEmpty
-                                    ? DecorationImage(
-                                        image: NetworkImage(
-                                          user.profileImageUrl,
-                                        ),
-                                        fit: BoxFit.cover,
-                                      )
-                                    : null,
-                                shape: BoxShape.circle,
-                                color: Colors.white,
-                                border: Border.all(
+                    SizedBox(width: 10),
+                  ],
+                ),
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor,
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(30),
+                            bottomRight: Radius.circular(30),
+                          ),
+                        ),
+                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                        child: Column(
+                          children: [
+                            // Positioned(child: child),
+                            // Avatar
+                            Hero(
+                              tag: 'user-avatar-${user.uid}',
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  image: user.profileImageUrl.isNotEmpty
+                                      ? DecorationImage(
+                                          image: NetworkImage(
+                                            user.profileImageUrl,
+                                          ),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : null,
+                                  shape: BoxShape.circle,
                                   color: Colors.white,
-                                  width: 4,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 4,
+                                  ),
+                                ),
+                                child: Center(),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // Name
+                            Text(
+                              user.fullName,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onPrimary,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            // Email
+                            Text(
+                              user.email,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: theme.colorScheme.onPrimary.withOpacity(
+                                  0.9,
                                 ),
                               ),
-                              child: Center(),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Profile Status Card
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Card(
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _StatusItem(
+                                  icon: user.isProfileCreated
+                                      ? Icons.person_outline
+                                      : Icons.error,
+
+                                  label: 'Bio Data',
+                                  value: user.isProfileCreated
+                                      ? 'Created'
+                                      : 'Pending',
+                                  color: user.isProfileCreated
+                                      ? Colors.green
+                                      : Colors.orange,
+                                ),
+
+                                _StatusItem(
+                                  icon: Icons.verified_user,
+                                  label: 'Profile Status',
+                                  value: user.profileStatus,
+                                  color: user.profileStatus == 'active'
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          // Name
-                          Text(
-                            user.fullName,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.onPrimary,
-                            ),
-                            textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Contact Information
+                      _SectionCard(
+                        title: 'Contact Information',
+                        icon: Icons.contact_mail,
+                        children: [
+                          _DetailRow(
+                            icon: Icons.phone,
+                            label: 'Phone',
+                            value: user.phone.isNotEmpty
+                                ? user.phone
+                                : 'Not provided',
                           ),
-                          const SizedBox(height: 8),
-                          // Email
-                          Text(
-                            user.email,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: theme.colorScheme.onPrimary.withOpacity(
-                                0.9,
-                              ),
-                            ),
-                            textAlign: TextAlign.center,
+                          const Divider(height: 24),
+                          _DetailRow(
+                            icon: Icons.email,
+                            label: 'Email',
+                            value: user.email,
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 24),
 
-                    // Profile Status Card
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Card(
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _StatusItem(
-                                icon: Icons.check_circle,
-                                label: 'Profile Status',
-                                value: user.isProfileCreated
-                                    ? 'Created'
-                                    : 'Pending',
-                                color: user.isProfileCreated
-                                    ? Colors.green
-                                    : Colors.orange,
-                              ),
-                            ],
+                      // Account Information
+                      _SectionCard(
+                        title: 'Account Information',
+                        icon: Icons.account_box,
+                        children: [
+                          const Divider(height: 24),
+                          _DetailRow(
+                            icon: Icons.verified_user,
+                            label: 'Role',
+                            value: user.role.isNotEmpty ? user.role : 'User',
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                          const Divider(height: 24),
 
-                    // Contact Information
-                    _SectionCard(
-                      title: 'Contact Information',
-                      icon: Icons.contact_mail,
-                      children: [
-                        _DetailRow(
-                          icon: Icons.phone,
-                          label: 'Phone',
-                          value: user.phone.isNotEmpty
-                              ? user.phone
-                              : 'Not provided',
-                        ),
-                        const Divider(height: 24),
-                        _DetailRow(
-                          icon: Icons.email,
-                          label: 'Email',
-                          value: user.email,
-                        ),
-                      ],
-                    ),
-
-                    // Account Information
-                    _SectionCard(
-                      title: 'Account Information',
-                      icon: Icons.account_box,
-                      children: [
-                        const Divider(height: 24),
-                        _DetailRow(
-                          icon: Icons.verified_user,
-                          label: 'Role',
-                          value: user.role.isNotEmpty ? user.role : 'User',
-                        ),
-                        const Divider(height: 24),
-                      ],
-                    ),
-
-                    // Matrimony Information
-                    _SectionCard(
-                      title: 'Matrimony Information',
-                      icon: Icons.favorite_border,
-                      children: [
-                        _DetailRow(
-                          icon: Icons.fingerprint,
-                          label: 'Matrimony ID',
-                          value: user.metrimonyId.isNotEmpty
-                              ? user.metrimonyId
-                              : 'Not assigned',
-                        ),
-                        const Divider(height: 24),
-                        _DetailRow(
-                          icon: Icons.person_pin,
-                          label: 'Profile ID',
-                          value: user.profileId.isNotEmpty
-                              ? user.profileId
-                              : 'Not assigned',
-                        ),
-                        const Divider(height: 24),
-                      ],
-                    ),
-
-                    // Activity Information
-                    _SectionCard(
-                      title: 'Activity',
-                      icon: Icons.history,
-                      children: [
-                        _DetailRow(
-                          icon: Icons.calendar_today,
-                          label: 'Created At',
-                          value: _formatDateTime(user.createdAt),
-                        ),
-                        const Divider(height: 24),
-                        _DetailRow(
-                          icon: Icons.access_time,
-                          label: 'Last Seen',
-                          value: _formatDateTime(user.lastSeen),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-                  ],
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
-                  ),
-                  decoration: BoxDecoration(color: Colors.transparent),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Handle call action
-                            launchUrl(Uri.parse('tel:${user.phone}'));
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Contacting ${user.fullName}...'),
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.phone),
-                          label: const Text('Call'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.primaryColor,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                          _DetailRow(
+                            icon: Icons.person_outline,
+                            label: 'Gender',
+                            value: user.gender.isNotEmpty
+                                ? user.gender
+                                : 'Not specified',
                           ),
-                        ),
+
+                          const Divider(height: 24),
+                        ],
                       ),
-                      SizedBox(width: 5.w),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            launchUrl(Uri.parse('mailto:${user.email}'));
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Mailing ${user.fullName}...'),
+                      // Matrimony Information
+                      // _SectionCard(
+                      //   title: 'Matrimony Information',
+                      //   icon: Icons.favorite_border,
+                      //   children: [
+                      //     _DetailRow(
+                      //       icon: Icons.fingerprint,
+                      //       label: 'Matrimony ID',
+                      //       value: user.metrimonyId.isNotEmpty
+                      //           ? user.metrimonyId
+                      //           : 'Not assigned',
+                      //     ),
+                      //     const Divider(height: 24),
+                      //     _DetailRow(
+                      //       icon: Icons.person_pin,
+                      //       label: 'Profile ID',
+                      //       value: user.profileId.isNotEmpty
+                      //           ? user.profileId
+                      //           : 'Not assigned',
+                      //     ),
+                      //     const Divider(height: 24),
+                      //   ],
+                      // ),
 
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.post_add),
-                          label: const Text('Mail'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                      // Activity Information
+                      _SectionCard(
+                        title: 'Activity',
+                        icon: Icons.history,
+                        children: [
+                          _DetailRow(
+                            icon: Icons.calendar_today,
+                            label: 'Created At',
+                            value: _formatDateTime(user.createdAt),
                           ),
-                        ),
+                          const Divider(height: 24),
+                          _DetailRow(
+                            icon: Icons.access_time,
+                            label: 'Last Seen',
+                            value: _formatDateTime(user.lastSeen),
+                          ),
+                        ],
                       ),
+
+                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
+              ],
+            ),
+            bottomNavigationBar: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
               ),
-            ],
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        launchUrl(Uri.parse('tel:${user.phone}'));
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Contacting ${user.fullName}...'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.phone),
+                      label: const Text('Call'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.primaryColor,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 5.w),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        launchUrl(Uri.parse('mailto:${user.email}'));
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Mailing ${user.fullName}...'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.post_add),
+                      label: const Text('Mail'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           );
         },
         error: (error, stackTrace) {

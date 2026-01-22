@@ -84,8 +84,10 @@ class MetrimonyFireStoreDsImpl implements MetrimonyFirestoreDs {
   @override
   Future<List<Map<String, dynamic>>> getAllMetrimonyProfiles() async {
     try {
+      // Fetch only active profiles from metrimony_profiles collection
       final querySnapshot = await firestore
           .collection('metrimony_profiles')
+          .where('profileStatus', isEqualTo: 'active')
           .get();
 
       return querySnapshot.docs

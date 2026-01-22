@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,12 +29,19 @@ class _ViewPaymentDetailScreenState
       ref
           .read(userPaymentNotifierProvider.notifier)
           .getUserPayment(agentId: widget.agentId, userId: widget.userId);
+      // Fetch after marriage payments for this user
+      ref
+          .read(afterMarriagePaymentsForUserNotifierProvider.notifier)
+          .getAfterMarriagePaymentForUser(userId: widget.userId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final userPaymentState = ref.watch(userPaymentNotifierProvider);
+    final afterMarriagePaymentState = ref.watch(
+      afterMarriagePaymentsForUserNotifierProvider,
+    );
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
@@ -115,7 +123,7 @@ class _ViewPaymentDetailScreenState
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '₹${(payment.amount / 100).toStringAsFixed(2)}',
+                          '₹${(payment.amount).toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontSize: 36,
                             fontWeight: FontWeight.bold,
@@ -261,6 +269,13 @@ class _ViewPaymentDetailScreenState
                     ],
                   ],
                 ),
+                const SizedBox(height: 24),
+
+                // After Marriage Payments Section
+                _buildAfterMarriagePaymentsSection(
+                  afterMarriagePaymentState,
+                  theme,
+                ),
               ],
             ),
           );
@@ -301,6 +316,184 @@ class _ViewPaymentDetailScreenState
       return 'Not available';
     }
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  Widget _buildAfterMarriagePaymentsSection(
+    AsyncValue<Payment?> afterMarriagePaymentState,
+    ThemeData theme,
+  ) {
+    return afterMarriagePaymentState.when(
+      data: (payment) {
+        if (payment == null) {
+          return _DetailCard(
+            title: 'After Marriage Payment',
+            icon: Icons.favorite,
+            children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.sentiment_dissatisfied_outlined,
+                        size: 48,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'No After Marriage Payment Found',
+                        style: TextStyle(color: Colors.grey[600]),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+        return _DetailCard(
+          title: 'After Marriage Payment',
+          icon: Icons.favorite,
+          children: [_buildAfterMarriagePaymentCard(payment, theme)],
+        );
+      },
+      loading: () => _DetailCard(
+        title: 'After Marriage Payment',
+        icon: Icons.favorite,
+        children: const [
+          Center(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ],
+      ),
+
+      error: (error, stack) => _DetailCard(
+        title: 'After Marriage Payment',
+        icon: Icons.favorite,
+        children: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: Colors.red[400]),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Error loading after marriage payments',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAfterMarriagePaymentCard(Payment payment, ThemeData theme) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        children: [
+          // Status Header
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+              gradient: LinearGradient(
+                colors: payment.status == 'SUCCESS'
+                    ? [Colors.green[400]!, Colors.green[600]!]
+                    : payment.status == 'FAILED'
+                    ? [Colors.red[400]!, Colors.red[600]!]
+                    : [Colors.orange[400]!, Colors.orange[600]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      payment.status == 'SUCCESS'
+                          ? Icons.check_circle
+                          : payment.status == 'FAILED'
+                          ? Icons.cancel
+                          : Icons.pending,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      payment.status,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  '₹${(payment.amount).toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Payment Details
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _DetailItem(
+                  label: 'Payment ID',
+                  value: payment.razorpayPaymentId.isNotEmpty
+                      ? payment.razorpayPaymentId
+                      : 'Not available',
+                  icon: Icons.fingerprint,
+                ),
+                const Divider(height: 24),
+                _DetailItem(
+                  label: 'Order ID',
+                  value: payment.orderId.isNotEmpty ? payment.orderId : 'N/A',
+                  icon: Icons.receipt,
+                ),
+                const Divider(height: 24),
+                _DetailItem(
+                  label: 'Payment Type',
+                  value: payment.paymentType.isNotEmpty
+                      ? payment.paymentType
+                      : 'After Marriage',
+                  icon: Icons.category,
+                ),
+                const Divider(height: 24),
+                _DetailItem(
+                  label: 'Created At',
+                  value: _formatDateTime(payment.createdAt),
+                  icon: Icons.calendar_today,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

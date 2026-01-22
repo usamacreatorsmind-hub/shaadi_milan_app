@@ -9,5 +9,7 @@ abstract class UserRepository {
     required String userId,
     required String status,
     String? reason,
-  }); 
+  });
+
+  Future<void> closeMatrimonyProfile(String userId);
 }

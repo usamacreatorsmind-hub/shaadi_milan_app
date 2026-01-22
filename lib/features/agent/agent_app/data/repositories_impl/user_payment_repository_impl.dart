@@ -19,4 +19,14 @@ class UserPaymentRepositoryImpl implements UserPaymentsRepository {
   Future<List<Payment?>> getUsersPayment({required String agentId}) {
     return paymentsDs.getUsersPayment(agentId: agentId);
   }
+
+  @override
+  Future<List<Payment?>> getAfterMarriagePayments({required String agentId}) {
+    return paymentsDs.getAfterMarriagePayments(agentId: agentId);
+  }
+
+  @override
+  Future<Payment?> getAfterMarriagePaymentForUser({required String userId}) {
+    return paymentsDs.getAfterMarriagePaymentForUser(userId: userId);
+  }
 }

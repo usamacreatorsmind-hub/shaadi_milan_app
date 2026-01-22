@@ -8,7 +8,6 @@ class PaymentApi {
 
   Future<Map<String, dynamic>> createOrder({
     required double amount,
-    
     required String uid,
     required String agentId,
     required String email,
@@ -17,7 +16,7 @@ class PaymentApi {
     required String paymentType,
     required String region,
     required String district,
-    required String gender, 
+    required String gender,
   }) async {
     try {
       final response = await _dio.post(
@@ -25,8 +24,8 @@ class PaymentApi {
         data: {
           "amount": amount, // Razorpay expects amount in paisa
           "uid": uid,
-          "email": email,
           "agentId": agentId,
+          "email": email,
           "fullName": fullName,
           "phone": phone,
           "paymentType": paymentType,
@@ -37,16 +36,26 @@ class PaymentApi {
       );
       return response.data;
     } on DioException catch (e) {
-      throw Exception("Failed to create order: ${e.message}");
+      if (e.response != null) {
+        // The server responded with a status code other than 2xx
+        print("Error data: ${e.response?.data}");
+        print("Error headers: ${e.response?.headers}");
+        print("Error request options: ${e.response?.requestOptions}");
+        throw Exception(
+          "Failed to create order: ${e.response?.data['message'] ?? e.message}",
+        );
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print("Error request: ${e.requestOptions}");
+        print("Error message: ${e.message}");
+        throw Exception("Failed to create order: ${e.message}");
+      }
     }
   }
 
   Future<String> fetchBaseUrl() async {
     final paymentApiFirestore = PaymentApiFirestore();
     final firestoreBaseUrl = await paymentApiFirestore.getUrl();
-
-    print("this is Pa");
-
     _dio.options.baseUrl = firestoreBaseUrl ?? "No url";
 
     return _dio.options.baseUrl;

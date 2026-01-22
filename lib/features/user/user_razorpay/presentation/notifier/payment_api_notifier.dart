@@ -56,8 +56,7 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
   }) async {
     try {
       state = state.copyWith(status: PayStatus.loading);
-
-      // print all data here
+      debugPrint("Printing all data here");
       debugPrint("Amount: $amount");
       debugPrint("UID: $uid");
       debugPrint("Email: $email");
@@ -77,15 +76,16 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
         agentId: agentId,
         uid: uid,
         paymentType: paymentType,
-
         email: email,
         fullName: fullName,
         phone: phone,
         region: region,
         district: district,
-
         gender: gender,
       );
+
+      // print response
+      debugPrint("API Response: $data");
 
       _razorpayService.open({
         "key": data['key'], // rzp_test_...
