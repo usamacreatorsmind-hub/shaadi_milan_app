@@ -163,6 +163,12 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     if (state.aadharPdfPath == null) {
       throw Exception('Aadhar PDF is required');
     }
+    if (state.imageWithAgentUrl == null) {
+      throw Exception('Image with agent is required');
+    }
+    if (state.profileImage == null) {
+      throw Exception('Profile image is required');
+    }
 
     try {
       ref.read(uploadProgressProvider.notifier).state = 0.0;

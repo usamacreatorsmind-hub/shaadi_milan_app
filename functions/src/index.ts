@@ -63,6 +63,12 @@ export const notifyAgentOnUserRegister = onDocumentCreated(
     const userId = event.params.userId;
     const agentId = user.agentId;
 
+    // Check if agent already notified (prevents duplicate on retry)
+    if (user.agentNotifiedOnRegister === true) {
+      logger.info("Agent already notified for registration", { userId });
+      return;
+    }
+
     if (!agentId || agentId.trim() === "") {
       logger.info("User registered without agent ID", { userId });
       return;
@@ -115,6 +121,13 @@ export const notifyAgentOnUserRegister = onDocumentCreated(
     };
 
     const success = await sendNotification(message, `user_register_${userId}`);
+
+    // Mark as notified to prevent duplicates on retry
+    await snapshot.ref.update({
+      agentNotifiedOnRegister: true,
+      agentNotifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
     if (!success) {
       await cleanInvalidToken("agents", agentId);
     }
@@ -578,9 +591,12 @@ export const notifyAgentOnUserProfileComplete = onDocumentUpdated(
     const after = event.data?.after.data();
     if (!before || !after) return;
 
-    // Only notify if profile was just completed
+    // Only notify if profile was just completed (isProfileCreated changed from false to true)
     if (before.isProfileCreated === after.isProfileCreated) return;
     if (!after.isProfileCreated) return;
+
+    // Don't notify if already notified for profile completion
+    if (after.agentNotifiedOnProfileComplete === true) return;
 
     const userId = event.params.userId;
     const agentId = after.agentId;
@@ -622,11 +638,17 @@ export const notifyAgentOnUserProfileComplete = onDocumentUpdated(
       },
     };
 
-    await sendNotification(message, `profile_completed_${userId}`);
+    const success = await sendNotification(message, `profile_completed_${userId}`);
+
+    // Mark as notified to prevent duplicates
+    if (success) {
+      await event.data?.after.ref.update({
+        agentNotifiedOnProfileComplete: true,
+        agentNotifiedOnProfileCompleteAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    }
   }
 );
-
- 
 
 // ============================================================
 // SUPPORT TICKET CREATED - Notify Agent
