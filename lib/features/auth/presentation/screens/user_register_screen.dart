@@ -55,6 +55,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     if (nameCtrl.text.isEmpty ||
         emailCtrl.text.isEmpty ||
         phoneCtrl.text.isEmpty ||
+        agentIdCtrl.text.isEmpty ||
         pwCtrl.text.isEmpty ||
         confirmPwCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -381,7 +382,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                           autofillHints: const [AutofillHints.newPassword],
                           controller: agentIdCtrl,
                           prefixIcon: Icons.verified_user_outlined,
-                          label: "Agent Id (Optional)",
+                          label: "Agent Id  ",
                           hint: "",
                           obscureText: false,
                           keyboardType: TextInputType.visiblePassword,

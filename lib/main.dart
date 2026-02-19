@@ -1,15 +1,14 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:upgrader/upgrader.dart';
 
+import 'core/notification/notification_service.dart';
 import 'app/app.dart';
 import 'core/env/app_env.dart';
 import 'core/env/app_env_config.dart';
-import 'core/notification/notification_service.dart';
 import 'core/notification/in_app_messaging_service.dart';
 import 'firebase_options.dart';
 

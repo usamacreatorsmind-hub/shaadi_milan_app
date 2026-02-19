@@ -124,6 +124,8 @@ class UserNotifier extends StateNotifier<AsyncValue<UserEntity?>> {
   }
 }
 
+
+
 /// Provider for UserNotifier
 final agentUserNotifierProvider =
     StateNotifierProvider<UserNotifier, AsyncValue<UserEntity?>>((ref) {

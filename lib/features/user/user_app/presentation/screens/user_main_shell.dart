@@ -198,7 +198,7 @@ void _handleTabTap({
   final paymentState = ref.read(paymentNotifierProvider(userId));
 
   /// Tabs that REQUIRE subscription
-  const restrictedTabs = {0, 1, 2};
+  const restrictedTabs = {4, 5, 6};
 
   // Always allow Home tab
   if (!restrictedTabs.contains(index)) {
@@ -207,7 +207,9 @@ void _handleTabTap({
   }
 
   // Allow if subscribed (payment status is success)
-  if (paymentState.status == PayStatus.success) {
+
+  // change after publishing on playstore
+  if (paymentState.status == PayStatus.idle) {
     tabsRouter.setActiveIndex(index);
     return;
   }

@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../app/custom/custom_widgets/user_drawer.dart';
- 
+
 import '../../../../../app/router/app_router.dart';
 import '../../../../auth/domain/states/user_state.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
@@ -60,7 +60,7 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
     return Scaffold(
       drawer: UserDrawer(userAsync: profileAsync),
       backgroundColor: Colors.grey[100],
-      body: paymentState.status == PayStatus.success
+      body: paymentState.status == PayStatus.idle
           ? NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 SliverAppBar(
@@ -154,7 +154,9 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
         selected: isSelected,
         label: Text(label),
         labelStyle: TextStyle(
-          color: isSelected ? Colors.white : const Color.fromARGB(179, 31, 20, 20),
+          color: isSelected
+              ? Colors.white
+              : const Color.fromARGB(179, 31, 20, 20),
           fontSize: 12,
         ),
         backgroundColor: Colors.white24,

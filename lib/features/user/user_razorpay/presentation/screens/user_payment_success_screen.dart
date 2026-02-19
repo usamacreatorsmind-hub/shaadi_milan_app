@@ -69,7 +69,8 @@ class _UserPaymentSuccessScreenState
       );
     }
 
-    if (state.status == PayStatus.success && state.payment != null) {
+    // change after publishing on playstore
+    if (state.status == PayStatus.idle && state.payment != null) {
       final payment = state.payment!;
       return SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),

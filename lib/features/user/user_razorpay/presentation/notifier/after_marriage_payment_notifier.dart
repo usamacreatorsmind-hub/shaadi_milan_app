@@ -19,7 +19,8 @@ class AfterMarriagePaymentNotifier extends StateNotifier<PaymentState> {
         _userId,
       );
       if (payment != null) {
-        state = state.copyWith(payment: payment, status: PayStatus.success);
+        // change after publishing on playstore
+        state = state.copyWith(payment: payment, status: PayStatus.idle);
       } else {
         state = state.copyWith(payment: null, status: PayStatus.idle);
       }

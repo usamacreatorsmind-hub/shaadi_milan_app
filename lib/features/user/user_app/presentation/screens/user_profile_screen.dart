@@ -146,7 +146,9 @@ class UserProfileScreen extends ConsumerWidget {
                                 child: CircularProgressIndicator(),
                               );
                             }
-                            if (paymentState.status == PayStatus.success) {
+
+                            // change after publishing on playstore
+                            if (paymentState.status == PayStatus.idle) {
                               print(" this  is payment status");
                               print(paymentState.status);
                               return GestureDetector(
@@ -268,9 +270,7 @@ class UserProfileScreen extends ConsumerWidget {
                           title: "User Status",
                           onTap: () {
                             // navigate to user status screen
-                            AutoRouter.of(
-                              context,
-                            ).push(  UserStatusRoute());
+                            AutoRouter.of(context).push(UserStatusRoute());
                           },
                         ),
 
@@ -302,9 +302,7 @@ class UserProfileScreen extends ConsumerWidget {
                           title: "Change Password",
                           onTap: () {
                             // navigate to change password screen
-                            AutoRouter.of(
-                              context,
-                            ).push( ChangePasswordRoute());
+                            AutoRouter.of(context).push(ChangePasswordRoute());
                           },
                         ),
 
@@ -315,7 +313,7 @@ class UserProfileScreen extends ConsumerWidget {
                           onTap: () {
                             AutoRouter.of(
                               context,
-                            ).push(  UserPaymentOrderHistoryRoute());
+                            ).push(UserPaymentOrderHistoryRoute());
                           },
                         ),
 
@@ -356,9 +354,7 @@ class UserProfileScreen extends ConsumerWidget {
 
                               ref.watch(authRepositoryProvider).signOut();
 
-                              AutoRouter.of(
-                                context,
-                              ).replace(  UserLoginRoute());
+                              AutoRouter.of(context).replace(UserLoginRoute());
 
                               print("Logout button pressed");
                             },

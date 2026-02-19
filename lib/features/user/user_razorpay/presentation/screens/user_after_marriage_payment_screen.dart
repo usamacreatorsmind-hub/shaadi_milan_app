@@ -80,7 +80,8 @@ class _UserPaymentScreenState
 
     // Listen for payment success/failure to handle navigation/dialogs
     ref.listen<PaymentState>(paymentProvider, (previous, next) {
-      if (next.status == PayStatus.success) {
+      // change after publishing on playstore
+      if (next.status == PayStatus.idle) {
         // Show Success Dialog
         showDialog(
           context: context,

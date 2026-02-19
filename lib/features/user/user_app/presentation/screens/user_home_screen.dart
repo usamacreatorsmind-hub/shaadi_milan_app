@@ -68,7 +68,9 @@ class UserHomeScreen extends ConsumerWidget {
 
           // If payment is successful, show the home content.
           // Otherwise, show the payment screen.
-          if (paymentState.status == PayStatus.success) {
+
+          // change after publishing on playstore
+          if (paymentState.status == PayStatus.idle) {
             return CustomScrollView(
               slivers: [
                 const MinimalAppBar(title: "Home", showShadow: true),
