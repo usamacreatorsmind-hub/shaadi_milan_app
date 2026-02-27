@@ -95,6 +95,9 @@ class _UserEducationFormScreenState
     }
 
     if (!_formKey.currentState!.validate()) return;
+    if (_extraCourseCtrl.text.isNotEmpty) {
+      extraCourses.add(_extraCourseCtrl.text.trim());
+    }
 
     final profile = EducationProfile(
       isIlletrate: false,

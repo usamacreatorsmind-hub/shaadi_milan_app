@@ -72,15 +72,17 @@ class HomeController extends StateNotifier<HomeState> {
     state = state.copyWith(metrimonyProfiles: const AsyncValue.loading());
 
     // Watch opposite gender users
-    _usersSubscription = _userRepository.watchOppositeGenderUsers(currentUid).listen(
-      (users) {
-        _currentUsers = users;
-        _watchProfiles(users.map((u) => u.uid).toList());
-      },
-      onError: (e, st) {
-        state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
-      },
-    );
+    _usersSubscription = _userRepository
+        .watchOppositeGenderUsers(currentUid)
+        .listen(
+          (users) {
+            _currentUsers = users;
+            _watchProfiles(users.map((u) => u.uid).toList());
+          },
+          onError: (e, st) {
+            state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
+          },
+        );
   }
 
   void _watchProfiles(List<String> userIds) {
@@ -92,42 +94,48 @@ class HomeController extends StateNotifier<HomeState> {
     }
 
     // Watch matrimony profiles for those users
-    _profilesSubscription = _matrimonyRepository.watchMatrimonyProfilesForUsers(userIds).listen(
-      (profiles) async {
-        try {
-          final data = <MatrimonyProfileViewModel>[];
+    _profilesSubscription = _matrimonyRepository
+        .watchMatrimonyProfilesForUsers(userIds)
+        .listen(
+          (profiles) async {
+            try {
+              final data = <MatrimonyProfileViewModel>[];
 
-          for (final profile in profiles) {
-            final user = _currentUsers.firstWhere(
-              (u) => u.uid == profile.userId,
-              orElse: () => UserEntity.empty(),
-            );
+              for (final profile in profiles) {
+                final user = _currentUsers.firstWhere(
+                  (u) => u.uid == profile.userId,
+                  orElse: () => UserEntity.empty(),
+                );
 
-            if (user.uid.isEmpty) continue;
+                if (user.uid.isEmpty) continue;
 
-            AgentEntity? agent;
-            if (user.agentId.isNotEmpty) {
-              try {
-                agent = await _agentRepository.fetchAgent(user.agentId);
-              } catch (_) {}
+                AgentEntity? agent;
+                if (user.agentId.isNotEmpty) {
+                  try {
+                    agent = await _agentRepository.fetchAgent(user.agentId);
+                  } catch (_) {}
+                }
+
+                data.add(
+                  MatrimonyProfileViewModel(
+                    profile: profile,
+                    user: user,
+                    agent: agent,
+                  ),
+                );
+              }
+
+              state = state.copyWith(metrimonyProfiles: AsyncValue.data(data));
+            } catch (e, st) {
+              state = state.copyWith(
+                metrimonyProfiles: AsyncValue.error(e, st),
+              );
             }
-
-            data.add(MatrimonyProfileViewModel(
-              profile: profile,
-              user: user,
-              agent: agent,
-            ));
-          }
-
-          state = state.copyWith(metrimonyProfiles: AsyncValue.data(data));
-        } catch (e, st) {
-          state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
-        }
-      },
-      onError: (e, st) {
-        state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
-      },
-    );
+          },
+          onError: (e, st) {
+            state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
+          },
+        );
   }
 
   @override

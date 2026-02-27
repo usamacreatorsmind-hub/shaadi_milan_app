@@ -1,4 +1,3 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -33,13 +32,21 @@ class UserFirestoreDS {
       return;
     }
 
-    // Determine opposite gender
-    final oppositeGender = currentUserGender == 'male' ? 'Female' : 'Male';
+    // Determine opposite gender in lowercase to match stored auth values.
+    final oppositeGender = switch (currentUserGender) {
+      'male' => 'female',
+      'female' => 'male',
+      _ => '',
+    };
+    if (oppositeGender.isEmpty) {
+      yield [];
+      return;
+    }
 
-    // Watch users with opposite gender and active profileStatus using snapshots
+    // Watch users with opposite gender; profile activity is validated via
+    // matrimony_profiles in the next pipeline stage.
     yield* _users
         .where('gender', isEqualTo: oppositeGender)
-        .where('profileStatus', isEqualTo: 'active')
         .snapshots()
         .map(
           (snapshot) => snapshot.docs

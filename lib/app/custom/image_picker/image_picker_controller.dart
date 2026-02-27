@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/core/themes/app_theme.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,7 +33,8 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: 'Crop Image',
-          toolbarColor: Colors.pink,
+          toolbarColor: AppTheme.lightTheme.primaryColor,
+
           toolbarWidgetColor: Colors.white,
           initAspectRatio: CropAspectRatioPreset.original,
           lockAspectRatio: false,
@@ -43,24 +45,24 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     return croppedFile?.path;
   }
 
-  // // 📄 Pick Aadhar PDF
-  // Future<void> pickAadharPdf() async {
-  //   if (_isPicking) return;
-  //   _isPicking = true;
+  // 📄 Pick Aadhar PDF
+  Future<void> pickAadharPdf() async {
+    if (_isPicking) return;
+    _isPicking = true;
 
-  //   try {
-  //     FilePickerResult? result = await FilePicker.platform.pickFiles(
-  //       type: FileType.custom,
-  //       allowedExtensions: ['pdf'],
-  //     );
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
 
-  //     if (result == null || result.files.single.path == null) return;
+      if (result == null || result.files.single.path == null) return;
 
-  //     state = state.copyWith(aadharPdfPath: result.files.single.path);
-  //   } finally {
-  //     _isPicking = false;
-  //   }
-  // }
+      state = state.copyWith(aadharPdfPath: result.files.single.path);
+    } finally {
+      _isPicking = false;
+    }
+  }
 
   // pick images from gallary
   Future<void> pickAadharImages() async {
@@ -82,16 +84,14 @@ class ImagePickerController extends StateNotifier<ImagesState> {
   }
 
   // 📸 Pick primary image
-  Future<void> pickPrimaryImage() async {
+  Future<void> pickPrimaryImage(BuildContext context) async {
     if (_isPicking) return;
+    final source = await showImageSourceSelection(context);
+    if (source == null) return;
     _isPicking = true;
 
     try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-
-        imageQuality: 80,
-      );
+      final XFile? image = await _picker.pickImage(source: source, imageQuality: 80);
 
       if (image == null) return;
 
@@ -105,7 +105,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
   }
 
   // 🖼 Pick multiple gallery images
-  Future<void> pickSecondaryImages() async {
+  Future<void> pickSecondaryImages(BuildContext context) async {
     if (_isPicking) return;
     _isPicking = true;
 
@@ -157,17 +157,20 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
   // ☁️ Upload images
   Future<void> uploadImages(String uid) async {
-    if (state.primaryImage == null) {
+    if (state.profileImage == null || state.profileImage!.isEmpty) {
+      throw Exception('Profile image is required');
+    }
+    if (state.primaryImage == null || state.primaryImage!.isEmpty) {
       throw Exception('Primary image is required');
     }
-    if (state.aadharPdfPath == null) {
-      throw Exception('Aadhar PDF is required');
-    }
-    if (state.imageWithAgentUrl == null) {
+    if (state.imageWithAgentUrl == null || state.imageWithAgentUrl!.isEmpty) {
       throw Exception('Image with agent is required');
     }
-    if (state.profileImage == null) {
-      throw Exception('Profile image is required');
+    if (state.secondaryImages.isEmpty) {
+      throw Exception('At least one gallery image is required');
+    }
+    if (state.aadharPdfPath == null || state.aadharPdfPath!.isEmpty) {
+      throw Exception('Aadhar document is required');
     }
 
     try {
@@ -176,8 +179,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       // Use service directly to access progress callbacks
       final service = ref.read(imageUploadServiceProvider);
 
-      final hasSecondary = state.secondaryImages.isNotEmpty;
-      final steps = hasSecondary ? 5 : 4; // primary, aadhar, imageWithAgent, profileImage + optional secondary
+      const steps = 5; // primary, secondary, aadhar, imageWithAgent, profileImage
       final stepWeight = 1.0 / steps;
 
       void updateStepProgress(int stepIndex, double p) {
@@ -193,36 +195,30 @@ class ImagePickerController extends StateNotifier<ImagesState> {
         onProgress: (p) => updateStepProgress(0, p),
       );
 
-      // 2. Secondary (Optional)
-      List<String> secondaryImageUrls = [];
-      int nextStep = 1;
-
-      if (hasSecondary) {
-        secondaryImageUrls = await service.uploadSecondaryImages(
-          uid: uid,
-          filePaths: state.secondaryImages,
-          onProgress: (p) => updateStepProgress(1, p),
-        );
-        nextStep = 2;
-      }
+      // 2. Secondary
+      final secondaryImageUrls = await service.uploadSecondaryImages(
+        uid: uid,
+        filePaths: state.secondaryImages,
+        onProgress: (p) => updateStepProgress(1, p),
+      );
 
       // 3. Aadhar
       final aadharCardUrl = await service.uploadAadharCard(
         uid: uid,
         filePath: state.aadharPdfPath!,
-        onProgress: (p) => updateStepProgress(nextStep, p),
+        onProgress: (p) => updateStepProgress(2, p),
       );
 
       final imagewithagenturl = await service.uploadImageWithAgent(
         uid: uid,
         filePath: state.imageWithAgentUrl!,
-        onProgress: (p) => updateStepProgress(nextStep + 1, p),
+        onProgress: (p) => updateStepProgress(3, p),
       );
 
       final profileImageUrl = await service.uploadProfileImage(
         uid: uid,
         filePath: state.profileImage!,
-        onProgress: (p) => updateStepProgress(nextStep + 2, p),
+        onProgress: (p) => updateStepProgress(4, p),
       );
 
       ref
@@ -263,19 +259,25 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     }
   }
 
-  void pickProfileImage() async {
+  Future<void> pickProfileImage(BuildContext context) async {
     if (_isPicking) return;
+
+    final source = await showImageSourceSelection(context);
+
+    if (source == null) return; // user cancelled
+
     _isPicking = true;
 
     try {
       final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
+        source: source,
         imageQuality: 80,
       );
 
       if (image == null) return;
 
       final croppedPath = await _cropImage(image.path, isPrimary: true);
+
       if (croppedPath != null) {
         state = state.copyWith(profileImage: croppedPath);
       }
@@ -283,6 +285,37 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       _isPicking = false;
     }
   }
+
+  // build a image source selection bottom sheet
+  Future<ImageSource?> showImageSourceSelection(BuildContext context) {
+    return showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Camera'),
+                onTap: () {
+                  Navigator.pop(context, ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Gallery'),
+                onTap: () {
+                  Navigator.pop(context, ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 }
 
 final imagePickerProvider =

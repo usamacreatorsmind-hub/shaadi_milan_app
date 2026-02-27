@@ -9,7 +9,8 @@ import 'package:flutter_riverpod/legacy.dart';
 class SupportTicketNotifier extends StateNotifier<AsyncValue<SupportTicket>> {
   final AgentSupportRepository _agentSupportRepository;
 
-  StreamSubscription<SupportTicket>? _ticketSubscription;
+  StreamSubscription<SupportTicket>? _ticketSubscription;   
+  
   SupportTicketNotifier(this._agentSupportRepository)
     : super(AsyncValue.loading());
 

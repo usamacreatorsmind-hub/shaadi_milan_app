@@ -15,66 +15,76 @@ class SupportTicketsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ticketsAsync = ref.watch(userSupportTicketsStreamProvider(userId));
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          const ModernGradientAppBar(
-            title: 'Support Tickets',
-            subtitle: 'View and manage your tickets',
-          ),
-
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: ticketsAsync.when(
-              loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              error: (error, stack) => SliverFillRemaining(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: Colors.red,
-                      ),
-                      const SizedBox(height: 16),
-                      Text('Error: $error'),
-                    ],
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              ModernGradientAppBar(
+                leading: Builder(
+                  builder: (context) => IconButton(
+                    icon: const Icon(Icons.menu, color: Colors.white),
+                    onPressed: () => Scaffold.of(context).openDrawer(),
                   ),
                 ),
-              ),
-              data: (tickets) {
-                if (tickets.isEmpty) {
-                  return const SliverFillRemaining(child: _EmptyState());
-                }
 
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => _TicketCard(
-                      ticket: tickets[index],
-                      onTap: () => context.router.push(
-                        SupportTicketDetailRoute(ticketId: tickets[index].id),
-                      ),
-                    ),
-                    childCount: tickets.length,
+                title: 'Support Tickets',
+                subtitle: 'View and manage your tickets',
+              ),
+
+              SliverPadding(
+                padding: const EdgeInsets.all(16),
+                sliver: ticketsAsync.when(
+                  loading: () => const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
                   ),
-                );
-              },
+                  error: (error, stack) => SliverFillRemaining(
+                    child: Center(child: Text('Error: $error')),
+                  ),
+                  data: (tickets) {
+                    if (tickets.isEmpty) {
+                      return const SliverFillRemaining(child: _EmptyState());
+                    }
+
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => _TicketCard(
+                          ticket: tickets[index],
+                          onTap: () => context.router.push(
+                            SupportTicketDetailRoute(
+                              ticketId: tickets[index].id,
+                            ),
+                          ),
+                        ),
+                        childCount: tickets.length,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+
+          /// ✅ Fully Custom Positioned Button
+          Positioned(
+            bottom:
+                size.height *
+                0.12, // 👈 Change this to control vertical position
+
+            right:
+                size.width *
+                0.05, // 👈 Change this to control horizontal position
+            child: FloatingActionButton.extended(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              onPressed: () => context.router.push(SupportTicketFormRoute()),
+              icon: const Icon(Icons.add),
+              label: const Text('New Ticket'),
             ),
           ),
         ],
       ),
-
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        onPressed: () => context.router.push(SupportTicketFormRoute()),
-        icon: const Icon(Icons.add),
-        label: const Text('New Ticket'),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
   }
 }

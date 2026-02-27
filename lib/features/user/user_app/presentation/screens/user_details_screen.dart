@@ -19,6 +19,7 @@ import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../../../widgets/marquee.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
+import '../../domain/states/image_state.dart';
 import '../../domain/states/metrimony_state.dart';
 
 // read profile from firebase
@@ -33,8 +34,6 @@ final matrimonyProfileProvider =
 
       final userRepo = ref.watch(userRepositoryProvider);
       final user = await userRepo.fetchUser(uid);
-      print("user");
-      print(user.toString());
 
       AgentEntity? agent;
       if (user.agentId.isNotEmpty) {
@@ -42,8 +41,6 @@ final matrimonyProfileProvider =
             .watch(agentFirestoreDsProvider)
             .fetchAgentByUid(user.agentId);
       }
-      print(agent);
-      print(agent);
       return MatrimonyProfileViewModel(
         profile: matrimonyProfile,
         user: user,
@@ -62,6 +59,27 @@ class UserDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
+  List<String> _buildDisplayImages(ProfileImages profileImages) {
+    final rawImages = <String>[
+      profileImages.profileImageUrl,
+      profileImages.primaryImageUrl,
+      ...profileImages.secondaryImageUrls,
+      profileImages.imageWithAgentUrl,
+    ];
+
+    final unique = <String>{};
+    final cleaned = <String>[];
+    for (final url in rawImages) {
+      if (url.trim().isEmpty) continue;
+      if (unique.add(url)) cleaned.add(url);
+    }
+
+    if (cleaned.isEmpty) {
+      return const ['https://via.placeholder.com/150'];
+    }
+    return cleaned;
+  }
+
   Future<void> _sendEmail(String email) async {
     final Uri emailUri = Uri(
       scheme: 'mailto',
@@ -100,29 +118,11 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
 
     return Scaffold(
       body: profileAsync.when(
-        loading: () {
-          print(" this is error");
-          return const Center(child: CircularProgressIndicator());
-        },
-        error: (err, stackTrace) {
-          print(" this is error");
-          return Center(child: Text('Error: $err'));
-        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stackTrace) => Center(child: Text('Error: $err')),
         data: (viewModel) {
-          print(" this is use data");
-          print(viewModel);
-
           final profile = viewModel.profile;
-          final List<String> images = [
-            if (profile.images.primaryImageUrl.isNotEmpty)
-              profile.images.primaryImageUrl
-            else
-              'https://via.placeholder.com/150',
-
-            ...(profile.images.secondaryImageUrls ?? []),
-            if (profile.images.imageWithAgentUrl.isNotEmpty)
-              profile.images.imageWithAgentUrl,
-          ];
+          final List<String> images = _buildDisplayImages(profile.images);
 
           return Stack(
             children: [
@@ -351,31 +351,10 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 title: 'Address',
                                 icon: Icons.location_on,
                                 children: [
-                                  // show addrress tile wise
-                                  _InfoTile(
-                                    label: 'Place of residence',
-                                    icon: Icons.location_on_outlined,
-                                    value: profile.address.addressLine1,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Post Office',
-
-                                    icon: Icons.local_post_office_outlined,
-
-                                    value: profile.address.post,
-                                  ),
-
                                   _InfoTile(
                                     label: 'City',
                                     icon: Icons.location_city_outlined,
                                     value: profile.address.city,
-                                  ),
-                                  _InfoTile(
-                                    label: 'Police Station',
-
-                                    icon: Icons.local_police_outlined,
-
-                                    value: profile.address.policeStation,
                                   ),
 
                                   _InfoTile(
@@ -383,14 +362,6 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                     icon: Icons.map_outlined,
                                     value: profile.address.state,
                                   ),
-
-                                  _InfoTile(
-                                    label: 'Pin Code',
-                                    icon: Icons.local_post_office_outlined,
-                                    value: profile.address.pincode,
-                                  ),
-
-                                  SizedBox(height: 20),
                                 ],
                               ),
                             ],
@@ -705,10 +676,6 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               ),
                             ),
                             onPressed: () async {
-                              // add this user's id to user collection 's current id or user
-
-                              // read user colleciton and then push id of current profile to current logged in user
-                              // Get the current user's UID
                               final currentUserId = ref
                                   .read(authRepositoryProvider)
                                   .currentUser
@@ -717,57 +684,63 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               final profileId = viewModel.user?.uid;
                               final agentId = viewModel.user?.agentId;
 
-                              final status = "pending"; // Or any initial status
-                              final updatedAt = DateTime.now();
-
-                              // fetch current user's agent id
-
-                              final userRepo = ref.watch(
-                                userRepositoryProvider,
-                              );
-                              final currentUser = userRepo.fetchUser(
-                                currentUserId!,
-                              );
-
-                              final currentUserData = await currentUser;
-                              final senderAgent = currentUserData.agentId;
-
-                              WishlistEntity wishListItem = WishlistEntity(
-                                senderId: currentUserId!,
-                                receiverId: profileId!,
-                                receiverAgent: agentId!,
-                                senderAgent: senderAgent,
-                                status: status,
-
-                                updatedAt: updatedAt,
-                              );
-
-                              if (currentUserId!.isNotEmpty &&
-                                  profileId!.isNotEmpty &&
-                                  agentId!.isNotEmpty) {
-                                ref
-                                    .read(wishlistRepositoryProvider)
-                                    .addWishlist(wishListItem);
-
-                                // Optionally, show a success message
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Added to wishlist!'),
-                                    duration: Duration(seconds: 1),
-                                  ),
-                                );
-                              } else {
-                                // Handle case where current user is not logged in
+                              if (currentUserId == null ||
+                                  profileId == null ||
+                                  agentId == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
-                                      // user might not have agent id
                                       'User ID or Profile ID or Agent ID is missing.',
                                     ),
-                                    duration: Duration(seconds: 2),
                                   ),
                                 );
+                                return;
                               }
+
+                              final wishlistRepo = ref.read(
+                                wishlistRepositoryProvider,
+                              );
+
+                              /// ✅ Proper existence check
+                              final existing = await wishlistRepo
+                                  .getExistingWishlist(
+                                    senderId: currentUserId,
+                                    receiverId: profileId,
+                                  );
+
+                              if (existing != null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Already added to wishlist!'),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              /// ✅ Fetch current user agent
+                              final userRepo = ref.read(userRepositoryProvider);
+                              final currentUserData = await userRepo.fetchUser(
+                                currentUserId,
+                              );
+
+                              final senderAgent = currentUserData.agentId;
+
+                              final wishListItem = WishlistEntity(
+                                senderId: currentUserId,
+                                receiverId: profileId,
+                                receiverAgent: agentId,
+                                senderAgent: senderAgent,
+                                status: "pending",
+                                updatedAt: DateTime.now(),
+                              );
+
+                              await wishlistRepo.addWishlist(wishListItem);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Added to wishlist!'),
+                                ),
+                              );
                             },
                           ),
                         ),

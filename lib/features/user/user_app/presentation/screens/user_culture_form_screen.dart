@@ -32,20 +32,26 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
   final _manualCasteController = TextEditingController();
   final _languagesController = TextEditingController();
 
+  final List<String> langauges = [];
   @override
   void initState() {
     super.initState();
     widget.registerSubmit?.call(_submitForm);
+
     if (widget.mode == FormMode.edit &&
         widget.existingCulturalProfile != null) {
       final cult = widget.existingCulturalProfile!;
+
       _subCasteController.text = cult.subCaste;
-      _languagesController.text = cult.languages.join(", ");
+
+      // ✅ Load languages into chips
+      langauges.addAll(cult.languages);
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref
             .read(religionControllerProvider.notifier)
             .setReligion(cult.religion);
+
         ref.read(religionControllerProvider.notifier).setCaste(cult.caste);
       });
     }
@@ -57,15 +63,13 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
   //   _languagesController.dispose();
   //   super.dispose();
   // }
-
   void _submitForm() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
     final religion = ref.read(religionControllerProvider).religion;
     var caste = ref.read(religionControllerProvider).caste;
 
-    // If user selected 'Other', take manual input
-    if (caste.toLowerCase() == 'other') {
+    if (caste.toLowerCase().trim() == 'other') {
       final manual = _manualCasteController.text.trim();
       if (manual.isEmpty) {
         ScaffoldMessenger.of(
@@ -76,16 +80,17 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
       caste = manual;
     }
 
+    if (_languagesController.text.isNotEmpty) {
+      langauges.add(_languagesController.text.trim());
+    }
+
     ref
         .read(cultureControllerProvider.notifier)
         .saveCultural(
           religion: religion,
           caste: caste,
           subCaste: _subCasteController.text.trim(),
-          languages: _languagesController.text
-              .split(',')
-              .map((e) => e.trim())
-              .toList(),
+          languages: langauges, // ✅ FIXED
         );
   }
 
@@ -237,16 +242,6 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                 keyboardType: TextInputType.text,
               ),
               const SizedBox(height: 12),
-              AppTextField(
-                controller: _languagesController,
-                label: "Languages Known",
-                hint: "Enter languages separated by commas",
-                prefixIcon: Icons.language,
-                validator: (v) => v?.isEmpty == true ? "Required" : null,
-                iconColor: Theme.of(context).colorScheme.primary,
-                obscureText: false,
-                keyboardType: TextInputType.text,
-              ),
 
               const SizedBox(height: 24),
               state.isLoading
@@ -254,10 +249,103 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                   : (widget.registerSubmit != null
                         ? const SizedBox.shrink()
                         : AppButton(text: "Save", onPressed: _submitForm)),
+
+              // ========== EXTRA QUALIFICATION SECTION ==========
+              _sectionHeader('Additional Qualifications'),
+              const SizedBox(height: 16),
+
+              _extraCourseInput(),
+
+              if (langauges.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _extraCourseChips(),
+              ],
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _sectionHeader(String title) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+      ),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
+  }
+
+  Widget _extraCourseInput() {
+    return Row(
+      children: [
+        Expanded(
+          child: AppTextField(
+            controller: _languagesController,
+            prefixIcon: Icons.language,
+            iconColor: Theme.of(context).colorScheme.primary,
+            label: 'Add Known Languages',
+            hint: 'e.g., Hindi, English, Mathili etc',
+            obscureText: false,
+            keyboardType: TextInputType.text,
+            validator: (_) => null,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          ),
+          child: IconButton(
+            icon: Icon(
+              Icons.add_circle,
+              size: 28,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onPressed: () {
+              final value = _languagesController.text.trim();
+              if (value.isEmpty || langauges.contains(value)) return;
+              setState(() {
+                langauges.add(value);
+                _languagesController.clear();
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _extraCourseChips() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: langauges.map((course) {
+        return Chip(
+          label: Text(course),
+          deleteIcon: const Icon(Icons.close, size: 18),
+          onDeleted: () => setState(() => langauges.remove(course)),
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.primary.withOpacity(0.1),
+          labelStyle: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w500,
+          ),
+          side: BorderSide(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+          ),
+        );
+      }).toList(),
     );
   }
 }

@@ -59,7 +59,7 @@ class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
           ),
           bottomNavigationBar: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            height: _isVisible ? 100 : 0,
+            height: _isVisible ? 80 : 0,
             child: Wrap(
               children: [
                 CustomBottomNavBar(
@@ -103,6 +103,7 @@ class CustomBottomNavBar extends StatelessWidget {
     ),
     BottomNavItem(
       icon: Icons.payments_outlined,
+
       label: 'Revenue', // Earnings & Commissions
     ),
     BottomNavItem(
@@ -144,12 +145,12 @@ class CustomBottomNavBar extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
+                  horizontal: 12,
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? Colors.red.withOpacity(0.15)
+                      ? Theme.of(context).colorScheme.primary.withOpacity(0.12)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -158,18 +159,22 @@ class CustomBottomNavBar extends StatelessWidget {
                   children: [
                     Icon(
                       items[index].icon,
-                      size: 24,
-                      color: isSelected ? Colors.red : Colors.grey,
+                      size: 26,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.grey,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       items[index].label,
                       style: TextStyle(
-                        fontSize: 12,
-                        color: isSelected ? Colors.red : Colors.grey,
+                        fontSize: 12, // ✅ Proper size
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey,
                         fontWeight: isSelected
                             ? FontWeight.w600
-                            : FontWeight.normal,
+                            : FontWeight.w400,
                       ),
                     ),
                   ],

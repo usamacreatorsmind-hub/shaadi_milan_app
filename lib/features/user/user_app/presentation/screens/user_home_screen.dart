@@ -7,7 +7,6 @@ import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../../../widgets/marquee.dart';
 
 import '../../../../../core/filters/home_filter_controller.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../../app/router/app_router.dart';
 import '../../domain/states/religion_state.dart';
@@ -17,7 +16,6 @@ import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:ui';
 
 /// =======================
 /// USER HOME SCREEN
@@ -42,7 +40,7 @@ class UserHomeScreen extends ConsumerWidget {
     }
 
     if (filter.religion.isNotEmpty) {
-      if (filterText.isNotEmpty) filterText += ' • ';
+      if (filterText.isNotEmpty) filterText += ' | ';
       filterText += filter.religion;
       if (filter.caste.isNotEmpty) {
         filterText += ' (${filter.caste})';
@@ -73,7 +71,27 @@ class UserHomeScreen extends ConsumerWidget {
           if (paymentState.status == PayStatus.idle) {
             return CustomScrollView(
               slivers: [
-                const MinimalAppBar(title: "Home", showShadow: true),
+                ModernGradientAppBar(
+                  title: "Home",
+                  subtitle: "Find your best match",
+                  leading: Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(Icons.menu, color: Colors.white),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    ),
+                  ),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.notifications_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () => context.router.push(
+                        const UserNotificationRoute(),
+                      ),
+                    ),
+                  ],
+                ),
                 // other slivers...
 
                 /// ================= LOCATION BAR =================
@@ -129,9 +147,9 @@ class UserHomeScreen extends ConsumerWidget {
                               transitionDuration: const Duration(
                                 milliseconds: 400,
                               ),
-                              pageBuilder: (_, __, ___) =>
+                              pageBuilder: (context, animation, secondaryAnimation) =>
                                   const FilterRightSheet(),
-                              transitionBuilder: (_, animation, __, child) {
+                              transitionBuilder: (context, animation, secondaryAnimation, child) {
                                 return SlideTransition(
                                   position: Tween(
                                     begin: const Offset(1, 0),
@@ -148,15 +166,24 @@ class UserHomeScreen extends ConsumerWidget {
                   ),
                 ),
 
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: _HomeSummaryCard(
+                      fullName: user.fullName,
+                      hasFilter: filterText.isNotEmpty,
+                      filterText: filterText.isEmpty ? 'All Profiles' : filterText,
+                    ),
+                  ),
+                ),
+
                 /// ================= PROFILES LIST =================
                 homeState.metrimonyProfiles.when(
                   loading: () => const SliverToBoxAdapter(
                     child: Center(child: CircularProgressIndicator()),
                   ),
                   error: (e, _) {
-                    print('Error loading profiles: $e');
-
-                    print(e);
+                    debugPrint('Error loading profiles: $e');
 
                     return SliverToBoxAdapter(
                       child: Center(child: Text(e.toString())),
@@ -192,41 +219,75 @@ class UserHomeScreen extends ConsumerWidget {
                     }).toList();
 
                     if (filteredProfiles.isEmpty) {
-                      return const SliverToBoxAdapter(
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(32.0),
-                            child: Text('No profiles match your filter.'),
+                      return SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.outlineVariant,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.search_off_rounded,
+                                  size: 42,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(height: 10),
+                                const Text(
+                                  'No profiles match your filters.',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                TextButton.icon(
+                                  onPressed: () {
+                                    ref.read(homeFilterProvider.notifier).reset();
+                                  },
+                                  icon: const Icon(Icons.refresh_rounded),
+                                  label: const Text('Reset filters'),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
                     }
 
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final viewModel = filteredProfiles[index];
-                        final profile = viewModel.profile;
-                        final user = viewModel.user;
+                    return SliverPadding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final viewModel = filteredProfiles[index];
+                          final profile = viewModel.profile;
+                          final user = viewModel.user;
+                          final displayName = user?.fullName ?? 'N/A';
+                          final designation = profile.employment.designation;
 
-                        debugPrint(
-                          profile.images.secondaryImageUrls.toString(),
-                        );
-                        debugPrint(profile.images.primaryImageUrl.toString());
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          child: ProfileCard(
-                            uid: profile.userId,
-                            name: user?.fullName ?? 'N/A',
-                            age: profile.identity.age ?? 0,
-                            designation:
-                                profile.employment.designation ?? "N/A",
-                            imageUrl: profile.images.primaryImageUrl ?? "",
-                          ),
-                        );
-                      }, childCount: filteredProfiles.length),
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            child: ProfileCard(
+                              uid: profile.userId,
+                              name: displayName.isEmpty ? 'N/A' : displayName,
+                              age: profile.identity.age,
+                              designation: (designation == null || designation.isEmpty)
+                                  ? 'N/A'
+                                  : designation,
+                              imageUrl: profile.images.primaryImageUrl,
+                            ),
+                          );
+                        }, childCount: filteredProfiles.length),
+                      ),
                     );
                   },
                 ),
@@ -234,15 +295,79 @@ class UserHomeScreen extends ConsumerWidget {
             );
           } else {
             // If payment is not successful, show the payment screen.
-            print(" Navigating to paymetn screen");
-            print(paymentState.status);
-
-            print(paymentState.status);
-
-            print(user.uid);
+            debugPrint("Navigating to payment screen");
+            debugPrint(paymentState.status.name);
+            debugPrint(user.uid);
             return UserPaymentScreen(userId: user.uid);
           }
         },
+      ),
+    );
+  }
+}
+
+class _HomeSummaryCard extends StatelessWidget {
+  final String fullName;
+  final bool hasFilter;
+  final String filterText;
+
+  const _HomeSummaryCard({
+    required this.fullName,
+    required this.hasFilter,
+    required this.filterText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        gradient: LinearGradient(
+          colors: [colors.primaryContainer, colors.surfaceContainerHighest],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Welcome, ${fullName.isEmpty ? 'User' : fullName.split(' ').first}',
+            style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            hasFilter
+                ? 'Showing filtered results'
+                : 'Showing all available matches',
+            style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            decoration: BoxDecoration(
+              color: colors.surface.withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.tune_rounded, size: 16),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    filterText,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -489,108 +614,125 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-
-        border: Border.all(
-          // theme color
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
-
-          strokeAlign: BorderSide.strokeAlignCenter,
-
-          width: 3,
-        ),
-
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: GestureDetector(
-        onTap: () {
-          context.router.push(UserDetailRoute(uid: uid));
-        },
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-                bottom: Radius.circular(10),
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(22),
+        onTap: () => context.router.push(UserDetailRoute(uid: uid)),
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: colors.outlineVariant),
+            boxShadow: [
+              BoxShadow(
+                color: colors.shadow.withValues(alpha: 0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
               ),
-              child: imageUrl.isEmpty
-                  ? Container(
-                      height: MediaQuery.of(context).size.height * 0.55,
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+                child: Stack(
+                  children: [
+                    SizedBox(
+                      height: 320,
                       width: double.infinity,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.person, size: 60),
-                    )
-                  : Image.network(
-                      imageUrl,
-                      height: MediaQuery.of(context).size.height * 0.55,
-                      width: double.infinity,
-                      fit: BoxFit.fill,
-                      errorBuilder: (_, __, ___) => Container(
-                        height: MediaQuery.of(context).size.height * 0.55,
-                        width: double.infinity,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.person, size: 60),
-                      ),
+                      child: imageUrl.isEmpty
+                          ? Container(
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.person, size: 64),
+                            )
+                          : Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.person, size: 64),
+                              ),
+                            ),
                     ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.cake_outlined,
-                        size: 18,
-                        color: Colors.grey[700],
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$age years',
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                      const SizedBox(width: 16),
-                      Icon(
-                        Icons.work_outline,
-                        size: 18,
-                        color: Colors.grey[700],
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          designation,
-                          style: TextStyle(color: Colors.grey[700]),
-                          overflow: TextOverflow.ellipsis,
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withValues(alpha: 0.65),
+                            ],
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                ],
+                    ),
+                    Positioned(
+                      left: 14,
+                      right: 14,
+                      bottom: 14,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              const Icon(Icons.cake_outlined, size: 16, color: Colors.white),
+                              const SizedBox(width: 5),
+                              Text(
+                                '$age yrs',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(width: 14),
+                              const Icon(Icons.work_outline_rounded, size: 16, color: Colors.white),
+                              const SizedBox(width: 5),
+                              Expanded(
+                                child: Text(
+                                  designation,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: FilledButton.tonalIcon(
+                    onPressed: () => context.router.push(UserDetailRoute(uid: uid)),
+                    icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                    label: const Text('View Profile'),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+

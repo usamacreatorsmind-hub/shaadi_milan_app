@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../app/custom/image_picker/image_picker_controller.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../../../../core/enums/enum.dart';
+import '../../domain/states/image_state.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../controllers/metrimony_profile_controller.dart';
 import 'user_address_form_screen.dart';
@@ -32,6 +33,26 @@ class _MatrimonyFormFlowScreenState
 
   void _registerSubmit(MatrimonyStep step, VoidCallback callback) {
     _submitCallbacks[step] = callback;
+  }
+
+  String? _validateImageStep(ImagesState imageState) {
+    if (imageState.profileImage == null || imageState.profileImage!.isEmpty) {
+      return 'Please select a profile image';
+    }
+    if (imageState.primaryImage == null || imageState.primaryImage!.isEmpty) {
+      return 'Please select a matrimony image';
+    }
+    if (imageState.imageWithAgentUrl == null ||
+        imageState.imageWithAgentUrl!.isEmpty) {
+      return 'Please select an image with agent';
+    }
+    if (imageState.secondaryImages.isEmpty) {
+      return 'Please select at least one gallery image';
+    }
+    if (imageState.aadharPdfPath == null || imageState.aadharPdfPath!.isEmpty) {
+      return 'Please select Aadhar document';
+    }
+    return null;
   }
 
   @override
@@ -96,21 +117,12 @@ class _MatrimonyFormFlowScreenState
                           if (_submitCallbacks.containsKey(state.step)) {
                             _submitCallbacks[state.step]!.call();
                           } else if (state.step == MatrimonyStep.image) {
-                            if (imageState.primaryImage == null) {
+                            final validationError = _validateImageStep(
+                              imageState,
+                            );
+                            if (validationError != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Please select a primary profile image',
-                                  ),
-                                ),
-                              );
-                              return;
-                            }
-                            if (imageState.aadharPdfPath == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Please select Aadhar PDF'),
-                                ),
+                                SnackBar(content: Text(validationError)),
                               );
                               return;
                             }

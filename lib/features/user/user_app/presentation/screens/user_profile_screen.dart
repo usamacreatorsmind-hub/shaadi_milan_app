@@ -75,7 +75,16 @@ class UserProfileScreen extends ConsumerWidget {
         data: (profile) {
           return CustomScrollView(
             slivers: [
-              MinimalAppBar(title: "My Profile"),
+              ModernGradientAppBar(
+                title: "My Profile",
+                subtitle: "Manage your account",
+                leading: Builder(
+                  builder: (context) => IconButton(
+                    icon: const Icon(Icons.menu, color: Colors.white),
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                  ),
+                ),
+              ),
 
               // SliverAppBar(
               //   backgroundColor: Colors.grey[100],

@@ -12,8 +12,6 @@ class ExpandableImagePickerList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(imagePickerProvider);
     final controller = ref.read(imagePickerProvider.notifier);
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     return Column(
       children: [
@@ -21,13 +19,14 @@ class ExpandableImagePickerList extends ConsumerWidget {
         _ExpandableTile(
           title: "Profile Image",
           isSelected: state.profileImage != null,
-          onTapPick: controller.pickProfileImage,
+          onTapPick: () => controller.pickProfileImage(context),
+
           child: _profileImagePreview(state.profileImage),
         ),
         _ExpandableTile(
           title: 'Matrimony Image',
           isSelected: state.primaryImage != null,
-          onTapPick: controller.pickPrimaryImage,
+          onTapPick: () => controller.pickPrimaryImage(context),
           child: _singleImagePreview(state.primaryImage),
         ),
 
@@ -43,7 +42,7 @@ class ExpandableImagePickerList extends ConsumerWidget {
         _ExpandableTile(
           title: 'Gallery Images',
           isSelected: state.secondaryImages.isNotEmpty,
-          onTapPick: controller.pickSecondaryImages,
+          onTapPick: () => controller.pickSecondaryImages(context),
           child: _galleryPreview(
             state.secondaryImages,
             controller.removeSecondaryImage,
@@ -120,6 +119,24 @@ class ExpandableImagePickerList extends ConsumerWidget {
 
   Widget _aadharPreview(String? path) {
     if (path == null) return const SizedBox();
+    final normalizedPath = path.toLowerCase();
+    final isImage =
+        normalizedPath.endsWith('.jpg') ||
+        normalizedPath.endsWith('.jpeg') ||
+        normalizedPath.endsWith('.png') ||
+        normalizedPath.endsWith('.webp');
+
+    if (isImage) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.file(
+          File(path),
+          height: 220,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -139,7 +156,7 @@ class ExpandableImagePickerList extends ConsumerWidget {
     );
   }
 
-  Widget _profileImagePreview(profilImage) {
+  Widget _profileImagePreview(String? profilImage) {
     if (profilImage == null) return const SizedBox();
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),

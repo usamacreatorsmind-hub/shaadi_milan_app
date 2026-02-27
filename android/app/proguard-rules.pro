@@ -1,0 +1,2 @@
+-dontwarn kotlin.Unit
+-dontwarn kotlinx.coroutines.**

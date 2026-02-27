@@ -7,6 +7,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 import '../../../../../app/custom/custom_widgets/user_drawer.dart';
 
 import '../../../../../app/router/app_router.dart';
@@ -63,43 +64,38 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
       body: paymentState.status == PayStatus.idle
           ? NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                SliverAppBar(
-                  title: const Text("Wishlist"),
-                  centerTitle: true,
-                  floating: true,
-                  pinned: true,
-                  backgroundColor: theme.primaryColor,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  bottom: PreferredSize(
-                    preferredSize: const Size.fromHeight(100),
+                ModernGradientAppBar(
+                  title: "Wishlist",
+                  subtitle: "Manage your interests",
+
+                  leading: Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(Icons.menu, color: Colors.white),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: theme.scaffoldBackgroundColor,
                     child: Column(
                       children: [
-                        // Status Filter Chips
-                        _buildStatusFilter(theme),
-                        // Tab Bar
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _buildStatusFilter(theme),
+                        ),
+                        const SizedBox(height: 8),
                         TabBar(
                           controller: _tabController,
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          labelColor: theme.colorScheme.onPrimary,
-                          unselectedLabelColor: theme.colorScheme.onPrimary
-                              .withOpacity(0.7),
-                          indicator: UnderlineTabIndicator(
-                            borderSide: BorderSide(
-                              width: 3,
-                              color: theme.colorScheme.onPrimary,
-                            ),
-                          ),
+                          indicatorColor: theme.primaryColor,
+                          labelColor: theme.primaryColor,
+                          unselectedLabelColor: theme.primaryColor,
                           tabs: const [
-                            Tab(
-                              icon: Icon(Icons.favorite),
-                              text: "My Wishlist",
-                            ),
-                            Tab(
-                              icon: Icon(Icons.favorite_border),
-                              text: "Wishlisted Me",
-                            ),
+                            Tab(text: "My Wishlist"),
+                            Tab(text: "Wishlisted Me"),
                           ],
                         ),
+                        const SizedBox(height: 12),
                       ],
                     ),
                   ),
@@ -108,12 +104,10 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
               body: TabBarView(
                 controller: _tabController,
                 children: [
-                  // My Wishlist Tab
                   _MyWishlistTab(
                     userId: widget.userId,
                     statusFilter: _selectedStatus,
                   ),
-                  // Wishlisted Me Tab
                   _WishlistedMeTab(
                     userId: widget.userId,
                     statusFilter: _selectedStatus,
@@ -472,6 +466,8 @@ class _WishlistItemCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(matrimonyProfileProvider(profileId));
+    final heroTag =
+        'wishlist-image-${wishlist.id}-$profileId-${isMyWishlist ? 'my' : 'me'}';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -508,7 +504,7 @@ class _WishlistItemCard extends ConsumerWidget {
                     children: [
                       // Profile Image
                       Hero(
-                        tag: 'wishlist-image-$profileId',
+                        tag: heroTag,
                         child: CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.grey.shade200,
