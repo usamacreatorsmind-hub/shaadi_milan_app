@@ -1,5 +1,5 @@
 name: arvika_marriage_bureau
-description: "A new Flutter project."
+description: "ARVIKA Marriage Bureau App - A comprehensive matchmaking platform connecting individuals seeking meaningful relationships. With a user-friendly interface, advanced search filters, and personalized matchmaking algorithms, ARVIKA offers a seamless experience for finding compatible partners. Whether you're looking for love, companionship, or friendship, ARVIKA is your trusted companion on the journey to meaningful connections."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.1+1
 
 environment:
   sdk: ^3.10.4
@@ -86,6 +86,8 @@ dependencies:
   awesome_notifications_fcm: ^0.10.0
   awesome_notifications_core: ^0.10.0
   upgrader: ^12.5.0
+  firebase_remote_config: ^6.3.0
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:

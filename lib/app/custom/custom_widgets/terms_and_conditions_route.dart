@@ -1,5 +1,8 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../core/constants/app_constants.dart';
 
 @RoutePage()
 class TermsAndConditionsScreen extends StatelessWidget {
@@ -22,19 +25,19 @@ class TermsAndConditionsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Terms and Conditions for Arvika Marriage Bureau",
+              "Terms and Conditions for ${AppConstants.appName}",
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.primary,
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              "Last updated: October 26, 2023",
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.grey.shade600,
-              ),
-            ),
+            // Text(
+            //   "Last updated: ${AppConstants.termsLastUpdated}",
+            //   style: theme.textTheme.bodySmall?.copyWith(
+            //     color: Colors.grey.shade600,
+            //   ),
+            // ),
             const SizedBox(height: 20),
             _buildSection(
               context,
@@ -104,7 +107,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
               context,
               title: "10. Changes to Terms",
               content:
-                  "Arvika Marriage Bureau reserves the right, in its sole discretion, to change the Terms under which www.arvikamarriage.com is offered. The most current version of the Terms will supersede all previous versions. Arvika Marriage Bureau encourages you to periodically review the Terms to stay informed of our updates.",
+                  "${AppConstants.appName} reserves the right, in its sole discretion, to change the Terms under which this application is offered. The most current version of the Terms will supersede all previous versions. ${AppConstants.appName} encourages you to periodically review the Terms to stay informed of our updates.",
             ),
             const SizedBox(height: 20),
             _buildSection(
@@ -118,8 +121,12 @@ class TermsAndConditionsScreen extends StatelessWidget {
               context,
               title: "12. Contact Us",
               content:
-                  "Arvika Marriage Bureau welcomes your questions or comments regarding the Terms: Email: support@arvikamarriage.com",
+                  "${AppConstants.appName} welcomes your questions or comments regarding the Terms: Email: ${AppConstants.supportEmail}",
             ),
+
+            const SizedBox(height: 20),
+            _buildLinkSection(context),
+
             const SizedBox(height: 20),
           ],
         ),
@@ -155,4 +162,48 @@ class TermsAndConditionsScreen extends StatelessWidget {
       ],
     );
   }
+
+  Widget _buildLinkSection(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Privacy Policy",
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Your privacy is important to us. Please review our Privacy Policy to understand how we collect, use, and protect your personal information.",
+          textAlign: TextAlign.justify,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            height: 1.5,
+            color: Colors.grey.shade700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () async {
+            final uri = Uri.parse(AppConstants.privacyPolicyUrl);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            }
+          },
+          child: Text(
+            AppConstants.privacyPolicyUrl,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.primary,
+              decoration: TextDecoration.underline,
+              height: 1.5,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
 }

@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/core/constants/app_constants.dart';
 import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/wishlist_notifier.dart';
 import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
@@ -74,10 +75,25 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
       if (unique.add(url)) cleaned.add(url);
     }
 
-    if (cleaned.isEmpty) {
-      return const ['https://via.placeholder.com/150'];
-    }
     return cleaned;
+  }
+
+  void _showNoImagesDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('No Photos Available'),
+        content: const Text(
+          'This profile does not have any photos uploaded yet.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _sendEmail(String email) async {
@@ -123,6 +139,12 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
         data: (viewModel) {
           final profile = viewModel.profile;
           final List<String> images = _buildDisplayImages(profile.images);
+
+          if (images.isEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => _showNoImagesDialog(context),
+            );
+          }
 
           return Stack(
             children: [
@@ -858,7 +880,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                                     child: ElevatedButton.icon(
                                                       onPressed: () {
                                                         _sendEmail(
-                                                          "admin@example.com",
+                                                          AppConstants
+                                                              .grievanceEmail,
                                                         ); // Replace with actual admin email
                                                       },
                                                       icon: const Icon(

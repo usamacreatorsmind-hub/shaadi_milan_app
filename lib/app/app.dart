@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_service.dart';
 import 'package:arvika_marriage_bureau/core/notification/notification_service.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
 import 'package:flutter/material.dart';
@@ -7,22 +8,31 @@ import 'package:sizer/sizer.dart';
 import '../core/themes/app_theme.dart';
 import 'providers/global_providers.dart';
 
-class App extends ConsumerWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) RemoteConfigService().checkForUpdate(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final appRouter = ref.watch(appRouterProvider);
-    // load all data here
 
     ref.watch(paymentApiFirestoreProvider);
 
-    // final themeMode = ref.watch(themeProvider);
     return Sizer(
       builder: (context, orientation, deviceType) => MaterialApp.router(
         theme: AppTheme.lightTheme,
-        // darkTheme: AppTheme.darkTheme,
-        // themeMode: themeMode,
         title: 'Arvika Marriage Bureau',
         routerConfig: appRouter.config(),
         debugShowCheckedModeBanner: false,

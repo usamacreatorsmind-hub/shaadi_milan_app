@@ -1,5 +1,9 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../core/constants/app_constants.dart';
+
 @RoutePage()
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -16,19 +20,19 @@ class PrivacyPolicyScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Privacy Policy for Arvika Marriage Bureau",
+              "Privacy Policy for ${AppConstants.appName}",
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.primary,
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              "Last updated: October 26, 2023",
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.grey.shade600,
-              ),
-            ),
+            // Text(
+            //   "Last updated: ${AppConstants.privacyPolicyLastUpdated}",
+            //   style: theme.textTheme.bodySmall?.copyWith(
+            //     color: Colors.grey.shade600,
+            //   ),
+            // ),
             const SizedBox(height: 20),
             _buildSection(
               context,
@@ -121,7 +125,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               context,
               title: "10. Governing Law",
               content:
-                  "These Terms shall be governed and construed in accordance with the laws of [Your Country/State], without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of these Terms will remain in effect. These Terms constitute the entire agreement between us regarding our Service, and supersede and replace any prior agreements we might have between us regarding the Service.",
+                  "These Terms shall be governed and construed in accordance with the laws of ${AppConstants.governingLaw}, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of these Terms will remain in effect. These Terms constitute the entire agreement between us regarding our Service, and supersede and replace any prior agreements we might have between us regarding the Service.",
             ),
 
             _buildSection(
@@ -145,15 +149,61 @@ class PrivacyPolicyScreen extends StatelessWidget {
               title: "13. Grievance Officer",
               content:
                   "In accordance with Information Technology Act 2000 and rules made there under, the name and contact details of the Grievance Officer are provided below:\n\n"
-                  "Name: [Grievance Officer Name]\n"
-                  "Email: grievance@arvikamarriage.com\n"
-                  "Address: [Grievance Officer Address]",
+                  "Name: ${AppConstants.grievanceOfficerName}\n"
+                  "Email: ${AppConstants.grievanceEmail}\n"
+                  "Address: ${AppConstants.grievanceOfficerAddress}",
             ),
+
+            const SizedBox(height: 20),
+
+            _buildLinkSection(context),
 
             const SizedBox(height: 20),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildLinkSection(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Privacy Policy",
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Your privacy is important to us. Please review our Privacy Policy to understand how we collect, use, and protect your personal information.",
+          textAlign: TextAlign.justify,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            height: 1.5,
+            color: Colors.grey.shade700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () async {
+            final uri = Uri.parse(AppConstants.privacyPolicyUrl);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            }
+          },
+          child: Text(
+            AppConstants.privacyPolicyUrl,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.primary,
+              decoration: TextDecoration.underline,
+              height: 1.5,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

@@ -1,9 +1,11 @@
+import 'package:arvika_marriage_bureau/core/constants/app_constants.dart';
 import 'package:arvika_marriage_bureau/core/notification/notification_service.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../app/router/app_router.dart';
@@ -276,10 +278,62 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
+
+                /// 📄 Terms & Privacy
+                _TermsPrivacyFooter(),
+
+                const SizedBox(height: 16),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TermsPrivacyFooter extends StatelessWidget {
+  const _TermsPrivacyFooter();
+
+  Future<void> _openPrivacy() async {
+    final uri = Uri.parse(AppConstants.privacyPolicyUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final linkStyle = TextStyle(
+      color: theme.colorScheme.primary,
+      fontWeight: FontWeight.w600,
+      fontSize: 13,
+      decoration: TextDecoration.underline,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        children: [
+          Text(
+            'By continuing, you agree to our ',
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+          ),
+          GestureDetector(
+            onTap: null,
+            child: Text('Terms & Conditions', style: linkStyle),
+          ),
+          Text(
+            ' and ',
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+          ),
+          GestureDetector(
+            onTap: _openPrivacy,
+            child: Text('Privacy Policy', style: linkStyle),
+          ),
+        ],
       ),
     );
   }

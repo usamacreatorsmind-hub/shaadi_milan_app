@@ -61,3 +61,10 @@ npm-debug.log*
 # Symbolication
 app.*.symbols
 app.*.map.json
+
+# ===============================
+# Signing — never commit these
+# ===============================
+android/key.properties
+android/app/*.jks
+android/app/*.keystore

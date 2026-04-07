@@ -92,8 +92,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         beginColor: const Color(0xFF6A11CB),
                         endColor: const Color(0xFF2575FC),
                         delay: 0.2,
-                        onTap: () =>
-                            context.router.push(  AgentLoginRoute()),
+                        onTap: () => context.router.push(AgentLoginRoute()),
                       ),
 
                       const SizedBox(height: 40),
@@ -106,8 +105,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         beginColor: const Color(0xFFFF512F),
                         endColor: const Color(0xFFDD2476),
                         delay: 0.4,
-                        onTap: () =>
-                            context.router.push( UserLoginRoute()),
+                        onTap: () => context.router.push(UserLoginRoute()),
                       ),
                     ],
                   ),
@@ -158,6 +156,39 @@ class RoleSelectionScreen extends StatelessWidget {
                               },
                               child: Text(
                                 "Need Help ? Contact Us",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).primaryColor,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            GestureDetector(
+                              onTap: () =>
+                                  context.pushRoute(const PrivacyPolicyRoute()),
+                              child: Text(
+                                "Privacy Policy",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).primaryColor,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => context.pushRoute(
+                                const TermsAndConditionsRoute(),
+                              ),
+                              child: Text(
+                                "Terms & Conditions",
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,

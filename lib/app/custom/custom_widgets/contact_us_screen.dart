@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../core/constants/app_constants.dart';
 
 @RoutePage()
 class ContactUsScreen extends StatelessWidget {
@@ -73,24 +74,24 @@ class ContactUsScreen extends StatelessWidget {
                   icon: Icons.email_outlined,
                   color: Colors.redAccent,
                   title: "Email Us",
-                  subtitle: "support@arvikamarriage.com",
-                  onTap: () => _launchUrl("mailto:support@arvikamarriage.com"),
+                  subtitle: AppConstants.supportEmail,
+                  onTap: () => _launchUrl(AppConstants.emailLink),
                 ),
 
                 _ContactTile(
                   icon: Icons.phone_outlined,
                   color: Colors.blueAccent,
                   title: "Call Us",
-                  subtitle: "+91 98765 43210",
-                  onTap: () => _launchUrl("tel:+919876543210"),
+                  subtitle: AppConstants.phone,
+                  onTap: () => _launchUrl(AppConstants.phoneLink),
                 ),
 
                 _ContactTile(
                   icon: FontAwesomeIcons.whatsapp,
                   color: Colors.green,
                   title: "WhatsApp",
-                  subtitle: "+91 98765 43210",
-                  onTap: () => _launchUrl("https://wa.me/919876543210"),
+                  subtitle: AppConstants.phone,
+                  onTap: () => _launchUrl(AppConstants.whatsappLink),
                 ),
 
                 _ContactTile(
@@ -109,7 +110,7 @@ class ContactUsScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -118,7 +119,7 @@ class ContactUsScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          "Our support team is available\n9 AM – 6 PM (IST), Monday to Friday",
+                          "Our support team is available\n${AppConstants.supportHours}",
                           style: theme.textTheme.bodySmall,
                         ),
                       ),

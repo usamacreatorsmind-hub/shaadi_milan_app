@@ -18,12 +18,12 @@ class SearchScreen extends StatelessWidget {
               child: Row(
                 children: [
                   const Expanded(child: SearchWidget()),
-                  IconButton(
-                    onPressed: () {
-                      // TODO: Implement filter functionality
-                    },
-                    icon: const Icon(Icons.filter_list),
-                  ),
+                  // IconButton(
+                  //   onPressed: () {
+                  //     // TODO: Implement filter functionality
+                  //   },
+                  //   icon: const Icon(Icons.filter_list),
+                  // ),
                 ],
               ),
             ),

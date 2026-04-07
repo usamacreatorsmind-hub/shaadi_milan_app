@@ -3,7 +3,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:upgrader/upgrader.dart';
 
 import 'core/notification/notification_service.dart';
 import 'app/app.dart';
@@ -65,7 +64,7 @@ void main() async {
         channelShowBadge: true,
       ),
     ],
-    debug: true,
+    debug: false,
   );
 
   // Permission request
@@ -80,5 +79,5 @@ void main() async {
   await NotificationService.init();
   await InAppMessagingService.init();
 
-  runApp(UpgradeAlert(child: const ProviderScope(child: App())));
+  runApp(const ProviderScope(child: App()));
 }

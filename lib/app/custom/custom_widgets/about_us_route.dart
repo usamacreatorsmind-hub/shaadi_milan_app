@@ -1,6 +1,8 @@
 
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+
+import '../../../core/constants/app_constants.dart';
 @RoutePage()
 class AboutUsScreen extends StatelessWidget {
   const AboutUsScreen({super.key});
@@ -23,7 +25,7 @@ class AboutUsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              "Welcome to Arvika Marriage Bureau",
+              "Welcome to ${AppConstants.appName}",
               textAlign: TextAlign.center,
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
@@ -32,7 +34,7 @@ class AboutUsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 15),
             Text(
-              "Your trusted partner in finding your perfect match.",
+              AppConstants.appTagline,
               textAlign: TextAlign.center,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: Colors.grey.shade700,
@@ -77,7 +79,7 @@ class AboutUsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              "© 2024 Arvika Marriage Bureau. All rights reserved.",
+              AppConstants.copyright,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: Colors.grey.shade500,
               ),

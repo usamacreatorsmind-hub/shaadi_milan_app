@@ -41,8 +41,6 @@ class _UserChatScreenState extends ConsumerState<UserChatScreen>
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
-              IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-              IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
             ],
           ),
         ),

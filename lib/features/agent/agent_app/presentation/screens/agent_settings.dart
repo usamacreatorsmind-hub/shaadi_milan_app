@@ -1,5 +1,6 @@
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,6 +12,30 @@ class AgentSettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.pop(ctx);
+              FirebaseAuth.instance.signOut();
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -24,6 +49,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
+          // ── Account ──────────────────────────────────────────────────────
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -33,40 +59,16 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
             child: Column(
               children: [
                 ListTile(
-                  leading: Icon(
-                    Icons.person_outline,
-                    color: theme.primaryColor,
-                  ),
-                  title: const Text('Edit Profile'),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    // TODO: Navigate to edit profile screen
-                  },
-                ),
-                const Divider(height: 1),
-                ListTile(
                   leading: Icon(Icons.lock_outline, color: theme.primaryColor),
                   title: const Text('Change Password'),
                   trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    context.pushRoute(ChangePasswordRoute());
-                  },
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: Icon(
-                    Icons.notifications_none,
-                    color: theme.primaryColor,
-                  ),
-                  title: const Text('Notification Settings'),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    // TODO: Navigate to notification settings screen
-                  },
+                  onTap: () => context.pushRoute(ChangePasswordRoute()),
                 ),
               ],
             ),
           ),
+
+          // ── App Info ─────────────────────────────────────────────────────
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -79,9 +81,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
                   leading: Icon(Icons.info_outline, color: theme.primaryColor),
                   title: const Text('About Us'),
                   trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    // TODO: Navigate to about us screen
-                  },
+                  onTap: () => context.pushRoute(const AboutUsRoute()),
                 ),
                 const Divider(height: 1),
                 ListTile(
@@ -91,9 +91,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
                   ),
                   title: const Text('Privacy Policy'),
                   trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    // TODO: Navigate to privacy policy screen
-                  },
+                  onTap: () => context.pushRoute(const PrivacyPolicyRoute()),
                 ),
                 const Divider(height: 1),
                 ListTile(
@@ -103,13 +101,14 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
                   ),
                   title: const Text('Terms and Conditions'),
                   trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    // TODO: Navigate to terms and conditions screen
-                  },
+                  onTap: () =>
+                      context.pushRoute(const TermsAndConditionsRoute()),
                 ),
               ],
             ),
           ),
+
+          // ── Logout ───────────────────────────────────────────────────────
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -121,9 +120,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
                 'Logout',
                 style: TextStyle(color: theme.colorScheme.error),
               ),
-              onTap: () {
-                // TODO: Implement logout functionality
-              },
+              onTap: () => _showLogoutDialog(context),
             ),
           ),
         ],
