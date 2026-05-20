@@ -53,7 +53,8 @@ class _ViewMetrimonyProfileScreenState
       backgroundColor: Colors.grey[100],
 
       bottomNavigationBar: profileAsync.maybeWhen(
-        data: (profile) => profile.user.uid == widget.userId
+        data: (profile) =>
+            true // Always show for valid data if viewed by agent
             ? Padding(
                 padding: const EdgeInsets.all(16),
                 child: ElevatedButton.icon(

@@ -1,3 +1,4 @@
+import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_service.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_recemmonded_repository.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
@@ -23,11 +24,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// USER HOME SCREEN
 /// =======================
 @RoutePage()
-class UserHomeScreen extends ConsumerWidget {
+class UserHomeScreen extends ConsumerStatefulWidget {
   const UserHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _UserHomeScreenState();
+}
+
+class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
+  @override
+  initState() {
+    super.initState();
+
+    // If you want fresh data every time the screen is entered,
+    // invalidate is fine. However, watch() will trigger the fetch
+    // automatically if not already loaded. If you need a manual refresh,
+    // consider adding a RefreshIndicator to the UI instead of
+    // invalidating on every initState.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Fetch the matrimony profiles when screen loads
+      ref.invalidate(homeControllerProvider);
+      ref.invalidate(currentUserRecommendedIdsProvider);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // current user provider
     final currentUserAsync = ref.watch(currentUserProvider);
 

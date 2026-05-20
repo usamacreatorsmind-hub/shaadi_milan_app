@@ -1,3 +1,5 @@
+import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_service.dart';
+
 import '../../../../../app/custom/custom_widgets/drawer.dart';
 import '../notifier/analytics_provider.dart';
 import '../notifier/user_nofier.dart';
@@ -23,6 +25,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(usersPaymentsNotifierProvider.notifier)

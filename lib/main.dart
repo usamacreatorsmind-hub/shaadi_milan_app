@@ -80,5 +80,5 @@ void main() async {
   await NotificationService.init();
   await InAppMessagingService.init();
 
-  runApp(SecureApp(child: const ProviderScope(child: App())));
+  runApp(const ProviderScope(child: App()));
 }
