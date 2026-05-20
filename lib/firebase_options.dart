@@ -41,48 +41,51 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCr7dyD4xW7Np1YdwbAc8Owe1n3pP7xBNI',
-    appId: '1:909636679466:web:d3179a941cf53971a39053',
-    messagingSenderId: '909636679466',
-    projectId: 'fir-app-e3a53',
-    authDomain: 'fir-app-e3a53.firebaseapp.com',
-    storageBucket: 'fir-app-e3a53.firebasestorage.app',
-    measurementId: 'G-2KKNX97FRT',
+    apiKey: 'AIzaSyDkMr2WO_5V_MtNoInBPEo264QLpqZr_00',
+    appId: '1:867606443625:web:837188ad0bca3d997614f8',
+    messagingSenderId: '867606443625',
+    projectId: 'arvika-marriage-bureau-d31df',
+    authDomain: 'arvika-marriage-bureau-d31df.firebaseapp.com',
+    storageBucket: 'arvika-marriage-bureau-d31df.firebasestorage.app',
+    measurementId: 'G-X1WPNCLWY9',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCnMC_xW5dnd1Z33orwFQkrxsVPlndbTTw',
-    appId: '1:909636679466:android:9f991ed256456ce9a39053',
-    messagingSenderId: '909636679466',
-    projectId: 'fir-app-e3a53',
-    storageBucket: 'fir-app-e3a53.firebasestorage.app',
+    apiKey: 'AIzaSyBMCHd7Ar0niJyrlRmht251QSTZPhHe2o4',
+    appId: '1:867606443625:android:20496ed7dc3e3e8b7614f8',
+    messagingSenderId: '867606443625',
+    projectId: 'arvika-marriage-bureau-d31df',
+    storageBucket: 'arvika-marriage-bureau-d31df.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD24YPvsQTW-vYODPlWrajFfJAJPHTs28g',
-    appId: '1:909636679466:ios:2126571cc70ab58aa39053',
-    messagingSenderId: '909636679466',
-    projectId: 'fir-app-e3a53',
-    storageBucket: 'fir-app-e3a53.firebasestorage.app',
-    iosBundleId: 'com.example.flutterApplication1',
+    apiKey: 'AIzaSyB8Mv9uVaE9TX6IyW986hreb-sIjmhSV8w',
+    appId: '1:867606443625:ios:fc3e885a7a884e4d7614f8',
+    messagingSenderId: '867606443625',
+    projectId: 'arvika-marriage-bureau-d31df',
+    storageBucket: 'arvika-marriage-bureau-d31df.firebasestorage.app',
+    iosClientId: '867606443625-tg1do37jqo84eh2qth4i6f4pdibft1s5.apps.googleusercontent.com',
+    iosBundleId: 'com.example.arvikaMarriageBureau',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyD24YPvsQTW-vYODPlWrajFfJAJPHTs28g',
-    appId: '1:909636679466:ios:2126571cc70ab58aa39053',
-    messagingSenderId: '909636679466',
-    projectId: 'fir-app-e3a53',
-    storageBucket: 'fir-app-e3a53.firebasestorage.app',
-    iosBundleId: 'com.example.flutterApplication1',
+    apiKey: 'AIzaSyB8Mv9uVaE9TX6IyW986hreb-sIjmhSV8w',
+    appId: '1:867606443625:ios:fc3e885a7a884e4d7614f8',
+    messagingSenderId: '867606443625',
+    projectId: 'arvika-marriage-bureau-d31df',
+    storageBucket: 'arvika-marriage-bureau-d31df.firebasestorage.app',
+    iosClientId: '867606443625-tg1do37jqo84eh2qth4i6f4pdibft1s5.apps.googleusercontent.com',
+    iosBundleId: 'com.example.arvikaMarriageBureau',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCr7dyD4xW7Np1YdwbAc8Owe1n3pP7xBNI',
-    appId: '1:909636679466:web:bf300710de7e5d6fa39053',
-    messagingSenderId: '909636679466',
-    projectId: 'fir-app-e3a53',
-    authDomain: 'fir-app-e3a53.firebaseapp.com',
-    storageBucket: 'fir-app-e3a53.firebasestorage.app',
-    measurementId: 'G-Y7SXNPVNZF',
+    apiKey: 'AIzaSyDkMr2WO_5V_MtNoInBPEo264QLpqZr_00',
+    appId: '1:867606443625:web:f65f23869081097f7614f8',
+    messagingSenderId: '867606443625',
+    projectId: 'arvika-marriage-bureau-d31df',
+    authDomain: 'arvika-marriage-bureau-d31df.firebaseapp.com',
+    storageBucket: 'arvika-marriage-bureau-d31df.firebasestorage.app',
+    measurementId: 'G-6K2ELCY9MF',
   );
+
 }

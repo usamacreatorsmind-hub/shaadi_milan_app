@@ -15,7 +15,7 @@ class HomeFilterState {
   });
 
   HomeFilterState copyWith({
-    String? state,
+    String? state,  
     String? city,
     String? religion,
     String? caste,

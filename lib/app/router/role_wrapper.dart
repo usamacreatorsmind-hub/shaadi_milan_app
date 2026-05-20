@@ -73,7 +73,7 @@ class _AuthWrapperScreenState extends ConsumerState<AuthWrapperScreen> {
               },
               (user) {
                 // User - check profile
-                if (user.isProfileCreated) {
+                if (!user.isProfileCreated) {
                   context.router.replaceAll([UserMainShellRoute()]);
                 } else {
                   context.router.replaceAll([MatrimonyFormFlowRoute()]);

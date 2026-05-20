@@ -1,6 +1,10 @@
 import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:arvika_marriage_bureau/core/filters/home_filter_controller.dart';
+import 'package:arvika_marriage_bureau/features/agent/agent_app/domain/states/match_filter_state.dart';
 import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/religion_state.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/state_city.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod/src/framework.dart';
 import 'package:sizer/sizer.dart';
@@ -434,17 +438,13 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        launchUrl(Uri.parse('tel:${user.phone}'));
+                         
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Contacting ${user.fullName}...'),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
+                         
                       },
                       icon: const Icon(Icons.phone),
-                      label: const Text('Call'),
+                      label: const Text('Matching Profile'),
+
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primaryColor,
                         foregroundColor: theme.colorScheme.onPrimary,
@@ -456,30 +456,6 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                     ),
                   ),
                   SizedBox(width: 5.w),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        launchUrl(Uri.parse('mailto:${user.email}'));
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Mailing ${user.fullName}...'),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.post_add),
-                      label: const Text('Mail'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -546,6 +522,257 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
       return 'Not available';
     }
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+class MatchingOptionsSheet extends ConsumerWidget {
+  String userId, gender, cast, religion, state, district;
+
+  MatchingOptionsSheet({
+    super.key,
+    this.userId = '',
+    this.gender = '',
+    this.cast = '',
+    this.religion = '',
+    this.state = '',
+    this.district = '',
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Matching Options',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 16),
+          // Add your matching options here
+        ],
+      ),
+    );
+  }
+}
+
+/// =======================
+/// FILTER RIGHT SHEET
+/// =======================
+class MatchingFilterRightSheet extends ConsumerWidget {
+  const MatchingFilterRightSheet({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filter = ref.watch(matchFilterProvider);
+    final locationAsync = ref.watch(locationJsonProvider);
+    final religionsAsync = ref.watch(religionsProvider);
+
+    return Material(
+      color: Colors.white,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Filter Profiles',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          ref.read(matchFilterProvider.notifier).reset();
+                        },
+                        child: const Text('Reset'),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const Divider(),
+
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ================= LOCATION SECTION =================
+                      const Text(
+                        'Location',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      locationAsync.when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => Text('Error: $e'),
+                        data: (states) {
+                          /// All state names from JSON
+                          final stateNames = states.map((e) => e.name).toList();
+
+                          /// Selected state object
+                          final selectedState = states.firstWhere(
+                            (s) => s.name == filter.state,
+                            orElse: () => StateCityModel(name: '', cities: []),
+                          );
+
+                          return Column(
+                            children: [
+                              _buildDropdown(
+                                title: 'State',
+                                value: filter.state.isEmpty
+                                    ? null
+                                    : filter.state,
+                                items: stateNames,
+                                onChanged: (val) {
+                                  if (val != null) {
+                                    ref
+                                        .read(homeFilterProvider.notifier)
+                                        .updateState(val);
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildDropdown(
+                                title: 'City',
+                                value: filter.city.isEmpty ? null : filter.city,
+                                items: selectedState.cities,
+                                onChanged: (val) {
+                                  if (val != null) {
+                                    ref
+                                        .read(homeFilterProvider.notifier)
+                                        .updateCity(val);
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // ================= RELIGION SECTION =================
+                      const Text(
+                        'Cultural',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      religionsAsync.when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => Text('Error: $e'),
+                        data: (religions) {
+                          final religionNames = religions
+                              .map((r) => r.name)
+                              .toList();
+
+                          final selectedReligion = religions.firstWhere(
+                            (r) => r.name == filter.religion,
+                            orElse: () =>
+                                ReligionModel(id: '', name: '', castes: []),
+                          );
+
+                          return Column(
+                            children: [
+                              _buildDropdown(
+                                title: 'Religion',
+                                value: filter.religion.isEmpty
+                                    ? null
+                                    : filter.religion,
+                                items: religionNames,
+                                onChanged: (val) {
+                                  if (val != null) {
+                                    ref
+                                        .read(homeFilterProvider.notifier)
+                                        .updateReligion(val);
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildDropdown(
+                                title: 'Caste',
+                                value: filter.caste.isEmpty
+                                    ? null
+                                    : filter.caste,
+                                items: selectedReligion.castes,
+                                onChanged: (val) {
+                                  if (val != null) {
+                                    ref
+                                        .read(homeFilterProvider.notifier)
+                                        .updateCaste(val);
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Apply Filters'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// ================= DROPDOWN BUILDER =================
+  static Widget _buildDropdown({
+    required String title,
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<String>(
+          initialValue: value,
+          items: items
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+      ],
+    );
   }
 }
 

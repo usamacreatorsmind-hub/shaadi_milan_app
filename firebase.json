@@ -1,18 +1,1 @@
-{
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run build"
-      ]
-    }
-  ]
-}
+{"functions":[{"source":"functions","codebase":"default","ignore":["node_modules",".git","firebase-debug.log","firebase-debug.*.log","*.local"],"predeploy":["npm --prefix \"$RESOURCE_DIR\" run build"]}],"flutter":{"platforms":{"android":{"default":{"projectId":"arvika-marriage-bureau-d31df","appId":"1:867606443625:android:20496ed7dc3e3e8b7614f8","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"arvika-marriage-bureau-d31df","configurations":{"android":"1:867606443625:android:20496ed7dc3e3e8b7614f8","ios":"1:867606443625:ios:fc3e885a7a884e4d7614f8","macos":"1:867606443625:ios:fc3e885a7a884e4d7614f8","web":"1:867606443625:web:837188ad0bca3d997614f8","windows":"1:867606443625:web:f65f23869081097f7614f8"}}}}}}

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:arvika_marriage_bureau/core/status/status.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 /// Example: Feature Notifier with integrated status management
 ///
@@ -12,7 +15,7 @@ class ExampleFeatureNotifier extends StateNotifier<AsyncValue<String>> {
 
   /// Example 1: Fetch data with status management
   Future<void> fetchExampleData() async {
-    final statusService = AppStatusService(ref);
+    final statusService = AppStatusService(ref as WidgetRef);
 
     try {
       statusService.setLoading(message: 'Fetching example data...');
@@ -32,18 +35,15 @@ class ExampleFeatureNotifier extends StateNotifier<AsyncValue<String>> {
 
   /// Example 2: Authenticate user
   Future<void> authenticateUser(String email, String password) async {
-    final statusService = AppStatusService(ref);
+    final statusService = AppStatusService(ref as WidgetRef);
 
     try {
-      await statusService.handleAuthentication(
-        () async {
-          // Simulate authentication
-          await Future.delayed(const Duration(seconds: 2));
-          if (email.isEmpty) throw Exception('Email required');
-          return {'email': email, 'token': 'abc123'};
-        },
-        successMessage: 'Authentication successful',
-      );
+      await statusService.handleAuthentication(() async {
+        // Simulate authentication
+        await Future.delayed(const Duration(seconds: 2));
+        if (email.isEmpty) throw Exception('Email required');
+        return {'email': email, 'token': 'abc123'};
+      }, successMessage: 'Authentication successful');
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
     }
@@ -51,17 +51,14 @@ class ExampleFeatureNotifier extends StateNotifier<AsyncValue<String>> {
 
   /// Example 3: Sync data with server
   Future<void> syncData() async {
-    final statusService = AppStatusService(ref);
+    final statusService = AppStatusService(ref as WidgetRef);
 
     try {
-      await statusService.handleSync(
-        () async {
-          // Simulate server sync
-          await Future.delayed(const Duration(seconds: 3));
-          return 'Sync completed';
-        },
-        syncingMessage: 'Syncing with server...',
-      );
+      await statusService.handleSync(() async {
+        // Simulate server sync
+        await Future.delayed(const Duration(seconds: 3));
+        return 'Sync completed';
+      }, syncingMessage: 'Syncing with server...');
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
     }
@@ -69,7 +66,7 @@ class ExampleFeatureNotifier extends StateNotifier<AsyncValue<String>> {
 
   /// Example 4: Network error handling
   Future<void> handleNetworkOperation() async {
-    final statusService = AppStatusService(ref);
+    final statusService = AppStatusService(ref as WidgetRef);
 
     try {
       statusService.setLoading();
@@ -77,7 +74,9 @@ class ExampleFeatureNotifier extends StateNotifier<AsyncValue<String>> {
       await Future.delayed(const Duration(seconds: 1));
     } catch (e) {
       if (e is SocketException) {
-        statusService.handleNetworkError(message: 'Please check your internet connection');
+        statusService.handleNetworkError(
+          message: 'Please check your internet connection',
+        );
       } else {
         statusService.setError(e);
       }
@@ -86,7 +85,7 @@ class ExampleFeatureNotifier extends StateNotifier<AsyncValue<String>> {
 
   /// Example 5: Session handling
   void handleSessionExpired() {
-    final statusService = AppStatusService(ref);
+    final statusService = AppStatusService(ref as WidgetRef);
     statusService.handleSessionExpired();
     // Then redirect to login screen
   }
@@ -95,8 +94,8 @@ class ExampleFeatureNotifier extends StateNotifier<AsyncValue<String>> {
 // Provider for the example feature
 final exampleFeatureProvider =
     StateNotifierProvider<ExampleFeatureNotifier, AsyncValue<String>>((ref) {
-  return ExampleFeatureNotifier(ref);
-});
+      return ExampleFeatureNotifier(ref);
+    });
 
 // Import this in your feature Dart or widget:
 //
@@ -131,4 +130,3 @@ final exampleFeatureProvider =
 // }
 
 // For import SocketException
-import 'dart:io';

@@ -1,3 +1,6 @@
+import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/profile_match_screen.dart';
+
 import '../../../../user/user_app/domain/states/image_state.dart';
 import '../../../../user/user_app/domain/states/metrimony_profile_view_model.dart';
 import '../../../../user/user_app/presentation/screens/my_profile_screen.dart';
@@ -33,10 +36,11 @@ class _ViewMetrimonyProfileScreenState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Fetch the matrimony profile when screen loads
-      ref.invalidate(matrimonyProfileViewModelProvider(widget.userId));
-    });
+    // If you want fresh data every time the screen is entered,
+    // invalidate is fine. However, watch() will trigger the fetch
+    // automatically if not already loaded. If you need a manual refresh,
+    // consider adding a RefreshIndicator to the UI instead of
+    // invalidating on every initState.
   }
 
   @override
@@ -47,6 +51,29 @@ class _ViewMetrimonyProfileScreenState
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
+
+      bottomNavigationBar: profileAsync.maybeWhen(
+        data: (profile) => profile.user.uid == widget.userId
+            ? Padding(
+                padding: const EdgeInsets.all(16),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    context.router.push(ProfileMatchRoute(profile: profile));
+                  },
+                  icon: const Icon(Icons.search),
+                  label: const Text('Match Profiles'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              )
+            : SizedBox(),
+        orElse: () => const SizedBox(),
+      ),
+
       appBar: AppBar(
         title: const Text('Matrimony Profile'),
         backgroundColor: Theme.of(context).primaryColor,

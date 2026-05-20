@@ -38,3 +38,5 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
     state = state.copyWith(caste: value);
   }
 }
+
+ 

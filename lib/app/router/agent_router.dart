@@ -43,6 +43,10 @@ class AgentRouter {
       page: AgentHomeRoute.page,
       guards: [AuthGuard(ref), AgentGuard(ref)],
     ),
+    AutoRoute(
+      page: ProfileMatchRoute.page,
+      guards: [AuthGuard(ref), AgentGuard(ref)],
+    ),
 
     AutoRoute(
       page: ViewPaymentDetailRoute.page,

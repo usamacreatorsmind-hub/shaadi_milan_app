@@ -1,3 +1,5 @@
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_recemmonded_repository.dart';
+import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 
@@ -31,6 +33,10 @@ class UserHomeScreen extends ConsumerWidget {
 
     final homeState = ref.watch(homeControllerProvider);
     final filter = ref.watch(homeFilterProvider);
+    final recommendedIdsAsync = ref.watch(currentUserRecommendedIdsProvider);
+    final recommendedProfileIds =
+        recommendedIdsAsync.asData?.value ?? const <String>[];
+    final recommendedProfileIdSet = recommendedProfileIds.toSet();
 
     String filterText = '';
     if (filter.city.isNotEmpty) {
@@ -45,6 +51,27 @@ class UserHomeScreen extends ConsumerWidget {
       if (filter.caste.isNotEmpty) {
         filterText += ' (${filter.caste})';
       }
+    }
+
+    bool isRecommended(MatrimonyProfileViewModel viewModel) {
+      final profile = viewModel.profile;
+      final profileUser = viewModel.user;
+
+      final candidateIds = <String>{
+        profile.userId,
+        profile.metrimonyId,
+        profile.identity.profileId,
+        profileUser?.uid ?? '',
+        profileUser?.profileId ?? '',
+        profileUser?.metrimonyId ?? '',
+      }..removeWhere((id) => id.isEmpty);
+
+      final matches = candidateIds.any(recommendedProfileIdSet.contains);
+      debugPrint(
+        'Recommended check for ${profileUser?.fullName ?? profile.userId}: '
+        'candidates=$candidateIds, suggested=$recommendedProfileIds, match=$matches',
+      );
+      return matches;
     }
 
     return Scaffold(
@@ -86,9 +113,8 @@ class UserHomeScreen extends ConsumerWidget {
                         Icons.notifications_outlined,
                         color: Colors.white,
                       ),
-                      onPressed: () => context.router.push(
-                        const UserNotificationRoute(),
-                      ),
+                      onPressed: () =>
+                          context.router.push(const UserNotificationRoute()),
                     ),
                   ],
                 ),
@@ -147,17 +173,24 @@ class UserHomeScreen extends ConsumerWidget {
                               transitionDuration: const Duration(
                                 milliseconds: 400,
                               ),
-                              pageBuilder: (context, animation, secondaryAnimation) =>
-                                  const FilterRightSheet(),
-                              transitionBuilder: (context, animation, secondaryAnimation, child) {
-                                return SlideTransition(
-                                  position: Tween(
-                                    begin: const Offset(1, 0),
-                                    end: Offset.zero,
-                                  ).animate(animation),
-                                  child: child,
-                                );
-                              },
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const FilterRightSheet(),
+                              transitionBuilder:
+                                  (
+                                    context,
+                                    animation,
+                                    secondaryAnimation,
+                                    child,
+                                  ) {
+                                    return SlideTransition(
+                                      position: Tween(
+                                        begin: const Offset(1, 0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    );
+                                  },
                             );
                           },
                         ),
@@ -172,7 +205,9 @@ class UserHomeScreen extends ConsumerWidget {
                     child: _HomeSummaryCard(
                       fullName: user.fullName,
                       hasFilter: filterText.isNotEmpty,
-                      filterText: filterText.isEmpty ? 'All Profiles' : filterText,
+                      filterText: filterText.isEmpty
+                          ? 'All Profiles'
+                          : filterText,
                     ),
                   ),
                 ),
@@ -218,7 +253,11 @@ class UserHomeScreen extends ConsumerWidget {
                           casteMatch;
                     }).toList();
 
-                    if (filteredProfiles.isEmpty) {
+                    final visibleProfiles = filteredProfiles.where((viewModel) {
+                      return isRecommended(viewModel);
+                    }).toList();
+
+                    if (visibleProfiles.isEmpty) {
                       return SliverToBoxAdapter(
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
@@ -228,7 +267,9 @@ class UserHomeScreen extends ConsumerWidget {
                               color: Theme.of(context).cardColor,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: Theme.of(context).colorScheme.outlineVariant,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.outlineVariant,
                               ),
                             ),
                             child: Column(
@@ -240,7 +281,7 @@ class UserHomeScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 10),
                                 const Text(
-                                  'No profiles match your filters.',
+                                  'No recommended profiles match your filters.',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -249,7 +290,9 @@ class UserHomeScreen extends ConsumerWidget {
                                 const SizedBox(height: 10),
                                 TextButton.icon(
                                   onPressed: () {
-                                    ref.read(homeFilterProvider.notifier).reset();
+                                    ref
+                                        .read(homeFilterProvider.notifier)
+                                        .reset();
                                   },
                                   icon: const Icon(Icons.refresh_rounded),
                                   label: const Text('Reset filters'),
@@ -265,7 +308,7 @@ class UserHomeScreen extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 16),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate((context, index) {
-                          final viewModel = filteredProfiles[index];
+                          final viewModel = visibleProfiles[index];
                           final profile = viewModel.profile;
                           final user = viewModel.user;
                           final displayName = user?.fullName ?? 'N/A';
@@ -280,13 +323,14 @@ class UserHomeScreen extends ConsumerWidget {
                               uid: profile.userId,
                               name: displayName.isEmpty ? 'N/A' : displayName,
                               age: profile.identity.age,
-                              designation: (designation == null || designation.isEmpty)
+                              designation:
+                                  (designation == null || designation.isEmpty)
                                   ? 'N/A'
                                   : designation,
                               imageUrl: profile.images.primaryImageUrl,
                             ),
                           );
-                        }, childCount: filteredProfiles.length),
+                        }, childCount: visibleProfiles.length),
                       ),
                     );
                   },
@@ -638,7 +682,9 @@ class ProfileCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(22),
+                ),
                 child: Stack(
                   children: [
                     SizedBox(
@@ -652,10 +698,11 @@ class ProfileCard extends StatelessWidget {
                           : Image.network(
                               imageUrl,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.person, size: 64),
-                              ),
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.person, size: 64),
+                                  ),
                             ),
                     ),
                     Positioned.fill(
@@ -692,21 +739,35 @@ class ProfileCard extends StatelessWidget {
                           const SizedBox(height: 6),
                           Row(
                             children: [
-                              const Icon(Icons.cake_outlined, size: 16, color: Colors.white),
+                              const Icon(
+                                Icons.cake_outlined,
+                                size: 16,
+                                color: Colors.white,
+                              ),
                               const SizedBox(width: 5),
                               Text(
                                 '$age yrs',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                               const SizedBox(width: 14),
-                              const Icon(Icons.work_outline_rounded, size: 16, color: Colors.white),
+                              const Icon(
+                                Icons.work_outline_rounded,
+                                size: 16,
+                                color: Colors.white,
+                              ),
                               const SizedBox(width: 5),
                               Expanded(
                                 child: Text(
                                   designation,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ],
@@ -722,7 +783,8 @@ class ProfileCard extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: FilledButton.tonalIcon(
-                    onPressed: () => context.router.push(UserDetailRoute(uid: uid)),
+                    onPressed: () =>
+                        context.router.push(UserDetailRoute(uid: uid)),
                     icon: const Icon(Icons.arrow_forward_rounded, size: 18),
                     label: const Text('View Profile'),
                   ),
@@ -735,4 +797,3 @@ class ProfileCard extends StatelessWidget {
     );
   }
 }
-

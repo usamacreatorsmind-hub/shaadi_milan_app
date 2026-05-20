@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../../../auth/domain/states/user_state.dart';
@@ -122,6 +123,22 @@ class HomeController extends StateNotifier<HomeState> {
                     user: user,
                     agent: agent,
                   ),
+                );
+              }
+
+              debugPrint('Fetched ${data.length} home profiles initially');
+              for (final viewModel in data) {
+                final profile = viewModel.profile;
+                final user = viewModel.user;
+                debugPrint(
+                  'Home profile -> '
+                  'name: ${user?.fullName ?? 'N/A'}, '
+                  'uid: ${profile.userId}, '
+                  'metrimonyId: ${profile.metrimonyId}, '
+                  'profileId: ${profile.identity.profileId}, '
+                  'gender: ${profile.identity.gender}, '
+                  'state: ${profile.address.state}, '
+                  'city: ${profile.address.city}',
                 );
               }
 

@@ -296,7 +296,7 @@ class UserEntity {
       profileStatus: map['profileStatus'] ?? 'active',
       profileImageUrl: map['profileImageUrl'] ?? '',
       uid: map['uid'] ?? '',
-      gender: map['gender'],
+      gender: map['gender'] ?? '',
       email: map['email'] ?? '',
       fullName: map['fullName'] ?? '',
       phone: map['phone'] ?? '',

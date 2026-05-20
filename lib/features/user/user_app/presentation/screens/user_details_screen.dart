@@ -62,9 +62,9 @@ class UserDetailScreen extends ConsumerStatefulWidget {
 class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
   List<String> _buildDisplayImages(ProfileImages profileImages) {
     final rawImages = <String>[
-      profileImages.profileImageUrl,
       profileImages.primaryImageUrl,
       ...profileImages.secondaryImageUrls,
+      profileImages.profileImageUrl,
       profileImages.imageWithAgentUrl,
     ];
 

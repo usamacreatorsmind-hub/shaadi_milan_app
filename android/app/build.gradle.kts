@@ -8,13 +8,18 @@ if (keystorePropertiesFile.exists()) {
 }
 plugins {
     id("com.android.application")
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
+    id("com.google.firebase.firebase-perf")
+    id("com.google.firebase.crashlytics")
+    // END: FlutterFire Configuration
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
-    namespace = "com.arvikamarriagebureau.app"
+    namespace = "com.arvikamarriagebureau.arvika"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -29,7 +34,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.arvikamarriagebureau.app"
+        applicationId = "com.arvikamarriagebureau.arvika"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         compileSdkVersion(36)

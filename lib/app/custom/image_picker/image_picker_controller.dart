@@ -25,11 +25,6 @@ class ImagePickerController extends StateNotifier<ImagesState> {
   Future<String?> _cropImage(String path, {bool isPrimary = false}) async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
-      maxWidth: isPrimary ? 500 : 800,
-      maxHeight: isPrimary ? 500 : 800,
-      compressQuality: isPrimary ? 70 : 80,
-      compressFormat: ImageCompressFormat.jpg,
-
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: 'Crop Image',
@@ -91,7 +86,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      final XFile? image = await _picker.pickImage(source: source, imageQuality: 80);
+      final XFile? image = await _picker.pickImage(source: source);
 
       if (image == null) return;
 
@@ -110,10 +105,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      final images = await _picker.pickMultiImage(
-        imageQuality: 50,
-        limit: maxSecondaryImages,
-      );
+      final images = await _picker.pickMultiImage(limit: maxSecondaryImages);
 
       if (images.isEmpty) return;
 
@@ -179,7 +171,8 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       // Use service directly to access progress callbacks
       final service = ref.read(imageUploadServiceProvider);
 
-      const steps = 5; // primary, secondary, aadhar, imageWithAgent, profileImage
+      const steps =
+          5; // primary, secondary, aadhar, imageWithAgent, profileImage
       final stepWeight = 1.0 / steps;
 
       void updateStepProgress(int stepIndex, double p) {
@@ -243,10 +236,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 80,
-      );
+      final XFile? image = await _picker.pickImage(source: ImageSource.camera);
 
       if (image == null) return;
 
@@ -269,10 +259,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      final XFile? image = await _picker.pickImage(
-        source: source,
-        imageQuality: 80,
-      );
+      final XFile? image = await _picker.pickImage(source: source);
 
       if (image == null) return;
 
@@ -315,7 +302,6 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       },
     );
   }
-
 }
 
 final imagePickerProvider =
