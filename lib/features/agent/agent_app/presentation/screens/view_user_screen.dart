@@ -2,6 +2,7 @@ import 'package:arvika_marriage_bureau/app/router/app_router.dart';
 import 'package:arvika_marriage_bureau/core/filters/home_filter_controller.dart';
 import 'package:arvika_marriage_bureau/features/agent/agent_app/domain/states/match_filter_state.dart';
 import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
+import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/metrimony_notifier.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/religion_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/state_city.dart';
@@ -107,8 +108,8 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile closed successfully')),
         );
+        context.router.maybePop();
       }
-      context.router.maybePop();
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
@@ -437,12 +438,41 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen> {
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                         
+                      onPressed: () async {
+                        // Show loading indicator
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (dialogContext) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
 
-                         
+                        try {
+                          // Fetch the full MetrimonyProfileViewModel for this user
+                          final datasource = ref.read(metrimonyFirestoreDsProvider);
+                          final vm = await datasource.getMetrimonyProfileViewModel(user.uid);
+
+                          if (context.mounted) {
+                            // Close loading indicator
+                            context.router.maybePop();
+                            
+                            // Navigate to matching profiles screen
+                            context.router.push(ProfileMatchRoute(profile: vm));
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            context.router.maybePop(); // Close loading indicator
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Failed to load matching profiles: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
                       },
-                      icon: const Icon(Icons.phone),
+                      icon: const Icon(Icons.favorite),
                       label: const Text('Matching Profile'),
 
                       style: ElevatedButton.styleFrom(

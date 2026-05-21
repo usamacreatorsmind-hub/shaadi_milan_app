@@ -3,7 +3,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenshot_blocker/flutter_screenshot_blocker.dart';
 
 import 'core/notification/notification_service.dart';
 import 'app/app.dart';

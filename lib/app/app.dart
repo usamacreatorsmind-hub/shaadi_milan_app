@@ -2,9 +2,9 @@ import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_ser
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenshot_blocker/flutter_screenshot_blocker.dart';
 import 'package:sizer/sizer.dart';
 
+import 'router/app_router.dart';
 import '../core/themes/app_theme.dart';
 import 'providers/global_providers.dart';
 
@@ -34,7 +34,7 @@ class _AppState extends ConsumerState<App> {
         routerConfig: appRouter.config(),
         debugShowCheckedModeBanner: false,
         builder: (context, child) {
-          return SecureApp(child: _GlobalUpdateChecker(child: child!));
+          return _GlobalUpdateChecker(appRouter: appRouter, child: child!);
         },
       ),
     );
@@ -43,8 +43,9 @@ class _AppState extends ConsumerState<App> {
 
 /// Wrapper to perform version check once the MaterialApp is initialized
 class _GlobalUpdateChecker extends StatefulWidget {
+  final AppRouter appRouter;
   final Widget child;
-  const _GlobalUpdateChecker({required this.child});
+  const _GlobalUpdateChecker({required this.appRouter, required this.child});
 
   @override
   State<_GlobalUpdateChecker> createState() => _GlobalUpdateCheckerState();
@@ -55,7 +56,12 @@ class _GlobalUpdateCheckerState extends State<_GlobalUpdateChecker> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) RemoteConfigService.instance.checkForUpdate(context);
+      if (!mounted) return;
+
+      final navigatorContext = widget.appRouter.navigatorKey.currentContext;
+      if (navigatorContext != null) {
+        RemoteConfigService.instance.checkForUpdate(navigatorContext);
+      }
     });
   }
 

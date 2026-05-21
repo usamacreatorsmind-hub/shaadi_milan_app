@@ -53,10 +53,84 @@ class UserRecemmondedRepository {
         'name': name,
         'phone': phone,
         'gender': gender,
-        'ids': profileIds,
+        'ids': FieldValue.arrayUnion(profileIds),
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> updateMutualRecommendedProfiles({
+    required String sourceUid,
+    required String sourceName,
+    required String sourcePhone,
+    required String sourceGender,
+    required String targetUid,
+    required String targetName,
+    required String targetPhone,
+    required String targetGender,
+  }) async {
+    try {
+      final batch = firestore.batch();
+      final sourceRef = firestore
+          .collection('suggested_profiles')
+          .doc(sourceUid);
+      final targetRef = firestore
+          .collection('suggested_profiles')
+          .doc(targetUid);
+
+      batch.set(sourceRef, {
+        'userId': sourceUid,
+        'name': sourceName,
+        'phone': sourcePhone,
+        'gender': sourceGender,
+        'ids': FieldValue.arrayUnion([targetUid]),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      batch.set(targetRef, {
+        'userId': targetUid,
+        'name': targetName,
+        'phone': targetPhone,
+        'gender': targetGender,
+        'ids': FieldValue.arrayUnion([sourceUid]),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      await batch.commit();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> removeMutualRecommendedProfiles({
+    required String sourceUid,
+    required String targetUid,
+  }) async {
+    try {
+      final batch = firestore.batch();
+      final sourceRef = firestore
+          .collection('suggested_profiles')
+          .doc(sourceUid);
+      final targetRef = firestore
+          .collection('suggested_profiles')
+          .doc(targetUid);
+
+      batch.set(sourceRef, {
+        'ids': FieldValue.arrayRemove([targetUid]),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      batch.set(targetRef, {
+        'ids': FieldValue.arrayRemove([sourceUid]),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      await batch.commit();
       return true;
     } catch (e) {
       return false;

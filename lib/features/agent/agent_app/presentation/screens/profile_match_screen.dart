@@ -98,6 +98,84 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
     }
   }
 
+  Future<void> _recommendProfile(MetrimonyProfileViewModel match) async {
+    if (_recommendedProfiles!.ids.contains(match.user.uid)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profile already recommended!'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final repo = ref.read(userRecemmondedRepositoryProvider);
+
+    // Perform mutual recommendation using the repository's batch update method
+    final success = await repo.updateMutualRecommendedProfiles(
+      sourceUid: widget.profile.user.uid,
+      sourceName: widget.profile.user.fullName,
+      sourcePhone: widget.profile.user.phone,
+      sourceGender: widget.profile.identity.gender,
+      targetUid: match.user.uid,
+      targetName: match.user.fullName,
+      targetPhone: match.user.phone,
+      targetGender: match.identity.gender,
+    );
+
+    if (mounted) {
+      if (success) {
+        setState(() {
+          _recommendedProfiles!.ids.add(match.user.uid);
+        });
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            success
+                ? 'Profile Recommended Successfully'
+                : 'Failed to Recommend Profile',
+          ),
+          backgroundColor: success ? Colors.green : Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _removeRecommendation(MetrimonyProfileViewModel match) async {
+    final repo = ref.read(userRecemmondedRepositoryProvider);
+
+    // Perform mutual recommendation removal using the repository's batch update method
+    final success = await repo.removeMutualRecommendedProfiles(
+      sourceUid: widget.profile.user.uid,
+      targetUid: match.user.uid,
+    );
+
+    if (mounted) {
+      if (success) {
+        setState(() {
+          _recommendedProfiles!.ids.remove(match.user.uid);
+        });
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            success
+                ? 'Recommendation Removed Successfully'
+                : 'Failed to Remove Recommendation',
+          ),
+          backgroundColor: success ? Colors.green : Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final allProfilesAsync = ref.watch(allProfilesProvider);
@@ -171,49 +249,10 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                     final match = matches[index];
                     return InkWell(
                       borderRadius: BorderRadius.circular(20),
-                      onTap: () async {
-                        if (_recommendedProfiles!.ids.contains(
-                          match.user.uid,
-                        )) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Profile already recommended!'),
-                              backgroundColor: Colors.orange,
-                              duration: Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                          return;
-                        }
-
-                        final repo = ref.read(
-                          userRecemmondedRepositoryProvider,
-                        );
-
-                        final success = await repo.updateRecommendedProfiles(
-                          gender: widget.profile.identity.gender,
-                          name: widget.profile.user.fullName,
-                          phone: widget.profile.user.phone,
-                          profileIds: [match.user.uid],
-                          uid: widget.profile.user.uid,
-                        );
-
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                success
-                                    ? 'Recommended profile updated successfully!'
-                                    : 'Failed to update recommended profile.',
-                              ),
-                              backgroundColor: success
-                                  ? Colors.green
-                                  : Colors.red,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
-                      },
+                      onTap: () =>
+                          _recommendedProfiles!.ids.contains(match.user.uid)
+                          ? _removeRecommendation(match)
+                          : _recommendProfile(match),
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 18),
                         decoration: BoxDecoration(
@@ -342,63 +381,34 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                   SizedBox(
                                     width: double.infinity,
                                     child: ElevatedButton.icon(
-                                      onPressed:
+                                      onPressed: () =>
                                           _recommendedProfiles!.ids.contains(
                                             match.user.uid,
                                           )
-                                          ? null
-                                          : () async {
-                                              final repo = ref.read(
-                                                userRecemmondedRepositoryProvider,
-                                              );
-
-                                              final success = await repo
-                                                  .updateRecommendedProfiles(
-                                                    gender: widget
-                                                        .profile
-                                                        .identity
-                                                        .gender,
-                                                    name: widget
-                                                        .profile
-                                                        .user
-                                                        .fullName,
-                                                    phone: widget
-                                                        .profile
-                                                        .user
-                                                        .phone,
-                                                    profileIds: [
-                                                      match.user.uid,
-                                                    ],
-                                                    uid:
-                                                        widget.profile.user.uid,
-                                                  );
-
-                                              if (context.mounted) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      success
-                                                          ? 'Profile Recommended Successfully'
-                                                          : 'Failed to Recommend Profile',
-                                                    ),
-                                                    backgroundColor: success
-                                                        ? Colors.green
-                                                        : Colors.red,
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                      icon: const Icon(Icons.favorite),
+                                          ? _removeRecommendation(match)
+                                          : _recommendProfile(match),
+                                      icon: Icon(
+                                        _recommendedProfiles!.ids.contains(
+                                              match.user.uid,
+                                            )
+                                            ? Icons.favorite_border
+                                            : Icons.favorite,
+                                      ),
                                       label: Text(
                                         _recommendedProfiles!.ids.contains(
                                               match.user.uid,
                                             )
-                                            ? 'Already Recommended'
+                                            ? 'Remove Recommendation'
                                             : 'Recommend Profile',
                                       ),
                                       style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            _recommendedProfiles!.ids.contains(
+                                              match.user.uid,
+                                            )
+                                            ? Colors.red.shade400
+                                            : theme.primaryColor,
+                                        foregroundColor: Colors.white,
                                         minimumSize: const Size(
                                           double.infinity,
                                           50,
@@ -409,21 +419,6 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-
-                                  SizedBox(
-                                    height: 12,
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        context.pushRoute(
-                                          UserProfileRoute(
-                                            userId: match.user.uid,
-                                          ),
-                                        );
-                                      },
-                                      child: const Text('View Full Profile'),
                                     ),
                                   ),
                                 ],

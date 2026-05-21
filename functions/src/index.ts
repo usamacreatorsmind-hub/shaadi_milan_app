@@ -1,5 +1,5 @@
 import { setGlobalOptions } from "firebase-functions/v2";
-import { onDocumentCreated,  onDocumentUpdated } from "firebase-functions/v2/firestore";
+import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from "firebase-functions/v2/firestore";
 import * as admin from "firebase-admin";
 import { logger } from "firebase-functions";
 
@@ -715,4 +715,72 @@ export const notifyAgentOnSupportTicketCreated = onDocumentCreated(
 
  
  
- 
+
+
+export const notifyUserOnProfileSuggestion = onDocumentWritten(
+  "suggested_profiles/{userId}",
+  async (event) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    
+    // If document was deleted, do nothing
+    if (!after) return;
+
+    const userId = event.params.userId;
+    const beforeIds: string[] = before?.ids || [];
+    const afterIds: string[] = after.ids || [];
+
+    // Detect newly added profile IDs in the suggested list
+    const newlyAddedIds = afterIds.filter(id => !beforeIds.includes(id));
+    if (newlyAddedIds.length === 0) return;
+
+    // Process notifications for each newly suggested profile
+    for (const suggestedUserId of newlyAddedIds) {
+      const [userSnap, suggestedUserSnap] = await Promise.all([
+        admin.firestore().collection("users").doc(userId).get(),
+        admin.firestore().collection("users").doc(suggestedUserId).get(),
+      ]);
+
+      if (!userSnap.exists || !userSnap.data()?.fcmToken) {
+        logger.warn("User not found or has no FCM token", { userId });
+        continue;
+      }
+
+      const suggestedUserName = suggestedUserSnap.data()?.fullName ?? "a potential match";
+      const userFcmToken = userSnap.data()!.fcmToken;
+
+      const message: admin.messaging.Message = {
+        token: userFcmToken,
+        notification: {
+          title: "New Profile Suggestion",
+          body: `Your agent has suggested a new profile: ${suggestedUserName}`,
+        },
+        data: {
+          click_action: "FLUTTER_NOTIFICATION_CLICK",
+          screen: "view_user",
+          userId: suggestedUserId,
+          type: "PROFILE_SUGGESTION",
+        },
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "fcm_channel",
+            priority: "high",
+            sound: "default",
+            clickAction: "FLUTTER_NOTIFICATION_CLICK",
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: "default",
+              badge: 1,
+            },
+          },
+        },
+      };
+
+      await sendNotification(message, `profile_suggestion_${userId}_${suggestedUserId}`);
+    }
+  }
+);
