@@ -1,5 +1,3 @@
-import 'package:flutter/rendering.dart';
-
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -17,15 +15,11 @@ class AgentMainShellScreen extends ConsumerStatefulWidget {
 }
 
 class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
-  bool _isVisible = true;
-
   @override
   Widget build(BuildContext context) {
-    // 🔹 Listen for Auth State Changes (Logout)
     ref.listen(authStateProvider, (previous, next) {
       next.whenData((data) {
         if (data == null) {
-          // User logged out, redirect to Onboarding
           context.router.replaceAll([const OnboardingRoute()]);
         }
       });
@@ -45,145 +39,41 @@ class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
         final tabsRouter = AutoTabsRouter.of(context);
 
         return Scaffold(
-          extendBody: true,
-          body: NotificationListener<UserScrollNotification>(
-            onNotification: (notification) {
-              if (notification.direction == ScrollDirection.reverse) {
-                if (_isVisible) setState(() => _isVisible = false);
-              } else if (notification.direction == ScrollDirection.forward) {
-                if (!_isVisible) setState(() => _isVisible = true);
-              }
-              return true;
-            },
-            child: child,
-          ),
-          bottomNavigationBar: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            height: _isVisible ? 80 : 0,
-            child: Wrap(
-              children: [
-                CustomBottomNavBar(
-                  currentIndex: tabsRouter.activeIndex,
-                  onTap: tabsRouter.setActiveIndex,
-                ),
-              ],
-            ),
+          body: child,
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: tabsRouter.activeIndex,
+            onTap: tabsRouter.setActiveIndex,
+            type: BottomNavigationBarType.fixed,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.analytics_outlined),
+                activeIcon: Icon(Icons.analytics),
+                label: 'Dashboard',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.groups_3_outlined),
+                activeIcon: Icon(Icons.groups_3),
+                label: 'Clients',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.payments_outlined),
+                activeIcon: Icon(Icons.payments),
+                label: 'Revenue',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.favorite_outline),
+                activeIcon: Icon(Icons.favorite),
+                label: 'Wishlist',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                activeIcon: Icon(Icons.person),
+                label: 'My Profile',
+              ),
+            ],
           ),
         );
       },
-    );
-  }
-}
-
-class BottomNavItem {
-  final IconData icon;
-  final String label;
-
-  const BottomNavItem({required this.icon, required this.label});
-}
-
-class CustomBottomNavBar extends StatelessWidget {
-  final int currentIndex;
-  final ValueChanged<int> onTap;
-
-  const CustomBottomNavBar({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-  });
-
-  static const List<BottomNavItem> items = [
-    BottomNavItem(
-      icon: Icons.analytics_outlined,
-      label: 'Dashboard', // Stats & Overview
-    ),
-    BottomNavItem(
-      icon: Icons.groups_3_outlined,
-      label: 'Clients', // Their own data/profiles
-    ),
-    BottomNavItem(
-      icon: Icons.payments_outlined,
-
-      label: 'Revenue', // Earnings & Commissions
-    ),
-    BottomNavItem(
-      icon: Icons.favorite_outline,
-      label: 'Wishlist', // Wishlist
-    ),
-    BottomNavItem(
-      icon: Icons.person_outline,
-      label: 'My Profile', // Tasks, Meetings, & Follow-ups
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(items.length, (index) {
-            final bool isSelected = index == currentIndex;
-
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => onTap(index),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? Theme.of(context).colorScheme.primary.withOpacity(0.12)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      items[index].icon,
-                      size: 26,
-                      color: isSelected
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.grey,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      items[index].label,
-                      style: TextStyle(
-                        fontSize: 12, // ✅ Proper size
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : Colors.grey,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
     );
   }
 }

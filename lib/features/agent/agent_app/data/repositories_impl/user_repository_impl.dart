@@ -8,8 +8,8 @@ class UserRepositoryImpl implements UserRepository {
   UserRepositoryImpl({required this.userFirestore});
 
   @override
-  Future<List<UserEntity>> getUsersForAgent(String agentId) {
-    return userFirestore.getUsersForAgent(agentId);
+  Future<List<UserEntity>> getUsersForAgent( ) {
+    return userFirestore.getUsersForAgent( );
   }
 
   // update status

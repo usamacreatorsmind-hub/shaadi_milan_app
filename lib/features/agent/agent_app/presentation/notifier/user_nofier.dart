@@ -35,11 +35,10 @@ class UsersNotifier extends StateNotifier<AsyncValue<List<UserEntity>>> {
 
   UsersNotifier(this._userRepository) : super(const AsyncValue.data([]));
 
-  /// Fetch all users for a specific agent
-  Future<void> getUsersForAgent(String agentId) async {
+  Future<void> getUsersForAgent() async {
     try {
       state = const AsyncValue.loading();
-      final users = await _userRepository.getUsersForAgent(agentId);
+      final users = await _userRepository.getUsersForAgent();
       state = AsyncValue.data(users);
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);

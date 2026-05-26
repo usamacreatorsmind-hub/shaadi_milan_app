@@ -85,14 +85,14 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
               : TabBarView(
                   controller: _tabController,
                   children: [
-                    // Tab 1: Wishlists where agent's users are senders
+                    // Tab 1: Wishlists where user is sender
                     _buildWishlistList(
-                      wishlists: _filterBySenderAgent(wishlistState.filteredWishlists),
+                      wishlists: _filterBySender(wishlistState.filteredWishlists),
                       isMyUsersSender: true,
                     ),
-                    // Tab 2: Wishlists where agent's users are receivers (leads)
+                    // Tab 2: Wishlists where user is receiver (leads)
                     _buildWishlistList(
-                      wishlists: _filterByReceiverAgent(wishlistState.filteredWishlists),
+                      wishlists: _filterByReceiver(wishlistState.filteredWishlists),
                       isMyUsersSender: false,
                     ),
                   ],
@@ -100,12 +100,12 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
     );
   }
 
-  List<WishlistEntity> _filterBySenderAgent(List<WishlistEntity> wishlists) {
-    return wishlists.where((w) => w.senderAgent == widget.agentId).toList();
+  List<WishlistEntity> _filterBySender(List<WishlistEntity> wishlists) {
+    return wishlists;
   }
 
-  List<WishlistEntity> _filterByReceiverAgent(List<WishlistEntity> wishlists) {
-    return wishlists.where((w) => w.receiverAgent == widget.agentId).toList();
+  List<WishlistEntity> _filterByReceiver(List<WishlistEntity> wishlists) {
+    return wishlists;
   }
 
   Widget _buildStatusFilter(ThemeData theme) {

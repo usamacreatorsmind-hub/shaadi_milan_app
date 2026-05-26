@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 abstract class UserFirestore {
-  Future<List<UserEntity>> getUsersForAgent(String agentId);
+  Future<List<UserEntity>> getUsersForAgent();
   Future<UserEntity> getUserById(String userId);
 
   Future<void> updateUserStatus({
@@ -50,20 +50,18 @@ class UserFirestoreImpl implements UserFirestore {
   }
 
   @override
-  Future<List<UserEntity>> getUsersForAgent(String agentId) async {
+  Future<List<UserEntity>> getUsersForAgent() async {
     //fetch user from firestore where agentId matches
     debugPrint("getting Users for Agent");
-    List<UserEntity> users = await firestore
-        .collection('users')
-        .where('agentId', isEqualTo: agentId)
-        .get()
-        .then((querySnapshot) {
-          return querySnapshot.docs.map((doc) {
-            final data = doc.data();
-            data['uid'] = doc.id; // Add document ID as uid
-            return UserEntity.fromMap(data);
-          }).toList();
-        });
+    List<UserEntity> users = await firestore.collection('users').get().then((
+      querySnapshot,
+    ) {
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        data['uid'] = doc.id; // Add document ID as uid
+        return UserEntity.fromMap(data);
+      }).toList();
+    });
     for (var user in users) {
       debugPrint(user.toString());
     }

@@ -20,11 +20,7 @@ class AppStatusService {
   }
 
   /// Set a custom status
-  void setStatus(
-    AppStatus status, {
-    String? message,
-    dynamic data,
-  }) {
+  void setStatus(AppStatus status, {String? message, dynamic data}) {
     _notifier.setStatus(status, message: message, data: data);
   }
 

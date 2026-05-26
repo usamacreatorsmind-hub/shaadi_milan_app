@@ -110,30 +110,14 @@ class WishlistFirestoreDSImpl implements WishlistFirestoreDS {
 
   @override
   Future<List<WishlistEntity>> getWishlistsForAgent(String agentId) async {
-    // Get wishlists where agent is either sender's agent or receiver's agent
-    final senderAgentQuery = await _wishlistsCollection
-        .where('senderAgent', isEqualTo: agentId)
-        .get();
+    final querySnapshot = await _wishlistsCollection.get();
 
-    final receiverAgentQuery = await _wishlistsCollection
-        .where('receiverAgent', isEqualTo: agentId)
-        .get();
-
-    final Map<String, WishlistEntity> uniqueWishlists = {};
-
-    for (final doc in senderAgentQuery.docs) {
+    final wishlists = querySnapshot.docs.map((doc) {
       final data = doc.data();
       data['id'] = doc.id;
-      uniqueWishlists[doc.id] = _mapToWishlistEntity(data);
-    }
+      return _mapToWishlistEntity(data);
+    }).toList();
 
-    for (final doc in receiverAgentQuery.docs) {
-      final data = doc.data();
-      data['id'] = doc.id;
-      uniqueWishlists[doc.id] = _mapToWishlistEntity(data);
-    }
-
-    final wishlists = uniqueWishlists.values.toList();
     wishlists.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
     return wishlists;
   }
@@ -183,32 +167,13 @@ class WishlistFirestoreDSImpl implements WishlistFirestoreDS {
 
   @override
   Stream<List<WishlistEntity>> watchWishlistsForAgent(String agentId) {
-    // Watch sender agent wishlists and combine with receiver agent
-    final senderStream = _wishlistsCollection
-        .where('senderAgent', isEqualTo: agentId)
-        .snapshots();
-
-    // Combine both streams
-    return senderStream.asyncMap((senderSnapshot) async {
-      final receiverSnapshot = await _wishlistsCollection
-          .where('receiverAgent', isEqualTo: agentId)
-          .get();
-
-      final Map<String, WishlistEntity> uniqueWishlists = {};
-
-      for (final doc in senderSnapshot.docs) {
+    return _wishlistsCollection.snapshots().map((snapshot) {
+      final wishlists = snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
-        uniqueWishlists[doc.id] = _mapToWishlistEntity(data);
-      }
+        return _mapToWishlistEntity(data);
+      }).toList();
 
-      for (final doc in receiverSnapshot.docs) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        uniqueWishlists[doc.id] = _mapToWishlistEntity(data);
-      }
-
-      final wishlists = uniqueWishlists.values.toList();
       wishlists.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
       return wishlists;
     });

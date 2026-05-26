@@ -78,7 +78,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(agentUsersNotifierProvider.notifier)
-          .getUsersForAgent(widget.agentId);
+          .getUsersForAgent();
 
       ref
           .read(usersPaymentsNotifierProvider.notifier)
@@ -132,7 +132,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                   onRetry: () {
                     ref
                         .read(agentUsersNotifierProvider.notifier)
-                        .getUsersForAgent(widget.agentId);
+                        .getUsersForAgent();
                   },
                 ),
               );

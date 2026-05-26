@@ -32,7 +32,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           .getUsersPayment(agentId: widget.agentId);
       ref
           .read(agentUsersNotifierProvider.notifier)
-          .getUsersForAgent(widget.agentId);
+          .getUsersForAgent();
     });
   }
 

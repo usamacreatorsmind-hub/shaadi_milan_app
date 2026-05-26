@@ -1,7 +1,5 @@
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
-import 'package:flutter/rendering.dart';
-import 'dart:ui';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
@@ -22,15 +20,12 @@ class UserMainShellScreen extends ConsumerStatefulWidget {
 
 class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
   final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-  bool _isVisible = true;
 
   @override
   Widget build(BuildContext context) {
-    // 🔹 Listen for Auth State Changes (Logout)
     ref.listen(authStateProvider, (previous, next) {
       next.whenData((data) {
         if (data == null) {
-          // User logged out, redirect to Onboarding
           context.router.replaceAll([const OnboardingRoute()]);
         }
       });
@@ -40,7 +35,6 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
       routes: [
         UserHomeRoute(),
         UserWishListRoute(userId: uid),
-
         SupportTicketsRoute(userId: uid),
         UserProfileRoute(userId: uid),
       ],
@@ -48,195 +42,56 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
           FadeTransition(opacity: animation, child: child),
       builder: (context, child) {
         final tabsRouter = AutoTabsRouter.of(context);
+        final paymentState = ref.watch(paymentNotifierProvider(uid));
+        final isPaid = paymentState.status == PayStatus.success;
 
         return Scaffold(
-          extendBody: true,
-          body: NotificationListener<UserScrollNotification>(
-            onNotification: (notification) {
-              if (notification.direction == ScrollDirection.reverse) {
-                if (_isVisible) setState(() => _isVisible = false);
-              } else if (notification.direction == ScrollDirection.forward) {
-                if (!_isVisible) setState(() => _isVisible = true);
+          body: child,
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: tabsRouter.activeIndex,
+            onTap: (index) {
+              if (paymentState.status == PayStatus.loading) return;
+
+              if (!isPaid) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please subscribe to access this feature'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                context.router.push(UserPaymentRoute(userId: uid));
+                return;
               }
-              return true;
+
+              HapticFeedback.lightImpact();
+              tabsRouter.setActiveIndex(index);
             },
-            child: child,
-          ),
-          bottomNavigationBar: AnimatedSlide(
-            offset: _isVisible ? Offset.zero : const Offset(0, 1.2),
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOutCubic,
-            child: AnimatedOpacity(
-              opacity: _isVisible ? 1 : 0,
-              duration: const Duration(milliseconds: 200),
-              child: CustomBottomNavBar(
-                currentIndex: tabsRouter.activeIndex,
-                onTap: (index) => _handleTabTap(
-                  context: context,
-                  ref: ref,
-                  tabsRouter: tabsRouter,
-                  index: index,
-                ),
+            type: BottomNavigationBarType.fixed,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                activeIcon: Icon(Icons.home),
+                label: 'Home',
               ),
-            ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.favorite_outline),
+                activeIcon: Icon(Icons.favorite),
+                label: 'WishList',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.support_agent_outlined),
+                activeIcon: Icon(Icons.support_agent),
+                label: 'Support',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                activeIcon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+            ],
           ),
         );
       },
     );
   }
-}
-
-class BottomNavItem {
-  final IconData icon;
-  final String label;
-
-  const BottomNavItem({required this.icon, required this.label});
-}
-
-class CustomBottomNavBar extends StatelessWidget {
-  final int currentIndex;
-  final ValueChanged<int> onTap;
-
-  const CustomBottomNavBar({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-  });
-
-  static const List<BottomNavItem> items = [
-    BottomNavItem(icon: Icons.home_outlined, label: 'Home'),
-    BottomNavItem(icon: Icons.favorite_outline, label: 'WishList'),
-    BottomNavItem(icon: Icons.support_agent_sharp, label: 'Support'),
-    BottomNavItem(icon: Icons.person_outline, label: 'Profile'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return SafeArea(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-        height: 72,
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withOpacity(0.85),
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 25,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(items.length, (index) {
-              final bool isSelected = index == currentIndex;
-
-              return GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => onTap(index),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOutCubic,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? theme.colorScheme.primary.withOpacity(0.12)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedScale(
-                        scale: isSelected ? 1.1 : 1.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: Icon(
-                          items[index].icon,
-                          size: 24,
-                          color: isSelected
-                              ? theme.colorScheme.primary
-                              : Colors.grey.shade600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        items[index].label,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: isSelected
-                              ? theme.colorScheme.primary
-                              : Colors.grey.shade600,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.normal,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-void _handleTabTap({
-  required BuildContext context,
-  required WidgetRef ref,
-  required TabsRouter tabsRouter,
-  required int index,
-}) {
-  HapticFeedback.lightImpact();
-
-  // Get current user ID
-  final authState = ref.read(authStateProvider);
-  final userId = authState.value?.fold((_) => null, (u) => u.uid);
-
-  if (userId == null) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('User not authenticated')));
-    return;
-  }
-
-  // Watch payment status asynchronously
-  final paymentState = ref.read(paymentNotifierProvider(userId));
-
-  /// Tabs that REQUIRE subscription
-  const restrictedTabs = {4, 5, 6};
-
-  // Always allow Home tab
-  if (!restrictedTabs.contains(index)) {
-    tabsRouter.setActiveIndex(index);
-    return;
-  }
-
-  // Allow if subscribed (payment status is success)
-
-  // change after publishing on playstore
-  if (paymentState.status == PayStatus.idle) {
-    tabsRouter.setActiveIndex(index);
-    return;
-  }
-
-  // ❌ BLOCK TAB SWITCH
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Please subscribe to access this feature')),
-  );
-
-  // Redirect to payment
-  context.router.push(UserPaymentRoute(userId: userId));
 }

@@ -1,5 +1,6 @@
 import '../../../features/auth/presentation/controllers/auth_controller.dart';
-import '../../../features/auth/presentation/providers/auth_providers.dart';
+import '../../../features/user/user_razorpay/domain/states/payment.dart';
+import '../../../features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:share_plus/share_plus.dart';
@@ -28,6 +29,30 @@ class UserDrawer extends ConsumerWidget {
             return const Center(child: Text("No user data"));
           }
 
+          final paymentState = ref.watch(paymentNotifierProvider(user.uid));
+          final isPaid = paymentState.status == PayStatus.success;
+          final isLoading = paymentState.status == PayStatus.loading;
+
+          void requirePayment() {
+            context.maybePop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please subscribe to access this feature'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            context.pushRoute(UserPaymentRoute(userId: user.uid));
+          }
+
+          void guardedTap(VoidCallback action) {
+            if (isLoading) return;
+            if (!isPaid) {
+              requirePayment();
+              return;
+            }
+            action();
+          }
+
           return Column(
             children: [
               DrawerHeader1(user: user),
@@ -40,47 +65,46 @@ class UserDrawer extends ConsumerWidget {
                     DrawerItem(
                       icon: Icons.dashboard_outlined,
                       title: "Dashboard",
-                      onTap: () {
+                      onTap: () => guardedTap(() {
                         context.maybePop();
-                        context.pushRoute(  UserMainShellRoute());
-                      },
+                        context.pushRoute(UserMainShellRoute());
+                      }),
                     ),
 
                     DrawerItem(
                       icon: Icons.person_outline,
                       title: "My Profile",
-                      onTap: () {
+                      onTap: () => guardedTap(() {
                         context.maybePop();
                         context.pushRoute(MyProfileDetailRoute(user: user));
-                      },
+                      }),
                     ),
 
                     DrawerItem(
                       icon: Icons.favorite_border,
                       title: "Wishlist",
-                      onTap: () {
+                      onTap: () => guardedTap(() {
                         context.maybePop();
                         context.pushRoute(UserWishListRoute(userId: user.uid));
-                      },
+                      }),
                     ),
 
                     DrawerItem(
                       icon: Icons.notifications_outlined,
                       title: "Notifications",
                       trailing: _NotificationBadge(count: 3),
-                      onTap: () {
+                      onTap: () => guardedTap(() {
                         context.maybePop();
                         context.pushRoute(const UserNotificationRoute());
-                      },
+                      }),
                     ),
 
                     DrawerItem(
                       icon: Icons.settings_outlined,
                       title: "Settings",
-                      onTap: () {
+                      onTap: () => guardedTap(() {
                         context.maybePop();
-                        // context.pushRoute(const UserSettingsRoute());
-                      },
+                      }),
                     ),
 
                     const _SectionTitle(title: "Legal & Info"),
@@ -117,18 +141,12 @@ class UserDrawer extends ConsumerWidget {
                     DrawerItem(
                       icon: Icons.support_agent,
                       title: 'Support Tickets',
-
-                      onTap: () {
-                        final userId = ref
-                            .read(authStateProvider)
-                            .value
-                            ?.fold((agent) => null, (user) => user.uid);
-                        if (userId != null) {
-                          context.router.push(
-                            SupportTicketsRoute(userId: userId),
-                          );
-                        }
-                      },
+                      onTap: () => guardedTap(() {
+                        context.maybePop();
+                        context.router.push(
+                          SupportTicketsRoute(userId: user.uid),
+                        );
+                      }),
                     ),
 
                     DrawerItem(
