@@ -36,57 +36,59 @@ class AgentEntityScreen extends ConsumerWidget {
           return DefaultTabController(
             length: 4,
             child: NestedScrollView(
-              floatHeaderSlivers: true,
               headerSliverBuilder: (context, innerBoxIsScrolled) {
                 return [
-                  // ===== APP BAR + PROFILE + TABS =====
+                  // ── 1. PLAIN TOOLBAR (no FlexibleSpace, no expandedHeight) ──
                   SliverAppBar(
                     pinned: true,
-                    expandedHeight: 300,
+                    floating: false,
+                    // No expandedHeight → height is exactly kToolbarHeight
                     backgroundColor: theme.primaryColor,
-                    iconTheme: IconThemeData(
-                      color: theme.colorScheme.onPrimary,
-                    ),
-                    title: SizedBox(
-                      height: 56,
-                      child: Center(
-                        child: Text(
-                          agent.agentName,
-                          style: TextStyle(
-                            color: theme.colorScheme.onPrimary,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    elevation: innerBoxIsScrolled ? 4 : 0,
+                    title: AnimatedOpacity(
+                      // Only show name in toolbar when user has scrolled
+                      opacity: innerBoxIsScrolled ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Text(
+                        agent.agentName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     centerTitle: true,
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Padding(
-                        padding: const EdgeInsets.only(top: 80),
-                        child: ProfileHeader(agent: agent),
-                      ),
+                  ),
+
+                  // ── 2. PROFILE HEADER (natural height, no overlap) ──────────
+                  SliverToBoxAdapter(
+                    child: Container(
+                      color: theme.primaryColor,
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                      child: ProfileHeader(agent: agent),
                     ),
                   ),
 
+                  // ── 3. STICKY TAB BAR ───────────────────────────────────────
                   SliverPersistentHeader(
                     delegate: _SliverAppBarDelegate(
                       TabBar(
-                        labelColor: Theme.of(context).primaryColor,
+                        labelColor: theme.primaryColor,
                         tabAlignment: TabAlignment.center,
                         isScrollable: true,
-                        indicatorColor: Colors.transparent,
+                        indicatorColor: theme.primaryColor,
+                        indicatorWeight: 3,
                         unselectedLabelColor: Colors.grey,
                         labelPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                         ),
-                        dividerColor: Colors.transparent,
-
+                        dividerColor: Colors.grey.shade200,
                         labelStyle: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
-                        tabs: [
+                        tabs: const [
                           TabWidget(label: 'Overview', icon: Icons.person),
                           TabWidget(label: 'Media', icon: Icons.image),
                           TabWidget(label: 'Contact', icon: Icons.contact_mail),
@@ -120,10 +122,10 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   const _SliverAppBarDelegate(this._tabBar);
 
   @override
-  double get minExtent => _tabBar.preferredSize.height;
+  double get minExtent => _tabBar.preferredSize.height + 1;
 
   @override
-  double get maxExtent => _tabBar.preferredSize.height;
+  double get maxExtent => _tabBar.preferredSize.height + 1;
 
   @override
   Widget build(
@@ -131,7 +133,16 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return Container(color: Colors.white, child: _tabBar);
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _tabBar,
+          Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
+        ],
+      ),
+    );
   }
 
   @override
@@ -338,28 +349,113 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        CircleAvatar(
-          radius: 40,
-          backgroundColor: theme.primaryColor.withOpacity(0.1),
-          backgroundImage: agent.profileImageUrl.isNotEmpty
-              ? NetworkImage(agent.profileImageUrl)
-              : null,
-          child: agent.profileImageUrl.isEmpty
-              ? Text(
-                  agent.agentName[0].toUpperCase(),
-                  style: TextStyle(fontSize: 30, color: theme.primaryColor),
-                )
-              : null,
+        // Avatar with white border ring
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: CircleAvatar(
+            radius: 44,
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            backgroundImage: agent.profileImageUrl.isNotEmpty
+                ? NetworkImage(agent.profileImageUrl)
+                : null,
+            child: agent.profileImageUrl.isEmpty
+                ? Text(
+                    agent.agentName.isNotEmpty
+                        ? agent.agentName[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(
+                      fontSize: 32,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
+          ),
         ),
-        const SizedBox(height: 8),
+
+        const SizedBox(height: 12),
+
+        // Name — white on primary background
         Text(
           agent.agentName,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 2,
         ),
-        Text(agent.agentEmail, style: TextStyle(color: Colors.grey.shade600)),
+
+        const SizedBox(height: 4),
+
+        // Email — slightly translucent white
+        Text(
+          agent.agentEmail,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.white.withValues(alpha: 0.8),
+          ),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+        ),
+
+        const SizedBox(height: 8),
+
+        // Approval badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: agent.isApproved
+                ? Colors.green.withValues(alpha: 0.25)
+                : Colors.red.withValues(alpha: 0.25),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: agent.isApproved
+                  ? Colors.green.shade300
+                  : Colors.red.shade300,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                agent.isApproved
+                    ? Icons.verified_rounded
+                    : Icons.cancel_rounded,
+                size: 14,
+                color: agent.isApproved
+                    ? Colors.green.shade200
+                    : Colors.red.shade200,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                agent.isApproved ? 'Approved' : 'Not Approved',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: agent.isApproved
+                      ? Colors.green.shade200
+                      : Colors.red.shade200,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

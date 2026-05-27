@@ -7,10 +7,47 @@ import 'agen_profile.screen.dart';
 import '../../../../../app/router/app_router.dart';
 import '../notifier/user_nofier.dart';
 import '../../../../auth/domain/states/user_state.dart';
+import '../../../../user/user_app/domain/states/address_state.dart';
+import '../../../../user/user_app/domain/states/cultural_state.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../user/user_razorpay/domain/states/payment.dart';
+import '../../data/datasources/metrimony_firestore_ds.dart';
+
+// =====================================================
+// ADDRESS PROVIDER — fetches state/city from
+// metrimony_profiles for a given userId
+// =====================================================
+final userAddressProvider =
+    FutureProvider.family<AddressProfile, String>((ref, userId) async {
+  final ds = MetrimonyFireStoreDsImpl();
+  try {
+    final data = await ds.getMetrimonyProfile(userId);
+    final address = data['address'];
+    if (address is Map<String, dynamic>) {
+      return AddressProfile.fromMap(address);
+    }
+  } catch (_) {}
+  return AddressProfile.empty();
+});
+
+// =====================================================
+// CULTURAL PROVIDER — fetches religion/caste from
+// metrimony_profiles for a given userId
+// =====================================================
+final userCulturalProvider =
+    FutureProvider.family<CulturalProfile, String>((ref, userId) async {
+  final ds = MetrimonyFireStoreDsImpl();
+  try {
+    final data = await ds.getMetrimonyProfile(userId);
+    final cultural = data['cultural'];
+    if (cultural is Map<String, dynamic>) {
+      return CulturalProfile.fromMap(cultural);
+    }
+  } catch (_) {}
+  return CulturalProfile.empty();
+});
 
 // =====================================================
 // FILTER ENUMS
@@ -34,7 +71,11 @@ class ClientFilterState {
   final ProfileStatusFilter profileStatus;
   final ProfileCreatedFilter profileCreated;
   final String searchQuery;
-  final bool myClientsOnly; // ← NEW: show only this agent's clients
+  final bool myClientsOnly;
+  final String state;     // ← location filter
+  final String city;      // ← location filter (resets when state changes)
+  final String religion;  // ← cultural filter
+  final String caste;     // ← cultural filter (resets when religion changes)
 
   const ClientFilterState({
     this.gender = GenderFilter.all,
@@ -43,6 +84,10 @@ class ClientFilterState {
     this.profileCreated = ProfileCreatedFilter.all,
     this.searchQuery = '',
     this.myClientsOnly = false,
+    this.state = '',
+    this.city = '',
+    this.religion = '',
+    this.caste = '',
   });
 
   ClientFilterState copyWith({
@@ -52,6 +97,10 @@ class ClientFilterState {
     ProfileCreatedFilter? profileCreated,
     String? searchQuery,
     bool? myClientsOnly,
+    String? state,
+    String? city,
+    String? religion,
+    String? caste,
   }) {
     return ClientFilterState(
       gender: gender ?? this.gender,
@@ -60,6 +109,10 @@ class ClientFilterState {
       profileCreated: profileCreated ?? this.profileCreated,
       searchQuery: searchQuery ?? this.searchQuery,
       myClientsOnly: myClientsOnly ?? this.myClientsOnly,
+      state: state ?? this.state,
+      city: city ?? this.city,
+      religion: religion ?? this.religion,
+      caste: caste ?? this.caste,
     );
   }
 
@@ -69,7 +122,11 @@ class ClientFilterState {
       profileStatus == ProfileStatusFilter.all &&
       profileCreated == ProfileCreatedFilter.all &&
       searchQuery.isEmpty &&
-      !myClientsOnly;
+      !myClientsOnly &&
+      state.isEmpty &&
+      city.isEmpty &&
+      religion.isEmpty &&
+      caste.isEmpty;
 
   int get activeFilterCount {
     int count = 0;
@@ -79,6 +136,10 @@ class ClientFilterState {
     if (profileCreated != ProfileCreatedFilter.all) count++;
     if (searchQuery.isNotEmpty) count++;
     if (myClientsOnly) count++;
+    if (state.isNotEmpty) count++;
+    if (city.isNotEmpty) count++;
+    if (religion.isNotEmpty) count++;
+    if (caste.isNotEmpty) count++;
     return count;
   }
 }
@@ -105,6 +166,12 @@ class ClientFilterNotifier extends StateNotifier<ClientFilterState> {
   void setSearch(String v) => state = state.copyWith(searchQuery: v);
   void toggleMyClientsOnly() =>
       state = state.copyWith(myClientsOnly: !state.myClientsOnly);
+  // reset city when state changes (mirrors home/revenue filter behaviour)
+  void setFilterState(String v) => state = state.copyWith(state: v, city: '');
+  void setCity(String v) => state = state.copyWith(city: v);
+  // reset caste when religion changes (mirrors home/revenue filter behaviour)
+  void setReligion(String v) => state = state.copyWith(religion: v, caste: '');
+  void setCaste(String v) => state = state.copyWith(caste: v);
   void reset() => state = const ClientFilterState();
 }
 
@@ -385,6 +452,35 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 return const SliverFillRemaining(child: _EmptyView());
               }
 
+              // Pre-resolve address for every user that has a matrimony profile
+              // so the where() below can filter synchronously.
+              final addressMap = <String, AddressProfile>{};
+              if (filter.state.isNotEmpty || filter.city.isNotEmpty) {
+                for (final u in users) {
+                  if (u.isProfileCreated) {
+                    final addr = ref
+                        .watch(userAddressProvider(u.uid))
+                        .asData
+                        ?.value;
+                    if (addr != null) addressMap[u.uid] = addr;
+                  }
+                }
+              }
+
+              // Pre-resolve cultural profile (religion/caste) similarly.
+              final culturalMap = <String, CulturalProfile>{};
+              if (filter.religion.isNotEmpty || filter.caste.isNotEmpty) {
+                for (final u in users) {
+                  if (u.isProfileCreated) {
+                    final cult = ref
+                        .watch(userCulturalProvider(u.uid))
+                        .asData
+                        ?.value;
+                    if (cult != null) culturalMap[u.uid] = cult;
+                  }
+                }
+              }
+
               // Fetch payments once
               final payments = paymentsAsync.maybeWhen(
                 data: (data) => data,
@@ -476,6 +572,42 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                   if (!user.fullName.toLowerCase().contains(q) &&
                       !user.phone.toLowerCase().contains(q) &&
                       !user.email.toLowerCase().contains(q)) {
+                    return false;
+                  }
+                }
+
+                // State / City — matched against matrimony profile address
+                if (filter.state.isNotEmpty) {
+                  final addr = addressMap[user.uid];
+                  if (addr == null) return false;
+                  if (addr.state.toLowerCase() !=
+                      filter.state.toLowerCase()) {
+                    return false;
+                  }
+                }
+                if (filter.city.isNotEmpty) {
+                  final addr = addressMap[user.uid];
+                  if (addr == null) return false;
+                  if (addr.city.toLowerCase() !=
+                      filter.city.toLowerCase()) {
+                    return false;
+                  }
+                }
+
+                // Religion / Caste — matched against matrimony profile cultural
+                if (filter.religion.isNotEmpty) {
+                  final cult = culturalMap[user.uid];
+                  if (cult == null) return false;
+                  if (cult.religion.toLowerCase() !=
+                      filter.religion.toLowerCase()) {
+                    return false;
+                  }
+                }
+                if (filter.caste.isNotEmpty) {
+                  final cult = culturalMap[user.uid];
+                  if (cult == null) return false;
+                  if (cult.caste.toLowerCase() !=
+                      filter.caste.toLowerCase()) {
                     return false;
                   }
                 }
@@ -623,6 +755,38 @@ class _ActiveFilterChips extends ConsumerWidget {
         Icons.person,
         Colors.indigo,
         () => notifier.toggleMyClientsOnly(),
+      ));
+    }
+    if (filter.state.isNotEmpty) {
+      chips.add(_chip(
+        filter.state,
+        Icons.location_on_outlined,
+        Colors.teal,
+        () => notifier.setFilterState(''),
+      ));
+    }
+    if (filter.city.isNotEmpty) {
+      chips.add(_chip(
+        filter.city,
+        Icons.location_city_outlined,
+        Colors.cyan,
+        () => notifier.setCity(''),
+      ));
+    }
+    if (filter.religion.isNotEmpty) {
+      chips.add(_chip(
+        filter.religion,
+        Icons.temple_hindu_outlined,
+        Colors.deepPurple,
+        () => notifier.setReligion(''),
+      ));
+    }
+    if (filter.caste.isNotEmpty) {
+      chips.add(_chip(
+        filter.caste,
+        Icons.people_alt_outlined,
+        Colors.brown,
+        () => notifier.setCaste(''),
       ));
     }
     if (filter.paymentStatus != PaymentStatusFilter.all) {

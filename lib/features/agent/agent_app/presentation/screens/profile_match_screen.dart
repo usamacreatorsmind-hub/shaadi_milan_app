@@ -60,6 +60,11 @@ class ProfileMatchScreen extends ConsumerStatefulWidget {
 
 class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
   RecommendedProfiles? _recommendedProfiles;
+
+  // ── Search ───────────────────────────────────────────
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
   String _normalize(String value) => value.trim().toLowerCase();
 
   String _regionKey(MetrimonyProfileViewModel profile) {
@@ -73,6 +78,15 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
   void initState() {
     super.initState();
     _loadExistingRecommendations();
+    _searchController.addListener(() {
+      setState(() => _searchQuery = _searchController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadExistingRecommendations() async {
@@ -196,57 +210,184 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
         title: const Text('Suggested Matches'),
         backgroundColor: theme.primaryColor,
         foregroundColor: theme.colorScheme.onPrimary,
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Showing matches for ${widget.profile.user.fullName}',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+        // ── SEARCH BAR pinned inside AppBar bottom ──────────
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+            child: TextField(
+              controller: _searchController,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Search by name, caste, religion, city…',
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  fontSize: 13,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Colors.white.withValues(alpha: 0.8),
+                  size: 20,
+                ),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          size: 18,
+                          color: Colors.white.withValues(alpha: 0.8),
+                        ),
+                        onPressed: () => _searchController.clear(),
+                      )
+                    : null,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 0,
+                ),
+                filled: true,
+                fillColor: Colors.white.withValues(alpha: 0.15),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.3),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: Colors.white, width: 1.5),
+                ),
               ),
             ),
           ),
-          Expanded(
-            child: allProfilesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error: $err')),
-              data: (profiles) {
-                final matches = profiles.where((p) {
-                  // Basic requirements
-                  final isOppositeGender =
-                      p.identity.gender.toLowerCase() == targetGender;
-                  final isNotSelf = p.user.uid != widget.profile.user.uid;
+        ),
+      ),
+      body: allProfilesAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+        data: (profiles) {
+          // ── 1. Caste / region filter (existing logic) ──────
+          final matches = profiles.where((p) {
+            final isOppositeGender =
+                p.identity.gender.toLowerCase() == targetGender;
+            final isNotSelf = p.user.uid != widget.profile.user.uid;
+            if (!isOppositeGender || !isNotSelf) return false;
 
-                  if (!isOppositeGender || !isNotSelf) return false;
+            final sameCaste =
+                sourceCaste.isNotEmpty &&
+                _normalize(p.cultural.caste) == sourceCaste;
+            final sameRegion =
+                sourceRegion.isNotEmpty && _regionKey(p) == sourceRegion;
 
-                  // Loosen filters: Match if same caste OR same region
-                  final sameCaste =
-                      sourceCaste.isNotEmpty &&
-                      _normalize(p.cultural.caste) == sourceCaste;
-                  final sameRegion =
-                      sourceRegion.isNotEmpty && _regionKey(p) == sourceRegion;
+            return sameCaste || sameRegion;
+          }).toList();
 
-                  // Return true if it's a potential match (you can adjust priority later)
-                  return sameCaste || sameRegion;
+          // ── 2. Search filter ────────────────────────────────
+          final q = _normalize(_searchQuery);
+          final filtered = q.isEmpty
+              ? matches
+              : matches.where((p) {
+                  return _normalize(p.user.fullName).contains(q) ||
+                      _normalize(p.cultural.caste).contains(q) ||
+                      _normalize(p.cultural.religion).contains(q) ||
+                      _normalize(p.address.city).contains(q) ||
+                      _normalize(p.address.state).contains(q);
                 }).toList();
 
-                if (matches.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'No matching profiles found for the same caste and region.',
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                }
+          if (matches.isEmpty) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'No matching profiles found for the same caste and region.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: matches.length,
+          if (filtered.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.search_off,
+                      size: 56,
+                      color: Colors.grey.shade300,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'No results for "$_searchQuery"',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton.icon(
+                      onPressed: () => _searchController.clear(),
+                      icon: const Icon(Icons.clear),
+                      label: const Text('Clear search'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── count bar ─────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Matches for ${widget.profile.user.fullName}',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.primaryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        q.isEmpty
+                            ? '${filtered.length} match${filtered.length != 1 ? 'es' : ''}'
+                            : '${filtered.length} / ${matches.length}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: theme.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                  itemCount: filtered.length,
                   itemBuilder: (context, index) {
-                    final match = matches[index];
+                    final match = filtered[index];
                     return InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () =>
@@ -429,11 +570,11 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                       ),
                     );
                   },
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

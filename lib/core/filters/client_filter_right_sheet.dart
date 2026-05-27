@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/agent/agent_app/presentation/screens/agent_users_screen.dart';
+import '../../features/user/user_app/domain/states/state_city.dart';
+import '../../features/user/user_app/domain/states/religion_state.dart';
 
 /// =====================================================
 /// CLIENT FILTER RIGHT SHEET
@@ -129,6 +131,36 @@ class ClientFilterRightSheet extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // ══ LOCATION ═════════════════════════
+                          _sectionLabel('Location'),
+                          const SizedBox(height: 10),
+                          _LocationSection(
+                            selectedState: filter.state,
+                            selectedCity: filter.city,
+                            onStateChanged: (v) {
+                              notifier.setFilterState(v ?? '');
+                            },
+                            onCityChanged: (v) {
+                              notifier.setCity(v ?? '');
+                            },
+                          ),
+                          const SizedBox(height: 24),
+
+                          // ══ RELIGION & CASTE ═════════════════
+                          _sectionLabel('Religion & Caste'),
+                          const SizedBox(height: 10),
+                          _CulturalSection(
+                            selectedReligion: filter.religion,
+                            selectedCaste: filter.caste,
+                            onReligionChanged: (v) {
+                              notifier.setReligion(v ?? '');
+                            },
+                            onCasteChanged: (v) {
+                              notifier.setCaste(v ?? '');
+                            },
+                          ),
+                          const SizedBox(height: 24),
+
                           // ══ MY CLIENTS ONLY TOGGLE ══════════
                           _sectionLabel('Scope'),
                           const SizedBox(height: 8),
@@ -330,6 +362,206 @@ class ClientFilterRightSheet extends ConsumerWidget {
       default:
         return PaymentStatusFilter.all;
     }
+  }
+}
+
+// =====================================================
+// LOCATION SECTION — State + City dropdowns
+// =====================================================
+
+class _LocationSection extends ConsumerWidget {
+  final String selectedState;
+  final String selectedCity;
+  final ValueChanged<String?> onStateChanged;
+  final ValueChanged<String?> onCityChanged;
+
+  const _LocationSection({
+    required this.selectedState,
+    required this.selectedCity,
+    required this.onStateChanged,
+    required this.onCityChanged,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locationAsync = ref.watch(locationJsonProvider);
+
+    return locationAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Text(
+        'Could not load locations: $e',
+        style: const TextStyle(color: Colors.red, fontSize: 12),
+      ),
+      data: (states) {
+        final stateNames = states.map((s) => s.name).toList();
+
+        final selectedStateObj = states.firstWhere(
+          (s) => s.name == selectedState,
+          orElse: () => StateCityModel(name: '', cities: []),
+        );
+        final cityNames = selectedStateObj.cities;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── STATE ──────────────────────────────────
+            DropdownButtonFormField<String>(
+              initialValue: selectedState.isEmpty ? null : selectedState,
+              hint: const Text('Select State'),
+              isExpanded: true,
+              items: [
+                const DropdownMenuItem(value: '', child: Text('All States')),
+                ...stateNames.map(
+                  (s) => DropdownMenuItem(value: s, child: Text(s)),
+                ),
+              ],
+              onChanged: onStateChanged,
+              decoration: InputDecoration(
+                labelText: 'State',
+                prefixIcon: const Icon(Icons.location_on_outlined, size: 18),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // ── CITY / DISTRICT ────────────────────────
+            DropdownButtonFormField<String>(
+              initialValue: selectedCity.isEmpty ? null : selectedCity,
+              hint: const Text('Select City / District'),
+              isExpanded: true,
+              // disable city picker until a state is chosen
+              onChanged: selectedState.isEmpty ? null : onCityChanged,
+              items: [
+                const DropdownMenuItem(
+                  value: '',
+                  child: Text('All Cities'),
+                ),
+                ...cityNames.map(
+                  (c) => DropdownMenuItem(value: c, child: Text(c)),
+                ),
+              ],
+              decoration: InputDecoration(
+                labelText: 'City / District',
+                prefixIcon: const Icon(
+                  Icons.location_city_outlined,
+                  size: 18,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// =====================================================
+// CULTURAL SECTION — Religion + Caste dropdowns
+// =====================================================
+
+class _CulturalSection extends ConsumerWidget {
+  final String selectedReligion;
+  final String selectedCaste;
+  final ValueChanged<String?> onReligionChanged;
+  final ValueChanged<String?> onCasteChanged;
+
+  const _CulturalSection({
+    required this.selectedReligion,
+    required this.selectedCaste,
+    required this.onReligionChanged,
+    required this.onCasteChanged,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final religionsAsync = ref.watch(religionsProvider);
+
+    return religionsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Text(
+        'Could not load religions: $e',
+        style: const TextStyle(color: Colors.red, fontSize: 12),
+      ),
+      data: (religions) {
+        final religionNames = religions.map((r) => r.name).toList();
+
+        final selectedReligionObj = religions.firstWhere(
+          (r) => r.name == selectedReligion,
+          orElse: () => ReligionModel(id: '', name: '', castes: []),
+        );
+        final casteNames = selectedReligionObj.castes;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── RELIGION ───────────────────────────────
+            DropdownButtonFormField<String>(
+              initialValue: selectedReligion.isEmpty ? null : selectedReligion,
+              hint: const Text('Select Religion'),
+              isExpanded: true,
+              items: [
+                const DropdownMenuItem(value: '', child: Text('All Religions')),
+                ...religionNames.map(
+                  (r) => DropdownMenuItem(value: r, child: Text(r)),
+                ),
+              ],
+              onChanged: onReligionChanged,
+              decoration: InputDecoration(
+                labelText: 'Religion',
+                prefixIcon: const Icon(Icons.temple_hindu_outlined, size: 18),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // ── CASTE ──────────────────────────────────
+            DropdownButtonFormField<String>(
+              initialValue: selectedCaste.isEmpty ? null : selectedCaste,
+              hint: const Text('Select Caste'),
+              isExpanded: true,
+              // disable caste picker until a religion is chosen
+              onChanged: selectedReligion.isEmpty ? null : onCasteChanged,
+              items: [
+                const DropdownMenuItem(value: '', child: Text('All Castes')),
+                ...casteNames.map(
+                  (c) => DropdownMenuItem(value: c, child: Text(c)),
+                ),
+              ],
+              decoration: InputDecoration(
+                labelText: 'Caste',
+                prefixIcon: const Icon(Icons.people_alt_outlined, size: 18),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
