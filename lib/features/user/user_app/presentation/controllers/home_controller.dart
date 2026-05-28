@@ -10,7 +10,6 @@ import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/repositories/user_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';

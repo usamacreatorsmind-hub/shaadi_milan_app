@@ -1,12 +1,82 @@
+// import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_service.dart';
+// import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:sizer/sizer.dart';
+
+// import 'router/app_router.dart';
+// import '../core/themes/app_theme.dart';
+// import 'providers/global_providers.dart';
+
+// class App extends ConsumerStatefulWidget {
+//   const App({super.key});
+
+//   @override
+//   ConsumerState<App> createState() => _AppState();
+// }
+
+// class _AppState extends ConsumerState<App> {
+//   @override
+//   void initState() {
+//     super.initState();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final appRouter = ref.watch(appRouterProvider);
+
+//     ref.watch(paymentApiFirestoreProvider);
+
+//     return Sizer(
+//       builder: (context, orientation, deviceType) => MaterialApp.router(
+//         theme: AppTheme.lightTheme,
+//         title: 'Arvika Marriage Bureau',
+//         routerConfig: appRouter.config(),
+//         debugShowCheckedModeBanner: false,
+//         builder: (context, child) {
+//           return _GlobalUpdateChecker(appRouter: appRouter, child: child!);
+//         },
+//       ),
+//     );
+//   }
+// }
+
+// /// Wrapper to perform version check once the MaterialApp is initialized
+// class _GlobalUpdateChecker extends StatefulWidget {
+//   final AppRouter appRouter;
+//   final Widget child;
+//   const _GlobalUpdateChecker({required this.appRouter, required this.child});
+
+//   @override
+//   State<_GlobalUpdateChecker> createState() => _GlobalUpdateCheckerState();
+// }
+
+// class _GlobalUpdateCheckerState extends State<_GlobalUpdateChecker> {
+//   @override
+//   void initState() {
+//     super.initState();
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       if (!mounted) return;
+
+//       final navigatorContext = widget.appRouter.navigatorKey.currentContext;
+//       if (navigatorContext != null) {
+//         RemoteConfigService.instance.checkForUpdate(navigatorContext);
+//       }
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) => widget.child;
+// }
 import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_service.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sizer/sizer.dart';
 
-import 'router/app_router.dart';
 import '../core/themes/app_theme.dart';
 import 'providers/global_providers.dart';
+import 'router/app_router.dart';
 
 class App extends ConsumerStatefulWidget {
   const App({super.key});
@@ -16,55 +86,61 @@ class App extends ConsumerStatefulWidget {
 }
 
 class _AppState extends ConsumerState<App> {
+  late final AppRouter _appRouter;
+
   @override
   void initState() {
     super.initState();
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    final appRouter = ref.watch(appRouterProvider);
+    /// Initialize router once
+    _appRouter = ref.read(appRouterProvider);
 
-    ref.watch(paymentApiFirestoreProvider);
-
-    return Sizer(
-      builder: (context, orientation, deviceType) => MaterialApp.router(
-        theme: AppTheme.lightTheme,
-        title: 'Arvika Marriage Bureau',
-        routerConfig: appRouter.config(),
-        debugShowCheckedModeBanner: false,
-        builder: (context, child) {
-          return _GlobalUpdateChecker(appRouter: appRouter, child: child!);
-        },
-      ),
-    );
-  }
-}
-
-/// Wrapper to perform version check once the MaterialApp is initialized
-class _GlobalUpdateChecker extends StatefulWidget {
-  final AppRouter appRouter;
-  final Widget child;
-  const _GlobalUpdateChecker({required this.appRouter, required this.child});
-
-  @override
-  State<_GlobalUpdateChecker> createState() => _GlobalUpdateCheckerState();
-}
-
-class _GlobalUpdateCheckerState extends State<_GlobalUpdateChecker> {
-  @override
-  void initState() {
-    super.initState();
+    /// Lazy initialize payment API after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      ref.read(paymentApiFirestoreProvider);
 
-      final navigatorContext = widget.appRouter.navigatorKey.currentContext;
-      if (navigatorContext != null) {
-        RemoteConfigService.instance.checkForUpdate(navigatorContext);
-      }
+      /// Delay remote config slightly to avoid startup freeze
+      Future.delayed(const Duration(seconds: 1), () async {
+        if (!mounted) return;
+
+        final navigatorContext = _appRouter.navigatorKey.currentContext;
+
+        if (navigatorContext != null) {
+          try {
+            await RemoteConfigService.instance.checkForUpdate(navigatorContext);
+          } catch (e) {
+            debugPrint('RemoteConfig Error: $e');
+          }
+        }
+      });
     });
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) {
+    return Sizer(
+      builder: (context, orientation, deviceType) {
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          title: 'Arvika Marriage Bureau',
+
+          /// THEME
+          theme: AppTheme.lightTheme,
+
+          /// ROUTER
+          routerConfig: _appRouter.config(),
+
+          /// PERFORMANCE
+          builder: (context, child) {
+            return MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: const TextScaler.linear(1.0)),
+              child: child ?? const SizedBox(),
+            );
+          },
+        );
+      },
+    );
+  }
 }

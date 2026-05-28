@@ -7,7 +7,6 @@ import '../../domain/repositories/review_repository.dart';
 import '../../domain/states/review_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 class ReviewNotifier extends StateNotifier<ReviewState> {
   final ReviewRepository _reviewRepository;

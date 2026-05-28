@@ -9,6 +9,544 @@
 
 part of 'app_router.dart';
 
+abstract class _$AppRouter extends RootStackRouter {
+  // ignore: unused_element
+  _$AppRouter({super.navigatorKey});
+
+  @override
+  final Map<String, PageFactory> pagesMap = {
+    AboutUsRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AboutUsScreen(),
+      );
+    },
+    AgentActivitiesRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentActivitiesRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentActivitiesScreen(
+          agentId: args.agentId,
+          key: args.key,
+        ),
+      );
+    },
+    AgentContactRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentContactRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentContactScreen(
+          key: args.key,
+          agentId: args.agentId,
+        ),
+      );
+    },
+    AgentDashboardRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentDashboardRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentDashboardScreen(
+          agentId: args.agentId,
+          key: args.key,
+        ),
+      );
+    },
+    AgentEntityRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentEntityRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentEntityScreen(
+          key: args.key,
+          uid: args.uid,
+        ),
+      );
+    },
+    AgentHomeRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AgentHomeScreen(),
+      );
+    },
+    AgentLoginRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AgentLoginScreen(),
+      );
+    },
+    AgentMainShellRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentMainShellRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentMainShellScreen(
+          agentId: args.agentId,
+          key: args.key,
+        ),
+      );
+    },
+    AgentRevenueRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentRevenueRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentRevenueScreen(
+          key: args.key,
+          agentId: args.agentId,
+        ),
+      );
+    },
+    AgentSettingsRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AgentSettingsScreen(),
+      );
+    },
+    AgentSupportRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentSupportRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentSupportScreen(
+          key: args.key,
+          agentId: args.agentId,
+        ),
+      );
+    },
+    AgentUserRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentUserRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentUserScreen(
+          key: args.key,
+          agentId: args.agentId,
+        ),
+      );
+    },
+    AgentWishlistRoute.name: (routeData) {
+      final args = routeData.argsAs<AgentWishlistRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: AgentWishlistScreen(
+          key: args.key,
+          agentId: args.agentId,
+        ),
+      );
+    },
+    AgentnotificationRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AgentnotificationScreen(),
+      );
+    },
+    AuthWrapperRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const AuthWrapperScreen(),
+      );
+    },
+    ChangePasswordRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ChangePasswordScreen(),
+      );
+    },
+    ContactUsRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ContactUsScreen(),
+      );
+    },
+    MatrimonyFormFlowRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const MatrimonyFormFlowScreen(),
+      );
+    },
+    MetrimonyProfileRoute.name: (routeData) {
+      final args = routeData.argsAs<MetrimonyProfileRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: MetrimonyProfileScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
+    MyProfileDetailRoute.name: (routeData) {
+      final args = routeData.argsAs<MyProfileDetailRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: MyProfileDetailScreen(
+          key: args.key,
+          user: args.user,
+        ),
+      );
+    },
+    MyProfileRoute.name: (routeData) {
+      final args = routeData.argsAs<MyProfileRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: MyProfileScreen(
+          key: args.key,
+          uid: args.uid,
+        ),
+      );
+    },
+    MyReviewRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const MyReviewScreen(),
+      );
+    },
+    OnboardingRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const OnboardingScreen(),
+      );
+    },
+    PrivacyPolicyRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const PrivacyPolicyScreen(),
+      );
+    },
+    ProfileMatchRoute.name: (routeData) {
+      final args = routeData.argsAs<ProfileMatchRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ProfileMatchScreen(
+          key: args.key,
+          profile: args.profile,
+        ),
+      );
+    },
+    ResetPasswordRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ResetPasswordScreen(),
+      );
+    },
+    ReviewDetailsRoute.name: (routeData) {
+      final args = routeData.argsAs<ReviewDetailsRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ReviewDetailsScreen(
+          key: args.key,
+          review: args.review,
+        ),
+      );
+    },
+    ReviewFormRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ReviewFormScreen(),
+      );
+    },
+    ReviewRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ReviewScreen(),
+      );
+    },
+    RoleSelectionRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const RoleSelectionScreen(),
+      );
+    },
+    SearchRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const SearchScreen(),
+      );
+    },
+    SplashRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const SplashScreen(),
+      );
+    },
+    SupportTicketDetailRoute.name: (routeData) {
+      final args = routeData.argsAs<SupportTicketDetailRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: SupportTicketDetailScreen(
+          key: args.key,
+          ticketId: args.ticketId,
+        ),
+      );
+    },
+    SupportTicketFormRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const SupportTicketFormScreen(),
+      );
+    },
+    SupportTicketsRoute.name: (routeData) {
+      final args = routeData.argsAs<SupportTicketsRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: SupportTicketsScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
+    TermsAndConditionsRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const TermsAndConditionsScreen(),
+      );
+    },
+    UserAddressFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserAddressFormRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserAddressFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingAddressProfile: args.existingAddressProfile,
+          registerSubmit: args.registerSubmit,
+        ),
+      );
+    },
+    UserAfterMarriagePaymentRoute.name: (routeData) {
+      final args = routeData.argsAs<UserAfterMarriagePaymentRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserAfterMarriagePaymentScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
+    UserBiodataCheckRoute.name: (routeData) {
+      final args = routeData.argsAs<UserBiodataCheckRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserBiodataCheckScreen(
+          key: args.key,
+          isAgreed: args.isAgreed,
+        ),
+      );
+    },
+    UserChatRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserChatScreen(),
+      );
+    },
+    UserCultureFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserCultureFormRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserCultureFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingCulturalProfile: args.existingCulturalProfile,
+          registerSubmit: args.registerSubmit,
+        ),
+      );
+    },
+    UserDetailRoute.name: (routeData) {
+      final args = routeData.argsAs<UserDetailRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserDetailScreen(
+          key: args.key,
+          uid: args.uid,
+        ),
+      );
+    },
+    UserEducationFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserEducationFormRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserEducationFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingEducationProfile: args.existingEducationProfile,
+          registerSubmit: args.registerSubmit,
+        ),
+      );
+    },
+    UserEmploymentFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserEmploymentFormRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserEmploymentFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingEmploymentProfile: args.existingEmploymentProfile,
+          registerSubmit: args.registerSubmit,
+        ),
+      );
+    },
+    UserFamilyFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserFamilyFormRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserFamilyFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingFamilyProfile: args.existingFamilyProfile,
+          registerSubmit: args.registerSubmit,
+        ),
+      );
+    },
+    UserHomeRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserHomeScreen(),
+      );
+    },
+    UserIdentityFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserIdentityFormRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserIdentityFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingIdentityProfile: args.existingIdentityProfile,
+          registerSubmit: args.registerSubmit,
+        ),
+      );
+    },
+    UserImageFormRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserImageFormScreen(),
+      );
+    },
+    UserLoginRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserLoginScreen(),
+      );
+    },
+    UserMainShellRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserMainShellScreen(),
+      );
+    },
+    UserNotificationRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserNotificationScreen(),
+      );
+    },
+    UserPaymentOrderHistoryRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserPaymentOrderHistoryScreen(),
+      );
+    },
+    UserPaymentRoute.name: (routeData) {
+      final args = routeData.argsAs<UserPaymentRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserPaymentScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
+    UserPaymentSuccessRoute.name: (routeData) {
+      final args = routeData.argsAs<UserPaymentSuccessRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserPaymentSuccessScreen(
+          key: args.key,
+          user: args.user,
+        ),
+      );
+    },
+    UserPhysicalFormRoute.name: (routeData) {
+      final args = routeData.argsAs<UserPhysicalFormRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserPhysicalFormScreen(
+          key: args.key,
+          mode: args.mode,
+          existingPhysicalProfile: args.existingPhysicalProfile,
+          registerSubmit: args.registerSubmit,
+        ),
+      );
+    },
+    UserProfileRoute.name: (routeData) {
+      final args = routeData.argsAs<UserProfileRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserProfileScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
+    UserRegisterRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserRegisterScreen(),
+      );
+    },
+    UserStatusRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const UserStatusScreen(),
+      );
+    },
+    UserWishListRoute.name: (routeData) {
+      final args = routeData.argsAs<UserWishListRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: UserWishListScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
+    ViewAgentProfileRoute.name: (routeData) {
+      final args = routeData.argsAs<ViewAgentProfileRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ViewAgentProfileScreen(
+          key: args.key,
+          agentId: args.agentId,
+        ),
+      );
+    },
+    ViewPaymentDetailRoute.name: (routeData) {
+      final args = routeData.argsAs<ViewPaymentDetailRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ViewPaymentDetailScreen(
+          key: args.key,
+          userId: args.userId,
+          agentId: args.agentId,
+        ),
+      );
+    },
+    ViewUserRoute.name: (routeData) {
+      final args = routeData.argsAs<ViewUserRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ViewUserScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
+    ViewWishListUserRoute.name: (routeData) {
+      final args = routeData.argsAs<ViewWishListUserRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ViewWishListUserScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
+  };
+}
+
 /// generated route for
 /// [AboutUsScreen]
 class AboutUsRoute extends PageRouteInfo<void> {
@@ -20,12 +558,7 @@ class AboutUsRoute extends PageRouteInfo<void> {
 
   static const String name = 'AboutUsRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const AboutUsScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -46,16 +579,8 @@ class AgentActivitiesRoute extends PageRouteInfo<AgentActivitiesRouteArgs> {
 
   static const String name = 'AgentActivitiesRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<AgentActivitiesRouteArgs>();
-      return AgentActivitiesScreen(
-        agentId: args.agentId,
-        key: args.key,
-      );
-    },
-  );
+  static const PageInfo<AgentActivitiesRouteArgs> page =
+      PageInfo<AgentActivitiesRouteArgs>(name);
 }
 
 class AgentActivitiesRouteArgs {
@@ -92,16 +617,8 @@ class AgentContactRoute extends PageRouteInfo<AgentContactRouteArgs> {
 
   static const String name = 'AgentContactRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<AgentContactRouteArgs>();
-      return AgentContactScreen(
-        key: args.key,
-        agentId: args.agentId,
-      );
-    },
-  );
+  static const PageInfo<AgentContactRouteArgs> page =
+      PageInfo<AgentContactRouteArgs>(name);
 }
 
 class AgentContactRouteArgs {
@@ -138,16 +655,8 @@ class AgentDashboardRoute extends PageRouteInfo<AgentDashboardRouteArgs> {
 
   static const String name = 'AgentDashboardRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<AgentDashboardRouteArgs>();
-      return AgentDashboardScreen(
-        agentId: args.agentId,
-        key: args.key,
-      );
-    },
-  );
+  static const PageInfo<AgentDashboardRouteArgs> page =
+      PageInfo<AgentDashboardRouteArgs>(name);
 }
 
 class AgentDashboardRouteArgs {
@@ -184,16 +693,8 @@ class AgentEntityRoute extends PageRouteInfo<AgentEntityRouteArgs> {
 
   static const String name = 'AgentEntityRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<AgentEntityRouteArgs>();
-      return AgentEntityScreen(
-        key: args.key,
-        uid: args.uid,
-      );
-    },
-  );
+  static const PageInfo<AgentEntityRouteArgs> page =
+      PageInfo<AgentEntityRouteArgs>(name);
 }
 
 class AgentEntityRouteArgs {
@@ -223,12 +724,7 @@ class AgentHomeRoute extends PageRouteInfo<void> {
 
   static const String name = 'AgentHomeRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const AgentHomeScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -242,12 +738,7 @@ class AgentLoginRoute extends PageRouteInfo<void> {
 
   static const String name = 'AgentLoginRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const AgentLoginScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -268,16 +759,8 @@ class AgentMainShellRoute extends PageRouteInfo<AgentMainShellRouteArgs> {
 
   static const String name = 'AgentMainShellRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<AgentMainShellRouteArgs>();
-      return AgentMainShellScreen(
-        agentId: args.agentId,
-        key: args.key,
-      );
-    },
-  );
+  static const PageInfo<AgentMainShellRouteArgs> page =
+      PageInfo<AgentMainShellRouteArgs>(name);
 }
 
 class AgentMainShellRouteArgs {
@@ -314,16 +797,8 @@ class AgentRevenueRoute extends PageRouteInfo<AgentRevenueRouteArgs> {
 
   static const String name = 'AgentRevenueRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<AgentRevenueRouteArgs>();
-      return AgentRevenueScreen(
-        key: args.key,
-        agentId: args.agentId,
-      );
-    },
-  );
+  static const PageInfo<AgentRevenueRouteArgs> page =
+      PageInfo<AgentRevenueRouteArgs>(name);
 }
 
 class AgentRevenueRouteArgs {
@@ -353,12 +828,7 @@ class AgentSettingsRoute extends PageRouteInfo<void> {
 
   static const String name = 'AgentSettingsRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const AgentSettingsScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -379,16 +849,8 @@ class AgentSupportRoute extends PageRouteInfo<AgentSupportRouteArgs> {
 
   static const String name = 'AgentSupportRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<AgentSupportRouteArgs>();
-      return AgentSupportScreen(
-        key: args.key,
-        agentId: args.agentId,
-      );
-    },
-  );
+  static const PageInfo<AgentSupportRouteArgs> page =
+      PageInfo<AgentSupportRouteArgs>(name);
 }
 
 class AgentSupportRouteArgs {
@@ -425,16 +887,8 @@ class AgentUserRoute extends PageRouteInfo<AgentUserRouteArgs> {
 
   static const String name = 'AgentUserRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<AgentUserRouteArgs>();
-      return AgentUserScreen(
-        key: args.key,
-        agentId: args.agentId,
-      );
-    },
-  );
+  static const PageInfo<AgentUserRouteArgs> page =
+      PageInfo<AgentUserRouteArgs>(name);
 }
 
 class AgentUserRouteArgs {
@@ -471,16 +925,8 @@ class AgentWishlistRoute extends PageRouteInfo<AgentWishlistRouteArgs> {
 
   static const String name = 'AgentWishlistRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<AgentWishlistRouteArgs>();
-      return AgentWishlistScreen(
-        key: args.key,
-        agentId: args.agentId,
-      );
-    },
-  );
+  static const PageInfo<AgentWishlistRouteArgs> page =
+      PageInfo<AgentWishlistRouteArgs>(name);
 }
 
 class AgentWishlistRouteArgs {
@@ -510,12 +956,7 @@ class AgentnotificationRoute extends PageRouteInfo<void> {
 
   static const String name = 'AgentnotificationRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const AgentnotificationScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -529,12 +970,7 @@ class AuthWrapperRoute extends PageRouteInfo<void> {
 
   static const String name = 'AuthWrapperRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const AuthWrapperScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -548,12 +984,7 @@ class ChangePasswordRoute extends PageRouteInfo<void> {
 
   static const String name = 'ChangePasswordRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const ChangePasswordScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -567,12 +998,7 @@ class ContactUsRoute extends PageRouteInfo<void> {
 
   static const String name = 'ContactUsRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const ContactUsScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -586,12 +1012,7 @@ class MatrimonyFormFlowRoute extends PageRouteInfo<void> {
 
   static const String name = 'MatrimonyFormFlowRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const MatrimonyFormFlowScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -612,16 +1033,8 @@ class MetrimonyProfileRoute extends PageRouteInfo<MetrimonyProfileRouteArgs> {
 
   static const String name = 'MetrimonyProfileRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<MetrimonyProfileRouteArgs>();
-      return MetrimonyProfileScreen(
-        key: args.key,
-        userId: args.userId,
-      );
-    },
-  );
+  static const PageInfo<MetrimonyProfileRouteArgs> page =
+      PageInfo<MetrimonyProfileRouteArgs>(name);
 }
 
 class MetrimonyProfileRouteArgs {
@@ -658,16 +1071,8 @@ class MyProfileDetailRoute extends PageRouteInfo<MyProfileDetailRouteArgs> {
 
   static const String name = 'MyProfileDetailRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<MyProfileDetailRouteArgs>();
-      return MyProfileDetailScreen(
-        key: args.key,
-        user: args.user,
-      );
-    },
-  );
+  static const PageInfo<MyProfileDetailRouteArgs> page =
+      PageInfo<MyProfileDetailRouteArgs>(name);
 }
 
 class MyProfileDetailRouteArgs {
@@ -704,16 +1109,8 @@ class MyProfileRoute extends PageRouteInfo<MyProfileRouteArgs> {
 
   static const String name = 'MyProfileRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<MyProfileRouteArgs>();
-      return MyProfileScreen(
-        key: args.key,
-        uid: args.uid,
-      );
-    },
-  );
+  static const PageInfo<MyProfileRouteArgs> page =
+      PageInfo<MyProfileRouteArgs>(name);
 }
 
 class MyProfileRouteArgs {
@@ -743,12 +1140,7 @@ class MyReviewRoute extends PageRouteInfo<void> {
 
   static const String name = 'MyReviewRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const MyReviewScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -762,12 +1154,7 @@ class OnboardingRoute extends PageRouteInfo<void> {
 
   static const String name = 'OnboardingRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const OnboardingScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -781,12 +1168,7 @@ class PrivacyPolicyRoute extends PageRouteInfo<void> {
 
   static const String name = 'PrivacyPolicyRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const PrivacyPolicyScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -807,16 +1189,8 @@ class ProfileMatchRoute extends PageRouteInfo<ProfileMatchRouteArgs> {
 
   static const String name = 'ProfileMatchRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<ProfileMatchRouteArgs>();
-      return ProfileMatchScreen(
-        key: args.key,
-        profile: args.profile,
-      );
-    },
-  );
+  static const PageInfo<ProfileMatchRouteArgs> page =
+      PageInfo<ProfileMatchRouteArgs>(name);
 }
 
 class ProfileMatchRouteArgs {
@@ -846,12 +1220,7 @@ class ResetPasswordRoute extends PageRouteInfo<void> {
 
   static const String name = 'ResetPasswordRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const ResetPasswordScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -872,16 +1241,8 @@ class ReviewDetailsRoute extends PageRouteInfo<ReviewDetailsRouteArgs> {
 
   static const String name = 'ReviewDetailsRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<ReviewDetailsRouteArgs>();
-      return ReviewDetailsScreen(
-        key: args.key,
-        review: args.review,
-      );
-    },
-  );
+  static const PageInfo<ReviewDetailsRouteArgs> page =
+      PageInfo<ReviewDetailsRouteArgs>(name);
 }
 
 class ReviewDetailsRouteArgs {
@@ -911,12 +1272,7 @@ class ReviewFormRoute extends PageRouteInfo<void> {
 
   static const String name = 'ReviewFormRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const ReviewFormScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -930,12 +1286,7 @@ class ReviewRoute extends PageRouteInfo<void> {
 
   static const String name = 'ReviewRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const ReviewScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -949,12 +1300,7 @@ class RoleSelectionRoute extends PageRouteInfo<void> {
 
   static const String name = 'RoleSelectionRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const RoleSelectionScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -968,12 +1314,7 @@ class SearchRoute extends PageRouteInfo<void> {
 
   static const String name = 'SearchRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const SearchScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -987,12 +1328,7 @@ class SplashRoute extends PageRouteInfo<void> {
 
   static const String name = 'SplashRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const SplashScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1014,16 +1350,8 @@ class SupportTicketDetailRoute
 
   static const String name = 'SupportTicketDetailRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<SupportTicketDetailRouteArgs>();
-      return SupportTicketDetailScreen(
-        key: args.key,
-        ticketId: args.ticketId,
-      );
-    },
-  );
+  static const PageInfo<SupportTicketDetailRouteArgs> page =
+      PageInfo<SupportTicketDetailRouteArgs>(name);
 }
 
 class SupportTicketDetailRouteArgs {
@@ -1053,12 +1381,7 @@ class SupportTicketFormRoute extends PageRouteInfo<void> {
 
   static const String name = 'SupportTicketFormRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const SupportTicketFormScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1079,16 +1402,8 @@ class SupportTicketsRoute extends PageRouteInfo<SupportTicketsRouteArgs> {
 
   static const String name = 'SupportTicketsRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<SupportTicketsRouteArgs>();
-      return SupportTicketsScreen(
-        key: args.key,
-        userId: args.userId,
-      );
-    },
-  );
+  static const PageInfo<SupportTicketsRouteArgs> page =
+      PageInfo<SupportTicketsRouteArgs>(name);
 }
 
 class SupportTicketsRouteArgs {
@@ -1118,12 +1433,7 @@ class TermsAndConditionsRoute extends PageRouteInfo<void> {
 
   static const String name = 'TermsAndConditionsRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const TermsAndConditionsScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1133,7 +1443,7 @@ class UserAddressFormRoute extends PageRouteInfo<UserAddressFormRouteArgs> {
     Key? key,
     required FormMode mode,
     required AddressProfile? existingAddressProfile,
-    void Function(VoidCallback)? registerSubmit,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
           UserAddressFormRoute.name,
@@ -1148,18 +1458,8 @@ class UserAddressFormRoute extends PageRouteInfo<UserAddressFormRouteArgs> {
 
   static const String name = 'UserAddressFormRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserAddressFormRouteArgs>();
-      return UserAddressFormScreen(
-        key: args.key,
-        mode: args.mode,
-        existingAddressProfile: args.existingAddressProfile,
-        registerSubmit: args.registerSubmit,
-      );
-    },
-  );
+  static const PageInfo<UserAddressFormRouteArgs> page =
+      PageInfo<UserAddressFormRouteArgs>(name);
 }
 
 class UserAddressFormRouteArgs {
@@ -1176,7 +1476,7 @@ class UserAddressFormRouteArgs {
 
   final AddressProfile? existingAddressProfile;
 
-  final void Function(VoidCallback)? registerSubmit;
+  final void Function(void Function())? registerSubmit;
 
   @override
   String toString() {
@@ -1203,16 +1503,8 @@ class UserAfterMarriagePaymentRoute
 
   static const String name = 'UserAfterMarriagePaymentRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserAfterMarriagePaymentRouteArgs>();
-      return UserAfterMarriagePaymentScreen(
-        key: args.key,
-        userId: args.userId,
-      );
-    },
-  );
+  static const PageInfo<UserAfterMarriagePaymentRouteArgs> page =
+      PageInfo<UserAfterMarriagePaymentRouteArgs>(name);
 }
 
 class UserAfterMarriagePaymentRouteArgs {
@@ -1249,16 +1541,8 @@ class UserBiodataCheckRoute extends PageRouteInfo<UserBiodataCheckRouteArgs> {
 
   static const String name = 'UserBiodataCheckRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserBiodataCheckRouteArgs>();
-      return UserBiodataCheckScreen(
-        key: args.key,
-        isAgreed: args.isAgreed,
-      );
-    },
-  );
+  static const PageInfo<UserBiodataCheckRouteArgs> page =
+      PageInfo<UserBiodataCheckRouteArgs>(name);
 }
 
 class UserBiodataCheckRouteArgs {
@@ -1288,12 +1572,7 @@ class UserChatRoute extends PageRouteInfo<void> {
 
   static const String name = 'UserChatRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const UserChatScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1303,7 +1582,7 @@ class UserCultureFormRoute extends PageRouteInfo<UserCultureFormRouteArgs> {
     Key? key,
     required FormMode mode,
     CulturalProfile? existingCulturalProfile,
-    void Function(VoidCallback)? registerSubmit,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
           UserCultureFormRoute.name,
@@ -1318,18 +1597,8 @@ class UserCultureFormRoute extends PageRouteInfo<UserCultureFormRouteArgs> {
 
   static const String name = 'UserCultureFormRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserCultureFormRouteArgs>();
-      return UserCultureFormScreen(
-        key: args.key,
-        mode: args.mode,
-        existingCulturalProfile: args.existingCulturalProfile,
-        registerSubmit: args.registerSubmit,
-      );
-    },
-  );
+  static const PageInfo<UserCultureFormRouteArgs> page =
+      PageInfo<UserCultureFormRouteArgs>(name);
 }
 
 class UserCultureFormRouteArgs {
@@ -1346,7 +1615,7 @@ class UserCultureFormRouteArgs {
 
   final CulturalProfile? existingCulturalProfile;
 
-  final void Function(VoidCallback)? registerSubmit;
+  final void Function(void Function())? registerSubmit;
 
   @override
   String toString() {
@@ -1372,16 +1641,8 @@ class UserDetailRoute extends PageRouteInfo<UserDetailRouteArgs> {
 
   static const String name = 'UserDetailRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserDetailRouteArgs>();
-      return UserDetailScreen(
-        key: args.key,
-        uid: args.uid,
-      );
-    },
-  );
+  static const PageInfo<UserDetailRouteArgs> page =
+      PageInfo<UserDetailRouteArgs>(name);
 }
 
 class UserDetailRouteArgs {
@@ -1407,7 +1668,7 @@ class UserEducationFormRoute extends PageRouteInfo<UserEducationFormRouteArgs> {
     Key? key,
     required FormMode mode,
     EducationProfile? existingEducationProfile,
-    void Function(VoidCallback)? registerSubmit,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
           UserEducationFormRoute.name,
@@ -1422,18 +1683,8 @@ class UserEducationFormRoute extends PageRouteInfo<UserEducationFormRouteArgs> {
 
   static const String name = 'UserEducationFormRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserEducationFormRouteArgs>();
-      return UserEducationFormScreen(
-        key: args.key,
-        mode: args.mode,
-        existingEducationProfile: args.existingEducationProfile,
-        registerSubmit: args.registerSubmit,
-      );
-    },
-  );
+  static const PageInfo<UserEducationFormRouteArgs> page =
+      PageInfo<UserEducationFormRouteArgs>(name);
 }
 
 class UserEducationFormRouteArgs {
@@ -1450,7 +1701,7 @@ class UserEducationFormRouteArgs {
 
   final EducationProfile? existingEducationProfile;
 
-  final void Function(VoidCallback)? registerSubmit;
+  final void Function(void Function())? registerSubmit;
 
   @override
   String toString() {
@@ -1466,7 +1717,7 @@ class UserEmploymentFormRoute
     Key? key,
     required FormMode mode,
     required EmploymentProfile? existingEmploymentProfile,
-    void Function(VoidCallback)? registerSubmit,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
           UserEmploymentFormRoute.name,
@@ -1481,18 +1732,8 @@ class UserEmploymentFormRoute
 
   static const String name = 'UserEmploymentFormRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserEmploymentFormRouteArgs>();
-      return UserEmploymentFormScreen(
-        key: args.key,
-        mode: args.mode,
-        existingEmploymentProfile: args.existingEmploymentProfile,
-        registerSubmit: args.registerSubmit,
-      );
-    },
-  );
+  static const PageInfo<UserEmploymentFormRouteArgs> page =
+      PageInfo<UserEmploymentFormRouteArgs>(name);
 }
 
 class UserEmploymentFormRouteArgs {
@@ -1509,7 +1750,7 @@ class UserEmploymentFormRouteArgs {
 
   final EmploymentProfile? existingEmploymentProfile;
 
-  final void Function(VoidCallback)? registerSubmit;
+  final void Function(void Function())? registerSubmit;
 
   @override
   String toString() {
@@ -1524,7 +1765,7 @@ class UserFamilyFormRoute extends PageRouteInfo<UserFamilyFormRouteArgs> {
     Key? key,
     required FormMode mode,
     required FamilyProfile? existingFamilyProfile,
-    void Function(VoidCallback)? registerSubmit,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
           UserFamilyFormRoute.name,
@@ -1539,18 +1780,8 @@ class UserFamilyFormRoute extends PageRouteInfo<UserFamilyFormRouteArgs> {
 
   static const String name = 'UserFamilyFormRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserFamilyFormRouteArgs>();
-      return UserFamilyFormScreen(
-        key: args.key,
-        mode: args.mode,
-        existingFamilyProfile: args.existingFamilyProfile,
-        registerSubmit: args.registerSubmit,
-      );
-    },
-  );
+  static const PageInfo<UserFamilyFormRouteArgs> page =
+      PageInfo<UserFamilyFormRouteArgs>(name);
 }
 
 class UserFamilyFormRouteArgs {
@@ -1567,7 +1798,7 @@ class UserFamilyFormRouteArgs {
 
   final FamilyProfile? existingFamilyProfile;
 
-  final void Function(VoidCallback)? registerSubmit;
+  final void Function(void Function())? registerSubmit;
 
   @override
   String toString() {
@@ -1586,12 +1817,7 @@ class UserHomeRoute extends PageRouteInfo<void> {
 
   static const String name = 'UserHomeRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const UserHomeScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1601,7 +1827,7 @@ class UserIdentityFormRoute extends PageRouteInfo<UserIdentityFormRouteArgs> {
     Key? key,
     required FormMode mode,
     IdentityProfile? existingIdentityProfile,
-    void Function(VoidCallback)? registerSubmit,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
           UserIdentityFormRoute.name,
@@ -1616,18 +1842,8 @@ class UserIdentityFormRoute extends PageRouteInfo<UserIdentityFormRouteArgs> {
 
   static const String name = 'UserIdentityFormRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserIdentityFormRouteArgs>();
-      return UserIdentityFormScreen(
-        key: args.key,
-        mode: args.mode,
-        existingIdentityProfile: args.existingIdentityProfile,
-        registerSubmit: args.registerSubmit,
-      );
-    },
-  );
+  static const PageInfo<UserIdentityFormRouteArgs> page =
+      PageInfo<UserIdentityFormRouteArgs>(name);
 }
 
 class UserIdentityFormRouteArgs {
@@ -1644,7 +1860,7 @@ class UserIdentityFormRouteArgs {
 
   final IdentityProfile? existingIdentityProfile;
 
-  final void Function(VoidCallback)? registerSubmit;
+  final void Function(void Function())? registerSubmit;
 
   @override
   String toString() {
@@ -1663,12 +1879,7 @@ class UserImageFormRoute extends PageRouteInfo<void> {
 
   static const String name = 'UserImageFormRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const UserImageFormScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1682,12 +1893,7 @@ class UserLoginRoute extends PageRouteInfo<void> {
 
   static const String name = 'UserLoginRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const UserLoginScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1701,12 +1907,7 @@ class UserMainShellRoute extends PageRouteInfo<void> {
 
   static const String name = 'UserMainShellRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const UserMainShellScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1720,12 +1921,7 @@ class UserNotificationRoute extends PageRouteInfo<void> {
 
   static const String name = 'UserNotificationRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const UserNotificationScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1739,12 +1935,7 @@ class UserPaymentOrderHistoryRoute extends PageRouteInfo<void> {
 
   static const String name = 'UserPaymentOrderHistoryRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const UserPaymentOrderHistoryScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1765,16 +1956,8 @@ class UserPaymentRoute extends PageRouteInfo<UserPaymentRouteArgs> {
 
   static const String name = 'UserPaymentRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserPaymentRouteArgs>();
-      return UserPaymentScreen(
-        key: args.key,
-        userId: args.userId,
-      );
-    },
-  );
+  static const PageInfo<UserPaymentRouteArgs> page =
+      PageInfo<UserPaymentRouteArgs>(name);
 }
 
 class UserPaymentRouteArgs {
@@ -1812,16 +1995,8 @@ class UserPaymentSuccessRoute
 
   static const String name = 'UserPaymentSuccessRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserPaymentSuccessRouteArgs>();
-      return UserPaymentSuccessScreen(
-        key: args.key,
-        user: args.user,
-      );
-    },
-  );
+  static const PageInfo<UserPaymentSuccessRouteArgs> page =
+      PageInfo<UserPaymentSuccessRouteArgs>(name);
 }
 
 class UserPaymentSuccessRouteArgs {
@@ -1847,7 +2022,7 @@ class UserPhysicalFormRoute extends PageRouteInfo<UserPhysicalFormRouteArgs> {
     Key? key,
     required FormMode mode,
     required PhysicalProfile? existingPhysicalProfile,
-    void Function(VoidCallback)? registerSubmit,
+    void Function(void Function())? registerSubmit,
     List<PageRouteInfo>? children,
   }) : super(
           UserPhysicalFormRoute.name,
@@ -1862,18 +2037,8 @@ class UserPhysicalFormRoute extends PageRouteInfo<UserPhysicalFormRouteArgs> {
 
   static const String name = 'UserPhysicalFormRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserPhysicalFormRouteArgs>();
-      return UserPhysicalFormScreen(
-        key: args.key,
-        mode: args.mode,
-        existingPhysicalProfile: args.existingPhysicalProfile,
-        registerSubmit: args.registerSubmit,
-      );
-    },
-  );
+  static const PageInfo<UserPhysicalFormRouteArgs> page =
+      PageInfo<UserPhysicalFormRouteArgs>(name);
 }
 
 class UserPhysicalFormRouteArgs {
@@ -1890,7 +2055,7 @@ class UserPhysicalFormRouteArgs {
 
   final PhysicalProfile? existingPhysicalProfile;
 
-  final void Function(VoidCallback)? registerSubmit;
+  final void Function(void Function())? registerSubmit;
 
   @override
   String toString() {
@@ -1916,16 +2081,8 @@ class UserProfileRoute extends PageRouteInfo<UserProfileRouteArgs> {
 
   static const String name = 'UserProfileRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserProfileRouteArgs>();
-      return UserProfileScreen(
-        key: args.key,
-        userId: args.userId,
-      );
-    },
-  );
+  static const PageInfo<UserProfileRouteArgs> page =
+      PageInfo<UserProfileRouteArgs>(name);
 }
 
 class UserProfileRouteArgs {
@@ -1955,12 +2112,7 @@ class UserRegisterRoute extends PageRouteInfo<void> {
 
   static const String name = 'UserRegisterRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const UserRegisterScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -1974,12 +2126,7 @@ class UserStatusRoute extends PageRouteInfo<void> {
 
   static const String name = 'UserStatusRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const UserStatusScreen();
-    },
-  );
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -2000,16 +2147,8 @@ class UserWishListRoute extends PageRouteInfo<UserWishListRouteArgs> {
 
   static const String name = 'UserWishListRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<UserWishListRouteArgs>();
-      return UserWishListScreen(
-        key: args.key,
-        userId: args.userId,
-      );
-    },
-  );
+  static const PageInfo<UserWishListRouteArgs> page =
+      PageInfo<UserWishListRouteArgs>(name);
 }
 
 class UserWishListRouteArgs {
@@ -2046,16 +2185,8 @@ class ViewAgentProfileRoute extends PageRouteInfo<ViewAgentProfileRouteArgs> {
 
   static const String name = 'ViewAgentProfileRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<ViewAgentProfileRouteArgs>();
-      return ViewAgentProfileScreen(
-        key: args.key,
-        agentId: args.agentId,
-      );
-    },
-  );
+  static const PageInfo<ViewAgentProfileRouteArgs> page =
+      PageInfo<ViewAgentProfileRouteArgs>(name);
 }
 
 class ViewAgentProfileRouteArgs {
@@ -2094,17 +2225,8 @@ class ViewPaymentDetailRoute extends PageRouteInfo<ViewPaymentDetailRouteArgs> {
 
   static const String name = 'ViewPaymentDetailRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<ViewPaymentDetailRouteArgs>();
-      return ViewPaymentDetailScreen(
-        key: args.key,
-        userId: args.userId,
-        agentId: args.agentId,
-      );
-    },
-  );
+  static const PageInfo<ViewPaymentDetailRouteArgs> page =
+      PageInfo<ViewPaymentDetailRouteArgs>(name);
 }
 
 class ViewPaymentDetailRouteArgs {
@@ -2144,16 +2266,8 @@ class ViewUserRoute extends PageRouteInfo<ViewUserRouteArgs> {
 
   static const String name = 'ViewUserRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<ViewUserRouteArgs>();
-      return ViewUserScreen(
-        key: args.key,
-        userId: args.userId,
-      );
-    },
-  );
+  static const PageInfo<ViewUserRouteArgs> page =
+      PageInfo<ViewUserRouteArgs>(name);
 }
 
 class ViewUserRouteArgs {
@@ -2190,16 +2304,8 @@ class ViewWishListUserRoute extends PageRouteInfo<ViewWishListUserRouteArgs> {
 
   static const String name = 'ViewWishListUserRoute';
 
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<ViewWishListUserRouteArgs>();
-      return ViewWishListUserScreen(
-        key: args.key,
-        userId: args.userId,
-      );
-    },
-  );
+  static const PageInfo<ViewWishListUserRouteArgs> page =
+      PageInfo<ViewWishListUserRouteArgs>(name);
 }
 
 class ViewWishListUserRouteArgs {

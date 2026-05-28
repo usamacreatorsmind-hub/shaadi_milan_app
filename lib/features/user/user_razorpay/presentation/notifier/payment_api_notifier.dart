@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
+
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../../data/api/payment_api.dart';

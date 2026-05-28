@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
+
 import 'app_status.dart';
 import 'app_status_notifier.dart';
 
 /// Provider for centralized app status management
 final appStatusProvider =
     StateNotifierProvider<AppStatusNotifier, AppStatusData>((ref) {
-  return AppStatusNotifier();
-});
+      return AppStatusNotifier();
+    });
 
 /// Provider to select the current app status (enum only)
 final appStatusValueProvider = Provider<AppStatus>((ref) {

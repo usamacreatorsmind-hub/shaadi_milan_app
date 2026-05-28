@@ -1,6 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'home_filter_state.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 /// =======================
 /// FILTER PROVIDER
@@ -38,5 +38,3 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
     state = state.copyWith(caste: value);
   }
 }
-
- 

@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../../../auth/domain/states/user_state.dart';
@@ -122,8 +121,6 @@ class UserNotifier extends StateNotifier<AsyncValue<UserEntity?>> {
     }
   }
 }
-
-
 
 /// Provider for UserNotifier
 final agentUserNotifierProvider =

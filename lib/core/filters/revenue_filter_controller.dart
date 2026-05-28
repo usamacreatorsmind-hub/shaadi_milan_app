@@ -1,6 +1,7 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'home_filter_state.dart';
 import 'revenue_filter_state.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 /// =======================
 /// FILTER PROVIDER

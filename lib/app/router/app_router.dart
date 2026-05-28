@@ -89,7 +89,7 @@ import 'user_router.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Screen,Route')
-class AppRouter extends RootStackRouter {
+class AppRouter extends _$AppRouter {
   final Ref ref;
   AppRouter(this.ref);
 

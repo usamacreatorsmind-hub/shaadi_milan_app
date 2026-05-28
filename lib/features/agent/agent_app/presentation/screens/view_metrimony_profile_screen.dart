@@ -10,16 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../notifier/metrimony_notifier.dart';
 
-// Provider to fetch matrimony profile view model for a specific user
-final matrimonyProfileViewModelProvider =
-    FutureProvider.family<MetrimonyProfileViewModel, String>((
-      ref,
-      userId,
-    ) async {
-      final datasource = ref.watch(metrimonyFirestoreDsProvider);
-      return datasource.getMetrimonyProfileViewModel(userId);
-    });
-
 @RoutePage()
 class MetrimonyProfileScreen extends ConsumerStatefulWidget {
   final String userId;
@@ -53,25 +43,25 @@ class _ViewMetrimonyProfileScreenState
       backgroundColor: Colors.grey[100],
 
       bottomNavigationBar: profileAsync.maybeWhen(
-        data: (profile) =>
-            true // Always show for valid data if viewed by agent
-            ? Padding(
-                padding: const EdgeInsets.all(16),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    context.router.push(ProfileMatchRoute(profile: profile));
-                  },
-                  icon: const Icon(Icons.search),
-                  label: const Text('Match Profiles'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+        data: (profile) {
+          if (profile == null) return const SizedBox();
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                context.router.push(ProfileMatchRoute(profile: profile));
+              },
+              icon: const Icon(Icons.search),
+              label: const Text('Match Profiles'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              )
-            : SizedBox(),
+              ),
+            ),
+          );
+        },
         orElse: () => const SizedBox(),
       ),
 
@@ -114,6 +104,18 @@ class _ViewMetrimonyProfileScreenState
           ),
         ),
         data: (profile) {
+          if (profile == null) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.favorite_border, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text('Matrimony profile not created yet'),
+                ],
+              ),
+            );
+          }
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(

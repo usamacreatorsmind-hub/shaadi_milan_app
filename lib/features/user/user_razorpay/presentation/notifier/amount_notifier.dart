@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../data/firestore/amount_firestore.dart';
 import '../../domain/repository/amount_repository.dart';
@@ -44,9 +43,7 @@ class AmountNotifier extends StateNotifier<AmountState> {
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
-  }         
-
-
+  }
 }
 
 final amountFirestoreDSProvider = Provider<AmountFirestore>((ref) {

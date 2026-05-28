@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/states/agent_state.dart';
 import '../providers/auth_providers.dart';
@@ -6,7 +8,6 @@ import 'package:dartz/dartz.dart';
 
 import '../../../auth/domain/states/user_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 class AuthController extends StateNotifier<User?> {
   bool isProfileCreated = false;
@@ -35,12 +36,12 @@ class AuthController extends StateNotifier<User?> {
   ) async {
     await _authRepository.signUpUserWithEmail(
       gender: gender,
-      
+
       fullName: fullName,
       email: email,
       password: password,
       agentId: agentId,
-      phone: phone, 
+      phone: phone,
     );
   }
 

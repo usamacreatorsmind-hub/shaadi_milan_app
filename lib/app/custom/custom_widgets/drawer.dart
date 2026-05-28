@@ -8,9 +8,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:riverpod/src/framework.dart';
 
 class AppDrawer extends ConsumerWidget {
-  AsyncValue<dynamic> agentAsync;
+  final AsyncValue<dynamic> agentAsync;
 
-  AppDrawer({super.key, required this.agentAsync});
+  const AppDrawer({super.key, required this.agentAsync});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

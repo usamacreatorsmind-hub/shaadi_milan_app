@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:arvika_marriage_bureau/core/status/status.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 /// Example: Feature Notifier with integrated status management
 ///

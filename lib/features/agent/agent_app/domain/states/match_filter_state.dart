@@ -1,5 +1,5 @@
 import 'package:arvika_marriage_bureau/core/filters/home_filter_state.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// =======================
 /// FILTER PROVIDER

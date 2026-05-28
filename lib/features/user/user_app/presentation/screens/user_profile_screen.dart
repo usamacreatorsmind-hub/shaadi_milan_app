@@ -15,7 +15,6 @@ import 'package:arvika_marriage_bureau/features/user/user_app/widgets/agent_bott
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 final userProfileScreenProvider =
     StreamProvider.family<MetrimonyProfileViewModel, String>((ref, userId) {

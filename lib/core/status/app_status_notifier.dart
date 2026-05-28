@@ -1,20 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
+
 import 'app_status.dart';
 
 /// StateNotifier for managing centralized app status
 class AppStatusNotifier extends StateNotifier<AppStatusData> {
-  AppStatusNotifier()
-      : super(
-          AppStatusData(status: AppStatus.initial),
-        );
+  AppStatusNotifier() : super(AppStatusData(status: AppStatus.initial));
 
   /// Update status with a new status
-  void setStatus(
-    AppStatus status, {
-    String? message,
-    dynamic data,
-  }) {
+  void setStatus(AppStatus status, {String? message, dynamic data}) {
     state = AppStatusData(
       status: status,
       message: message,
@@ -46,7 +39,11 @@ class AppStatusNotifier extends StateNotifier<AppStatusData> {
 
   /// Set authenticated state
   void setAuthenticated({dynamic user}) {
-    setStatus(AppStatus.authenticated, message: 'User authenticated', data: user);
+    setStatus(
+      AppStatus.authenticated,
+      message: 'User authenticated',
+      data: user,
+    );
   }
 
   /// Set unauthenticated state
@@ -90,10 +87,7 @@ class AppStatusNotifier extends StateNotifier<AppStatusData> {
 
   /// Set sync failed state
   void setSyncFailed({String? message}) {
-    setStatus(
-      AppStatus.syncFailed,
-      message: message ?? 'Sync failed',
-    );
+    setStatus(AppStatus.syncFailed, message: message ?? 'Sync failed');
   }
 
   /// Set maintenance state

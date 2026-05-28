@@ -71,7 +71,7 @@ class ContactUsScreen extends StatelessWidget {
                 const SizedBox(height: 30),
 
                 _ContactTile(
-                  icon: Icons.email_outlined,
+                  iconWidget: const Icon(Icons.email_outlined, color: Colors.redAccent),
                   color: Colors.redAccent,
                   title: "Email Us",
                   subtitle: AppConstants.supportEmail,
@@ -79,7 +79,7 @@ class ContactUsScreen extends StatelessWidget {
                 ),
 
                 _ContactTile(
-                  icon: Icons.phone_outlined,
+                  iconWidget: const Icon(Icons.phone_outlined, color: Colors.blueAccent),
                   color: Colors.blueAccent,
                   title: "Call Us",
                   subtitle: AppConstants.phone,
@@ -87,7 +87,7 @@ class ContactUsScreen extends StatelessWidget {
                 ),
 
                 _ContactTile(
-                  icon: FontAwesomeIcons.whatsapp,
+                  iconWidget: const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
                   color: Colors.green,
                   title: "WhatsApp",
                   subtitle: AppConstants.phone,
@@ -95,7 +95,7 @@ class ContactUsScreen extends StatelessWidget {
                 ),
 
                 _ContactTile(
-                  icon: Icons.message_outlined,
+                  iconWidget: const Icon(Icons.message_outlined, color: Colors.deepPurple),
                   color: Colors.deepPurple,
                   title: "Send a Message",
                   subtitle: "We'll get back to you shortly",
@@ -144,14 +144,14 @@ class ContactUsScreen extends StatelessWidget {
 
 /// 🔹 Reusable Contact Tile
 class _ContactTile extends StatelessWidget {
-  final IconData icon;
+  final Widget iconWidget;
   final String title;
   final String subtitle;
   final Color color;
   final VoidCallback onTap;
 
   const _ContactTile({
-    required this.icon,
+    required this.iconWidget,
     required this.title,
     required this.subtitle,
     required this.color,
@@ -182,7 +182,7 @@ class _ContactTile extends StatelessWidget {
                     color: color.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: color),
+                  child: iconWidget,
                 ),
                 const SizedBox(width: 16),
                 Expanded(

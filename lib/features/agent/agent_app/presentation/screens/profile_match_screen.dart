@@ -25,6 +25,8 @@ final allProfilesProvider = FutureProvider<List<MetrimonyProfileViewModel>>((
           profile['userId'],
         );
 
+        if (vm == null) return null;
+
         // Basic validation
         if (!vm.user.isProfileCreated) return null;
 
@@ -550,6 +552,28 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                             ? Colors.red.shade400
                                             : theme.primaryColor,
                                         foregroundColor: Colors.white,
+                                        minimumSize: const Size(
+                                          double.infinity,
+                                          50,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: OutlinedButton.icon(
+                                      onPressed: () => context.pushRoute(
+                                        ViewUserRoute(userId: match.user.uid),
+                                      ),
+                                      icon: const Icon(Icons.person_outline),
+                                      label: const Text('View Full Profile'),
+                                      style: OutlinedButton.styleFrom(
                                         minimumSize: const Size(
                                           double.infinity,
                                           50,

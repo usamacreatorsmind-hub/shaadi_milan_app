@@ -1,7 +1,8 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../domain/providers/providers.dart';
 import '../../domain/states/order.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 class OrderNotifier extends StateNotifier<OrderState> {
   final OrderRepository _orderRepository;

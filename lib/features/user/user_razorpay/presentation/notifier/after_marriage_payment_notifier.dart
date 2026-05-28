@@ -3,7 +3,6 @@ import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/provid
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/repository/payment_repository.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 class AfterMarriagePaymentNotifier extends StateNotifier<PaymentState> {
   final PaymentRepository _paymentRepository;

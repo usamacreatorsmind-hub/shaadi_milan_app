@@ -1,6 +1,5 @@
 import '../../../../auth/domain/states/agent_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../data/repositories_impl/agent_repository_impl.dart';
 

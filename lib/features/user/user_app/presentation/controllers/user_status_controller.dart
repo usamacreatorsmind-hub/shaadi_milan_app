@@ -1,5 +1,3 @@
-import 'package:flutter_riverpod/legacy.dart';
-
 import '../../data/repositories_impl/user_status_repo_impl.dart';
 import '../../domain/repositories/user_status_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

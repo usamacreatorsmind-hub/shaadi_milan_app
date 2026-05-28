@@ -32,8 +32,10 @@ final userDocProvider = StreamProvider.family<DocumentSnapshot?, String>((
   return ref.watch(firestoreProvider).collection('users').doc(uid).snapshots();
 });
 final userRoleProvider = Provider<String?>((ref) {
+  final user = ref.watch(userProvider);
+  if (user == null) return null;
   final userDoc = ref
-      .watch(userDocProvider(ref.watch(userProvider)!.uid))
+      .watch(userDocProvider(user.uid))
       .when(
         data: (doc) => doc,
         loading: () => null,

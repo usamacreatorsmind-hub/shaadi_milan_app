@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../auth/domain/states/user_state.dart';
 import '../../data/datasources/wishlist_firestore_ds.dart';
@@ -116,7 +115,9 @@ class MyWishlistNotifier extends StateNotifier<WishlistListState> {
   Future<void> removeWishlist(String wishlistId) async {
     try {
       await _repository.removeWishlist(wishlistId);
-      final updatedList = state.wishlists.where((w) => w.id != wishlistId).toList();
+      final updatedList = state.wishlists
+          .where((w) => w.id != wishlistId)
+          .toList();
       state = state.copyWith(wishlists: updatedList);
     } catch (e) {
       state = state.copyWith(error: e.toString());
@@ -244,23 +245,23 @@ class AgentWishlistNotifier extends StateNotifier<WishlistListState> {
 /// Provider for My Wishlist (user is sender)
 final myWishlistNotifierProvider =
     StateNotifierProvider<MyWishlistNotifier, WishlistListState>((ref) {
-  final repository = ref.watch(wishlistRepositoryProvider);
-  return MyWishlistNotifier(repository);
-});
+      final repository = ref.watch(wishlistRepositoryProvider);
+      return MyWishlistNotifier(repository);
+    });
 
 /// Provider for Wishlisted Me (user is receiver)
 final wishlistedMeNotifierProvider =
     StateNotifierProvider<WishlistedMeNotifier, WishlistListState>((ref) {
-  final repository = ref.watch(wishlistRepositoryProvider);
-  return WishlistedMeNotifier(repository);
-});
+      final repository = ref.watch(wishlistRepositoryProvider);
+      return WishlistedMeNotifier(repository);
+    });
 
 /// Provider for Agent Wishlists
 final agentWishlistNotifierProvider =
     StateNotifierProvider<AgentWishlistNotifier, WishlistListState>((ref) {
-  final repository = ref.watch(wishlistRepositoryProvider);
-  return AgentWishlistNotifier(repository);
-});
+      final repository = ref.watch(wishlistRepositoryProvider);
+      return AgentWishlistNotifier(repository);
+    });
 
 /// ==========================================
 /// Stream Providers for Real-time Updates
@@ -269,23 +270,23 @@ final agentWishlistNotifierProvider =
 /// Stream provider for My Wishlist
 final myWishlistStreamProvider =
     StreamProvider.family<List<WishlistEntity>, String>((ref, userId) {
-  final repository = ref.watch(wishlistRepositoryProvider);
-  return repository.watchMyWishlists(userId);
-});
+      final repository = ref.watch(wishlistRepositoryProvider);
+      return repository.watchMyWishlists(userId);
+    });
 
 /// Stream provider for Wishlisted Me
 final wishlistedMeStreamProvider =
     StreamProvider.family<List<WishlistEntity>, String>((ref, userId) {
-  final repository = ref.watch(wishlistRepositoryProvider);
-  return repository.watchWishlistedMe(userId);
-});
+      final repository = ref.watch(wishlistRepositoryProvider);
+      return repository.watchWishlistedMe(userId);
+    });
 
 /// Stream provider for Agent Wishlists
 final agentWishlistStreamProvider =
     StreamProvider.family<List<WishlistEntity>, String>((ref, agentId) {
-  final repository = ref.watch(wishlistRepositoryProvider);
-  return repository.watchWishlistsForAgent(agentId);
-});
+      final repository = ref.watch(wishlistRepositoryProvider);
+      return repository.watchWishlistsForAgent(agentId);
+    });
 
 /// ==========================================
 /// Helper Providers
@@ -293,18 +294,22 @@ final agentWishlistStreamProvider =
 
 /// Check if wishlist exists between sender and receiver
 final existingWishlistProvider =
-    FutureProvider.family<WishlistEntity?, ({String senderId, String receiverId})>(
-        (ref, params) {
-  final repository = ref.watch(wishlistRepositoryProvider);
-  return repository.getExistingWishlist(
-    senderId: params.senderId,
-    receiverId: params.receiverId,
-  );
-});
+    FutureProvider.family<
+      WishlistEntity?,
+      ({String senderId, String receiverId})
+    >((ref, params) {
+      final repository = ref.watch(wishlistRepositoryProvider);
+      return repository.getExistingWishlist(
+        senderId: params.senderId,
+        receiverId: params.receiverId,
+      );
+    });
 
 /// Get single wishlist by ID
-final wishlistByIdProvider =
-    FutureProvider.family<WishlistEntity?, String>((ref, wishlistId) {
+final wishlistByIdProvider = FutureProvider.family<WishlistEntity?, String>((
+  ref,
+  wishlistId,
+) {
   final repository = ref.watch(wishlistRepositoryProvider);
   return repository.getWishlistById(wishlistId);
 });

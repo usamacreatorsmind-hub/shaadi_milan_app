@@ -4,7 +4,6 @@ import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../data/datasources/firebase/agent_firestore_ds.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';

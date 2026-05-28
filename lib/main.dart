@@ -1,23 +1,120 @@
+// import 'package:awesome_notifications/awesome_notifications.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:flutter_screenshot_blocker/flutter_screenshot_blocker.dart';
+
+// import 'core/notification/notification_service.dart';
+// import 'app/app.dart';
+// import 'core/env/app_env.dart';
+// import 'core/env/app_env_config.dart';
+// import 'core/notification/in_app_messaging_service.dart';
+// import 'firebase_options.dart';
+
+// // Background handler - must be a top-level function
+// @pragma('vm:entry-point')
+// Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
+//   WidgetsFlutterBinding.ensureInitialized();
+
+//   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+//   await AwesomeNotifications().createNotification(
+//     content: NotificationContent(
+//       id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+//       channelKey: 'fcm_channel',
+//       title: message.notification?.title ?? 'New Notification',
+//       body: message.notification?.body ?? '',
+//       icon: 'resource://drawable/ic_notification', // ✅ REQUIRED
+//       notificationLayout: NotificationLayout.Default,
+//     ),
+//   );
+// }
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+
+//   AppEnvConfig.init(environment: AppEnvironment.prod);
+
+//   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+//   // Must be registered before runApp
+//   FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
+
+//   runApp(const ProviderScope(child: App()));
+
+//   // Defer non-critical init so the first frame renders immediately
+//   await AwesomeNotifications()
+//       .initialize('resource://drawable/ic_notification', [
+//         NotificationChannel(
+//           channelKey: 'basic_channel',
+//           channelName: 'Basic Notifications',
+//           channelDescription: 'General notifications',
+//           importance: NotificationImportance.High,
+//           channelShowBadge: true,
+//         ),
+//         NotificationChannel(
+//           channelKey: 'scheduled_channel',
+//           channelName: 'Scheduled Notifications',
+//           channelDescription: 'Scheduled reminders',
+//           importance: NotificationImportance.High,
+//           channelShowBadge: true,
+//         ),
+//         NotificationChannel(
+//           channelKey: 'fcm_channel',
+//           channelName: 'FCM Notifications',
+//           channelDescription: 'Firebase Cloud Messaging',
+//           importance: NotificationImportance.Max,
+//           playSound: true,
+//           enableVibration: true,
+//           channelShowBadge: true,
+//         ),
+//       ], debug: false);
+
+//   final isAllowed = await AwesomeNotifications().isNotificationAllowed();
+//   if (!isAllowed) {
+//     await AwesomeNotifications().requestPermissionToSendNotifications();
+//   }
+
+//   await Future.wait([
+//     NotificationService.init(),
+//     InAppMessagingService.init(),
+//     FlutterScreenshotBlocker.enableScreenshotBlocking(),
+//   ]);
+// }
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenshot_blocker/flutter_screenshot_blocker.dart';
 
-import 'core/notification/notification_service.dart';
 import 'app/app.dart';
 import 'core/env/app_env.dart';
 import 'core/env/app_env_config.dart';
 import 'core/notification/in_app_messaging_service.dart';
+import 'core/notification/notification_service.dart';
 import 'firebase_options.dart';
 
-// Background handler - must be a top-level function
+/// Background FCM handler
 @pragma('vm:entry-point')
 Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await AwesomeNotifications()
+      .initialize('resource://drawable/ic_notification', [
+        NotificationChannel(
+          channelKey: 'fcm_channel',
+          channelName: 'FCM Notifications',
+          channelDescription: 'Firebase Cloud Messaging',
+          importance: NotificationImportance.Max,
+          playSound: true,
+          enableVibration: true,
+          channelShowBadge: true,
+        ),
+      ], debug: false);
 
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
@@ -25,62 +122,87 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
       channelKey: 'fcm_channel',
       title: message.notification?.title ?? 'New Notification',
       body: message.notification?.body ?? '',
-      icon: 'resource://drawable/ic_notification', // ✅ REQUIRED
       notificationLayout: NotificationLayout.Default,
+      icon: 'resource://drawable/ic_notification',
     ),
   );
 }
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  /// ENV
   AppEnvConfig.init(environment: AppEnvironment.prod);
 
+  /// FIREBASE
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  await AwesomeNotifications().initialize(
-    'resource://drawable/ic_notification', // ✅ REQUIRED
-    [
-      NotificationChannel(
-        channelKey: 'basic_channel',
-        channelName: 'Basic Notifications',
-        channelDescription: 'General notifications',
-        importance: NotificationImportance.High,
-        channelShowBadge: true,
-      ),
-      NotificationChannel(
-        channelKey: 'scheduled_channel',
-        channelName: 'Scheduled Notifications',
-        channelDescription: 'Scheduled reminders',
-        importance: NotificationImportance.High,
-        channelShowBadge: true,
-      ),
-      NotificationChannel(
-        channelKey: 'fcm_channel',
-        channelName: 'FCM Notifications',
-        channelDescription: 'Firebase Cloud Messaging',
-        importance: NotificationImportance.Max,
-        playSound: true,
-        enableVibration: true,
-        channelShowBadge: true,
-      ),
-    ],
-    debug: false,
-  );
+  /// FCM BACKGROUND HANDLER
+  FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
 
-  // Permission request
+  /// AWESOME NOTIFICATIONS
+  await AwesomeNotifications()
+      .initialize('resource://drawable/ic_notification', [
+        NotificationChannel(
+          channelKey: 'basic_channel',
+          channelName: 'Basic Notifications',
+          channelDescription: 'General notifications',
+          importance: NotificationImportance.High,
+          channelShowBadge: true,
+        ),
+        NotificationChannel(
+          channelKey: 'scheduled_channel',
+          channelName: 'Scheduled Notifications',
+          channelDescription: 'Scheduled reminders',
+          importance: NotificationImportance.High,
+          channelShowBadge: true,
+        ),
+        NotificationChannel(
+          channelKey: 'fcm_channel',
+          channelName: 'FCM Notifications',
+          channelDescription: 'Firebase Cloud Messaging',
+          importance: NotificationImportance.Max,
+          playSound: true,
+          enableVibration: true,
+          channelShowBadge: true,
+        ),
+      ], debug: false);
+
+  /// NOTIFICATION PERMISSION
   final isAllowed = await AwesomeNotifications().isNotificationAllowed();
+
   if (!isAllowed) {
     await AwesomeNotifications().requestPermissionToSendNotifications();
   }
 
-  // Register background handler
-  FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
+  /// NON-BLOCKING INITIALIZATION
+  Future.microtask(() async {
+    try {
+      await Future.wait([
+        NotificationService.init(),
+        InAppMessagingService.init(),
+        FlutterScreenshotBlocker.enableScreenshotBlocking(),
+      ]);
 
-  await NotificationService.init();
-  await InAppMessagingService.init();
+      /// FCM TOKEN
+      final token = await FirebaseMessaging.instance.getToken();
 
-  await FlutterScreenshotBlocker.enableScreenshotBlocking();
+      debugPrint('🔔 FCM Token: $token');
+
+      final installationId = await FirebaseMessaging.instance.getToken();
+
+      debugPrint('🆔 Firebase Installation ID: $installationId');
+    } catch (e, s) {
+      debugPrint('Initialization Error: $e');
+      debugPrintStack(stackTrace: s);
+    }
+  });
+
+  /// GLOBAL ERROR HANDLER
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint(details.exceptionAsString());
+  };
 
   runApp(const ProviderScope(child: App()));
 }

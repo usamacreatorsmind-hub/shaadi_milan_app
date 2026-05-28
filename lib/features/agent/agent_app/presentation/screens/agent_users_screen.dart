@@ -1,5 +1,3 @@
-import 'package:flutter_riverpod/legacy.dart';
-
 import '../../../../../app/custom/custom_widgets/drawer.dart';
 import '../../../../../core/filters/client_filter_right_sheet.dart';
 import 'agen_profile.screen.dart';
@@ -19,8 +17,10 @@ import '../../data/datasources/metrimony_firestore_ds.dart';
 // ADDRESS PROVIDER — fetches state/city from
 // metrimony_profiles for a given userId
 // =====================================================
-final userAddressProvider =
-    FutureProvider.family<AddressProfile, String>((ref, userId) async {
+final userAddressProvider = FutureProvider.family<AddressProfile, String>((
+  ref,
+  userId,
+) async {
   final ds = MetrimonyFireStoreDsImpl();
   try {
     final data = await ds.getMetrimonyProfile(userId);
@@ -36,8 +36,10 @@ final userAddressProvider =
 // CULTURAL PROVIDER — fetches religion/caste from
 // metrimony_profiles for a given userId
 // =====================================================
-final userCulturalProvider =
-    FutureProvider.family<CulturalProfile, String>((ref, userId) async {
+final userCulturalProvider = FutureProvider.family<CulturalProfile, String>((
+  ref,
+  userId,
+) async {
   final ds = MetrimonyFireStoreDsImpl();
   try {
     final data = await ds.getMetrimonyProfile(userId);
@@ -72,10 +74,10 @@ class ClientFilterState {
   final ProfileCreatedFilter profileCreated;
   final String searchQuery;
   final bool myClientsOnly;
-  final String state;     // ← location filter
-  final String city;      // ← location filter (resets when state changes)
-  final String religion;  // ← cultural filter
-  final String caste;     // ← cultural filter (resets when religion changes)
+  final String state; // ← location filter
+  final String city; // ← location filter (resets when state changes)
+  final String religion; // ← cultural filter
+  final String caste; // ← cultural filter (resets when religion changes)
 
   const ClientFilterState({
     this.gender = GenderFilter.all,
@@ -236,8 +238,14 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                     .toggleMyClientsOnly(),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 4,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: filter.myClientsOnly
                         ? Colors.white
@@ -292,7 +300,9 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                                   ? Alignment.centerRight
                                   : Alignment.centerLeft,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 2,
+                                ),
                                 child: Container(
                                   width: 12,
                                   height: 12,
@@ -489,11 +499,15 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
 
               // Resolve payment status per user
               String resolvePaymentStatus(String uid) {
-                final userPayments =
-                    payments.where((p) => p != null && p.userId == uid);
+                final userPayments = payments.where(
+                  (p) => p != null && p.userId == uid,
+                );
                 if (userPayments.any(
-                  (p) => ['SUCCESS', 'PAID', 'CAPTURED']
-                      .contains(p?.status.toUpperCase()),
+                  (p) => [
+                    'SUCCESS',
+                    'PAID',
+                    'CAPTURED',
+                  ].contains(p?.status.toUpperCase()),
                 )) {
                   return 'PAID';
                 } else if (userPayments.any(
@@ -507,8 +521,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
               // ── APPLY FILTERS ──────────────────────────────
               final filteredUsers = users.where((user) {
                 // My Clients Only toggle
-                if (filter.myClientsOnly &&
-                    user.agentId != widget.agentId) {
+                if (filter.myClientsOnly && user.agentId != widget.agentId) {
                   return false;
                 }
 
@@ -560,7 +573,8 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                       !user.isProfileCreated) {
                     return false;
                   }
-                  if (filter.profileCreated == ProfileCreatedFilter.notCreated &&
+                  if (filter.profileCreated ==
+                          ProfileCreatedFilter.notCreated &&
                       user.isProfileCreated) {
                     return false;
                   }
@@ -580,16 +594,14 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 if (filter.state.isNotEmpty) {
                   final addr = addressMap[user.uid];
                   if (addr == null) return false;
-                  if (addr.state.toLowerCase() !=
-                      filter.state.toLowerCase()) {
+                  if (addr.state.toLowerCase() != filter.state.toLowerCase()) {
                     return false;
                   }
                 }
                 if (filter.city.isNotEmpty) {
                   final addr = addressMap[user.uid];
                   if (addr == null) return false;
-                  if (addr.city.toLowerCase() !=
-                      filter.city.toLowerCase()) {
+                  if (addr.city.toLowerCase() != filter.city.toLowerCase()) {
                     return false;
                   }
                 }
@@ -606,8 +618,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 if (filter.caste.isNotEmpty) {
                   final cult = culturalMap[user.uid];
                   if (cult == null) return false;
-                  if (cult.caste.toLowerCase() !=
-                      filter.caste.toLowerCase()) {
+                  if (cult.caste.toLowerCase() != filter.caste.toLowerCase()) {
                     return false;
                   }
                 }
@@ -629,45 +640,31 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
               return SliverPadding(
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 100),
                 sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final user = filteredUsers[index];
-                      final statusToDisplay = resolvePaymentStatus(user.uid);
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final user = filteredUsers[index];
+                    final statusToDisplay = resolvePaymentStatus(user.uid);
 
-                      return UserCard(
-                        user: user,
-                        paymentStatus: statusToDisplay,
-                        onViewUserProfile: () {
-                          context.router
-                              .push(ViewUserRoute(userId: user.uid));
-                        },
-                        onViewMatrimonyProfile: () {
-                          if (user.isProfileCreated) {
-                            context.router.push(
-                              MetrimonyProfileRoute(userId: user.uid),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Matrimony profile not created yet',
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        onViewPayment: () {
-                          context.router.push(
-                            ViewPaymentDetailRoute(
-                              userId: user.uid,
-                              agentId: user.agentId,
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    childCount: filteredUsers.length,
-                  ),
+                    return UserCard(
+                      user: user,
+                      paymentStatus: statusToDisplay,
+                      onViewUserProfile: () {
+                        context.router.push(ViewUserRoute(userId: user.uid));
+                      },
+                      onViewMatrimonyProfile: () {
+                        // Both buttons open the same combined screen;
+                        // Tab 2 (Matrimony Profile) is accessible by swiping.
+                        context.router.push(ViewUserRoute(userId: user.uid));
+                      },
+                      onViewPayment: () {
+                        context.router.push(
+                          ViewPaymentDetailRoute(
+                            userId: user.uid,
+                            agentId: user.agentId,
+                          ),
+                        );
+                      },
+                    );
+                  }, childCount: filteredUsers.length),
                 ),
               );
             },
@@ -750,76 +747,94 @@ class _ActiveFilterChips extends ConsumerWidget {
     final chips = <Widget>[];
 
     if (filter.myClientsOnly) {
-      chips.add(_chip(
-        'My Clients Only',
-        Icons.person,
-        Colors.indigo,
-        () => notifier.toggleMyClientsOnly(),
-      ));
+      chips.add(
+        _chip(
+          'My Clients Only',
+          Icons.person,
+          Colors.indigo,
+          () => notifier.toggleMyClientsOnly(),
+        ),
+      );
     }
     if (filter.state.isNotEmpty) {
-      chips.add(_chip(
-        filter.state,
-        Icons.location_on_outlined,
-        Colors.teal,
-        () => notifier.setFilterState(''),
-      ));
+      chips.add(
+        _chip(
+          filter.state,
+          Icons.location_on_outlined,
+          Colors.teal,
+          () => notifier.setFilterState(''),
+        ),
+      );
     }
     if (filter.city.isNotEmpty) {
-      chips.add(_chip(
-        filter.city,
-        Icons.location_city_outlined,
-        Colors.cyan,
-        () => notifier.setCity(''),
-      ));
+      chips.add(
+        _chip(
+          filter.city,
+          Icons.location_city_outlined,
+          Colors.cyan,
+          () => notifier.setCity(''),
+        ),
+      );
     }
     if (filter.religion.isNotEmpty) {
-      chips.add(_chip(
-        filter.religion,
-        Icons.temple_hindu_outlined,
-        Colors.deepPurple,
-        () => notifier.setReligion(''),
-      ));
+      chips.add(
+        _chip(
+          filter.religion,
+          Icons.temple_hindu_outlined,
+          Colors.deepPurple,
+          () => notifier.setReligion(''),
+        ),
+      );
     }
     if (filter.caste.isNotEmpty) {
-      chips.add(_chip(
-        filter.caste,
-        Icons.people_alt_outlined,
-        Colors.brown,
-        () => notifier.setCaste(''),
-      ));
+      chips.add(
+        _chip(
+          filter.caste,
+          Icons.people_alt_outlined,
+          Colors.brown,
+          () => notifier.setCaste(''),
+        ),
+      );
     }
     if (filter.paymentStatus != PaymentStatusFilter.all) {
-      chips.add(_chip(
-        _paymentLabel(filter.paymentStatus),
-        Icons.payments_outlined,
-        Colors.green,
-        () => notifier.setPaymentStatus(PaymentStatusFilter.all),
-      ));
+      chips.add(
+        _chip(
+          _paymentLabel(filter.paymentStatus),
+          Icons.payments_outlined,
+          Colors.green,
+          () => notifier.setPaymentStatus(PaymentStatusFilter.all),
+        ),
+      );
     }
     if (filter.profileStatus != ProfileStatusFilter.all) {
-      chips.add(_chip(
-        _profileStatusLabel(filter.profileStatus),
-        Icons.person_pin,
-        Colors.blue,
-        () => notifier.setProfileStatus(ProfileStatusFilter.all),
-      ));
+      chips.add(
+        _chip(
+          _profileStatusLabel(filter.profileStatus),
+          Icons.person_pin,
+          Colors.blue,
+          () => notifier.setProfileStatus(ProfileStatusFilter.all),
+        ),
+      );
     }
     if (filter.profileCreated != ProfileCreatedFilter.all) {
-      chips.add(_chip(
-        _profileCreatedLabel(filter.profileCreated),
-        Icons.create_outlined,
-        Colors.orange,
-        () => notifier.setProfileCreated(ProfileCreatedFilter.all),
-      ));
+      chips.add(
+        _chip(
+          _profileCreatedLabel(filter.profileCreated),
+          Icons.create_outlined,
+          Colors.orange,
+          () => notifier.setProfileCreated(ProfileCreatedFilter.all),
+        ),
+      );
     }
     if (filter.searchQuery.isNotEmpty) {
-      chips.add(_chip(
-        '"${filter.searchQuery}"',
-        Icons.search,
-        Colors.purple,
-        onRemoveSearch,
-      ));
+      chips.add(
+        _chip(
+          '"${filter.searchQuery}"',
+          Icons.search,
+          Colors.purple,
+          onRemoveSearch,
+        ),
+      );
     }
 
     if (chips.isEmpty) return const SizedBox.shrink();
@@ -896,7 +911,6 @@ class _ActiveFilterChips extends ConsumerWidget {
 // FILTER BOTTOM SHEET
 // =====================================================
 
-
 // =====================================================
 // USER CARD
 // =====================================================
@@ -941,8 +955,9 @@ class UserCard extends StatelessWidget {
               tag: 'user-avatar-${user.uid}',
               child: CircleAvatar(
                 radius: 30,
-                backgroundImage:
-                    imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
+                backgroundImage: imageUrl.isNotEmpty
+                    ? NetworkImage(imageUrl)
+                    : null,
                 backgroundColor: theme.colorScheme.primaryContainer,
                 child: imageUrl.isEmpty
                     ? Text(

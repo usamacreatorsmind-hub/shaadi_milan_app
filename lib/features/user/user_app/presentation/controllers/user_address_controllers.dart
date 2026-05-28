@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';

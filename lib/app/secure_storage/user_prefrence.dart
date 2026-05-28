@@ -6,7 +6,7 @@ class UserPreference {
   static const String _keyCollectionPath = 'collection_path';
   static const String _keyUserType = 'user_type';
 
-  void setCollectionPath(String path) async {
+  Future<void> setCollectionPath(String path) async {
     await _secureStorage.write(key: _keyCollectionPath, value: path);
   }
 
@@ -14,7 +14,7 @@ class UserPreference {
     return await _secureStorage.read(key: _keyCollectionPath);
   }
 
-  void setUserType(String userType) async {
+  Future<void> setUserType(String userType) async {
     await _secureStorage.write(key: _keyUserType, value: userType);
   }
 
@@ -22,7 +22,7 @@ class UserPreference {
     return await _secureStorage.read(key: _keyUserType);
   }
 
-  void clearPreferences() async {
+  Future<void> clearPreferences() async {
     await _secureStorage.deleteAll();
   }
 }

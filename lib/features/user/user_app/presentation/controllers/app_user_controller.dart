@@ -2,7 +2,6 @@ import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../../../auth/domain/states/user_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 class UserEntityController extends StateNotifier<AsyncValue<UserEntity?>> {
   final UserRepository _userRepository;

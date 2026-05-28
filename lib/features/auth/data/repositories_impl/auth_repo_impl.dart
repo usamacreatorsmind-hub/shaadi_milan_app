@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'data_source/firebase_auth_ds.dart';
 import '../../domain/states/agent_state.dart';
 import '../../domain/states/user_state.dart';
@@ -47,26 +49,38 @@ class AuthRepositoryImpl implements AuthRepository {
   authStateChanges() => ds.authStateChanges().asyncMap((user) async {
     if (user == null) return null;
 
-    // 1. Check if the user is in the 'users' collection
-    final userDoc = await firestore.collection('users').doc(user.uid).get();
-    if (userDoc.exists) {
-      final data = userDoc.data()!;
-      return Right(UserEntity.fromMap(data));
+    try {
+      // Try cache first, then network — avoids blocking on slow connections
+      final getOptions = const GetOptions(source: Source.serverAndCache);
+
+      final userDoc = await firestore
+          .collection('users')
+          .doc(user.uid)
+          .get(getOptions)
+          .timeout(const Duration(seconds: 10));
+
+      if (userDoc.exists) {
+        return Right(UserEntity.fromMap(userDoc.data()!));
+      }
+
+      final agentDoc = await firestore
+          .collection('agents')
+          .doc(user.uid)
+          .get(getOptions)
+          .timeout(const Duration(seconds: 10));
+
+      if (agentDoc.exists) {
+        return Left(AgentEntity.fromMap(agentDoc.data()!));
+      }
+    } catch (_) {
+      // Timeout or network error — fall through to default
     }
 
-    // 2. If not a user, check if they are in the 'agents' collection
-    final agentDoc = await firestore.collection('agents').doc(user.uid).get();
-    if (agentDoc.exists) {
-      final data = agentDoc.data()!;
-      return Left(AgentEntity.fromMap(data));
-    }
-
-    // 3. User is authenticated but has no record in Firestore yet (e.g., during sign-up).
-    // Default to a non-profile-created user state.
+    // Authenticated but no Firestore record yet (new sign-up or fetch failed)
     return Right(
       UserEntity(
         gender: '',
-        profileStatus: 'active',         
+        profileStatus: 'active',
         uid: user.uid,
         email: user.email ?? '',
         fullName: '',
@@ -75,7 +89,6 @@ class AuthRepositoryImpl implements AuthRepository {
         agentId: '',
         userType: '',
         isProfileCreated: false,
-
         metrimonyId: '',
         profileId: '',
         createdAt: DateTime.now(),

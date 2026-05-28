@@ -8,7 +8,6 @@ import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/reposi
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/amount.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/amount_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 final paymentRepositoryProvider = Provider<PaymentRepository>((ref) {
   return PaymentRepository(ref.watch(paymentFirestoreProvider));

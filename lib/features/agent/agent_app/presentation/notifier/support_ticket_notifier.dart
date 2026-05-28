@@ -4,13 +4,12 @@ import 'package:arvika_marriage_bureau/features/agent/agent_app/data/repositorie
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/support_ticket.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 class SupportTicketNotifier extends StateNotifier<AsyncValue<SupportTicket>> {
   final AgentSupportRepository _agentSupportRepository;
 
-  StreamSubscription<SupportTicket>? _ticketSubscription;   
-  
+  StreamSubscription<SupportTicket>? _ticketSubscription;
+
   SupportTicketNotifier(this._agentSupportRepository)
     : super(AsyncValue.loading());
 

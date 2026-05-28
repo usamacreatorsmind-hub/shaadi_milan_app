@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/providers/providers.dart';
 import '../../domain/states/payment.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 // Provider family that takes uid as parameter
 final paymentNotifierProvider =
