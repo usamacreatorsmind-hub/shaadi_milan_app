@@ -100,18 +100,21 @@ class FirebaseAuthDS implements FirebaseAuthDs {
     required String phone,
     required String email,
   }) async {
-    // Check phone
-    final phoneQuery = await _firestore
-        .collection('users')
-        .where('phone', isEqualTo: phone)
-        .limit(1)
-        .get();
+    // Check phone only if provided
+    if (phone.isNotEmpty) {
+      final phoneQuery = await _firestore
+          .collection('users')
+          .where('phone', isEqualTo: phone)
+          .limit(1)
+          .get();
 
-    if (phoneQuery.docs.isNotEmpty) {
-      return true;
+      if (phoneQuery.docs.isNotEmpty) {
+        return true;
+      }
     }
 
     // Check email
+    if (email.isEmpty) return false;
     final emailQuery = await _firestore
         .collection('users')
         .where('email', isEqualTo: email)
