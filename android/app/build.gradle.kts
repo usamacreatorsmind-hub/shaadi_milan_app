@@ -39,7 +39,6 @@ android {
         applicationId = "com.arvikamarriagebureau.arvika"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
-        compileSdkVersion(36)
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

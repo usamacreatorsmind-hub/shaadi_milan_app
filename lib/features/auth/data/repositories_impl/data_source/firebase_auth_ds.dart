@@ -1,4 +1,4 @@
-import 'dart:ffi';
+import 'package:flutter/foundation.dart';
 
 import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -96,22 +96,26 @@ class FirebaseAuthDS implements FirebaseAuthDs {
   }
 
   @override
+  @override
   Future<bool> checkUserIfExists({
     required String phone,
     required String email,
   }) async {
-    // Check phone
-    final phoneQuery = await _firestore
-        .collection('users')
-        .where('phone', isEqualTo: phone)
-        .limit(1)
-        .get();
+    // Check phone only if provided
+    if (phone.isNotEmpty) {
+      final phoneQuery = await _firestore
+          .collection('users')
+          .where('phone', isEqualTo: phone)
+          .limit(1)
+          .get();
 
-    if (phoneQuery.docs.isNotEmpty) {
-      return true;
+      if (phoneQuery.docs.isNotEmpty) {
+        return true;
+      }
     }
 
     // Check email
+    if (email.isEmpty) return false;
     final emailQuery = await _firestore
         .collection('users')
         .where('email', isEqualTo: email)
@@ -138,7 +142,7 @@ class FirebaseAuthDS implements FirebaseAuthDs {
         email: email,
         password: password,
       );
-      print("credential: $userCredential");
+      debugPrint("credential: $userCredential");
 
       final uid = userCredential.user!.uid;
 

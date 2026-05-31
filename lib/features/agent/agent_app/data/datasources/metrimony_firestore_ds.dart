@@ -5,7 +5,9 @@ import '../../../../user/user_app/domain/states/metrimony_profile_view_model.dar
 
 abstract class MetrimonyFirestoreDs {
   Future<Map<String, dynamic>> getMetrimonyProfile(String userId);
-  Future<MetrimonyProfileViewModel?> getMetrimonyProfileViewModel(String userId);
+  Future<MetrimonyProfileViewModel?> getMetrimonyProfileViewModel(
+    String userId,
+  );
   Future<List<Map<String, dynamic>>> getAllMetrimonyProfiles();
   Stream<Map<String, dynamic>> watchMetrimonyProfile(String userId);
 }

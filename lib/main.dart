@@ -168,16 +168,15 @@ Future<void> main() async {
         ),
       ], debug: false);
 
-  /// NOTIFICATION PERMISSION
-  final isAllowed = await AwesomeNotifications().isNotificationAllowed();
-
-  if (!isAllowed) {
-    await AwesomeNotifications().requestPermissionToSendNotifications();
-  }
-
   /// NON-BLOCKING INITIALIZATION
   Future.microtask(() async {
     try {
+      // Request notification permission after runApp so Flutter context exists
+      final isAllowed = await AwesomeNotifications().isNotificationAllowed();
+      if (!isAllowed) {
+        await AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+
       await Future.wait([
         NotificationService.init(),
         InAppMessagingService.init(),
