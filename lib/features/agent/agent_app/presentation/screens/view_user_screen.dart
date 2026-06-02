@@ -20,8 +20,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 @RoutePage()
 class ViewUserScreen extends ConsumerStatefulWidget {
   final String userId;
+  final bool showMatchButton;
 
-  const ViewUserScreen({super.key, required this.userId});
+  const ViewUserScreen({
+    super.key,
+    required this.userId,
+    this.showMatchButton = true,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ViewUserScreenState();
@@ -100,9 +105,9 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to close profile: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to close profile: $e')));
       }
     }
   }
@@ -160,13 +165,14 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
         actions: [
           userAsync.maybeWhen(
             data: (user) {
-              if (user != null && user.profileStatus == 'active') {
+              if (widget.showMatchButton &&
+                  user != null &&
+                  user.profileStatus == 'active') {
                 return OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 235, 227, 227),
                   ),
-                  onPressed: () =>
-                      _showCloseProfileDialog(context, user.uid),
+                  onPressed: () => _showCloseProfileDialog(context, user.uid),
                   child: const Text('Close Profile'),
                 );
               }
@@ -179,8 +185,9 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
         bottom: TabBar(
           controller: _tabController,
           labelColor: theme.colorScheme.onPrimary,
-          unselectedLabelColor:
-              theme.colorScheme.onPrimary.withValues(alpha: 0.6),
+          unselectedLabelColor: theme.colorScheme.onPrimary.withValues(
+            alpha: 0.6,
+          ),
           indicatorColor: theme.colorScheme.onPrimary,
           tabs: const [
             Tab(icon: Icon(Icons.person_outline), text: 'Profile'),
@@ -226,8 +233,7 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_off_outlined,
-                      size: 80, color: Colors.grey),
+                  Icon(Icons.person_off_outlined, size: 80, color: Colors.grey),
                   SizedBox(height: 16),
                   Text('User Not Found'),
                 ],
@@ -244,7 +250,9 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
           );
         },
       ),
-      bottomNavigationBar: _MatchProfilesBottomBar(userId: widget.userId),
+      bottomNavigationBar: widget.showMatchButton
+          ? _MatchProfilesBottomBar(userId: widget.userId)
+          : null,
     );
   }
 }
@@ -357,8 +365,9 @@ class _UserProfileTab extends StatelessWidget {
                           : Icons.error,
                       label: 'Bio Data',
                       value: user.isProfileCreated ? 'Created' : 'Pending',
-                      color:
-                          user.isProfileCreated ? Colors.green : Colors.orange,
+                      color: user.isProfileCreated
+                          ? Colors.green
+                          : Colors.orange,
                     ),
                     _StatusItem(
                       icon: Icons.verified_user,
@@ -381,10 +390,9 @@ class _UserProfileTab extends StatelessWidget {
             icon: Icons.contact_mail,
             children: [
               _InfoRow(
-                  'Phone',
-                  user.phone.isNotEmpty
-                      ? user.phone
-                      : 'Not provided'),
+                'Phone',
+                user.phone.isNotEmpty ? user.phone : 'Not provided',
+              ),
               const Divider(height: 16),
               _InfoRow('Email', user.email),
             ],
@@ -395,14 +403,12 @@ class _UserProfileTab extends StatelessWidget {
             title: 'Account Information',
             icon: Icons.account_box,
             children: [
-              _InfoRow(
-                  'Role', user.role.isNotEmpty ? user.role : 'User'),
+              _InfoRow('Role', user.role.isNotEmpty ? user.role : 'User'),
               const Divider(height: 16),
               _InfoRow(
-                  'Gender',
-                  user.gender.isNotEmpty
-                      ? user.gender
-                      : 'Not specified'),
+                'Gender',
+                user.gender.isNotEmpty ? user.gender : 'Not specified',
+              ),
             ],
           ),
 
@@ -463,7 +469,9 @@ class _MatrimonyProfileTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen(matrimonyProfileViewModelProvider(userId), (prev, next) {
       // Show dialog on first transition to null data (profile doesn't exist yet)
-      if (next.hasValue && next.value == null && (prev == null || prev.isLoading)) {
+      if (next.hasValue &&
+          next.value == null &&
+          (prev == null || prev.isLoading)) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) _showNoProfileDialog(context);
         });
@@ -498,183 +506,185 @@ class _MatrimonyProfileTab extends ConsumerWidget {
           );
         }
         return SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header card
-            _MatrimonyHeaderCard(profile: profile),
-            const SizedBox(height: 16),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header card
+              _MatrimonyHeaderCard(profile: profile),
+              const SizedBox(height: 16),
 
-            // Identity
-            _SectionCard(
-              title: 'Identity Information',
-              icon: Icons.person,
-              children: [
-                _InfoRow('Full Name', profile.user.fullName),
-                _InfoRow(
-                  'Date of Birth',
-                  profile.identity.dob
-                      .toLocal()
-                      .toString()
-                      .split(' ')[0],
-                ),
-                _InfoRow('Age', '${profile.identity.age} years'),
-                _InfoRow('Gender', profile.identity.gender),
-                _InfoRow('Aadhar', profile.identity.aadhar),
-                if (profile.identity.aboutMe.isNotEmpty)
-                  _InfoRow('About Me', profile.identity.aboutMe),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Physical
-            _SectionCard(
-              title: 'Physical Information',
-              icon: Icons.accessibility,
-              children: [
-                _InfoRow('Height', '${profile.physical.height} cm'),
-                _InfoRow('Weight', '${profile.physical.weight} kg'),
-                _InfoRow('Body Type', profile.physical.bodyType),
-                _InfoRow('Complexion', profile.physical.complexion),
-                _InfoRow(
-                  'Physically Challenged',
-                  profile.physical.physicallyChallenged ? 'Yes' : 'No',
-                ),
-                if (profile.physical.disabilityDetails != null)
-                  _InfoRow(
-                    'Disability Details',
-                    profile.physical.disabilityDetails!,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Cultural
-            _SectionCard(
-              title: 'Cultural Information',
-              icon: Icons.temple_hindu,
-              children: [
-                _InfoRow('Religion', profile.cultural.religion),
-                _InfoRow('Caste', profile.cultural.caste),
-                _InfoRow('Sub Caste', profile.cultural.subCaste),
-                _InfoRow(
-                  'Languages',
-                  profile.cultural.languages.join(', '),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Education
-            _SectionCard(
-              title: 'Education',
-              icon: Icons.school,
-              children: [
-                _InfoRow(
-                  'Is Illiterate',
-                  profile.education.isIlletrate ? 'Yes' : 'No',
-                ),
-                if (!profile.education.isIlletrate &&
-                    profile.education.education != null) ...[
-                  _InfoRow(
-                      'Course', profile.education.education!.course),
-                  _InfoRow('College / University',
-                      profile.education.education!.college),
-                  _InfoRow('Passing Year',
-                      '${profile.education.education!.passingYear}'),
-                  _InfoRow('Percentage',
-                      '${profile.education.education!.percentage}%'),
-                ],
-                if (profile.education.extraQualification
-                        ?.qualifications.isNotEmpty ==
-                    true)
-                  _InfoRow(
-                    'Extra Qualifications',
-                    profile.education.extraQualification!.qualifications
-                        .join(', '),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Employment
-            _SectionCard(
-              title: 'Employment',
-              icon: Icons.work,
-              children: [
-                _InfoRow('Job Type', profile.employment.jobType),
-                if (profile.employment.company != null)
-                  _InfoRow('Company', profile.employment.company!),
-                if (profile.employment.designation != null)
-                  _InfoRow(
-                      'Designation', profile.employment.designation!),
-                if (profile.employment.annualIncome != null)
-                  _InfoRow('Annual Income',
-                      '₹${profile.employment.annualIncome}'),
-                if (profile.employment.workLocation != null)
-                  _InfoRow(
-                      'Work Location', profile.employment.workLocation!),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Family
-            _SectionCard(
-              title: 'Family Information',
-              icon: Icons.family_restroom,
-              children: [
-                _InfoRow("Father's Name", profile.family.fatherName),
-                _InfoRow("Mother's Name", profile.family.motherName),
-                _InfoRow(
-                    'Brothers', '${profile.family.numberOfBrothers}'),
-                _InfoRow(
-                    'Sisters', '${profile.family.numberOfSisters}'),
-                _InfoRow('Family Type', profile.family.familyType),
-                _InfoRow('Family Status', profile.family.familyStatus),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Address
-            _SectionCard(
-              title: 'Address',
-              icon: Icons.location_on,
-              children: [
-                _InfoRow('Address', profile.address.addressLine1),
-                _InfoRow('Post', profile.address.post),
-                _InfoRow(
-                    'Police Station', profile.address.policeStation),
-                _InfoRow('City', profile.address.city),
-                _InfoRow('State', profile.address.state),
-                _InfoRow('Pincode', profile.address.pincode),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Agent Info
-            if (profile.agentEntity != null) ...[
+              // Identity
               _SectionCard(
-                title: 'Agent Information',
-                icon: Icons.support_agent,
+                title: 'Identity Information',
+                icon: Icons.person,
                 children: [
-                  _InfoRow('Agent Name', profile.agentEntity!.agentName),
-                  _InfoRow('Phone', profile.agentEntity!.agentMobile),
-                  _InfoRow('Email', profile.agentEntity!.agentEmail),
+                  _InfoRow('Full Name', profile.user.fullName),
                   _InfoRow(
-                      'License', profile.agentEntity!.agentLicenseNumber),
-                  _InfoRow('City', profile.agentEntity!.agentCity),
+                    'Date of Birth',
+                    profile.identity.dob.toLocal().toString().split(' ')[0],
+                  ),
+                  _InfoRow('Age', '${profile.identity.age} years'),
+                  _InfoRow('Gender', profile.identity.gender),
+                  _InfoRow('Aadhar', profile.identity.aadhar),
+                  if (profile.identity.aboutMe.isNotEmpty)
+                    _InfoRow('About Me', profile.identity.aboutMe),
                 ],
               ),
               const SizedBox(height: 16),
-            ],
 
-            // Photos & Documents
-            _ImagesTabSection(images: profile.images),
-            const SizedBox(height: 80),
-          ],
-        ),
-      );
+              // Physical
+              _SectionCard(
+                title: 'Physical Information',
+                icon: Icons.accessibility,
+                children: [
+                  _InfoRow('Height', '${profile.physical.height} cm'),
+                  _InfoRow('Weight', '${profile.physical.weight} kg'),
+                  _InfoRow('Body Type', profile.physical.bodyType),
+                  _InfoRow('Complexion', profile.physical.complexion),
+                  _InfoRow(
+                    'Physically Challenged',
+                    profile.physical.physicallyChallenged ? 'Yes' : 'No',
+                  ),
+                  if (profile.physical.disabilityDetails != null)
+                    _InfoRow(
+                      'Disability Details',
+                      profile.physical.disabilityDetails!,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Cultural
+              _SectionCard(
+                title: 'Cultural Information',
+                icon: Icons.temple_hindu,
+                children: [
+                  _InfoRow('Religion', profile.cultural.religion),
+                  _InfoRow('Caste', profile.cultural.caste),
+                  _InfoRow('Sub Caste', profile.cultural.subCaste),
+                  _InfoRow('Languages', profile.cultural.languages.join(', ')),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Education
+              _SectionCard(
+                title: 'Education',
+                icon: Icons.school,
+                children: [
+                  _InfoRow(
+                    'Is Illiterate',
+                    profile.education.isIlletrate ? 'Yes' : 'No',
+                  ),
+                  if (!profile.education.isIlletrate &&
+                      profile.education.education != null) ...[
+                    _InfoRow('Course', profile.education.education!.course),
+                    _InfoRow(
+                      'College / University',
+                      profile.education.education!.college,
+                    ),
+                    _InfoRow(
+                      'Passing Year',
+                      '${profile.education.education!.passingYear}',
+                    ),
+                    _InfoRow(
+                      'Percentage',
+                      '${profile.education.education!.percentage}%',
+                    ),
+                  ],
+                  if (profile
+                          .education
+                          .extraQualification
+                          ?.qualifications
+                          .isNotEmpty ==
+                      true)
+                    _InfoRow(
+                      'Extra Qualifications',
+                      profile.education.extraQualification!.qualifications.join(
+                        ', ',
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Employment
+              _SectionCard(
+                title: 'Employment',
+                icon: Icons.work,
+                children: [
+                  _InfoRow('Job Type', profile.employment.jobType),
+                  if (profile.employment.company != null)
+                    _InfoRow('Company', profile.employment.company!),
+                  if (profile.employment.designation != null)
+                    _InfoRow('Designation', profile.employment.designation!),
+                  if (profile.employment.annualIncome != null)
+                    _InfoRow(
+                      'Annual Income',
+                      '₹${profile.employment.annualIncome}',
+                    ),
+                  if (profile.employment.workLocation != null)
+                    _InfoRow('Work Location', profile.employment.workLocation!),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Family
+              _SectionCard(
+                title: 'Family Information',
+                icon: Icons.family_restroom,
+                children: [
+                  _InfoRow("Father's Name", profile.family.fatherName),
+                  _InfoRow("Mother's Name", profile.family.motherName),
+                  _InfoRow('Brothers', '${profile.family.numberOfBrothers}'),
+                  _InfoRow('Sisters', '${profile.family.numberOfSisters}'),
+                  _InfoRow('Family Type', profile.family.familyType),
+                  _InfoRow('Family Status', profile.family.familyStatus),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Address
+              _SectionCard(
+                title: 'Address',
+                icon: Icons.location_on,
+                children: [
+                  _InfoRow('Address', profile.address.addressLine1),
+                  _InfoRow('Post', profile.address.post),
+                  _InfoRow('Police Station', profile.address.policeStation),
+                  _InfoRow('City', profile.address.city),
+                  _InfoRow('State', profile.address.state),
+                  _InfoRow('Pincode', profile.address.pincode),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Agent Info
+              if (profile.agentEntity != null) ...[
+                _SectionCard(
+                  title: 'Agent Information',
+                  icon: Icons.support_agent,
+                  children: [
+                    _InfoRow('Agent Name', profile.agentEntity!.agentName),
+                    _InfoRow('Phone', profile.agentEntity!.agentMobile),
+                    _InfoRow('Email', profile.agentEntity!.agentEmail),
+                    _InfoRow(
+                      'License',
+                      profile.agentEntity!.agentLicenseNumber,
+                    ),
+                    _InfoRow('City', profile.agentEntity!.agentCity),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              // Photos & Documents
+              _ImagesTabSection(images: profile.images),
+              const SizedBox(height: 80),
+            ],
+          ),
+        );
       },
     );
   }
@@ -691,8 +701,7 @@ class _MatchProfilesBottomBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profileAsync =
-        ref.watch(matrimonyProfileViewModelProvider(userId));
+    final profileAsync = ref.watch(matrimonyProfileViewModelProvider(userId));
     final theme = Theme.of(context);
 
     return profileAsync.maybeWhen(
@@ -778,14 +787,12 @@ class _MatrimonyHeaderCard extends StatelessWidget {
                   if (profile.user.phone.isNotEmpty)
                     Text(
                       profile.user.phone,
-                      style:
-                          TextStyle(color: Colors.grey[600], fontSize: 12),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                   if (profile.user.email.isNotEmpty)
                     Text(
                       profile.user.email,
-                      style:
-                          TextStyle(color: Colors.grey[600], fontSize: 12),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                 ],
               ),
@@ -819,8 +826,7 @@ class _SectionCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Card(
         elevation: 2,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -877,8 +883,7 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               value.isEmpty ? 'Not provided' : value,
-              style: const TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -949,12 +954,10 @@ class _ImagesTabSection extends StatelessWidget {
       allImages.add(MapEntry('Profile Photo', images.profileImageUrl));
     }
     if (images.imageWithAgentUrl.isNotEmpty) {
-      allImages
-          .add(MapEntry('Photo with Agent', images.imageWithAgentUrl));
+      allImages.add(MapEntry('Photo with Agent', images.imageWithAgentUrl));
     }
     for (int i = 0; i < images.secondaryImageUrls.length; i++) {
-      allImages.add(
-          MapEntry('Gallery ${i + 1}', images.secondaryImageUrls[i]));
+      allImages.add(MapEntry('Gallery ${i + 1}', images.secondaryImageUrls[i]));
     }
 
     final hasAadhar = images.aadharCardUrl.isNotEmpty;
@@ -968,8 +971,7 @@ class _ImagesTabSection extends StatelessWidget {
       key: ValueKey('img_tabs_$tabCount'),
       child: Card(
         elevation: 1,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Builder(
           builder: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -978,14 +980,18 @@ class _ImagesTabSection extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    Icon(Icons.photo_library,
-                        size: 20,
-                        color: Theme.of(context).primaryColor),
+                    Icon(
+                      Icons.photo_library,
+                      size: 20,
+                      color: Theme.of(context).primaryColor,
+                    ),
                     const SizedBox(width: 8),
                     const Text(
                       'Photos & Documents',
                       style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -1006,8 +1012,7 @@ class _ImagesTabSection extends StatelessWidget {
                 child: TabBarView(
                   children: [
                     ...allImages.map(
-                      (e) =>
-                          _ImageViewer(imageUrl: e.value, label: e.key),
+                      (e) => _ImageViewer(imageUrl: e.value, label: e.key),
                     ),
                     if (hasAadhar)
                       _DocumentViewer(
@@ -1038,11 +1043,16 @@ class _ImageError extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.broken_image_outlined,
-                size: 56, color: Colors.grey[500]),
+            Icon(
+              Icons.broken_image_outlined,
+              size: 56,
+              color: Colors.grey[500],
+            ),
             const SizedBox(height: 8),
-            Text('$label not available',
-                style: TextStyle(color: Colors.grey[600])),
+            Text(
+              '$label not available',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
           ],
         ),
       ),
@@ -1075,18 +1085,18 @@ class _ImageViewer extends StatelessWidget {
                   fit: BoxFit.contain,
                   loadingBuilder: (context, child, progress) {
                     if (progress == null) return child;
-                    return const Center(
-                        child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   },
-                  errorBuilder: (_, _, _) =>
-                      _ImageError(label: label),
+                  errorBuilder: (_, _, _) => _ImageError(label: label),
                 ),
               ),
             ),
           ),
           const SizedBox(height: 12),
-          Text('Tap to view fullscreen',
-              style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+          Text(
+            'Tap to view fullscreen',
+            style: TextStyle(color: Colors.grey[600], fontSize: 12),
+          ),
         ],
       ),
     );
@@ -1111,8 +1121,7 @@ class _ImageViewer extends StatelessWidget {
                   loadingBuilder: (_, child, progress) {
                     if (progress == null) return child;
                     return const Center(
-                      child: CircularProgressIndicator(
-                          color: Colors.white),
+                      child: CircularProgressIndicator(color: Colors.white),
                     );
                   },
                   errorBuilder: (_, _, _) => const Icon(
@@ -1127,8 +1136,7 @@ class _ImageViewer extends StatelessWidget {
               top: 40,
               right: 20,
               child: IconButton(
-                icon: const Icon(Icons.close,
-                    color: Colors.white, size: 32),
+                icon: const Icon(Icons.close, color: Colors.white, size: 32),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -1143,8 +1151,7 @@ class _DocumentViewer extends StatelessWidget {
   final String documentUrl;
   final String label;
 
-  const _DocumentViewer(
-      {required this.documentUrl, required this.label});
+  const _DocumentViewer({required this.documentUrl, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -1163,9 +1170,10 @@ class _DocumentViewer extends StatelessWidget {
             color: Theme.of(context).primaryColor,
           ),
           const SizedBox(height: 16),
-          Text(label,
-              style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => _openDocument(context, isPdf),
@@ -1210,9 +1218,7 @@ class _DocumentViewer extends StatelessWidget {
 
   String _shortName(String url) {
     final name = url.split('/').last;
-    return name.length > 30
-        ? '...${name.substring(name.length - 30)}'
-        : name;
+    return name.length > 30 ? '...${name.substring(name.length - 30)}' : name;
   }
 }
 
@@ -1240,8 +1246,10 @@ class MatchingOptionsSheet extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Matching Options',
-              style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'Matching Options',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 16),
         ],
       ),
@@ -1271,8 +1279,7 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                 children: [
                   const Text(
                     'Filter Profiles',
-                    style: TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Row(
                     children: [
@@ -1298,22 +1305,21 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                       const Text(
                         'Location',
                         style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       locationAsync.when(
-                        loading: () => const Center(
-                            child: CircularProgressIndicator()),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('Error: $e'),
                         data: (states) {
-                          final stateNames =
-                              states.map((e) => e.name).toList();
+                          final stateNames = states.map((e) => e.name).toList();
                           final selectedState = states.firstWhere(
                             (s) => s.name == filter.state,
-                            orElse: () =>
-                                StateCityModel(name: '', cities: []),
+                            orElse: () => StateCityModel(name: '', cities: []),
                           );
                           return Column(
                             children: [
@@ -1334,9 +1340,7 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                               const SizedBox(height: 12),
                               _buildDropdown(
                                 title: 'City',
-                                value: filter.city.isEmpty
-                                    ? null
-                                    : filter.city,
+                                value: filter.city.isEmpty ? null : filter.city,
                                 items: selectedState.cities,
                                 onChanged: (val) {
                                   if (val != null) {
@@ -1354,22 +1358,24 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                       const Text(
                         'Cultural',
                         style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       religionsAsync.when(
-                        loading: () => const Center(
-                            child: CircularProgressIndicator()),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('Error: $e'),
                         data: (religions) {
-                          final religionNames =
-                              religions.map((r) => r.name).toList();
+                          final religionNames = religions
+                              .map((r) => r.name)
+                              .toList();
                           final selectedReligion = religions.firstWhere(
                             (r) => r.name == filter.religion,
-                            orElse: () => ReligionModel(
-                                id: '', name: '', castes: []),
+                            orElse: () =>
+                                ReligionModel(id: '', name: '', castes: []),
                           );
                           return Column(
                             children: [
@@ -1434,8 +1440,7 @@ class MatchingFilterRightSheet extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
           initialValue: value,
@@ -1444,8 +1449,7 @@ class MatchingFilterRightSheet extends ConsumerWidget {
               .toList(),
           onChanged: onChanged,
           decoration: InputDecoration(
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
       ],
@@ -1523,22 +1527,25 @@ class _WishlistUserTile extends ConsumerWidget {
                                 ? user.fullName
                                 : 'No Name',
                             style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           const SizedBox(height: 2),
                           Row(
                             children: [
-                              Icon(Icons.phone,
-                                  size: 14, color: Colors.grey[600]),
+                              Icon(
+                                Icons.phone,
+                                size: 14,
+                                color: Colors.grey[600],
+                              ),
                               const SizedBox(width: 4),
                               Text(
-                                user.phone.isNotEmpty
-                                    ? user.phone
-                                    : 'No phone',
+                                user.phone.isNotEmpty ? user.phone : 'No phone',
                                 style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey[700]),
+                                  fontSize: 13,
+                                  color: Colors.grey[700],
+                                ),
                               ),
                             ],
                           ),
@@ -1547,12 +1554,14 @@ class _WishlistUserTile extends ConsumerWidget {
                             children: [
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 2),
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: _getStatusColor(status)
-                                      .withValues(alpha: 0.1),
-                                  borderRadius:
-                                      BorderRadius.circular(12),
+                                  color: _getStatusColor(
+                                    status,
+                                  ).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
                                   status,
@@ -1567,8 +1576,9 @@ class _WishlistUserTile extends ConsumerWidget {
                               Text(
                                 formatDateTime(updatedAt),
                                 style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.grey[500]),
+                                  fontSize: 11,
+                                  color: Colors.grey[500],
+                                ),
                               ),
                             ],
                           ),
@@ -1588,25 +1598,25 @@ class _WishlistUserTile extends ConsumerWidget {
                           if (isSameAgent) {
                             _showSameAgentDialog(context);
                           } else {
-                            showAgentDialog(
-                                context, ref, user.agentId);
+                            showAgentDialog(context, ref, user.agentId);
                           }
                         },
-                        icon: Icon(isSameAgent
-                            ? Icons.check_circle_outline
-                            : Icons.person),
-                        label: Text(isSameAgent
-                            ? 'Same Agent'
-                            : 'Contact Agent'),
+                        icon: Icon(
+                          isSameAgent
+                              ? Icons.check_circle_outline
+                              : Icons.person,
+                        ),
+                        label: Text(
+                          isSameAgent ? 'Same Agent' : 'Contact Agent',
+                        ),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor:
-                              isSameAgent ? Colors.green : Colors.blue,
+                          foregroundColor: isSameAgent
+                              ? Colors.green
+                              : Colors.blue,
                           side: BorderSide(
-                              color: isSameAgent
-                                  ? Colors.green
-                                  : Colors.blue),
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 8),
+                            color: isSameAgent ? Colors.green : Colors.blue,
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
                         ),
                       ),
                     ),
@@ -1616,15 +1626,13 @@ class _WishlistUserTile extends ConsumerWidget {
                   child: SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      onPressed: () =>
-                          _showStatusDialog(context, ref),
+                      onPressed: () => _showStatusDialog(context, ref),
                       icon: const Icon(Icons.edit_note),
                       label: const Text('Update Status'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.orange,
                         side: const BorderSide(color: Colors.orange),
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 8),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                       ),
                     ),
                   ),
@@ -1653,16 +1661,18 @@ class _WishlistUserTile extends ConsumerWidget {
                     height: 16,
                     width: 120,
                     decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(4)),
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Container(
                     height: 12,
                     width: 80,
                     decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(4)),
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                 ],
               ),
@@ -1736,7 +1746,10 @@ class _WishlistUserTile extends ConsumerWidget {
   }
 
   Future<void> _updateStatus(
-      WidgetRef ref, String newStatus, BuildContext context) async {
+    WidgetRef ref,
+    String newStatus,
+    BuildContext context,
+  ) async {
     try {
       await ref
           .read(agentUserNotifierProvider.notifier)
@@ -1747,13 +1760,15 @@ class _WishlistUserTile extends ConsumerWidget {
           );
       ref.invalidate(agentUserNotifierProvider);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Status updated to $newStatus')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Status updated to $newStatus')));
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to update status: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to update status: $e')));
       }
     }
   }
@@ -1762,8 +1777,7 @@ class _WishlistUserTile extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        icon: const Icon(Icons.check_circle,
-            color: Colors.green, size: 48),
+        icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
         title: const Text('Same Agent'),
         content: const Text(
           'This user is registered under the same agent. No need to contact another agent for the matrimony process.',
@@ -1778,8 +1792,7 @@ class _WishlistUserTile extends ConsumerWidget {
     );
   }
 
-  void showAgentDialog(
-      BuildContext context, WidgetRef ref, String agentId) {
+  void showAgentDialog(BuildContext context, WidgetRef ref, String agentId) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -1807,13 +1820,18 @@ class _AgentDialog extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label,
-                  style:
-                      const TextStyle(fontSize: 12, color: Colors.grey)),
+              Text(
+                label,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
               const SizedBox(height: 2),
-              Text(value,
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500)),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
         ),
@@ -1824,16 +1842,20 @@ class _AgentDialog extends ConsumerWidget {
   Widget _buildStatusChip(dynamic agent) {
     if (agent.isApproved) {
       return const Chip(
-          label: Text('Approved'),
-          backgroundColor: Colors.greenAccent);
+        label: Text('Approved'),
+        backgroundColor: Colors.greenAccent,
+      );
     }
     if (agent.isRejected) {
       return const Chip(
-          label: Text('Rejected'),
-          backgroundColor: Colors.redAccent);
+        label: Text('Rejected'),
+        backgroundColor: Colors.redAccent,
+      );
     }
     return const Chip(
-        label: Text('Pending'), backgroundColor: Colors.orangeAccent);
+      label: Text('Pending'),
+      backgroundColor: Colors.orangeAccent,
+    );
   }
 
   @override
@@ -1841,8 +1863,7 @@ class _AgentDialog extends ConsumerWidget {
     final agentAsync = ref.watch(agentProvider(agentId));
 
     return AlertDialog(
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       contentPadding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
       title: agentAsync.when(
@@ -1860,9 +1881,13 @@ class _AgentDialog extends ConsumerWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(agent.agentName,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w600)),
+              child: Text(
+                agent.agentName,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
@@ -1871,11 +1896,13 @@ class _AgentDialog extends ConsumerWidget {
       ),
       content: agentAsync.when(
         loading: () => const SizedBox(
-            height: 120,
-            child: Center(child: CircularProgressIndicator())),
+          height: 120,
+          child: Center(child: CircularProgressIndicator()),
+        ),
         error: (_, _) => const SizedBox(
-            height: 120,
-            child: Center(child: Text('Failed to load agent info'))),
+          height: 120,
+          child: Center(child: Text('Failed to load agent info')),
+        ),
         data: (agent) => SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1904,12 +1931,13 @@ class _AgentDialog extends ConsumerWidget {
           if (agent.agentMobile.isNotEmpty) ...[
             TextButton.icon(
               onPressed: () {
-                final number =
-                    agent.agentMobile.replaceAll(RegExp(r'[^0-9]'), '');
+                final number = agent.agentMobile.replaceAll(
+                  RegExp(r'[^0-9]'),
+                  '',
+                );
                 final url =
                     'https://wa.me/$number?text=Hi, I am contacting you regarding a matrimony profile.';
-                launchUrl(Uri.parse(url),
-                    mode: LaunchMode.externalApplication);
+                launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
               },
               icon: const Icon(Icons.message, size: 18),
               label: const Text('WhatsApp'),

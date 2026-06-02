@@ -26,13 +26,20 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
   void initState() {
     super.initState();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await RemoteConfigService.instance.checkForUpdate(context);
+        await RemoteConfigService.instance.checkForMaintenanceMode(context);
+      } catch (e) {
+        debugPrint('RemoteConfig check failed on AgentHomeScreen: $e');
+      }
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(usersPaymentsNotifierProvider.notifier)
           .getUsersPayment(agentId: widget.agentId);
-      ref
-          .read(agentUsersNotifierProvider.notifier)
-          .getUsersForAgent();
+      ref.read(agentUsersNotifierProvider.notifier).getUsersForAgent();
     });
   }
 

@@ -303,226 +303,233 @@ class NotificationService {
     }
   }
 
-/// Central navigation handler
-static void _handleNavigation(Map<String, dynamic> data) {
-  if (data.isEmpty) return;
+  /// Central navigation handler
+  static void _handleNavigation(Map<String, dynamic> data) {
+    if (data.isEmpty) return;
 
-  debugPrint("Handle navigation data: $data");
+    debugPrint("Handle navigation data: $data");
 
-  // Optional external callback
-  onNotificationTap?.call(data);
+    // Optional external callback
+    onNotificationTap?.call(data);
 
-  if (_appRouter == null) {
-    debugPrint("Router not available in NotificationService");
-    return;
+    if (_appRouter == null) {
+      debugPrint("Router not available in NotificationService");
+      return;
+    }
+
+    final screen = data['screen'] as String?;
+    final type = data['type'] as String?;
+
+    // Extract IDs from notification data
+    final userId = data['userId'] as String? ?? data['id'] as String?;
+    final agentId = data['agentId'] as String?;
+    final profileId = data['profileId'] as String?;
+    final ticketId = data['ticketId'] as String?;
+    final senderId = data['senderId'] as String?;
+
+    debugPrint(
+      "Navigation: screen=$screen, type=$type, userId=$userId, agentId=$agentId",
+    );
+
+    switch (screen) {
+      // ============ AGENT SCREENS ============
+
+      // View user details (for agent)
+      case 'view_user':
+      case 'agent_user_view':
+        if (userId != null) {
+          debugPrint("Navigating to ViewUserScreen: userId=$userId");
+          _appRouter!.push(ViewUserRoute(userId: userId));
+        }
+        break;
+
+      // Agent users list
+      case 'agent_users_screen':
+        if (agentId != null) {
+          debugPrint("Navigating to AgentUserScreen: agentId=$agentId");
+          _appRouter!.push(AgentUserRoute(agentId: agentId));
+        }
+        break;
+
+      // Agent wishlist screen
+      case 'agent_wishlist':
+        if (agentId != null) {
+          debugPrint("Navigating to AgentWishlistScreen: agentId=$agentId");
+          _appRouter!.push(AgentWishlistRoute(agentId: agentId));
+        }
+        break;
+
+      // View wishlist user details (for agent)
+      case 'view_wishlist_user':
+      case 'agent_wishlist_details':
+        if (userId != null) {
+          debugPrint("Navigating to ViewWishListUserScreen: userId=$userId");
+          _appRouter!.push(ViewWishListUserRoute(userId: userId));
+        } else if (senderId != null) {
+          debugPrint(
+            "Navigating to ViewWishListUserScreen: senderId=$senderId",
+          );
+          _appRouter!.push(ViewWishListUserRoute(userId: senderId));
+        }
+        break;
+
+      // View payment details (for agent)
+      case 'view_payment_detail':
+        if (userId != null && agentId != null) {
+          debugPrint(
+            "Navigating to ViewPaymentDetailScreen: userId=$userId, agentId=$agentId",
+          );
+          _appRouter!.push(
+            ViewPaymentDetailRoute(userId: userId, agentId: agentId),
+          );
+        }
+        break;
+
+      // View matrimony profile (for agent)
+      case 'metrimony_profile':
+        if (profileId != null) {
+          debugPrint(
+            "Navigating to MetrimonyProfileScreen: profileId=$profileId",
+          );
+          _appRouter!.push(MetrimonyProfileRoute(userId: profileId));
+        }
+        break;
+
+      // Agent support screen
+      case 'agent_support':
+        if (agentId != null) {
+          debugPrint("Navigating to AgentSupportScreen: agentId=$agentId");
+          _appRouter!.push(AgentSupportRoute(agentId: agentId));
+        }
+        break;
+
+      // Agent notifications screen
+      case 'agent_notification':
+        debugPrint("Navigating to AgentNotificationScreen");
+        _appRouter!.push(const AgentnotificationRoute());
+        break;
+
+      // ============ USER SCREENS ============
+
+      // User wishlist screen
+      case 'user_wishlist':
+      case 'wishlist_details':
+        if (userId != null) {
+          debugPrint("Navigating to UserWishListScreen: userId=$userId");
+          _appRouter!.push(UserWishListRoute(userId: userId));
+        }
+        break;
+
+      // User notification screen
+      case 'user_notification':
+        debugPrint("Navigating to UserNotificationScreen");
+        _appRouter!.push(const UserNotificationRoute());
+        break;
+
+      // User profile screen
+      case 'user_profile':
+        if (userId != null) {
+          debugPrint("Navigating to UserProfileScreen: userId=$userId");
+          _appRouter!.push(UserProfileRoute(userId: userId));
+        }
+        break;
+
+      // User home screen
+      case 'user_home':
+        debugPrint("Navigating to UserHomeScreen");
+        _appRouter!.push(const UserHomeRoute());
+        break;
+
+      // Support tickets screen
+      case 'support_tickets':
+        if (userId != null) {
+          debugPrint("Navigating to SupportTicketsScreen: userId=$userId");
+          _appRouter!.push(SupportTicketsRoute(userId: userId));
+        }
+        break;
+
+      // Support ticket detail
+      case 'support_ticket_detail':
+        if (ticketId != null) {
+          debugPrint(
+            "Navigating to SupportTicketDetailScreen: ticketId=$ticketId",
+          );
+          _appRouter!.push(SupportTicketDetailRoute(ticketId: ticketId));
+        }
+        break;
+
+      // User detail screen (view another user's profile)
+      case 'user_detail':
+        if (userId != null) {
+          debugPrint("Navigating to UserDetailScreen: uid=$userId");
+          _appRouter!.push(UserDetailRoute(uid: userId));
+        }
+        break;
+
+      // Payment screen
+      case 'user_payment':
+        if (userId != null) {
+          debugPrint("Navigating to UserPaymentScreen: userId=$userId");
+          _appRouter!.push(UserPaymentRoute(userId: userId));
+        }
+        break;
+
+      default:
+        debugPrint("Unknown screen: $screen, type: $type");
+        // Fallback: try to navigate based on type
+        _handleNavigationByType(type, data);
+    }
   }
 
-  final screen = data['screen'] as String?;
-  final type = data['type'] as String?;
+  /// Fallback navigation handler based on notification type
+  static void _handleNavigationByType(String? type, Map<String, dynamic> data) {
+    if (type == null || _appRouter == null) return;
 
-  // Extract IDs from notification data
-  final userId = data['userId'] as String? ?? data['id'] as String?;
-  final agentId = data['agentId'] as String?;
-  final profileId = data['profileId'] as String?;
-  final ticketId = data['ticketId'] as String?;
-  final senderId = data['senderId'] as String?;
+    final userId = data['userId'] as String?;
+    final agentId = data['agentId'] as String?;
 
-  debugPrint("Navigation: screen=$screen, type=$type, userId=$userId, agentId=$agentId");
+    switch (type) {
+      case 'USER_REGISTERED':
+      case 'PROFILE_COMPLETED':
+      case 'MATRIMONY_PROFILE_CREATED':
+        if (userId != null) {
+          _appRouter!.push(ViewUserRoute(userId: userId));
+        }
+        break;
 
-  switch (screen) {
-    // ============ AGENT SCREENS ============
+      case 'PAYMENT_INITIATED':
+        if (userId != null && agentId != null) {
+          _appRouter!.push(
+            ViewPaymentDetailRoute(userId: userId, agentId: agentId),
+          );
+        }
+        break;
 
-    // View user details (for agent)
-    case 'view_user':
-    case 'agent_user_view':
-      if (userId != null) {
-        debugPrint("Navigating to ViewUserScreen: userId=$userId");
-        _appRouter!.push(ViewUserRoute(userId: userId));
-      }
-      break;
+      case 'WISHLIST_SENT':
+      case 'WISHLIST_RECEIVED':
+      case 'WISHLIST_STATUS_UPDATED':
+        if (userId != null) {
+          _appRouter!.push(UserWishListRoute(userId: userId));
+        }
+        break;
 
-    // Agent users list
-    case 'agent_users_screen':
-      if (agentId != null) {
-        debugPrint("Navigating to AgentUserScreen: agentId=$agentId");
-        _appRouter!.push(AgentUserRoute(agentId: agentId));
-      }
-      break;
+      case 'AGENT_WISHLIST_CREATED':
+      case 'AGENT_WISHLIST_STATUS_UPDATED':
+        if (agentId != null) {
+          _appRouter!.push(AgentWishlistRoute(agentId: agentId));
+        }
+        break;
 
-    // Agent wishlist screen
-    case 'agent_wishlist':
-      if (agentId != null) {
-        debugPrint("Navigating to AgentWishlistScreen: agentId=$agentId");
-        _appRouter!.push(AgentWishlistRoute(agentId: agentId));
-      }
-      break;
+      case 'SUPPORT_TICKET_CREATED':
+        if (agentId != null) {
+          _appRouter!.push(AgentSupportRoute(agentId: agentId));
+        }
+        break;
 
-    // View wishlist user details (for agent)
-    case 'view_wishlist_user':
-    case 'agent_wishlist_details':
-      if (userId != null) {
-        debugPrint("Navigating to ViewWishListUserScreen: userId=$userId");
-        _appRouter!.push(ViewWishListUserRoute(userId: userId));
-      } else if (senderId != null) {
-        debugPrint("Navigating to ViewWishListUserScreen: senderId=$senderId");
-        _appRouter!.push(ViewWishListUserRoute(userId: senderId));
-      }
-      break;
-
-    // View payment details (for agent)
-    case 'view_payment_detail':
-      if (userId != null && agentId != null) {
-        debugPrint("Navigating to ViewPaymentDetailScreen: userId=$userId, agentId=$agentId");
-        _appRouter!.push(ViewPaymentDetailRoute(
-          userId: userId,
-          agentId: agentId,
-        ));
-      }
-      break;
-
-    // View matrimony profile (for agent)
-    case 'metrimony_profile':
-      if (profileId != null) {
-        debugPrint("Navigating to MetrimonyProfileScreen: profileId=$profileId");
-        _appRouter!.push(MetrimonyProfileRoute(userId: profileId));
-      }
-      break;
-
-    // Agent support screen
-    case 'agent_support':
-      if (agentId != null) {
-        debugPrint("Navigating to AgentSupportScreen: agentId=$agentId");
-        _appRouter!.push(AgentSupportRoute(agentId: agentId));
-      }
-      break;
-
-    // Agent notifications screen
-    case 'agent_notification':
-      debugPrint("Navigating to AgentNotificationScreen");
-      _appRouter!.push(const AgentnotificationRoute());
-      break;
-
-    // ============ USER SCREENS ============
-
-    // User wishlist screen
-    case 'user_wishlist':
-    case 'wishlist_details':
-      if (userId != null) {
-        debugPrint("Navigating to UserWishListScreen: userId=$userId");
-        _appRouter!.push(UserWishListRoute(userId: userId));
-      }
-      break;
-
-    // User notification screen
-    case 'user_notification':
-      debugPrint("Navigating to UserNotificationScreen");
-      _appRouter!.push(const UserNotificationRoute());
-      break;
-
-    // User profile screen
-    case 'user_profile':
-      if (userId != null) {
-        debugPrint("Navigating to UserProfileScreen: userId=$userId");
-        _appRouter!.push(UserProfileRoute(userId: userId));
-      }
-      break;
-
-    // User home screen
-    case 'user_home':
-      debugPrint("Navigating to UserHomeScreen");
-      _appRouter!.push(const UserHomeRoute());
-      break;
-
-    // Support tickets screen
-    case 'support_tickets':
-      if (userId != null) {
-        debugPrint("Navigating to SupportTicketsScreen: userId=$userId");
-        _appRouter!.push(SupportTicketsRoute(userId: userId));
-      }
-      break;
-
-    // Support ticket detail
-    case 'support_ticket_detail':
-      if (ticketId != null) {
-        debugPrint("Navigating to SupportTicketDetailScreen: ticketId=$ticketId");
-        _appRouter!.push(SupportTicketDetailRoute(ticketId: ticketId));
-      }
-      break;
-
-    // User detail screen (view another user's profile)
-    case 'user_detail':
-      if (userId != null) {
-        debugPrint("Navigating to UserDetailScreen: uid=$userId");
-        _appRouter!.push(UserDetailRoute(uid: userId));
-      }
-      break;
-
-    // Payment screen
-    case 'user_payment':
-      if (userId != null) {
-        debugPrint("Navigating to UserPaymentScreen: userId=$userId");
-        _appRouter!.push(UserPaymentRoute(userId: userId));
-      }
-      break;
-
-    default:
-      debugPrint("Unknown screen: $screen, type: $type");
-      // Fallback: try to navigate based on type
-      _handleNavigationByType(type, data);
+      default:
+        debugPrint("Unknown notification type: $type");
+    }
   }
-}
-
-/// Fallback navigation handler based on notification type
-static void _handleNavigationByType(String? type, Map<String, dynamic> data) {
-  if (type == null || _appRouter == null) return;
-
-  final userId = data['userId'] as String?;
-  final agentId = data['agentId'] as String?;
-
-  switch (type) {
-    case 'USER_REGISTERED':
-    case 'PROFILE_COMPLETED':
-    case 'MATRIMONY_PROFILE_CREATED':
-      if (userId != null) {
-        _appRouter!.push(ViewUserRoute(userId: userId));
-      }
-      break;
-
-    case 'PAYMENT_INITIATED':
-      if (userId != null && agentId != null) {
-        _appRouter!.push(ViewPaymentDetailRoute(
-          userId: userId,
-          agentId: agentId,
-        ));
-      }
-      break;
-
-    case 'WISHLIST_SENT':
-    case 'WISHLIST_RECEIVED':
-    case 'WISHLIST_STATUS_UPDATED':
-      if (userId != null) {
-        _appRouter!.push(UserWishListRoute(userId: userId));
-      }
-      break;
-
-    case 'AGENT_WISHLIST_CREATED':
-    case 'AGENT_WISHLIST_STATUS_UPDATED':
-      if (agentId != null) {
-        _appRouter!.push(AgentWishlistRoute(agentId: agentId));
-      }
-      break;
-
-    case 'SUPPORT_TICKET_CREATED':
-      if (agentId != null) {
-        _appRouter!.push(AgentSupportRoute(agentId: agentId));
-      }
-      break;
-
-    default:
-      debugPrint("Unknown notification type: $type");
-  }
-}
-
 
   /// 📡 Subscribe to topic
   static Future<void> subscribeToTopic(String topic) async {

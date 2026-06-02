@@ -4,7 +4,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class CarouselImage extends StatelessWidget {
   final String url;
-  const CarouselImage({super.key, required this.url});
+  final BoxFit fit;
+
+  const CarouselImage({
+    super.key,
+    required this.url,
+    this.fit = BoxFit.fitHeight,
+  });
 
   bool get isSvg => url.toLowerCase().endsWith('.svg');
 
@@ -13,7 +19,7 @@ class CarouselImage extends StatelessWidget {
     if (isSvg) {
       return SvgPicture.network(
         url,
-        fit: BoxFit.cover,
+        fit: fit,
         placeholderBuilder: (_) =>
             const Center(child: CircularProgressIndicator()),
       );
@@ -21,7 +27,7 @@ class CarouselImage extends StatelessWidget {
 
     return CachedNetworkImage(
       imageUrl: url,
-      fit: BoxFit.cover,
+      fit: fit,
       placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
       errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 40),
     );

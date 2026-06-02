@@ -784,3 +784,12 @@ export const notifyUserOnProfileSuggestion = onDocumentWritten(
     }
   }
 );
+
+
+
+// ============================================================
+// Additional triggers can be added here following the same pattern
+// ============================================================
+
+
+// send notification on new profile suggestion (when agent adds a profile to suggested_profiles collection for a user)

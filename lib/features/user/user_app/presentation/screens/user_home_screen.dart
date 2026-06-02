@@ -41,10 +41,17 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
     // automatically if not already loaded. If you need a manual refresh,
     // consider adding a RefreshIndicator to the UI instead of
     // invalidating on every initState.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Fetch the matrimony profiles when screen loads
       ref.invalidate(homeControllerProvider);
       ref.invalidate(currentUserRecommendedIdsProvider);
+
+      try {
+        await RemoteConfigService.instance.checkForUpdate(context);
+        await RemoteConfigService.instance.checkForMaintenanceMode(context);
+      } catch (e) {
+        debugPrint('RemoteConfig check failed on UserHomeScreen: $e');
+      }
     });
   }
 
@@ -117,7 +124,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
           // Otherwise, show the payment screen.
 
           // change after publishing on playstore
-          if (paymentState.status == PayStatus.idle) {
+          if (paymentState.status == PayStatus.success) {
             return CustomScrollView(
               slivers: [
                 ModernGradientAppBar(
@@ -710,7 +717,7 @@ class ProfileCard extends StatelessWidget {
                 child: Stack(
                   children: [
                     SizedBox(
-                      height: 320,
+                      height: MediaQuery.of(context).size.height * 0.70,
                       width: double.infinity,
                       child: imageUrl.isEmpty
                           ? Container(
@@ -719,7 +726,7 @@ class ProfileCard extends StatelessWidget {
                             )
                           : Image.network(
                               imageUrl,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.fitHeight,
                               errorBuilder: (context, error, stackTrace) =>
                                   Container(
                                     color: Colors.grey[300],

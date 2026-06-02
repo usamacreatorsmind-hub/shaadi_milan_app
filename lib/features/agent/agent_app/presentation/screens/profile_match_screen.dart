@@ -69,13 +69,6 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
 
   String _normalize(String value) => value.trim().toLowerCase();
 
-  String _regionKey(MetrimonyProfileViewModel profile) {
-    final state = _normalize(profile.address.state);
-    if (state.isNotEmpty) return state;
-
-    return _normalize(profile.address.city);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -204,62 +197,72 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
     final theme = Theme.of(context);
     final sourceGender = widget.profile.identity.gender.toLowerCase();
     final targetGender = sourceGender == 'male' ? 'female' : 'male';
-    final sourceCaste = _normalize(widget.profile.cultural.caste);
-    final sourceRegion = _regionKey(widget.profile);
+    final sourceReligion = _normalize(widget.profile.cultural.religion);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Suggested Matches'),
         backgroundColor: theme.primaryColor,
-        foregroundColor: theme.colorScheme.onPrimary,
+        // foregroundColor: theme.colorScheme.onPrimary,
         // ── SEARCH BAR pinned inside AppBar bottom ──────────
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-            child: TextField(
-              controller: _searchController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Search by name, caste, religion, city…',
-                hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.6),
-                  fontSize: 13,
-                ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.white.withValues(alpha: 0.8),
-                  size: 20,
-                ),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.close,
-                          size: 18,
-                          color: Colors.white.withValues(alpha: 0.8),
-                        ),
-                        onPressed: () => _searchController.clear(),
-                      )
-                    : null,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 0,
-                ),
-                filled: true,
-                fillColor: Colors.white.withValues(alpha: 0.15),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.3),
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.primaryColor,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(20),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+              child: TextField(
+                controller: _searchController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Search by name, caste, religion, city…',
+                  hintStyle: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.6),
+                    fontSize: 13,
                   ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: const BorderSide(color: Colors.white, width: 1.5),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.white.withValues(alpha: 0.8),
+                    size: 20,
+                  ),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.close,
+                            size: 18,
+                            color: Colors.white.withValues(alpha: 0.8),
+                          ),
+                          onPressed: () => _searchController.clear(),
+                        )
+                      : null,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 0,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white.withValues(alpha: 0.15),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(
+                      color: Colors.white,
+                      width: 1.5,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -277,13 +280,11 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
             final isNotSelf = p.user.uid != widget.profile.user.uid;
             if (!isOppositeGender || !isNotSelf) return false;
 
-            final sameCaste =
-                sourceCaste.isNotEmpty &&
-                _normalize(p.cultural.caste) == sourceCaste;
-            final sameRegion =
-                sourceRegion.isNotEmpty && _regionKey(p) == sourceRegion;
+            final sameReligion =
+                sourceReligion.isNotEmpty &&
+                _normalize(p.cultural.religion) == sourceReligion;
 
-            return sameCaste || sameRegion;
+            return sameReligion;
           }).toList();
 
           // ── 2. Search filter ────────────────────────────────
@@ -292,7 +293,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
               ? matches
               : matches.where((p) {
                   return _normalize(p.user.fullName).contains(q) ||
-                      _normalize(p.cultural.caste).contains(q) ||
+                      // _normalize(p.cultural.caste).contains(q) ||
                       _normalize(p.cultural.religion).contains(q) ||
                       _normalize(p.address.city).contains(q) ||
                       _normalize(p.address.state).contains(q);
@@ -303,7 +304,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
               child: Padding(
                 padding: EdgeInsets.all(24),
                 child: Text(
-                  'No matching profiles found for the same caste and region.',
+                  'No matching profiles found for the same religion.',
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -569,7 +570,10 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                     width: double.infinity,
                                     child: OutlinedButton.icon(
                                       onPressed: () => context.pushRoute(
-                                        ViewUserRoute(userId: match.user.uid),
+                                        ViewUserRoute(
+                                          userId: match.user.uid,
+                                          showMatchButton: false,
+                                        ),
                                       ),
                                       icon: const Icon(Icons.person_outline),
                                       label: const Text('View Full Profile'),

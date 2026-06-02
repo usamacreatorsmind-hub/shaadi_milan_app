@@ -1,4 +1,5 @@
 import '../../../../app/router/app_router.dart';
+import '../../../../core/app_version_config/remote_config_service.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 
@@ -43,9 +44,16 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 3));
-    if (mounted) {
-      context.router.replace( AuthWrapperRoute());
+    if (!mounted) return;
+
+    try {
+      await RemoteConfigService.instance.checkForUpdate(context);
+    } catch (e) {
+      debugPrint('RemoteConfig update check failed: $e');
     }
+
+    if (!mounted) return;
+    context.router.replace(AuthWrapperRoute());
   }
 
   @override

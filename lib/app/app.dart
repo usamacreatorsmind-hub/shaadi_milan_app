@@ -105,13 +105,16 @@ class _AppState extends ConsumerState<App> {
 
         final navigatorContext = _appRouter.navigatorKey.currentContext;
 
-        if (navigatorContext != null) {
-          try {
-            await RemoteConfigService.instance.checkForUpdate(navigatorContext);
-          } catch (e) {
-            debugPrint('RemoteConfig Error: $e');
-          }
-        }
+        // if (navigatorContext != null) {
+        //   try {
+        //     await RemoteConfigService.instance.checkForUpdate(navigatorContext);
+        //     await RemoteConfigService.instance.checkForMaintenanceMode(
+        //       navigatorContext,
+        //     );
+        //   } catch (e) {
+        //     debugPrint('RemoteConfig Error: $e');
+        //   }
+        // }
       });
     });
   }

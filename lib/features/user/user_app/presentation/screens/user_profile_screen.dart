@@ -711,48 +711,50 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _SectionTitle(title: "Agent Setup"),
-          const SizedBox(height: 12),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _SectionTitle(title: "Agent Setup"),
+            const SizedBox(height: 12),
 
-          Row(
-            children: [
-              const SizedBox(width: 20),
-              Expanded(
-                child: _ActionTab(
-                  icon: Icons.person_add_alt_1_outlined,
-                  title: "Enter Agent ID",
-                  isSelected: selectedTab == 1,
-                  onTap: () {
-                    ref.read(agentSetupProvider.notifier).state = 1;
-                  },
+            Row(
+              children: [
+                const SizedBox(width: 20),
+                Expanded(
+                  child: _ActionTab(
+                    icon: Icons.person_add_alt_1_outlined,
+                    title: "Enter Agent ID",
+                    isSelected: selectedTab == 1,
+                    onTap: () {
+                      ref.read(agentSetupProvider.notifier).state = 1;
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _ActionTab(
-                  icon: Icons.contact_phone_outlined,
-                  title: "Contact Support",
-                  isSelected: selectedTab == 2,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _ActionTab(
+                    icon: Icons.contact_phone_outlined,
+                    title: "Contact Support",
+                    isSelected: selectedTab == 2,
 
-                  onTap: () {
-                    ref.read(agentSetupProvider.notifier).state = 2;
-                  },
+                    onTap: () {
+                      ref.read(agentSetupProvider.notifier).state = 2;
+                    },
+                  ),
                 ),
-              ),
 
-              const SizedBox(width: 20),
-            ],
-          ),
-          const SizedBox(height: 24),
+                const SizedBox(width: 20),
+              ],
+            ),
+            const SizedBox(height: 24),
 
-          if (selectedTab == 1)
-            _buildAgentForm()
-          else
-            _buildContactAndSupportForm(),
-        ],
+            if (selectedTab == 1)
+              _buildAgentForm()
+            else
+              _buildContactAndSupportForm(),
+          ],
+        ),
       ),
     );
   }
@@ -826,7 +828,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
           else if (_fetchedAgent != null)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(12),
@@ -858,11 +860,36 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text("Name: ${_fetchedAgent!.agentName}"),
-                      Text("Mobile: ${_fetchedAgent!.agentMobile}"),
-                      Text("Email: ${_fetchedAgent!.agentEmail}"),
-                      Text("Agent ID: ${_fetchedAgent!.agentId}"),
-                      Text("Address: ${_fetchedAgent!.agentAddress}"),
+                      Text(
+                        "Name: ${_fetchedAgent!.agentName}",
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+
+                        "Mobile: ${_fetchedAgent!.agentMobile}",
+                      ),
+                      Text(
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+
+                        "Email: ${_fetchedAgent!.agentEmail}",
+                      ),
+                      Text(
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+
+                        "Agent ID: ${_fetchedAgent!.agentId}",
+                      ),
+                      Text(
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+
+                        "Address: ${_fetchedAgent!.agentAddress}",
+                      ),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ],
@@ -909,8 +936,6 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
           SizedBox(
             child: Column(
               children: [
-                Row(children: [Text("Contact Us")]),
-                Text("Full Name"),
                 AppTextField(
                   prefixIcon: Icons.person,
 
@@ -921,7 +946,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                   keyboardType: TextInputType.name,
                 ),
                 const SizedBox(height: 16),
-                Text("Email Address"),
+
                 AppTextField(
                   prefixIcon: Icons.email,
 
@@ -932,7 +957,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
-                Text("Phone Number"),
+
                 AppTextField(
                   prefixIcon: Icons.phone,
                   iconColor: Theme.of(context).primaryColor,
@@ -942,7 +967,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 16),
-                Text("Message"),
+
                 AppTextField(
                   prefixIcon: Icons.message,
                   iconColor: Theme.of(context).primaryColor,
