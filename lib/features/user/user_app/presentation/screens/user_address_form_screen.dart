@@ -298,8 +298,6 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     return DropdownButtonFormField2<String>(
       isExpanded: true,
 
-      value: value,
-
       decoration: InputDecoration(
         labelText: label,
         hintText: 'Select ${label.toLowerCase()}',
@@ -354,7 +352,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
 
       items: items
           .map(
-            (item) => DropdownMenuItem<String>(
+            (item) => DropdownItem<String>(
               value: item,
               child: Text(item, style: const TextStyle(fontSize: 14)),
             ),

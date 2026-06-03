@@ -46,7 +46,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
       );
@@ -65,7 +65,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
       );

@@ -405,7 +405,6 @@ class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
           ),
         ),
       ),
-      value: widget.items.contains(widget.value) ? widget.value : null,
 
       dropdownStyleData: DropdownStyleData(
         isOverButton: true,
@@ -415,7 +414,7 @@ class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
       ),
       items: widget.items
           .map(
-            (item) => DropdownMenuItem<String>(
+            (item) => DropdownItem<String>(
               value: item,
               child: Text(item, style: const TextStyle(fontSize: 14)),
             ),

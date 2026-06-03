@@ -66,6 +66,8 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    bool _hasNavigated = false;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(

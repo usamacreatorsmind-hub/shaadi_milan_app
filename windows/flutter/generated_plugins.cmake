@@ -6,7 +6,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   awesome_notifications
   awesome_notifications_core
   cloud_firestore
-  connectivity_plus
   file_selector_windows
   firebase_auth
   firebase_core
@@ -14,7 +13,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_storage
   flutter_secure_storage_windows
   flutter_timezone
-  rive_common
   share_plus
   syncfusion_pdfviewer_windows
   url_launcher_windows

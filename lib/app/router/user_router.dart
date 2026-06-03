@@ -1,4 +1,3 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/my_review_screen.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -119,11 +118,6 @@ class UserRouter {
     ),
     AutoRoute(
       page: AgentContactRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
-    ),
-
-    AutoRoute(
-      page: AgentSettingsRoute.page,
       guards: [AuthGuard(ref), UserGuard(ref)],
     ),
 

@@ -19,10 +19,7 @@ import '../../features/onboarding/presentation/screens/role_selection_screen.dar
 import '../custom/custom_widgets/contact_us_screen.dart';
 import '../custom/custom_widgets/privacy_policy_route.dart';
 import '../custom/custom_widgets/terms_and_conditions_route.dart';
-import 'agent_guard.dart';
-import 'auth_guard.dart';
 import 'role_wrapper.dart';
-import 'user_guard.dart';
 import '../../core/enums/enum.dart';
 import '../../features/agent/agent_app/presentation/screens/agen_home_screen.dart';
 import '../../features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
@@ -80,7 +77,6 @@ import '../../features/auth/presentation/screens/user_login_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/user_register_screen.dart';
 import '../../features/auth/presentation/screens/agent_login_screen.dart';
-import '../../features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'agent_router.dart';
@@ -89,7 +85,7 @@ import 'user_router.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Screen,Route')
-class AppRouter extends _$AppRouter {
+class AppRouter extends RootStackRouter {
   final Ref ref;
   AppRouter(this.ref);
 
@@ -112,7 +108,6 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: PrivacyPolicyRoute.page),
     AutoRoute(page: TermsAndConditionsRoute.page),
     AutoRoute(page: ViewAgentProfileRoute.page),
-    AutoRoute(page: ChangePasswordRoute.page),
     // ================= USER ROUTES =================
     ...UserRouter.routes(ref),
 

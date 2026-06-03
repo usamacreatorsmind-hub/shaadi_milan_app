@@ -21,7 +21,7 @@ plugins {
 android {
     namespace = "com.arvikamarriagebureau.arvika"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "30.0.14904198"
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true

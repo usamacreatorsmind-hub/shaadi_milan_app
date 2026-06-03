@@ -182,15 +182,6 @@ Future<void> main() async {
         InAppMessagingService.init(),
         FlutterScreenshotBlocker.enableScreenshotBlocking(),
       ]);
-
-      /// FCM TOKEN
-      final token = await FirebaseMessaging.instance.getToken();
-
-      debugPrint('🔔 FCM Token: $token');
-
-      final installationId = await FirebaseMessaging.instance.getToken();
-
-      debugPrint('🆔 Firebase Installation ID: $installationId');
     } catch (e, s) {
       debugPrint('Initialization Error: $e');
       debugPrintStack(stackTrace: s);

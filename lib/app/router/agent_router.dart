@@ -36,10 +36,6 @@ class AgentRouter {
     ),
 
     AutoRoute(
-      page: AgentContactRoute.page,
-      guards: [AuthGuard(ref), AgentGuard(ref)],
-    ),
-    AutoRoute(
       page: AgentHomeRoute.page,
       guards: [AuthGuard(ref), AgentGuard(ref)],
     ),
