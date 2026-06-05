@@ -151,7 +151,9 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
     return profileData;
   }
 
-  Stream<List<MatrimonyProfile>> watchMatrimonyProfilesForUsers(List<String> userIds) {
+  Stream<List<MatrimonyProfile>> watchMatrimonyProfilesForUsers(
+    List<String> userIds,
+  ) {
     if (userIds.isEmpty) {
       return Stream.value([]);
     }
@@ -161,10 +163,10 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
         .where('profileStatus', isEqualTo: 'active')
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
-          .where((doc) => userIds.contains(doc.id))
-          .map((doc) => MatrimonyProfile.fromMap(doc.data()))
-          .toList();
-    });
+          return snapshot.docs
+              .where((doc) => userIds.contains(doc.id))
+              .map((doc) => MatrimonyProfile.fromMap(doc.data()))
+              .toList();
+        });
   }
 }

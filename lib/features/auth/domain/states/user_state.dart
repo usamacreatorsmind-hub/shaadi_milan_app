@@ -292,6 +292,13 @@ class UserEntity {
       return DateTime.fromMillisecondsSinceEpoch(0);
     }
 
+    final userStatus = map['userStatus'];
+    final bool isProfileCreated = map['isProfileCreated'] is bool
+        ? map['isProfileCreated'] as bool
+        : (userStatus is Map<String, dynamic>
+              ? (userStatus['isProfileCreated'] ?? false)
+              : false);
+
     return UserEntity(
       profileStatus: map['profileStatus'] ?? 'active',
       profileImageUrl: map['profileImageUrl'] ?? '',
@@ -303,7 +310,7 @@ class UserEntity {
       agentId: map['agentId'] ?? '',
       userType: map['userType'] ?? '',
       role: map['role'] ?? '',
-      isProfileCreated: map['isProfileCreated'] ?? false,
+      isProfileCreated: isProfileCreated,
       metrimonyId: map['metrimonyId'] ?? '',
       profileId: map['profileId'] ?? '',
 

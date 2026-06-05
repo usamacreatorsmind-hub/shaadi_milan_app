@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/recemonded_profiles.dart';
 
@@ -9,22 +10,23 @@ class UserRecemmondedRepository {
   /// Fetch full recommended profile document
   Future<RecommendedProfiles> fetchRecommendedProfiles(String uid) async {
     try {
-      print('Fetching recommended profiles for user: $uid');
+      debugPrint('Fetching recommended profiles for user: $uid');
       final DocumentSnapshot doc = await firestore
           .collection('suggested_profiles')
           .doc(uid)
           .get();
 
-      print("these are  the recommended profiles data for user $uid:");
-      print(doc.data());
+      debugPrint("these are  the recommended profiles data for user $uid:");
+      debugPrint(doc.data().toString());
 
       if (doc.exists && doc.data() != null) {
         return RecommendedProfiles.fromJson(doc.data() as Map<String, dynamic>);
-      } else {
-        throw Exception('No recommended profiles found for user $uid');
       }
+
+      return RecommendedProfiles.empty();
     } catch (e) {
-      throw Exception('Failed to fetch recommended profiles: $e');
+      debugPrint('Failed to fetch recommended profiles for $uid: $e');
+      return RecommendedProfiles.empty();
     }
   }
 
@@ -32,10 +34,10 @@ class UserRecemmondedRepository {
   Future<List<String>> fetchRecommendedProfileIds(String uid) async {
     try {
       final profiles = await fetchRecommendedProfiles(uid);
-
       return profiles.ids;
     } catch (e) {
-      throw Exception('Failed to fetch recommended profile IDs: $e');
+      debugPrint('Failed to fetch recommended profile IDs for $uid: $e');
+      return const <String>[];
     }
   }
 

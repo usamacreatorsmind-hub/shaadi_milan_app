@@ -1,4 +1,3 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_firestore.dart';
 import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -141,7 +140,8 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
         .set(metrimonyProfile.toMap());
 
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
-      'userStatus.isProfileCreated': false,
+      'isProfileCreated': false,
+      'userStatus': {'isProfileCreated': false},
     });
   }
 
@@ -195,6 +195,7 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
       'profileImageUrl': profile.images.profileImageUrl,
       'isProfileCreated': true,
+      'userStatus': {'isProfileCreated': true},
     });
   }
 }

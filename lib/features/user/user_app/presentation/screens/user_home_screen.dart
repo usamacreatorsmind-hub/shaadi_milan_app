@@ -42,12 +42,16 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
     // consider adding a RefreshIndicator to the UI instead of
     // invalidating on every initState.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+
       // Fetch the matrimony profiles when screen loads
       ref.invalidate(homeControllerProvider);
       ref.invalidate(currentUserRecommendedIdsProvider);
 
       try {
+        // ignore: use_build_context_synchronously
         await RemoteConfigService.instance.checkForUpdate(context);
+        // ignore: use_build_context_synchronously
         await RemoteConfigService.instance.checkForMaintenanceMode(context);
       } catch (e) {
         debugPrint('RemoteConfig check failed on UserHomeScreen: $e');
@@ -240,6 +244,70 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                     ),
                   ),
                 ),
+
+                if (!user.isProfileCreated)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.errorContainer,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.error.withValues(alpha: 0.35),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.warning_amber_rounded,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Complete your own profile first',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onErrorContainer,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Finish your profile details so we can show the best matches for you.',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onErrorContainer,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  TextButton.icon(
+                                    onPressed: () => context.router.push(
+                                      const MatrimonyFormFlowRoute(),
+                                    ),
+                                    icon: const Icon(Icons.edit_note_rounded),
+                                    label: const Text('Complete profile now'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
 
                 /// ================= PROFILES LIST =================
                 homeState.metrimonyProfiles.when(

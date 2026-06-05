@@ -187,7 +187,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
         if (!mounted) return;
         NotificationService.saveUserTokenToFirestore(user.uid);
 
-        context.router.replace(AuthWrapperRoute());
+        context.router.replaceAll([const AuthWrapperRoute()]);
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;

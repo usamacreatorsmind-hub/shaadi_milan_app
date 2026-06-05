@@ -19,8 +19,17 @@ class AuthWrapperScreen extends ConsumerWidget {
           context.router.replaceAll([const OnboardingRoute()]);
         } else {
           value.fold(
-            (agent) => context.router.replaceAll([AgentMainShellRoute(agentId: agent.uid)]),
-            (user) => context.router.replaceAll([UserMainShellRoute()]),
+            (agent) => context.router.replaceAll([
+              AgentMainShellRoute(agentId: agent.uid),
+            ]),
+            (user) {
+              if (!user.isProfileCreated) {
+                context.router.replaceAll([const MatrimonyFormFlowRoute()]);
+                return;
+              }
+
+              context.router.replaceAll([UserMainShellRoute()]);
+            },
           );
         }
       });
