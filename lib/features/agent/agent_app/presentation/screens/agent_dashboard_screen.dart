@@ -1,4 +1,5 @@
-import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_service.dart';
+import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
 
 import '../../../../../app/custom/custom_widgets/drawer.dart';
 import '../notifier/analytics_provider.dart';
@@ -74,7 +75,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
             floating: false,
             pinned: true,
             title: const Text(
-              'Dashboard',
+              AppConstants.dashboardTitle,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -99,7 +100,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                     children: [
                       const SizedBox(height: 30),
                       Text(
-                        'Welcome',
+                        AppConstants.welcome,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.9),
                           fontSize: 16,
@@ -116,7 +117,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                           ),
                         ),
                         loading: () => const Text(
-                          'Loading...',
+                          AppConstants.loading,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 28,
@@ -162,7 +163,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                   _buildStatsGrid(analyticsAsync, usersAsync),
                   const SizedBox(height: 24),
                   Text(
-                    'Quick Actions',
+                    AppConstants.quickActions,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -174,7 +175,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Recent Clients',
+                        AppConstants.recentClients,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -185,7 +186,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                             AgentUserRoute(agentId: widget.agentId),
                           );
                         },
-                        child: const Text('View All'),
+                        child: const Text(AppConstants.viewAll),
                       ),
                     ],
                   ),
@@ -214,7 +215,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
       physics: const NeverScrollableScrollPhysics(),
       children: [
         _buildStatCard(
-          title: 'Total Revenue',
+          title: AppConstants.totalRevenue,
           value: analyticsAsync.when(
             data: (data) => '₹${data.totalRevenue}',
             loading: () => '...',
@@ -224,7 +225,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           color: Colors.green,
         ),
         _buildStatCard(
-          title: 'Total Clients',
+          title: AppConstants.totalClients,
           value: usersAsync.when(
             data: (data) => '${data.length}',
             loading: () => '...',
@@ -235,7 +236,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
         ),
 
         _buildStatCard(
-          title: 'Success',
+          title: AppConstants.success,
           value: analyticsAsync.when(
             data: (data) => '${data.successCount}',
             loading: () => '...',
@@ -246,7 +247,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
         ),
 
         _buildStatCard(
-          title: 'Pending',
+          title: AppConstants.pending,
           value: analyticsAsync.when(
             data: (data) => '${data.pendingCount}',
             loading: () => '...',
@@ -323,7 +324,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
         _buildActionButton(
           context,
           icon: Icons.analytics,
-          label: 'Reports',
+          label: AppConstants.reports,
           color: Colors.blue,
           onTap: () {
             context.navigateTo(AgentRevenueRoute(agentId: widget.agentId));
@@ -332,7 +333,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
         _buildActionButton(
           context,
           icon: Icons.support_agent,
-          label: 'Support',
+          label: AppConstants.support,
           color: Colors.teal,
           onTap: () {
             context.router.push(const ContactUsRoute());
@@ -383,7 +384,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(16.0),
-              child: Text('No clients yet'),
+              child: Text(AppConstants.noClientsYet),
             ),
           );
         }
@@ -450,12 +451,12 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure you want to logout?'),
+          title: const Text(AppConstants.logout),
+          content: const Text(AppConstants.logoutConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: const Text(AppConstants.cancel),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -464,7 +465,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                 FirebaseAuth.instance.signOut();
               },
               child: const Text(
-                'Logout',
+                AppConstants.logout,
                 style: TextStyle(color: Colors.white),
               ),
             ),

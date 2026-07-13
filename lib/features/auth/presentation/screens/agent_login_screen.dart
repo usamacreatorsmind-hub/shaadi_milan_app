@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/core/constants/app_constants.dart';
-import 'package:arvika_marriage_bureau/core/notification/notification_service.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/notification/notification_service.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -194,7 +194,7 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                           controller: emailCtrl,
                           prefixIcon: Icons.alternate_email_rounded,
                           label: "Work Email",
-                          hint: "agent@arvika.com",
+                          hint: "agent@example.com",
                           keyboardType: TextInputType.emailAddress,
                           iconColor: theme.colorScheme.primary,
                           obscureText: false,

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:arvika_marriage_bureau/features/agent/agent_app/data/repositories_impl/support_repository_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/support_ticket.dart';
+import 'package:shadi_milan/features/agent/agent_app/data/repositories_impl/support_repository_impl.dart';
+import 'package:shadi_milan/features/user/user_app/domain/states/support_ticket.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

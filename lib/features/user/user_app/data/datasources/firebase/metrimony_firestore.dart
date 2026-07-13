@@ -1,3 +1,5 @@
+import 'package:shadi_milan/core/constants/app_constants.dart';
+
 import '../../../../../auth/domain/states/agent_state.dart';
 
 import '../data_source/metrimony_data_source.dart';
@@ -20,7 +22,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
   MatrimonyFirestoreDS(this._firestore);
 
   CollectionReference<Map<String, dynamic>> get _profiles =>
-      _firestore.collection('metrimony_profiles');
+      _firestore.collection(AppConstants.collProfiles);
 
   Future<void> _updateProfileSection(
     String uid,
@@ -29,7 +31,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
   ) async {
     await _profiles.doc(uid).update({
       key: data,
-      'updatedAt': FieldValue.serverTimestamp(),
+      AppConstants.fieldUpdatedAt: FieldValue.serverTimestamp(),
     });
   }
 
@@ -118,7 +120,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
 
     // Fetch only active profiles from metrimony_profiles collection
     final querySnapshot = await _profiles
-        .where('profileStatus', isEqualTo: 'active')
+        .where(AppConstants.fieldProfileStatus, isEqualTo: AppConstants.statusActive)
         .get();
 
     final profiles = querySnapshot.docs
@@ -131,24 +133,45 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
         .toList();
 
     // Get current user's gender
-    final userDoc = await _firestore.collection('users').doc(currentUid).get();
+    final userDoc = await _firestore.collection(AppConstants.collUsers).doc(currentUid).get();
 
-    final userGender = (userDoc.data()?['gender'] as String?)?.toLowerCase();
+    final userGender = (userDoc.data()?[AppConstants.fieldGender] as String?)?.toLowerCase();
 
     if (userGender == null) return profileData;
 
     // Case-insensitive gender filter
-    if (userGender == 'male') {
-      profileData = profileData
-          .where((profile) => profile.identity.gender.toLowerCase() == 'female')
-          .toList();
-    } else if (userGender == 'female') {
-      profileData = profileData
-          .where((profile) => profile.identity.gender.toLowerCase() == 'male')
-          .toList();
-    }
+    // if (userGender == 'male') {
+    //   profileData = profileData
+    //       .where((profile) => profile.identity.gender.toLowerCase() == 'female')
+    //       .toList();
+    // } else if (userGender == 'female') {
+    //   profileData = profileData
+    //       .where((profile) => profile.identity.gender.toLowerCase() == 'male')
+    //       .toList();
+    // }
+    profileData = profileData
+        // .where((profile) => profile.identity.gender.toLowerCase() == 'male')
+        .toList();
+
+
 
     return profileData;
+  }
+
+  Stream<List<MatrimonyProfile>> watchAllMatrimonyProfiles() {
+    final currentUid = FirebaseAuth.instance.currentUser?.uid;
+    return _profiles
+        .where(
+          AppConstants.fieldProfileStatus,
+          isEqualTo: AppConstants.statusActive,
+        )
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs
+              .map((doc) => MatrimonyProfile.fromMap(doc.data()))
+              .where((profile) => profile.userId != currentUid)
+              .toList();
+        });
   }
 
   Stream<List<MatrimonyProfile>> watchMatrimonyProfilesForUsers(
@@ -160,7 +183,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
 
     // Watch only active matrimony profiles and filter by userIds
     return _profiles
-        .where('profileStatus', isEqualTo: 'active')
+        .where(AppConstants.fieldProfileStatus, isEqualTo: AppConstants.statusActive)
         .snapshots()
         .map((snapshot) {
           return snapshot.docs

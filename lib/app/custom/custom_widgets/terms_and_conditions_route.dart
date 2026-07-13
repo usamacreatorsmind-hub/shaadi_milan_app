@@ -43,7 +43,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
               context,
               title: "1. Acceptance of Terms",
               content:
-                  "By accessing or using the Arvika Marriage Bureau website and services, you agree to be bound by these Terms and Conditions and our Privacy Policy. If you do not agree to all the terms and conditions of this agreement, then you may not access the website or use any services.",
+                  "By accessing or using the ${AppConstants.appName} website and services, you agree to be bound by these Terms and Conditions and our Privacy Policy. If you do not agree to all the terms and conditions of this agreement, then you may not access the website or use any services.",
             ),
             const SizedBox(height: 20),
             _buildSection(
@@ -72,35 +72,35 @@ class TermsAndConditionsScreen extends StatelessWidget {
               context,
               title: "5. Content Ownership and License",
               content:
-                  "You retain all ownership rights to the content you submit to the service. By submitting content, you grant Arvika Marriage Bureau a worldwide, non-exclusive, royalty-free, transferable license to use, reproduce, distribute, prepare derivative works of, display, and perform the content in connection with the service and Arvika Marriage Bureau's (and its successors' and affiliates') business, including without limitation for promoting and redistributing part or all of the service (and derivative works thereof) in any media formats and through any media channels.",
+                  "You retain all ownership rights to the content you submit to the service. By submitting content, you grant ${AppConstants.appName} a worldwide, non-exclusive, royalty-free, transferable license to use, reproduce, distribute, prepare derivative works of, display, and perform the content in connection with the service and ${AppConstants.appName}'s (and its successors' and affiliates') business, including without limitation for promoting and redistributing part or all of the service (and derivative works thereof) in any media formats and through any media channels.",
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
               title: "6. Premium Services and Payments",
               content:
-                  "Arvika Marriage Bureau may offer premium services that require payment. All fees are non-refundable unless otherwise stated. We reserve the right to change our prices at any time. Your subscription to premium services will automatically renew unless you cancel it before the end of the current subscription period.",
+                  "${AppConstants.appName} may offer premium services that require payment. All fees are non-refundable unless otherwise stated. We reserve the right to change our prices at any time. Your subscription to premium services will automatically renew unless you cancel it before the end of the current subscription period.",
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
               title: "7. Disclaimer of Warranties",
               content:
-                  "The service is provided on an 'as is' and 'as available' basis. Arvika Marriage Bureau makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties, including without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.",
+                  "The service is provided on an 'as is' and 'as available' basis. ${AppConstants.appName} makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties, including without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.",
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
               title: "8. Limitation of Liability",
               content:
-                  "In no event shall Arvika Marriage Bureau or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Arvika Marriage Bureau's website, even if Arvika Marriage Bureau  or a Arvika Marriage Bureau authorized representative has been notified orally or in writing of the possibility of such damage. Because some jurisdictions do not allow limitations on implied warranties, or limitations of liability for consequential or incidental damages, these limitations may not apply to you.",
+                  "In no event shall ${AppConstants.appName} or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on ${AppConstants.appName}'s website, even if ${AppConstants.appName}  or a ${AppConstants.appName} authorized representative has been notified orally or in writing of the possibility of such damage. Because some jurisdictions do not allow limitations on implied warranties, or limitations of liability for consequential or incidental damages, these limitations may not apply to you.",
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
               title: "9. Indemnification",
               content:
-                  "You agree to indemnify, defend, and hold harmless Arvika Marriage Bureau, its officers, directors, employees, agents, and third parties, for any losses, costs, liabilities, and expenses (including reasonable attorneys' fees) relating to or arising out of your use of or inability to use the Site or services, any user postings made by you, your violation of any terms of this Agreement or your violation of any rights of a third party, or your violation of any applicable laws, rules or regulations. Arvika Marriage Bureau reserves the right, at its own cost, to assume the exclusive defense and control of any matter otherwise subject to indemnification by you, in which event you will fully cooperate with Arvika Marriage Bureau in asserting any available defenses.",
+                  "You agree to indemnify, defend, and hold harmless ${AppConstants.appName}, its officers, directors, employees, agents, and third parties, for any losses, costs, liabilities, and expenses (including reasonable attorneys' fees) relating to or arising out of your use of or inability to use the Site or services, any user postings made by you, your violation of any terms of this Agreement or your violation of any rights of a third party, or your violation of any applicable laws, rules or regulations. ${AppConstants.appName} reserves the right, at its own cost, to assume the exclusive defense and control of any matter otherwise subject to indemnification by you, in which event you will fully cooperate with ${AppConstants.appName} in asserting any available defenses.",
             ),
             const SizedBox(height: 20),
             _buildSection(

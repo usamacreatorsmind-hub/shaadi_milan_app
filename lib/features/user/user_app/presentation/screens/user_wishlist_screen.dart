@@ -1,8 +1,8 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/shimmer.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/wishlist_notifier.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
+import 'package:shadi_milan/app/custom/custom_widgets/shimmer.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/wishlist_notifier.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

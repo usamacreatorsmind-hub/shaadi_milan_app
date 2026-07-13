@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
+import 'package:shadi_milan/features/auth/domain/states/agent_state.dart';
+import 'package:shadi_milan/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -1,3 +1,4 @@
+import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'animated_app_bar.dart';
 
@@ -15,11 +16,11 @@ class AppBarExamplesScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           // Example 1: Glass Morphism App Bar (Default)
-          const AnimatedGlassAppBar(
-            title: 'Arvika Marriage Bureau',
-            subtitle: 'Find your perfect match',
+          AnimatedGlassAppBar(
+            title: AppConstants.appName,
+            subtitle: AppConstants.homeSubtitle,
             showLogo: true,
-            logoAsset: 'assets/images/logo.png',
+            logoAsset: AppConstants.appLogoPath,
             actions: [
               Icon(Icons.notifications_outlined, color: Colors.black54),
               SizedBox(width: 16),
@@ -214,8 +215,8 @@ class UserHomeWithGlassAppBar extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           AnimatedGlassAppBar(
-            title: 'Arvika Marriage Bureau',
-            subtitle: 'Find your perfect match',
+            title: AppConstants.appName,
+            subtitle: AppConstants.homeSubtitle,
             showLogo: true,
             leading: Builder(
               builder: (context) => IconButton(

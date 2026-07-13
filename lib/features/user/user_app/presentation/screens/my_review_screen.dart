@@ -1,6 +1,6 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/review_notifiers.dart';
+import 'package:shadi_milan/app/router/app_router.dart';
+import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:shadi_milan/features/user/user_app/presentation/controllers/review_notifiers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

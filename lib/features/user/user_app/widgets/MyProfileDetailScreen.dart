@@ -57,8 +57,8 @@ class _MyProfileCardState extends ConsumerState<MyProfileDetailScreen> {
   Padding _buildInfoRow(String s, String agentId) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column( crossAxisAlignment:  CrossAxisAlignment.start,
+
         children: [
           Text(
             s,

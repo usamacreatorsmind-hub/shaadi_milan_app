@@ -38,7 +38,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               context,
               title: "1. Introduction",
               content:
-                  "Welcome to Arvika Marriage Bureau. We are committed to protecting your privacy and handling your data in an open and transparent manner. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.",
+                  "Welcome to ${AppConstants.appName}. We are committed to protecting your privacy and handling your data in an open and transparent manner. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.",
             ),
             const SizedBox(height: 20),
             _buildSection(
@@ -73,8 +73,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   "We may share your information in the following situations:\n\n"
                   "• With Other Users: Your profile information (excluding direct contact details unless you choose to share them) will be visible to other registered users to facilitate matchmaking.\n"
                   "• With Service Providers: We may employ third-party companies and individuals to facilitate our service, provide the service on our behalf, perform service-related services, or assist us in analyzing how our service is used.\n"
-                  "• For Legal Reasons: We may disclose your Personal Data in the good faith belief that such action is necessary to comply with a legal obligation, protect and defend the rights or property of Arvika Marriage Bureau, prevent or investigate possible wrongdoing in connection with the service, protect the personal safety of users of the service or the public, or protect against legal liability.\n"
-                  "• Business Transfers: If Arvika Marriage Bureau is involved in a merger, acquisition, or asset sale, your Personal Data may be transferred.",
+                  "• For Legal Reasons: We may disclose your Personal Data in the good faith belief that such action is necessary to comply with a legal obligation, protect and defend the rights or property of ${AppConstants.appName}, prevent or investigate possible wrongdoing in connection with the service, protect the personal safety of users of the service or the public, or protect against legal liability.\n"
+                  "• Business Transfers: If ${AppConstants.appName} is involved in a merger, acquisition, or asset sale, your Personal Data may be transferred.",
             ),
             const SizedBox(height: 20),
             _buildSection(
@@ -95,7 +95,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   "• The right to object to our processing of your Personal Data.\n"
                   "• The right to request that we restrict the processing of your personal information.\n"
                   "• The right to data portability.\n"
-                  "• The right to withdraw consent at any time where Arvika Marriage Bureau relied on your consent to process your personal information.",
+                  "• The right to withdraw consent at any time where ${AppConstants.appName} relied on your consent to process your personal information.",
             ),
             const SizedBox(height: 20),
             _buildSection(

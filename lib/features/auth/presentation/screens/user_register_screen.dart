@@ -1,9 +1,10 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/validators.dart';
-import 'package:arvika_marriage_bureau/core/notification/notification_service.dart';
-import 'package:arvika_marriage_bureau/features/auth/data/repositories_impl/data_source/firebase_auth_ds.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_firestore.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/app/custom/custom_widgets/validators.dart';
+import 'package:shadi_milan/core/notification/notification_service.dart';
+import 'package:shadi_milan/features/auth/data/repositories_impl/data_source/firebase_auth_ds.dart';
+import 'package:shadi_milan/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
+import 'package:shadi_milan/features/user/user_razorpay/data/firestore/payment_firestore.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +56,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     if (nameCtrl.text.isEmpty ||
         emailCtrl.text.isEmpty ||
         phoneCtrl.text.isEmpty ||
-        agentIdCtrl.text.isEmpty ||
+        // agentIdCtrl.text.isEmpty ||
         pwCtrl.text.isEmpty ||
         confirmPwCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -276,7 +277,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Join Arvika Marriage Bureau today",
+                  "Join ${AppConstants.appName} today",
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 15),
                 ),
 
@@ -383,7 +384,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                           controller: agentIdCtrl,
                           prefixIcon: Icons.verified_user_outlined,
                           label: "Agent Id  ",
-                          hint: "",
+                          hint: "optinal",
                           obscureText: false,
                           keyboardType: TextInputType.visiblePassword,
                           iconColor: theme.colorScheme.primary,

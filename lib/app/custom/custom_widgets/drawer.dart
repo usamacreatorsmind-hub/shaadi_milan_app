@@ -1,4 +1,5 @@
-import 'package:arvika_marriage_bureau/features/auth/presentation/providers/auth_providers.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/features/auth/presentation/providers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../router/app_router.dart';
@@ -76,7 +77,7 @@ class AppDrawer extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Agent ID: ${data.agentId}",
+                      "${AppConstants.agentIdLabel}${data.agentId}",
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 13,
@@ -95,14 +96,14 @@ class AppDrawer extends ConsumerWidget {
                   children: [
                     DrawerItem(
                       icon: Icons.dashboard_outlined,
-                      title: "Dashboard",
+                      title: AppConstants.dashboard,
                       onTap: () {
                         context.maybePop();
                       },
                     ),
                     DrawerItem(
                       icon: Icons.people_outline,
-                      title: "My Clients",
+                      title: AppConstants.myClients,
                       onTap: () {
                         context.maybePop();
                       },
@@ -110,7 +111,7 @@ class AppDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.bar_chart_outlined,
-                      title: "Analytics",
+                      title: AppConstants.analytics,
                       onTap: () {
                         context.maybePop();
                       },
@@ -126,7 +127,7 @@ class AppDrawer extends ConsumerWidget {
                     // ),
                     DrawerItem(
                       icon: Icons.support_agent,
-                      title: "Support Tickets",
+                      title: AppConstants.supportTickets,
                       onTap: () {
                         context.maybePop();
                         context.pushRoute(
@@ -137,7 +138,7 @@ class AppDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.description_outlined,
-                      title: "Documents",
+                      title: AppConstants.documents,
                       onTap: () {
                         context.maybePop();
                       },
@@ -145,7 +146,7 @@ class AppDrawer extends ConsumerWidget {
                     const Divider(),
                     DrawerItem(
                       icon: Icons.settings_outlined,
-                      title: "Settings",
+                      title: AppConstants.settings,
                       onTap: () {
                         context.maybePop();
                         context.pushRoute(AgentSettingsRoute());
@@ -154,7 +155,7 @@ class AppDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.person_outline,
-                      title: "My Profile",
+                      title: AppConstants.myProfile,
                       onTap: () {
                         context.maybePop();
                         context.pushRoute(AgentEntityRoute(uid: data.agentId));

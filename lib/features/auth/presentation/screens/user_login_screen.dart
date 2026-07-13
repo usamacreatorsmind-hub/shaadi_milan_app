@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/core/constants/app_constants.dart';
-import 'package:arvika_marriage_bureau/core/notification/notification_service.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/notification/notification_service.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

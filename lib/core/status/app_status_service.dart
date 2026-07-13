@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/core/status/app_status_notifier.dart';
+import 'package:shadi_milan/core/status/app_status_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app_status.dart';
 import 'app_status_provider.dart';

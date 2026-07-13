@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_service.dart';
+import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
 
 @RoutePage()
 class AgentHomeScreen extends ConsumerStatefulWidget {

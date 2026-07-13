@@ -46,7 +46,7 @@ class UserDrawer extends ConsumerWidget {
 
           void guardedTap(VoidCallback action) {
             if (isLoading) return;
-            if (!isPaid) {
+            if (isPaid) {
               requirePayment();
               return;
             }

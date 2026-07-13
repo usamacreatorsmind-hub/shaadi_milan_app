@@ -358,8 +358,9 @@ class AppDropDown extends ConsumerStatefulWidget {
 class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField2<String>(
+    return DropdownButtonFormField<String>(
       isExpanded: true,
+      value: widget.items.contains(widget.value) ? widget.value : null,
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: 'Select ${widget.label.toLowerCase()}',
@@ -405,16 +406,9 @@ class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
           ),
         ),
       ),
-
-      dropdownStyleData: DropdownStyleData(
-        isOverButton: true,
-        maxHeight: 200,
-
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
-      ),
       items: widget.items
           .map(
-            (item) => DropdownItem<String>(
+            (item) => DropdownMenuItem<String>(
               value: item,
               child: Text(item, style: const TextStyle(fontSize: 14)),
             ),

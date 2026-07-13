@@ -1,3 +1,4 @@
+import 'package:shadi_milan/core/constants/app_constants.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -48,27 +49,27 @@ class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.analytics_outlined),
                 activeIcon: Icon(Icons.analytics),
-                label: 'Dashboard',
+                label: AppConstants.navDashboard,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.groups_3_outlined),
                 activeIcon: Icon(Icons.groups_3),
-                label: 'Clients',
+                label: AppConstants.navClients,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.payments_outlined),
                 activeIcon: Icon(Icons.payments),
-                label: 'Revenue',
+                label: AppConstants.navRevenue,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.favorite_outline),
                 activeIcon: Icon(Icons.favorite),
-                label: 'Wishlist',
+                label: AppConstants.navWishlist,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person_outline),
                 activeIcon: Icon(Icons.person),
-                label: 'My Profile',
+                label: AppConstants.myProfile,
               ),
             ],
           ),

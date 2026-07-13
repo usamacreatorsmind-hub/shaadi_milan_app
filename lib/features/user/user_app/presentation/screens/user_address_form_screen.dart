@@ -1,20 +1,15 @@
-import 'package:arvika_marriage_bureau/app/providers/global_providers.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 import '../../../../../core/filters/home_filter_controller.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../core/enums/enum.dart';
 import '../../domain/states/state_city.dart';
-import 'user_home_screen.dart';
 import '../../domain/states/address_state.dart';
 import '../controllers/user_address_controllers.dart';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 
 @RoutePage()
 class UserAddressFormScreen extends ConsumerStatefulWidget {
@@ -184,12 +179,9 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                     final stateNames = states.map((e) => e.name).toList();
 
                     final selectedState = states.firstWhere(
-                      (s) => s.name == location.state,
+                      (s) => s.name == (location.state ?? ''),
                       orElse: () => StateCityModel(name: '', cities: []),
                     );
-
-                    _stateController.text = location.state;
-                    _districtController.text = location.city;
 
                     return Column(
                       children: [
@@ -295,9 +287,9 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     String? Function(String?)? validator,
     IconData icon = Icons.arrow_drop_down_circle_outlined,
   }) {
-    return DropdownButtonFormField2<String>(
+    return DropdownButtonFormField<String>(
       isExpanded: true,
-
+      value: value,
       decoration: InputDecoration(
         labelText: label,
         hintText: 'Select ${label.toLowerCase()}',
@@ -344,15 +336,9 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
         ),
       ),
 
-      dropdownStyleData: DropdownStyleData(
-        isOverButton: true,
-        maxHeight: 220,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
-      ),
-
       items: items
           .map(
-            (item) => DropdownItem<String>(
+            (item) => DropdownMenuItem<String>(
               value: item,
               child: Text(item, style: const TextStyle(fontSize: 14)),
             ),

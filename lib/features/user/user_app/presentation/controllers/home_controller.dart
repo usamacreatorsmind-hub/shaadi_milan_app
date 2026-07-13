@@ -71,41 +71,22 @@ class HomeController extends StateNotifier<HomeState> {
 
     state = state.copyWith(metrimonyProfiles: const AsyncValue.loading());
 
-    // Watch opposite gender users
-    _usersSubscription = _userRepository
-        .watchOppositeGenderUsers(currentUid)
-        .listen(
-          (users) {
-            _currentUsers = users;
-            _watchProfiles(users.map((u) => u.uid).toList());
-          },
-          onError: (e, st) {
-            state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
-          },
-        );
-  }
-
-  void _watchProfiles(List<String> userIds) {
-    _profilesSubscription?.cancel();
-
-    if (userIds.isEmpty) {
-      state = state.copyWith(metrimonyProfiles: const AsyncValue.data([]));
-      return;
-    }
-
-    // Watch matrimony profiles for those users
+    // Fetch directly from metrimony_profiles
     _profilesSubscription = _matrimonyRepository
-        .watchMatrimonyProfilesForUsers(userIds)
+        .watchAllMatrimonyProfiles()
         .listen(
           (profiles) async {
             try {
               final data = <MatrimonyProfileViewModel>[];
 
               for (final profile in profiles) {
-                final user = _currentUsers.firstWhere(
-                  (u) => u.uid == profile.userId,
-                  orElse: () => UserEntity.empty(),
-                );
+                // Fetch user data for this profile
+                UserEntity? user;
+                try {
+                  user = await _userRepository.fetchUser(profile.userId);
+                } catch (e) {
+                  user = UserEntity.empty();
+                }
 
                 if (user.uid.isEmpty) continue;
 
@@ -125,22 +106,7 @@ class HomeController extends StateNotifier<HomeState> {
                 );
               }
 
-              debugPrint('Fetched ${data.length} home profiles initially');
-              for (final viewModel in data) {
-                final profile = viewModel.profile;
-                final user = viewModel.user;
-                debugPrint(
-                  'Home profile -> '
-                  'name: ${user?.fullName ?? 'N/A'}, '
-                  'uid: ${profile.userId}, '
-                  'metrimonyId: ${profile.metrimonyId}, '
-                  'profileId: ${profile.identity.profileId}, '
-                  'gender: ${profile.identity.gender}, '
-                  'state: ${profile.address.state}, '
-                  'city: ${profile.address.city}',
-                );
-              }
-
+              debugPrint('Fetched ${data.length} home profiles directly');
               state = state.copyWith(metrimonyProfiles: AsyncValue.data(data));
             } catch (e, st) {
               state = state.copyWith(
@@ -152,6 +118,29 @@ class HomeController extends StateNotifier<HomeState> {
             state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
           },
         );
+
+    // Watch opposite gender users (COMMENTED OUT AS PER REQUEST)
+    /*
+    _usersSubscription = _userRepository
+        .watchOppositeGenderUsers(currentUid)
+        .listen(
+          (users) {
+            _currentUsers = users;
+            _watchProfiles(users.map((u) => u.uid).toList());
+          },
+          onError: (e, st) {
+            state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
+          },
+        );
+    */
+  }
+
+  void _watchProfiles(List<String> userIds) {
+    // COMMENTED OUT AS PER REQUEST
+    /*
+    _profilesSubscription?.cancel();
+    ...
+    */
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -90,7 +91,7 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
       _razorpayService.open({
         "key": data['key'], // rzp_test_...
         "amount": amountInPaisa, // ✅ Converted to paisa
-        "name": "Arvika Marriage Bureau",
+        "name": AppConstants.appName,
 
         "image":
             "https://firebasestorage.googleapis.com/v0/b/fir-app-e3a53.firebasestorage.app/o/company_files%2Flogo.png?alt=media&token=1d77300b-fa4d-4f0c-a4cb-c1772ae54b38", // Company logo

@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/support_ticket.dart';
+import 'package:shadi_milan/features/user/user_app/domain/states/support_ticket.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class SupportFirestore {

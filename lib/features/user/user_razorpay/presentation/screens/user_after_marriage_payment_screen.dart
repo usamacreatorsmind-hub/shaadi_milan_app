@@ -1,14 +1,14 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/core/notification/in_app_messaging_service.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/agent_state.dart';
-import 'package:arvika_marriage_bureau/features/auth/domain/states/user_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_profile_screen.dart';
+import 'package:shadi_milan/app/router/app_router.dart';
+import 'package:shadi_milan/core/notification/in_app_messaging_service.dart';
+import 'package:shadi_milan/features/auth/domain/states/agent_state.dart';
+import 'package:shadi_milan/features/auth/domain/states/user_state.dart';
+import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_state.dart';
+import 'package:shadi_milan/features/user/user_app/presentation/screens/user_profile_screen.dart';
 
 import '../../../user_app/domain/states/metrimony_profile_view_model.dart';
 import '../../domain/states/payment.dart';

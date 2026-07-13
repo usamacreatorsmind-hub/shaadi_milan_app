@@ -2,7 +2,8 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
+import 'package:shadi_milan/app/router/app_router.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -196,7 +197,7 @@ class NotificationService {
 
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
-        // icon: 'resource://drawable/ic_notification',
+        // icon: AppConstants.notificationIcon,
         displayOnBackground: true,
 
         badge: 10,
@@ -204,7 +205,7 @@ class NotificationService {
         displayOnForeground: true,
 
         id: Random().nextInt(100000),
-        channelKey: 'fcm_channel',
+        channelKey: AppConstants.fcmChannelKey,
         title: notification?.title ?? data['title'] ?? 'New Notification',
         body: notification?.body ?? data['body'] ?? '',
         largeIcon: notification?.android?.imageUrl ?? data['image'],
@@ -224,13 +225,13 @@ class NotificationService {
     required String title,
     required String body,
     Map<String, String>? payload,
-    String channelKey = 'basic_channel',
+    String channelKey = AppConstants.basicChannelKey,
   }) async {
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: Random().nextInt(100000),
 
-        // icon: 'resource://drawable/ic_notification',
+        // icon: AppConstants.notificationIcon,
         channelKey: channelKey,
         title: title,
         body: body,
@@ -251,10 +252,10 @@ class NotificationService {
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: id,
-        channelKey: 'scheduled_channel',
+        channelKey: AppConstants.scheduledChannelKey,
         notificationLayout: NotificationLayout.Default,
 
-        // icon: 'resource://drawable/ic_notification',
+        // icon: AppConstants.notificationIcon,
         wakeUpScreen: true,
 
         title: title,

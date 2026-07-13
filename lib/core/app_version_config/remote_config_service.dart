@@ -1,3 +1,4 @@
+import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
@@ -78,14 +79,12 @@ class RemoteConfigService {
       builder: (_) => PopScope(
         canPop: true,
         child: AlertDialog(
-          title: const Text('Update Required'),
-          content: const Text(
-            'A new version of the app is available. Please update to continue.',
-          ),
+          title: const Text(AppConstants.updateRequiredTitle),
+          content: const Text(AppConstants.updateRequiredMessage),
           actions: [
             TextButton(
               onPressed: () => _openStore(packageName),
-              child: const Text('Update Now'),
+              child: const Text(AppConstants.updateNowButton),
             ),
           ],
         ),
@@ -143,7 +142,7 @@ class RemoteConfigService {
                 const SizedBox(height: 20),
 
                 const Text(
-                  "Maintenance Mode",
+                  AppConstants.maintenanceModeTitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 24,
@@ -164,7 +163,7 @@ class RemoteConfigService {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    "Server Temporarily Unavailable",
+                    AppConstants.maintenanceModeSubtitle,
                     style: TextStyle(
                       color: Colors.orange.shade800,
                       fontWeight: FontWeight.w600,
@@ -176,7 +175,7 @@ class RemoteConfigService {
                 const SizedBox(height: 18),
 
                 Text(
-                  "We're currently performing scheduled maintenance to improve your experience.\n\nPlease check back in a few minutes.",
+                  AppConstants.maintenanceModeMessage,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
@@ -199,7 +198,7 @@ class RemoteConfigService {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          "Our team is working hard to restore services as quickly as possible.",
+                          AppConstants.maintenanceRestoringMessage,
                           style: TextStyle(
                             color: Colors.blue.shade700,
                             fontSize: 13,
@@ -221,7 +220,7 @@ class RemoteConfigService {
                 const SizedBox(height: 12),
 
                 Text(
-                  "Please wait...",
+                  AppConstants.pleaseWait,
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontWeight: FontWeight.w500,

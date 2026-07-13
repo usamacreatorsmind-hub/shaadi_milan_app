@@ -27,6 +27,8 @@ abstract class MatrimonyRepository {
   // read stream all metrimony profiles from server
   Future<List<MatrimonyProfile>> getAllMatrimonyProfiles();
 
+  Stream<List<MatrimonyProfile>> watchAllMatrimonyProfiles();
+
   Stream<MatrimonyProfile> watchMatrimonyProfile(String uid);
 
   Stream<List<MatrimonyProfile>> watchMatrimonyProfilesForUsers(List<String> userIds);

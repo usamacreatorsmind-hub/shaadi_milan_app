@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/profile_match_screen.dart';
+import 'package:shadi_milan/app/router/app_router.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/screens/profile_match_screen.dart';
 
 import '../../../../user/user_app/domain/states/image_state.dart';
 import '../../../../user/user_app/domain/states/metrimony_profile_view_model.dart';

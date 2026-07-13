@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
 
 @RoutePage()
 class AboutUsScreen extends StatelessWidget {
@@ -26,25 +27,25 @@ class AboutUsScreen extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(
+                  children: [
+                    const Icon(
                       Icons.favorite,
                       color: Colors.white,
                       size: 56,
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Text(
-                      'Arvika Marriage Bureau',
-                      style: TextStyle(
+                      AppConstants.appName,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
-                      'Connecting Hearts, Creating Happy Families',
-                      style: TextStyle(
+                      AppConstants.appTagline,
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
                       ),
@@ -66,7 +67,7 @@ class AboutUsScreen extends StatelessWidget {
                     icon: Icons.groups,
                     title: 'Who We Are',
                     description:
-                        'Arvika Marriage Bureau is a trusted matrimonial service '
+                        '${AppConstants.appName} is a trusted matrimonial service '
                         'dedicated to helping individuals and families find compatible life partners. '
                         'We believe marriage is not just a bond between two individuals, '
                         'but a union of families, values, and traditions.',
@@ -75,36 +76,22 @@ class AboutUsScreen extends StatelessWidget {
                   _infoSection(
                     context,
                     icon: Icons.flag,
-                    title: 'Our Mission',
-                    description:
-                        'Our mission is to create a safe, reliable, and respectful '
-                        'platform for matchmaking. We focus on transparency, '
-                        'privacy, and cultural values while making the search '
-                        'for a life partner simple and meaningful.',
+                    title: AppConstants.missionTitle,
+                    description: AppConstants.missionContent,
                   ),
 
                   _infoSection(
                     context,
                     icon: Icons.verified,
-                    title: 'Our Core Values',
-                    description:
-                        '• Trust & Privacy\n'
-                        '• Genuine & Verified Profiles\n'
-                        '• Family-Oriented Matchmaking\n'
-                        '• Cultural & Traditional Respect\n'
-                        '• Honest & Ethical Services',
+                    title: AppConstants.valuesTitle,
+                    description: AppConstants.valuesContent,
                   ),
 
                   _infoSection(
                     context,
                     icon: Icons.thumb_up_alt,
-                    title: 'Why Choose Arvika?',
-                    description:
-                        '✔ Verified and authentic profiles\n'
-                        '✔ Personalized matchmaking support\n'
-                        '✔ Simple and secure platform\n'
-                        '✔ Dedicated relationship assistance\n'
-                        '✔ Commitment to long-term happiness',
+                    title: AppConstants.whyChooseUsTitle,
+                    description: AppConstants.whyChooseUsContent,
                   ),
 
                   const SizedBox(height: 24),
@@ -112,8 +99,8 @@ class AboutUsScreen extends StatelessWidget {
                   // ================= FOOTER =================
                   Center(
                     child: Column(
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           'Made with ❤️ for meaningful connections',
                           style: TextStyle(
                             fontSize: 14,
@@ -121,10 +108,10 @@ class AboutUsScreen extends StatelessWidget {
                             color: Colors.black54,
                           ),
                         ),
-                        SizedBox(height: 6),
+                        const SizedBox(height: 6),
                         Text(
-                          '© Arvika Marriage Bureau',
-                          style: TextStyle(
+                          AppConstants.copyright,
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Colors.black45,
                           ),

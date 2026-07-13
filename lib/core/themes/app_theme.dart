@@ -1,8 +1,9 @@
+import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primaryRed = Color(0xFFB11226); // Deep Wedding Red
-  static const Color accentRed = Color(0xFFE53935); // Bright Red
+  static const Color primaryRed = Color(AppConstants.primaryRedHex); // Deep Wedding Red
+  static const Color accentRed = Color(AppConstants.accentRedHex); // Bright Red
 
   // -------------------- LIGHT THEME --------------------
   static ThemeData get lightTheme {
@@ -13,7 +14,7 @@ class AppTheme {
       visualDensity: VisualDensity.adaptivePlatformDensity,
       cardColor: Colors.white,
       // setfont family
-      fontFamily: 'Roboto',
+      fontFamily: AppConstants.fontFamily,
 
       textTheme: const TextTheme(
         displayLarge: TextStyle(

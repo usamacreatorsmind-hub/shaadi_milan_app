@@ -1,3 +1,4 @@
+import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class AnimatedGlassAppBar extends StatelessWidget {
     this.subtitle,
     this.titleWidget,
     this.showLogo = true,
-    this.logoAsset = 'assets/images/logo.png',
+    this.logoAsset = AppConstants.appLogoPath,
     this.expandedHeight = 140,
     this.collapsedHeight = 88,
   });
@@ -118,7 +119,7 @@ class AnimatedGlassAppBar extends StatelessWidget {
                                   ],
                                 ).createShader(bounds),
                                 child: Text(
-                                  title ?? 'Arvika Marriage Bureau',
+                                  title ?? AppConstants.appName,
                                   style: const TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.w800,

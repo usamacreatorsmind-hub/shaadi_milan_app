@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
+import 'package:shadi_milan/app/router/app_router.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 

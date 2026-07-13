@@ -1,8 +1,8 @@
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/support_ticket.dart'
+import 'package:shadi_milan/features/user/user_app/domain/states/support_ticket.dart'
     show TicketPriority;
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/controllers/support_notifier.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:shadi_milan/features/user/user_app/presentation/controllers/support_notifier.dart';
+import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

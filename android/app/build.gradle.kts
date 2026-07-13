@@ -19,7 +19,7 @@ plugins {
 }
 
 android {
-    namespace = "com.arvikamarriagebureau.arvika"
+    namespace = "com.shaadimilan.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "30.0.14904198"
 
@@ -36,7 +36,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.arvikamarriagebureau.arvika"
+        applicationId = "com.shaadimilan.app"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = flutter.versionCode

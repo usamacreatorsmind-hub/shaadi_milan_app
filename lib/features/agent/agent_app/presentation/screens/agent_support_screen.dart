@@ -1,8 +1,8 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/widgets.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/support_ticket_notifier.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/support_ticket.dart';
-import 'package:arvika_marriage_bureau/features/widgets/marquee.dart';
+import 'package:shadi_milan/app/custom/custom_widgets/chip_and_action_chip.dart';
+import 'package:shadi_milan/app/custom/custom_widgets/widgets.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/support_ticket_notifier.dart';
+import 'package:shadi_milan/features/user/user_app/domain/states/support_ticket.dart';
+import 'package:shadi_milan/features/widgets/marquee.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

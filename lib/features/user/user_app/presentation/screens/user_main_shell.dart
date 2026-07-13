@@ -1,5 +1,6 @@
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
@@ -51,17 +52,17 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
             currentIndex: tabsRouter.activeIndex,
             onTap: (index) {
               if (paymentState.status == PayStatus.loading) return;
-
-              if (!isPaid) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please subscribe to access this feature'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                context.router.push(UserPaymentRoute(userId: uid));
-                return;
-              }
+              //
+              // if (!isPaid) {
+              //   ScaffoldMessenger.of(context).showSnackBar(
+              //     const SnackBar(
+              //       content: Text('Please subscribe to access this feature'),
+              //       backgroundColor: Colors.red,
+              //     ),
+              //   );
+              //   context.router.push(UserPaymentRoute(userId: uid));
+              //   return;
+              // }
 
               HapticFeedback.lightImpact();
               tabsRouter.setActiveIndex(index);
@@ -71,22 +72,22 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined),
                 activeIcon: Icon(Icons.home),
-                label: 'Home',
+                label: AppConstants.navHome,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.favorite_outline),
                 activeIcon: Icon(Icons.favorite),
-                label: 'WishList',
+                label: AppConstants.navWishlist,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.support_agent_outlined),
                 activeIcon: Icon(Icons.support_agent),
-                label: 'Support',
+                label: AppConstants.navSupport,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person_outline),
                 activeIcon: Icon(Icons.person),
-                label: 'Profile',
+                label: AppConstants.navProfile,
               ),
             ],
           ),

@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../../app/router/app_router.dart';

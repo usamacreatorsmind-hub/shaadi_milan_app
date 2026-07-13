@@ -1,5 +1,5 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/drawer.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/user_details_screen.dart';
+import 'package:shadi_milan/app/custom/custom_widgets/drawer.dart';
+import 'package:shadi_milan/features/user/user_app/presentation/screens/user_details_screen.dart';
 
 import '../../../../../app/custom/custom_widgets/mime_type.dart';
 import '../../../../user/user_app/widgets/pdf_viewer_bottomsheet.dart';

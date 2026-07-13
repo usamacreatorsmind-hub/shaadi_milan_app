@@ -1,8 +1,9 @@
-import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_service.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_recemmonded_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_state.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/features/user/user_app/domain/repositories/user_recemmonded_repository.dart';
+import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_state.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 import '../../../../../app/custom/custom_widgets/user_drawer.dart';
@@ -15,7 +16,7 @@ import '../../../../../app/router/app_router.dart';
 import '../../domain/states/religion_state.dart';
 import '../../domain/states/state_city.dart';
 import '../controllers/home_controller.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/payment.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,7 +47,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
 
       // Fetch the matrimony profiles when screen loads
       ref.invalidate(homeControllerProvider);
-      ref.invalidate(currentUserRecommendedIdsProvider);
+      // ref.invalidate(currentUserRecommendedIdsProvider);
 
       try {
         // ignore: use_build_context_synchronously
@@ -66,27 +67,31 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
 
     final homeState = ref.watch(homeControllerProvider);
     final filter = ref.watch(homeFilterProvider);
-    final recommendedIdsAsync = ref.watch(currentUserRecommendedIdsProvider);
-    final recommendedProfileIds =
-        recommendedIdsAsync.asData?.value ?? const <String>[];
-    final recommendedProfileIdSet = recommendedProfileIds.toSet();
+    // COMMENTED OUT AS PER REQUEST
+    // final recommendedIdsAsync = ref.watch(currentUserRecommendedIdsProvider);
+    // final recommendedProfileIds =
+    //     recommendedIdsAsync.asData?.value ?? const <String>[];
+    // final recommendedProfileIdSet = recommendedProfileIds.toSet();
 
     String filterText = '';
-    if (filter.city.isNotEmpty) {
+    if ((filter.city ?? '').isNotEmpty) {
       filterText = '${filter.city}, ${filter.state}';
-    } else if (filter.state.isNotEmpty) {
+    } else if ((filter.state ?? '').isNotEmpty) {
       filterText = filter.state;
     }
 
-    if (filter.religion.isNotEmpty) {
+    if ((filter.religion ?? '').isNotEmpty) {
       if (filterText.isNotEmpty) filterText += ' | ';
       filterText += filter.religion;
-      if (filter.caste.isNotEmpty) {
+      if ((filter.caste ?? '').isNotEmpty) {
         filterText += ' (${filter.caste})';
       }
     }
 
     bool isRecommended(MatrimonyProfileViewModel viewModel) {
+      // COMMENTED OUT AS PER REQUEST - WE NOW SHOW ALL PROFILES DIRECTLY
+      return true;
+      /*
       final profile = viewModel.profile;
       final profileUser = viewModel.user;
 
@@ -105,6 +110,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
         'candidates=$candidateIds, suggested=$recommendedProfileIds, match=$matches',
       );
       return matches;
+      */
     }
 
     return Scaffold(
@@ -128,12 +134,12 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
           // Otherwise, show the payment screen.
 
           // change after publishing on playstore
-          if (paymentState.status == PayStatus.success) {
+          if (paymentState.status == PayStatus.idle) {
             return CustomScrollView(
               slivers: [
                 ModernGradientAppBar(
-                  title: "Home",
-                  subtitle: "Find your best match",
+                  title: AppConstants.home,
+                  subtitle: AppConstants.homeSubtitle,
                   leading: Builder(
                     builder: (context) => IconButton(
                       icon: const Icon(Icons.menu, color: Colors.white),
@@ -184,7 +190,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                     velocity: 50,
 
                                     filterText.isEmpty
-                                        ? 'All Profiles'
+                                        ? AppConstants.allProfiles
                                         : filterText,
                                     style: const TextStyle(
                                       fontSize: 13,
@@ -239,7 +245,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                       fullName: user.fullName,
                       hasFilter: filterText.isNotEmpty,
                       filterText: filterText.isEmpty
-                          ? 'All Profiles'
+                          ? AppConstants.allProfiles
                           : filterText,
                     ),
                   ),
@@ -273,7 +279,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Complete your own profile first',
+                                    AppConstants.completeProfileTitle,
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
@@ -284,7 +290,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'Finish your profile details so we can show the best matches for you.',
+                                    AppConstants.completeProfileMessage,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: Theme.of(
@@ -298,7 +304,9 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                       const MatrimonyFormFlowRoute(),
                                     ),
                                     icon: const Icon(Icons.edit_note_rounded),
-                                    label: const Text('Complete profile now'),
+                                    label: const Text(
+                                      AppConstants.completeProfileButton,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -327,29 +335,56 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
 
                       // If no state is selected, or if state matches
                       final stateMatch =
-                          filter.state.isEmpty ||
-                          (profile.address.state == filter.state);
+                          (filter.state ?? '').isEmpty ||
+                          (profile.address.state.toLowerCase() ==
+                              filter.state!.toLowerCase());
                       // If no city is selected, or if city matches
                       final cityMatch =
-                          filter.city.isEmpty ||
-                          (profile.address.city == filter.city);
+                          (filter.city ?? '').isEmpty ||
+                          (profile.address.city.toLowerCase() ==
+                              filter.city!.toLowerCase());
 
                       // If no religion is selected, or if religion matches
                       final religionMatch =
-                          filter.religion.isEmpty ||
-                          (profile.cultural.religion == filter.religion);
+                          (filter.religion ?? '').isEmpty ||
+                          (profile.cultural.religion.toLowerCase() ==
+                              filter.religion!.toLowerCase());
 
                       // If no caste is selected, or if caste matches
                       final casteMatch =
-                          filter.caste.isEmpty ||
-                          (profile.cultural.caste == filter.caste);
+                          (filter.caste ?? '').isEmpty ||
+                          (profile.cultural.caste.toLowerCase() ==
+                              filter.caste!.toLowerCase());
+
+                      // Gender matching logic
+                      bool genderMatch;
+                      final filterGender = (filter.gender ?? '');
+                      if (filterGender.isEmpty) {
+                        // Initial/Default state: show opposite gender
+                        final currentUserGender =
+                            (user.gender ?? '').toLowerCase();
+                        final opposite =
+                            (currentUserGender == 'male') ? 'female' : 'male';
+                        genderMatch =
+                            profile.identity.gender.toLowerCase() == opposite;
+                      } else if (filterGender == AppConstants.allProfiles) {
+                        // Explicitly show all
+                        genderMatch = true;
+                      } else {
+                        // Filter by specific gender
+                        genderMatch =
+                            profile.identity.gender.toLowerCase() ==
+                            filterGender.toLowerCase();
+                      }
 
                       return stateMatch &&
                           cityMatch &&
                           religionMatch &&
-                          casteMatch;
+                          casteMatch &&
+                          genderMatch;
                     }).toList();
 
+                    // Only show recommended profiles
                     final visibleProfiles = filteredProfiles.where((viewModel) {
                       return isRecommended(viewModel);
                     }).toList();
@@ -378,7 +413,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                 ),
                                 const SizedBox(height: 10),
                                 const Text(
-                                  'No recommended profiles match your filters.',
+                                  AppConstants.noProfilesFound,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -476,14 +511,14 @@ class _HomeSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Welcome, ${fullName.isEmpty ? 'User' : fullName.split(' ').first}',
+            '${AppConstants.welcomeLabel}${fullName.isEmpty ? 'User' : fullName.split(' ').first}',
             style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 6),
           Text(
             hasFilter
-                ? 'Showing filtered results'
-                : 'Showing all available matches',
+                ? AppConstants.showingFiltered
+                : AppConstants.showingAllMatches,
             style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13),
           ),
           const SizedBox(height: 12),
@@ -539,7 +574,7 @@ class FilterRightSheet extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Filter Profiles',
+                    AppConstants.filterProfiles,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Row(
@@ -548,7 +583,7 @@ class FilterRightSheet extends ConsumerWidget {
                         onPressed: () {
                           ref.read(homeFilterProvider.notifier).reset();
                         },
-                        child: const Text('Reset'),
+                        child: const Text(AppConstants.reset),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -625,6 +660,31 @@ class FilterRightSheet extends ConsumerWidget {
 
                       const SizedBox(height: 24),
 
+                      // ================= GENDER SECTION =================
+                      const Text(
+                        'Gender',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      _buildDropdown(
+                        title: 'Gender',
+                        value: (filter.gender ?? '').isEmpty ? null : filter.gender,
+                        items: [AppConstants.allProfiles, AppConstants.male, AppConstants.female],
+                        onChanged: (val) {
+                          if (val != null) {
+                            ref
+                                .read(homeFilterProvider.notifier)
+                                .updateGender(val);
+                          }
+                        },
+                      ),
+
+                      const SizedBox(height: 24),
+
                       // ================= RELIGION SECTION =================
                       const Text(
                         'Cultural',
@@ -696,7 +756,7 @@ class FilterRightSheet extends ConsumerWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Apply Filters'),
+                  child: const Text(AppConstants.applyFilters),
                 ),
               ),
             ],
@@ -719,7 +779,7 @@ class FilterRightSheet extends ConsumerWidget {
         Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
-          initialValue: value,
+          value: value,
           items: items
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),
@@ -883,7 +943,7 @@ class ProfileCard extends StatelessWidget {
                     onPressed: () =>
                         context.router.push(UserDetailRoute(uid: uid)),
                     icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                    label: const Text('View Profile'),
+                    label: const Text(AppConstants.viewProfile),
                   ),
                 ),
               ),

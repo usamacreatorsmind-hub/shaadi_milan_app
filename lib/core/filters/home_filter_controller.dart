@@ -11,10 +11,7 @@ final homeFilterProvider =
     );
 
 class HomeFilterController extends StateNotifier<HomeFilterState> {
-  HomeFilterController()
-    : super(
-        const HomeFilterState(state: '', city: '', religion: '', caste: ''),
-      );
+  HomeFilterController() : super(const HomeFilterState());
 
   void updateState(String value) {
     // reset city when state changes
@@ -22,7 +19,7 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
   }
 
   void reset() {
-    state = const HomeFilterState(state: '', city: '', religion: '', caste: '');
+    state = const HomeFilterState();
   }
 
   void updateCity(String value) {
@@ -36,5 +33,9 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
 
   void updateCaste(String value) {
     state = state.copyWith(caste: value);
+  }
+
+  void updateGender(String value) {
+    state = state.copyWith(gender: value);
   }
 }

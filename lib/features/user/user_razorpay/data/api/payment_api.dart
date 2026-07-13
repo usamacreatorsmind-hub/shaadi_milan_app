@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
+import 'package:shadi_milan/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
 import 'package:dio/dio.dart';
 
 class PaymentApi {

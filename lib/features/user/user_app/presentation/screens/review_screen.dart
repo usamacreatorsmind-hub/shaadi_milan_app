@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/app/custom/custom_widgets/chip_and_action_chip.dart';
+import 'package:shadi_milan/app/custom/custom_widgets/chip_and_action_chip.dart';
 
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 import '../../../../../app/custom/custom_widgets/drawer.dart';

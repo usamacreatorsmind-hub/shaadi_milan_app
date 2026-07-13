@@ -1,79 +1,26 @@
 {
   "project_info": {
-    "project_number": "867606443625",
-    "project_id": "arvika-marriage-bureau-d31df",
-    "storage_bucket": "arvika-marriage-bureau-d31df.firebasestorage.app"
+    "project_number": "909636679466",
+    "project_id": "fir-app-e3a53",
+    "storage_bucket": "fir-app-e3a53.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:867606443625:android:20496ed7dc3e3e8b7614f8",
+        "mobilesdk_app_id": "1:909636679466:android:fef1f4857e4c01a7a39053",
         "android_client_info": {
-          "package_name": "com.arvikamarriagebureau.arvika"
+          "package_name": "com.shaadimilan.app"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "867606443625-qii3ehm34r9fuqu36gasjc39od103vka.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBMCHd7Ar0niJyrlRmht251QSTZPhHe2o4"
+          "current_key": "AIzaSyCnMC_xW5dnd1Z33orwFQkrxsVPlndbTTw"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "867606443625-qii3ehm34r9fuqu36gasjc39od103vka.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "867606443625-tg1do37jqo84eh2qth4i6f4pdibft1s5.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.arvikaMarriageBureau"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:867606443625:android:f1838e748a92e8357614f8",
-        "android_client_info": {
-          "package_name": "com.arvikamarriagebureau.arvika"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "867606443625-qii3ehm34r9fuqu36gasjc39od103vka.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBMCHd7Ar0niJyrlRmht251QSTZPhHe2o4"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "867606443625-qii3ehm34r9fuqu36gasjc39od103vka.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "867606443625-tg1do37jqo84eh2qth4i6f4pdibft1s5.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.arvikaMarriageBureau"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

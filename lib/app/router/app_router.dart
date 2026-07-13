@@ -1,11 +1,11 @@
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/AgentNotification.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agent_support_screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/agent_wishlist_screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/profile_match_screen.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/screens/view_wishlist_user_screen.dart';
-import 'package:arvika_marriage_bureau/features/auth/presentation/screens/view_agent_profile.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/presentation/screens/my_review_screen.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/screens/user_after_marriage_payment_screen.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/screens/AgentNotification.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/screens/agent_support_screen.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/screens/agent_wishlist_screen.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/screens/profile_match_screen.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/screens/view_wishlist_user_screen.dart';
+import 'package:shadi_milan/features/auth/presentation/screens/view_agent_profile.dart';
+import 'package:shadi_milan/features/user/user_app/presentation/screens/my_review_screen.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_after_marriage_payment_screen.dart';
 
 import '../../features/user/user_app/domain/states/review_state.dart';
 import '../../features/user/user_app/presentation/screens/review_form_screen.dart';
@@ -92,12 +92,12 @@ class AppRouter extends RootStackRouter {
   @override
   List<AutoRoute> get routes => [
     // ================= ROOT =================
-    AutoRoute(page: SplashRoute.page, initial: true),
+    // AutoRoute(page: SplashRoute.page, initial: true),
     AutoRoute(page: RoleSelectionRoute.page),
     AutoRoute(page: ChangePasswordRoute.page),
     AutoRoute(page: ResetPasswordRoute.page),
 
-    AutoRoute(page: AuthWrapperRoute.page), // Unified authentication wrapper
+    AutoRoute(page: AuthWrapperRoute.page,initial: true), // Unified authentication wrapper
     // ================= AUTH & PUBLIC =================
     AutoRoute(page: OnboardingRoute.page),
     AutoRoute(page: UserLoginRoute.page), // For Users

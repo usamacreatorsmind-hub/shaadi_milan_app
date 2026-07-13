@@ -1,3 +1,4 @@
+import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,7 +12,7 @@ class UserFirestoreDS {
   UserFirestoreDS(this._firestore);
 
   CollectionReference<Map<String, dynamic>> get _users =>
-      _firestore.collection('users');
+      _firestore.collection(AppConstants.collUsers);
 
   Future<List<Map<String, dynamic>>> fetchUsers() async {
     final querySnapshot = await _users.get();
@@ -25,7 +26,7 @@ class UserFirestoreDS {
     final currentUserDoc = await _users.doc(currentUid).get();
     if (!currentUserDoc.exists) throw Exception('Current user not found');
 
-    final currentUserGender = (currentUserDoc.data()?['gender'] as String?)
+    final currentUserGender = (currentUserDoc.data()?[AppConstants.fieldGender] as String?)
         ?.toLowerCase();
     if (currentUserGender == null || currentUserGender.isEmpty) {
       yield [];
@@ -43,17 +44,14 @@ class UserFirestoreDS {
       return;
     }
 
-    // Watch users with opposite gender; profile activity is validated via
+    // Watch all users except current; profile activity is validated via
     // matrimony_profiles in the next pipeline stage.
-    yield* _users
-        .where('gender', isEqualTo: oppositeGender)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .where((doc) => doc.id != currentUid)
-              .map((doc) => doc.data())
-              .toList(),
-        );
+    yield* _users.snapshots().map(
+      (snapshot) => snapshot.docs
+          .where((doc) => doc.id != currentUid)
+          .map((doc) => doc.data())
+          .toList(),
+    );
   }
 
   Future<Map<String, dynamic>> fetchUser(String uid) async {

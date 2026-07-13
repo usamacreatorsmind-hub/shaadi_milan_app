@@ -1,5 +1,5 @@
-// import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_service.dart';
-// import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
+// import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
+// import 'package:shadi_milan/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
 // import 'package:flutter/material.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:sizer/sizer.dart';
@@ -68,8 +68,9 @@
 //   @override
 //   Widget build(BuildContext context) => widget.child;
 // }
-import 'package:arvika_marriage_bureau/core/app_version_config/remote_config_service.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
+import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sizer/sizer.dart';
@@ -125,7 +126,7 @@ class _AppState extends ConsumerState<App> {
       builder: (context, orientation, deviceType) {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          title: 'Arvika Marriage Bureau',
+          title: AppConstants.appName,
 
           /// THEME
           theme: AppTheme.lightTheme,

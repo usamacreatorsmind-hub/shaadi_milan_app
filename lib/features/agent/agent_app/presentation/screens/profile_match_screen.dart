@@ -1,9 +1,9 @@
-import 'package:arvika_marriage_bureau/app/router/app_router.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/metrimony_notifier.dart';
-import 'package:arvika_marriage_bureau/features/agent/agent_app/presentation/notifier/user_nofier.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/repositories/user_recemmonded_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
-import 'package:arvika_marriage_bureau/features/user/user_app/domain/states/recemonded_profiles.dart';
+import 'package:shadi_milan/app/router/app_router.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/metrimony_notifier.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/user_nofier.dart';
+import 'package:shadi_milan/features/user/user_app/domain/repositories/user_recemmonded_repository.dart';
+import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
+import 'package:shadi_milan/features/user/user_app/domain/states/recemonded_profiles.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

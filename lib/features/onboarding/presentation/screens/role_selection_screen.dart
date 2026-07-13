@@ -1,4 +1,6 @@
+import '../../../../app/custom/custom_widgets/app_logo.dart';
 import '../../../../app/router/app_router.dart';
+import '../../../../core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'dart:ui'; // Required for ImageFilter
@@ -48,19 +50,10 @@ class RoleSelectionScreen extends StatelessWidget {
                         },
                         child: Column(
                           children: [
-                            // circle avatar
-                            CircleAvatar(
-                              radius: 100,
-                              backgroundColor: Colors.transparent,
-                              child: Image.asset(
-                                'assets/images/logo.png',
-                                width: 200,
-                                height: 200,
-                              ),
-                            ),
-
+                            const AppLogo(size: 200),
+                            const SizedBox(height: 20),
                             Text(
-                              'Arvika Marriage Bureau',
+                              AppConstants.appName,
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -70,7 +63,7 @@ class RoleSelectionScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Your Journey to a Beautiful Union Begins Here',
+                              AppConstants.splashTagline,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 // theme color

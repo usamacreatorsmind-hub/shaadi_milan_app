@@ -321,7 +321,7 @@ class ClientFilterRightSheet extends ConsumerWidget {
     required ValueChanged<String?> onChanged,
   }) {
     return DropdownButtonFormField<String>(
-      initialValue: value,
+      value: value,
       items: items
           .map((e) => DropdownMenuItem(value: e, child: Text(e)))
           .toList(),
@@ -406,7 +406,7 @@ class _LocationSection extends ConsumerWidget {
           children: [
             // ── STATE ──────────────────────────────────
             DropdownButtonFormField<String>(
-              initialValue: selectedState.isEmpty ? null : selectedState,
+              value: selectedState.isEmpty ? null : selectedState,
               hint: const Text('Select State'),
               isExpanded: true,
               items: [
@@ -432,7 +432,7 @@ class _LocationSection extends ConsumerWidget {
 
             // ── CITY / DISTRICT ────────────────────────
             DropdownButtonFormField<String>(
-              initialValue: selectedCity.isEmpty ? null : selectedCity,
+              value: selectedCity.isEmpty ? null : selectedCity,
               hint: const Text('Select City / District'),
               isExpanded: true,
               // disable city picker until a state is chosen
@@ -509,7 +509,7 @@ class _CulturalSection extends ConsumerWidget {
           children: [
             // ── RELIGION ───────────────────────────────
             DropdownButtonFormField<String>(
-              initialValue: selectedReligion.isEmpty ? null : selectedReligion,
+              value: selectedReligion.isEmpty ? null : selectedReligion,
               hint: const Text('Select Religion'),
               isExpanded: true,
               items: [
@@ -535,7 +535,7 @@ class _CulturalSection extends ConsumerWidget {
 
             // ── CASTE ──────────────────────────────────
             DropdownButtonFormField<String>(
-              initialValue: selectedCaste.isEmpty ? null : selectedCaste,
+              value: selectedCaste.isEmpty ? null : selectedCaste,
               hint: const Text('Select Caste'),
               isExpanded: true,
               // disable caste picker until a religion is chosen

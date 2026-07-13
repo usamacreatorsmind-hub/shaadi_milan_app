@@ -1,5 +1,5 @@
-name: arvika_marriage_bureau
-description: "ARVIKA Marriage Bureau App - A comprehensive matchmaking platform connecting individuals seeking meaningful relationships. With a user-friendly interface, advanced search filters, and personalized matchmaking algorithms, ARVIKA offers a seamless experience for finding compatible partners. Whether you're looking for love, companionship, or friendship, ARVIKA is your trusted companion on the journey to meaningful connections."
+name: shadi_milan
+description: "Shaadi Milan App - A comprehensive matchmaking platform connecting individuals seeking meaningful relationships. With a user-friendly interface, advanced search filters, and personalized matchmaking algorithms, Shaadi Milan offers a seamless experience for finding compatible partners. Whether you're looking for love, companionship, or friendship, Shaadi Milan is your trusted companion on the journey to meaningful connections."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
@@ -129,6 +129,7 @@ flutter:
   assets:
     #   - images/a_dot_burr.jpeg
     - assets/images/
+    - assets/logo.png
 
     - assets/data/location.json
     - assets/data/religion_caste.json
@@ -137,10 +138,10 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/logo.png"
+  image_path: "assets/logo.png"
   remove_alpha_ios: true
   adaptive_icon_background: "#ffffff"
-  adaptive_icon_foreground: "assets/images/logo.png"
+  adaptive_icon_foreground: "assets/logo.png"
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

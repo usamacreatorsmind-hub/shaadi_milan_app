@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:arvika_marriage_bureau/core/status/status.dart';
+import 'package:shadi_milan/core/status/status.dart';
 
 /// Example: Feature Notifier with integrated status management
 ///
@@ -98,7 +98,7 @@ final exampleFeatureProvider =
 
 // Import this in your feature Dart or widget:
 //
-// import 'package:arvika_marriage_bureau/core/status/status.dart';
+// import 'package:shadi_milan/core/status/status.dart';
 // import 'example_feature_with_status.dart';
 //
 // Then use in Widget:

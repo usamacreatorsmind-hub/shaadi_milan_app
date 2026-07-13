@@ -1,4 +1,4 @@
-import 'package:arvika_marriage_bureau/core/filters/home_filter_state.dart';
+import 'package:shadi_milan/core/filters/home_filter_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// =======================
@@ -12,7 +12,7 @@ final matchFilterProvider =
 class MatchFilterController extends StateNotifier<HomeFilterState> {
   MatchFilterController()
     : super(
-        const HomeFilterState(state: '', city: '', religion: '', caste: ''),
+        const HomeFilterState(state: '', city: '', religion: '', caste: '', gender: ''),
       );
 
   void updateState(String value) {
@@ -21,7 +21,7 @@ class MatchFilterController extends StateNotifier<HomeFilterState> {
   }
 
   void reset() {
-    state = const HomeFilterState(state: '', city: '', religion: '', caste: '');
+    state = const HomeFilterState(state: '', city: '', religion: '', caste: '', gender: '');
   }
 
   void updateCity(String value) {

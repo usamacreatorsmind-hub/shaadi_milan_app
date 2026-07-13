@@ -95,6 +95,7 @@ import 'core/env/app_env_config.dart';
 import 'core/notification/in_app_messaging_service.dart';
 import 'core/notification/notification_service.dart';
 import 'firebase_options.dart';
+import 'core/constants/app_constants.dart';
 
 /// Background FCM handler
 @pragma('vm:entry-point')
@@ -103,27 +104,26 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  await AwesomeNotifications()
-      .initialize('resource://drawable/ic_notification', [
-        NotificationChannel(
-          channelKey: 'fcm_channel',
-          channelName: 'FCM Notifications',
-          channelDescription: 'Firebase Cloud Messaging',
-          importance: NotificationImportance.Max,
-          playSound: true,
-          enableVibration: true,
-          channelShowBadge: true,
-        ),
-      ], debug: false);
+  await AwesomeNotifications().initialize(AppConstants.notificationIcon, [
+    NotificationChannel(
+      channelKey: AppConstants.fcmChannelKey,
+      channelName: AppConstants.fcmChannelName,
+      channelDescription: AppConstants.fcmChannelDescription,
+      importance: NotificationImportance.Max,
+      playSound: true,
+      enableVibration: true,
+      channelShowBadge: true,
+    ),
+  ], debug: false);
 
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      channelKey: 'fcm_channel',
+      channelKey: AppConstants.fcmChannelKey,
       title: message.notification?.title ?? 'New Notification',
       body: message.notification?.body ?? '',
       notificationLayout: NotificationLayout.Default,
-      icon: 'resource://drawable/ic_notification',
+      icon: AppConstants.notificationIcon,
     ),
   );
 }
@@ -141,32 +141,31 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
 
   /// AWESOME NOTIFICATIONS
-  await AwesomeNotifications()
-      .initialize('resource://drawable/ic_notification', [
-        NotificationChannel(
-          channelKey: 'basic_channel',
-          channelName: 'Basic Notifications',
-          channelDescription: 'General notifications',
-          importance: NotificationImportance.High,
-          channelShowBadge: true,
-        ),
-        NotificationChannel(
-          channelKey: 'scheduled_channel',
-          channelName: 'Scheduled Notifications',
-          channelDescription: 'Scheduled reminders',
-          importance: NotificationImportance.High,
-          channelShowBadge: true,
-        ),
-        NotificationChannel(
-          channelKey: 'fcm_channel',
-          channelName: 'FCM Notifications',
-          channelDescription: 'Firebase Cloud Messaging',
-          importance: NotificationImportance.Max,
-          playSound: true,
-          enableVibration: true,
-          channelShowBadge: true,
-        ),
-      ], debug: false);
+  await AwesomeNotifications().initialize(AppConstants.notificationIcon, [
+    NotificationChannel(
+      channelKey: AppConstants.basicChannelKey,
+      channelName: AppConstants.basicChannelName,
+      channelDescription: AppConstants.basicChannelDescription,
+      importance: NotificationImportance.High,
+      channelShowBadge: true,
+    ),
+    NotificationChannel(
+      channelKey: AppConstants.scheduledChannelKey,
+      channelName: AppConstants.scheduledChannelName,
+      channelDescription: AppConstants.scheduledChannelDescription,
+      importance: NotificationImportance.High,
+      channelShowBadge: true,
+    ),
+    NotificationChannel(
+      channelKey: AppConstants.fcmChannelKey,
+      channelName: AppConstants.fcmChannelName,
+      channelDescription: AppConstants.fcmChannelDescription,
+      importance: NotificationImportance.Max,
+      playSound: true,
+      enableVibration: true,
+      channelShowBadge: true,
+    ),
+  ], debug: false);
 
   /// NON-BLOCKING INITIALIZATION
   Future.microtask(() async {

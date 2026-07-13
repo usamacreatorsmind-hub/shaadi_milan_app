@@ -1,5 +1,7 @@
+import '../../../../app/custom/custom_widgets/app_logo.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../core/app_version_config/remote_config_service.dart';
+import '../../../../core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 
@@ -88,11 +90,7 @@ class _SplashScreenState extends State<SplashScreen>
               scale: _scaleAnimation,
               child: FadeTransition(
                 opacity: _opacityAnimation,
-                child: Image.asset(
-                  'assets/images/logo.png', // Replace with your actual logo path
-                  width: 250,
-                  height: 250,
-                ),
+                child: const AppLogo(size: 180),
               ),
             ),
             const SizedBox(height: 30),
@@ -103,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 children: [
                   Text(
-                    'Arvika Marriage Bureau',
+                    AppConstants.appName,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: theme.primaryColor,
                       fontWeight: FontWeight.bold,
@@ -111,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Your Journey to a Beautiful Union Begins Here',
+                    AppConstants.splashTagline,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: Colors.grey[600],

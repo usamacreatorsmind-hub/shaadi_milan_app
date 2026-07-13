@@ -1,4 +1,4 @@
-package com.arvikamarriagebureau.arvika
+package com.shaadimilan.app
 
 import io.flutter.embedding.android.FlutterActivity
 

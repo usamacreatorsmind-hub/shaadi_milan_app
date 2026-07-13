@@ -1,12 +1,12 @@
-export 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/repository/amount_repository.dart';
-export 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/repository/order_repository.dart';
-export 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/repository/payment_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/data/providers/providers.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/repository/amount_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/repository/order_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/repository/payment_repository.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/domain/states/amount.dart';
-import 'package:arvika_marriage_bureau/features/user/user_razorpay/presentation/notifier/amount_notifier.dart';
+export 'package:shadi_milan/features/user/user_razorpay/domain/repository/amount_repository.dart';
+export 'package:shadi_milan/features/user/user_razorpay/domain/repository/order_repository.dart';
+export 'package:shadi_milan/features/user/user_razorpay/domain/repository/payment_repository.dart';
+import 'package:shadi_milan/features/user/user_razorpay/data/providers/providers.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/repository/amount_repository.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/repository/order_repository.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/repository/payment_repository.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/states/amount.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/amount_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final paymentRepositoryProvider = Provider<PaymentRepository>((ref) {
