@@ -1,3 +1,4 @@
+import '../../../../../core/constants/app_labels.dart';
 import '../../../../../core/filters/home_filter_controller.dart';
 import 'package:flutter/services.dart';
 
@@ -113,7 +114,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
 
       if (current.address != null && previous?.address == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Address saved successfully')),
+          SnackBar(content: Text(AppLabels.addressSavedSuccessfully(context))),
         );
       }
     });
@@ -121,7 +122,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Address Details',
+          AppLabels.addressDetails(context),
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
@@ -137,11 +138,11 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   controller: _atController,
                   prefixIcon: Icons.location_on,
                   iconColor: Theme.of(context).colorScheme.primary,
-                  label: "Place ",
-                  hint: "Enter your village, street, or locality",
+                  label: AppLabels.place(context),
+                  hint: AppLabels.placeHint(context),
                   obscureText: false,
                   keyboardType: TextInputType.streetAddress,
-                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                  validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
                 ),
                 const SizedBox(height: 16),
 
@@ -150,11 +151,11 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   controller: _postController,
                   prefixIcon: Icons.local_post_office,
                   iconColor: Theme.of(context).colorScheme.primary,
-                  label: "Post",
-                  hint: "Enter post office",
+                  label: AppLabels.post(context),
+                  hint: AppLabels.postHint(context),
                   obscureText: false,
                   keyboardType: TextInputType.text,
-                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                  validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
@@ -162,11 +163,11 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   prefixIcon: Icons.local_police,
 
                   iconColor: Theme.of(context).colorScheme.primary,
-                  label: "Police Station",
-                  hint: "Enter Police station",
+                  label: AppLabels.policeStation(context),
+                  hint: AppLabels.policeStationHint(context),
                   obscureText: false,
                   keyboardType: TextInputType.text,
-                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                  validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
                 ),
                 const SizedBox(height: 16),
 
@@ -187,7 +188,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                       children: [
                         _buildDropdown(
                           context: context,
-                          label: 'State',
+                          label: AppLabels.state(context),
                           value: stateNames.contains(location.state)
                               ? location.state
                               : null,
@@ -206,7 +207,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                         const SizedBox(height: 12),
                         _buildDropdown(
                           context: context,
-                          label: 'District',
+                          label: AppLabels.districtLabel(context),
                           value: selectedState.cities.contains(location.city)
                               ? location.city
                               : null,
@@ -241,16 +242,16 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   controller: _pinController,
                   prefixIcon: Icons.numbers,
                   iconColor: Theme.of(context).colorScheme.primary,
-                  label: "PIN Code",
-                  hint: "Enter 6-digit PIN",
+                  label: AppLabels.pinCodeLabel(context),
+                  hint: AppLabels.pinCodeHint(context),
                   obscureText: false,
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'PIN required';
+                      return AppLabels.pinCodeRequired(context);
                     }
                     if (value.length != 6) {
-                      return 'Invalid PIN';
+                      return AppLabels.invalidPinCode(context);
                     }
                     return null;
                   },
@@ -264,7 +265,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                           ? const SizedBox.shrink()
                           : AppButton(
                               onPressed: _submitForm,
-                              text: 'Save Address',
+                              text: AppLabels.saveAddress(context),
                             )),
                 // logout
                 const SizedBox(height: 16),

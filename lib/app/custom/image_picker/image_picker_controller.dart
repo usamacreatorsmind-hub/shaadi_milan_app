@@ -1,10 +1,11 @@
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import '../../../core/themes/app_theme.dart';
 import '../../../features/user/user_app/data/repositories_impl/user_image_repo_impl.dart';
@@ -23,19 +24,19 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
   bool _isPicking = false;
 
-  Future<String?> _cropImage(String path, {bool isPrimary = false}) async {
+  Future<String?> _cropImage(BuildContext context, String path, {bool isPrimary = false}) async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
       uiSettings: [
         AndroidUiSettings(
-          toolbarTitle: 'Crop Image',
+          toolbarTitle: AppLabels.cropImage(context),
           toolbarColor: AppTheme.lightTheme.primaryColor,
 
           toolbarWidgetColor: Colors.white,
           initAspectRatio: CropAspectRatioPreset.original,
           lockAspectRatio: false,
         ),
-        IOSUiSettings(title: 'Crop Image'),
+        IOSUiSettings(title: AppLabels.cropImage(context)),
       ],
     );
     return croppedFile?.path;
@@ -91,7 +92,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (image == null) return;
 
-      final croppedPath = await _cropImage(image.path, isPrimary: true);
+      final croppedPath = await _cropImage(context, image.path, isPrimary: true);
       if (croppedPath != null) {
         state = state.copyWith(primaryImage: croppedPath);
       }
@@ -112,7 +113,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       final List<String> croppedPaths = [];
       for (final img in images) {
-        final cropped = await _cropImage(img.path);
+        final cropped = await _cropImage(context, img.path);
         if (cropped != null) {
           croppedPaths.add(cropped);
         }
@@ -149,21 +150,21 @@ class ImagePickerController extends StateNotifier<ImagesState> {
   }
 
   // ☁️ Upload images
-  Future<void> uploadImages(String uid) async {
+  Future<void> uploadImages(BuildContext context, String uid) async {
     if (state.profileImage == null || state.profileImage!.isEmpty) {
-      throw Exception('Profile image is required');
+      throw Exception(AppLabels.profileImageRequired(context));
     }
     if (state.primaryImage == null || state.primaryImage!.isEmpty) {
-      throw Exception('Primary image is required');
+      throw Exception(AppLabels.primaryImageRequired(context));
     }
     if (state.imageWithAgentUrl == null || state.imageWithAgentUrl!.isEmpty) {
-      throw Exception('Image with agent is required');
+      throw Exception(AppLabels.imageWithAgentRequired(context));
     }
     if (state.secondaryImages.isEmpty) {
-      throw Exception('At least one gallery image is required');
+      throw Exception(AppLabels.atLeastOneGalleryImageRequired(context));
     }
     if (state.aadharPdfPath == null || state.aadharPdfPath!.isEmpty) {
-      throw Exception('Aadhar document is required');
+      throw Exception(AppLabels.aadharDocumentRequired(context));
     }
 
     try {
@@ -231,7 +232,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     }
   }
 
-  void pickImageWithAgent() async {
+  void pickImageWithAgent(BuildContext context) async {
     // Implementation for picking image with agent
     if (_isPicking) return;
     _isPicking = true;
@@ -241,7 +242,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (image == null) return;
 
-      final croppedPath = await _cropImage(image.path, isPrimary: false);
+      final croppedPath = await _cropImage(context, image.path, isPrimary: false);
       if (croppedPath != null) {
         state = state.copyWith(imageWithAgentUrl: croppedPath);
       }
@@ -264,7 +265,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (image == null) return;
 
-      final croppedPath = await _cropImage(image.path, isPrimary: true);
+      final croppedPath = await _cropImage(context, image.path, isPrimary: true);
 
       if (croppedPath != null) {
         state = state.copyWith(profileImage: croppedPath);
@@ -285,14 +286,14 @@ class ImagePickerController extends StateNotifier<ImagesState> {
             children: [
               ListTile(
                 leading: const Icon(Icons.camera_alt),
-                title: const Text('Camera'),
+                title: Text(AppLabels.camera(context)),
                 onTap: () {
                   Navigator.pop(context, ImageSource.camera);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: const Text('Gallery'),
+                title: Text(AppLabels.gallery(context)),
                 onTap: () {
                   Navigator.pop(context, ImageSource.gallery);
                 },

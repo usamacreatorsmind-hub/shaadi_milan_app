@@ -3,6 +3,7 @@ import '../../../../user/user_razorpay/domain/states/payment.dart';
 class AnalyticsState {
   final int totalRevenue;
   final int todayRevenue;
+  final double totalCommission;
 
   final int successCount;
   final int pendingCount;
@@ -27,6 +28,7 @@ class AnalyticsState {
   AnalyticsState({
     this.genderRevenue = const {},
     this.districtRevenue = const {},
+    this.totalCommission = 0.0,
     
 
     required this.maleRevenue,

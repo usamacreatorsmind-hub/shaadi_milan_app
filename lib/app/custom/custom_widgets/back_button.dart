@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 
 class BackButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -15,9 +17,8 @@ class BackButton extends StatelessWidget {
           color: Colors.grey.shade200,
           shape: BoxShape.circle,
         ),
-        child: Text("Back"),
+        child: Text(AppLabels.back(context)),
       ),
     );
   }
 }
-  

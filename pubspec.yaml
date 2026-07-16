@@ -71,7 +71,6 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   easy_stars: ^1.0.9
   dropdown_button2: ^3.1.0
-
   syncfusion_flutter_pdfviewer: ^33.2.10
   marquee: ^2.3.0
   carousel_slider: ^5.1.1
@@ -88,6 +87,8 @@ dependencies:
   upgrader: ^13.5.0
   firebase_remote_config: ^6.3.0
   package_info_plus: ^9.0.1
+  flutter_localizations:
+    sdk: flutter
   auto_route: ^11.1.0
 
 dev_dependencies:

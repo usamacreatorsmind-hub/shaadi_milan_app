@@ -2,11 +2,13 @@ import '../../../../../app/custom/custom_widgets/drawer.dart';
 import '../../../../../app/custom/custom_widgets/revenue_dashboard_tabbar.dart';
 import '../../../../../core/filters/revenue_filter_controller.dart';
 import '../../../../../core/filters/revenue_filter_right_sheet.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/states/analytics_state.dart';
 import '../notifier/analytics_provider.dart';
 import '../notifier/user_nofier.dart';
 import 'agen_profile.screen.dart';
 import '../../../../user/user_razorpay/domain/states/payment.dart';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
@@ -37,7 +39,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final analyticsAsync = ref.watch(analyticsProvider);
+    final analyticsAsync = ref.watch(analyticsProvider(widget.agentId));
 
     final theme = Theme.of(context);
 
@@ -55,7 +57,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
               headerSliverBuilder: (context, innerBoxIsScrolled) {
                 return [
                   SliverAppBar(
-                    title: const Text('Revenue Dashboard'),
+                    title: Text(AppLocalizations.of(context)!.revenueDashboard),
                     backgroundColor: theme.primaryColor,
                     foregroundColor: theme.colorScheme.onPrimary,
                     pinned: true,
@@ -162,7 +164,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            "Revenue by Gender",
+                                            AppLocalizations.of(context)!.revenueByGender,
                                             style: theme.textTheme.titleMedium
                                                 ?.copyWith(
                                                   fontWeight: FontWeight.bold,
@@ -260,7 +262,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            "Revenue by Religion",
+                                            AppLocalizations.of(context)!.revenueByReligion,
                                             style: theme.textTheme.titleMedium
                                                 ?.copyWith(
                                                   fontWeight: FontWeight.bold,
@@ -342,7 +344,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            "Revenue by Caste",
+                                            AppLocalizations.of(context)!.revenueByCaste,
 
                                             style: theme.textTheme.titleMedium
                                                 ?.copyWith(
@@ -498,7 +500,7 @@ class _RegionRevenueBarChart extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              "Region Revenue Distribution",
+              AppLocalizations.of(context)!.regionRevenueDistribution,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -602,7 +604,7 @@ class _TransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (payments.isEmpty) {
-      return const Center(child: Text("No transactions found"));
+      return Center(child: Text(AppLocalizations.of(context)!.noTransactionsFound));
     }
 
     return ListView.builder(
@@ -652,6 +654,15 @@ class _TransactionList extends StatelessWidget {
                     fontSize: 16,
                   ),
                 ),
+                if (payment.agentCommission > 0)
+                  Text(
+                    "${AppLocalizations.of(context)!.commission}: ₹${payment.agentCommission.toStringAsFixed(2)}",
+                    style: const TextStyle(
+                      color: Colors.orange,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 Text(
                   payment.status,
                   style: TextStyle(
@@ -706,10 +717,25 @@ class _RevenueRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        _RevenueCard('Total Revenue', analytics.totalRevenue),
-        const SizedBox(width: 12),
+        Row(
+          children: [
+            _RevenueCard(AppLocalizations.of(context)!.totalRevenue, '₹${analytics.totalRevenue}'),
+            const SizedBox(width: 12),
+            _RevenueCard(AppLocalizations.of(context)!.todayRevenue, '₹${analytics.todayRevenue}'),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            _RevenueCard(
+              AppLocalizations.of(context)!.yourCommission,
+              '₹${analytics.totalCommission.toStringAsFixed(2)}',
+              color: Colors.orange,
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -717,9 +743,10 @@ class _RevenueRow extends StatelessWidget {
 
 class _RevenueCard extends StatelessWidget {
   final String title;
-  final int value;
+  final String value;
+  final Color? color;
 
-  const _RevenueCard(this.title, this.value);
+  const _RevenueCard(this.title, this.value, {this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -740,10 +767,10 @@ class _RevenueCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                '₹ $value',
+                value,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.primaryColor,
+                  color: color ?? theme.primaryColor,
                 ),
               ),
             ],
@@ -753,6 +780,7 @@ class _RevenueCard extends StatelessWidget {
     );
   }
 }
+
 
 class _PaymentStatusPie extends StatelessWidget {
   final AnalyticsState analytics;
@@ -770,7 +798,7 @@ class _PaymentStatusPie extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              "Payment Status",
+              AppLocalizations.of(context)!.paymentStatus,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -824,11 +852,11 @@ class _PaymentStatusPie extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _LegendItem(color: Colors.green, text: 'Success'),
+                _LegendItem(color: Colors.green, text: AppLocalizations.of(context)!.success),
                 const SizedBox(width: 16),
-                _LegendItem(color: Colors.orange, text: 'Pending'),
+                _LegendItem(color: Colors.orange, text: AppLocalizations.of(context)!.pending),
                 const SizedBox(width: 16),
-                _LegendItem(color: Colors.red, text: 'Failed'),
+                _LegendItem(color: Colors.red, text: AppLocalizations.of(context)!.failed),
               ],
             ),
           ],
@@ -878,7 +906,7 @@ class _DailyRevenueChart extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              "Daily Revenue Trend",
+              AppLocalizations.of(context)!.dailyRevenueTrend,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),

@@ -8,7 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-
+ 
 class NotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   static AppRouter? _appRouter;

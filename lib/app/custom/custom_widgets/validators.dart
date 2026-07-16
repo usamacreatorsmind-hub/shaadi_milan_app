@@ -1,139 +1,143 @@
+import 'package:flutter/widgets.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
+
 class Validators {
-  static String? validateEmail(String? value) {
+  static String? validateEmail(BuildContext context, String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email is required';
+      return AppLabels.emailRequired(context);
     }
     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
     if (!emailRegex.hasMatch(value)) {
-      return 'Enter a valid email address';
+      return AppLabels.invalidEmail(context);
     }
     return null;
   }
 
   //  validat password with 8 char, symbol, and number
-  static String? validatePassword(String? value) {
+  static String? validatePassword(BuildContext context, String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password is required';
+      return AppLabels.passwordRequired(context);
     }
     if (value.length < 8) {
-      return 'Password must be at least 8 characters long';
+      return AppLabels.passwordTooShort(context);
     }
     if (!value.contains(RegExp(r'[A-Z]'))) {
-      return 'Password must contain at least one uppercase letter';
+      return AppLabels.passwordUppercase(context);
     }
     if (!value.contains(RegExp(r'[a-z]'))) {
-      return 'Password must contain at least one lowercase letter';
+      return AppLabels.passwordLowercase(context);
     }
     if (!value.contains(RegExp(r'[0-9]'))) {
-      return 'Password must contain at least one number';
+      return AppLabels.passwordNumber(context);
     }
     if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-      return 'Password must contain at least one special character';
+      return AppLabels.passwordSpecial(context);
     }
     return null;
   }
 
-  static String? validateConfirmPassword(String? value, String password) {
+  static String? validateConfirmPassword(BuildContext context, String? value, String password) {
     if (value == null || value.isEmpty) {
-      return 'Confirm password is required';
+      return AppLabels.confirmPasswordRequired(context);
     }
     if (value != password) {
-      return 'Passwords do not match';
+      return AppLabels.passwordsDoNotMatch(context);
     }
     return null;
   }
 
-  static String? validateName(String? value) {
+  static String? validateName(BuildContext context, String? value) {
     if (value == null || value.isEmpty) {
-      return 'Name is required';
+      return AppLabels.nameRequired(context);
     }
     if (value.length < 2) {
-      return 'Name must be at least 2 characters long';
+      return AppLabels.nameTooShort(context);
     }
     return null;
   }
 
-  static String? validatePhoneNumber(String? value) {
+  static String? validatePhoneNumber(BuildContext context, String? value) {
     if (value == null || value.isEmpty) {
-      return 'Phone number is required';
+      return AppLabels.phoneRequired(context);
     }
     final phoneRegex = RegExp(r'^[0-9]{10}$');
     if (!phoneRegex.hasMatch(value)) {
-      return 'Enter a valid 10-digit phone number';
+      return AppLabels.invalidPhone(context);
     }
     return null;
   }
 
-  static String? validateNotEmpty(String? value, String fieldName) {
+  static String? validateNotEmpty(BuildContext context, String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      return '$fieldName is required';
+      return '$fieldName ${AppLabels.isRequired(context)}';
     }
     return null;
   }
 
-  static String? validateAge(String? value) {
+  static String? validateAge(BuildContext context, String? value) {
     if (value == null || value.isEmpty) {
-      return 'Age is required';
+      return AppLabels.ageRequired(context);
     }
     final age = int.tryParse(value);
     if (age == null || age < 1 || age > 100) {
-      return 'Enter a valid age between 1 and 100';
+      return AppLabels.invalidAge(context);
     }
     return null;
   }
 
-  static String? validateNumber(String? value, String fieldName) {
+  static String? validateNumber(BuildContext context, String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      return '$fieldName is required';
+      return '$fieldName ${AppLabels.isRequired(context)}';
     }
     if (int.tryParse(value) == null) {
-      return '$fieldName must be a number';
+      return '$fieldName ${AppLabels.mustBeNumber(context)}';
     }
     return null;
   }
 
-  static String? validatePinCode(String? value) {
+  static String? validatePinCode(BuildContext context, String? value) {
     if (value == null || value.isEmpty) {
-      return 'PIN Code is required';
+      return AppLabels.pinCodeRequired(context);
     }
     final pinRegex = RegExp(r'^[0-9]{6}$');
     if (!pinRegex.hasMatch(value)) {
-      return 'Enter a valid 6-digit PIN Code';
+      return AppLabels.invalidPinCode(context);
     }
     return null;
   }
 
   // validete height in cm
-  static String? validateHeight(String? value) {
+  static String? validateHeight(BuildContext context, String? value) {
     if (value == null || value.isEmpty) {
-      return 'Height is required';
+      return AppLabels.heightRequired(context);
     }
     final height = int.tryParse(value);
     if (height == null || height < 30 || height > 250) {
-      return 'Enter a valid height in cm (e.g., 170)';
+      return AppLabels.invalidHeight(context);
     }
     return null;
   }
 
   // validat weight
-  static String? validateWeight(String? value) {
+  static String? validateWeight(BuildContext context, String? value) {
     if (value == null || value.isEmpty) {
-      return 'Weight is required';
+      return AppLabels.weightRequired(context);
     }
     final weight = int.tryParse(value);
     if (weight == null || weight < 1 || weight > 300) {
-      return 'Enter a valid weight in kg (e.g., 70)';
+      return AppLabels.invalidWeight(context);
     }
     return null;
   }
 
-  static String? validateAadhar(String? value) {
+  static String? validateAadhar(BuildContext context, String? value) {
     if (value == null || value.isEmpty) {
-      return 'Aadhar number is required';
+      return AppLabels.aadharRequired(context);
     }
     final aadharRegex = RegExp(r'^[0-9]{12}$');
     if (!aadharRegex.hasMatch(value)) {
-      return 'Enter a valid 12-digit Aadhar number';
+      return AppLabels.invalidAadhar(context);
     }
     return null;
   }

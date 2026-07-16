@@ -153,7 +153,7 @@ class AgentSupportTicketDetailScreen extends ConsumerWidget {
                 _buildInfoRow('User Name', ticket.userName),
                 _buildInfoRow('User Email', ticket.userEmail),
                 _buildInfoRow('User ID', ticket.userId),
-                _buildInfoRow('Agent ID', ticket.agentId),
+                _buildInfoRow('Staff Id', ticket.agentId),
 
                 _buildInfoRow('Priority', ticket.priority.displayName),
                 _buildInfoRow('Status', ticket.status.displayName),

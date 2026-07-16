@@ -1,4 +1,5 @@
 import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 
@@ -44,7 +45,7 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
       builder: (context, child) {
         final tabsRouter = AutoTabsRouter.of(context);
         final paymentState = ref.watch(paymentNotifierProvider(uid));
-        final isPaid = paymentState.status == PayStatus.success;
+        // final isPaid = paymentState.status == PayStatus.success;
 
         return Scaffold(
           body: child,
@@ -55,8 +56,8 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
               //
               // if (!isPaid) {
               //   ScaffoldMessenger.of(context).showSnackBar(
-              //     const SnackBar(
-              //       content: Text('Please subscribe to access this feature'),
+              //     SnackBar(
+              //       content: Text(AppConstants.pleaseSubscribe(context)),
               //       backgroundColor: Colors.red,
               //     ),
               //   );
@@ -68,26 +69,26 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
               tabsRouter.setActiveIndex(index);
             },
             type: BottomNavigationBarType.fixed,
-            items: const [
+            items: [
               BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
-                label: AppConstants.navHome,
+                icon: const Icon(Icons.home_outlined),
+                activeIcon: const Icon(Icons.home),
+                label: AppLabels.navHome(context),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.favorite_outline),
-                activeIcon: Icon(Icons.favorite),
-                label: AppConstants.navWishlist,
+                icon: const Icon(Icons.favorite_outline),
+                activeIcon: const Icon(Icons.favorite),
+                label: AppLabels.navWishlist(context),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.support_agent_outlined),
-                activeIcon: Icon(Icons.support_agent),
-                label: AppConstants.navSupport,
+                icon: const Icon(Icons.support_agent_outlined),
+                activeIcon: const Icon(Icons.support_agent),
+                label:  AppLabels.navSupport(context),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
-                label: AppConstants.navProfile,
+                icon: const Icon(Icons.person_outline),
+                activeIcon: const Icon(Icons.person),
+                label: AppLabels.navProfile(context),
               ),
             ],
           ),

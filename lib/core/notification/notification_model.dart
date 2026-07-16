@@ -125,7 +125,7 @@ class NotificationModel {
   /// Get target user ID if applicable
   String? get targetUserId => data['userId'] as String?;
 
-  /// Get target agent ID if applicable
+  /// Get target Staff Id if applicable
   String? get targetAgentId => data['agentId'] as String?;
 
   /// Get payment ID if applicable

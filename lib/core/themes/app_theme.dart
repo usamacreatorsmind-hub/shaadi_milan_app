@@ -1,9 +1,10 @@
-import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+ 
 
 class AppTheme {
-  static const Color primaryRed = Color(AppConstants.primaryRedHex); // Deep Wedding Red
-  static const Color accentRed = Color(AppConstants.accentRedHex); // Bright Red
+  static   Color primaryRed = Color(AppConstants.primaryRedHex); // Deep Wedding Red
+  static   Color accentRed = Color(AppConstants.accentRedHex); // Bright Red
 
   // -------------------- LIGHT THEME --------------------
   static ThemeData get lightTheme {
@@ -120,17 +121,17 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: primaryRed),
+          borderSide: BorderSide(color: primaryRed),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: primaryRed, width: 2),
+          borderSide:   BorderSide(color: primaryRed, width: 2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: Colors.grey.shade400),
         ),
-        labelStyle: const TextStyle(color: primaryRed),
+        labelStyle:   TextStyle(color: primaryRed),
         hintStyle: TextStyle(color: Colors.grey.shade600),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         contentPadding: const EdgeInsets.symmetric(
@@ -169,7 +170,7 @@ class AppTheme {
           Set<WidgetState> states,
         ) {
           if (states.contains(WidgetState.selected)) {
-            return primaryRed.withOpacity(0.5);
+            return primaryRed.withValues(alpha: 0.5);
           }
           return null; // Use default color
         }),
@@ -216,7 +217,7 @@ class AppTheme {
       // Add a custom theme for the text selection
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: primaryRed,
-        selectionColor: primaryRed.withOpacity(0.3),
+        selectionColor: primaryRed.withValues(alpha: 0.3),
         selectionHandleColor: primaryRed,
       ),
 
@@ -228,7 +229,7 @@ class AppTheme {
         dayForegroundColor: WidgetStateProperty.all(Colors.black87),
         yearForegroundColor: WidgetStateProperty.all(Colors.black87),
         todayBackgroundColor: WidgetStateProperty.all(
-          primaryRed.withOpacity(0.2),
+          primaryRed.withValues(alpha: 0.2),
         ),
         todayForegroundColor: WidgetStateProperty.all(primaryRed),
         confirmButtonStyle: TextButton.styleFrom(foregroundColor: primaryRed),
@@ -267,7 +268,7 @@ class AppTheme {
           backgroundColor: accentRed,
           foregroundColor: Colors.white,
           elevation: 3,
-          shadowColor: accentRed.withOpacity(0.3),
+          shadowColor: accentRed.withValues(alpha: 0.3),
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -331,7 +332,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: card,
         elevation: 4,
-        shadowColor: Colors.black.withOpacity(0.4),
+        shadowColor: Colors.black.withValues(alpha: 0.4),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
 
@@ -365,7 +366,7 @@ class AppTheme {
       iconTheme: const IconThemeData(color: Colors.white70),
 
       dividerTheme: DividerThemeData(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withValues(alpha: 0.08),
         thickness: 1,
       ),
     );

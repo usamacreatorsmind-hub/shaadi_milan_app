@@ -1,10 +1,8 @@
 import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/app/custom/custom_widgets/validators.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/core/notification/notification_service.dart';
-import 'package:shadi_milan/features/auth/data/repositories_impl/data_source/firebase_auth_ds.dart';
 import 'package:shadi_milan/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
-import 'package:shadi_milan/features/user/user_razorpay/data/firestore/payment_firestore.dart';
-import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -56,12 +54,11 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     if (nameCtrl.text.isEmpty ||
         emailCtrl.text.isEmpty ||
         phoneCtrl.text.isEmpty ||
-        // agentIdCtrl.text.isEmpty ||
         pwCtrl.text.isEmpty ||
         confirmPwCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please fill all fields"),
+        SnackBar(
+          content: Text(AppLabels.fillAllFields(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -70,8 +67,8 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
 
     if (pwCtrl.text != confirmPwCtrl.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Passwords do not match"),
+        SnackBar(
+          content: Text(AppLabels.passwordsDoNotMatch(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -82,14 +79,9 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
 
     final authRepo = ref.watch(authRepositoryProvider);
 
-    // 2️⃣ check if agent exists
-    // 2️⃣ check if agent exists
-
     final agentId = agentIdCtrl.text.trim();
     final firestore = ref.read(agentFirestoreDsProvider);
     bool agentExists = false;
-
-    // check if phone is registered
 
     if (agentId.isNotEmpty) {
       try {
@@ -101,7 +93,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error checking agent ID: $e'),
+            content: Text('Error checking Staff Id: $e'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -114,9 +106,9 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Agent ID does not exist. Please check the ID or leave it blank.',
+            'Staff Id does not exist. Please check the ID or leave it blank.',
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -182,7 +174,6 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
 
       final user = authRepo.currentUser;
       if (user != null) {
-        // Invalidate auth state to ensure latest data is loaded
         ref.invalidate(authStateProvider);
         await Future.delayed(const Duration(milliseconds: 500));
         if (!mounted) return;
@@ -200,16 +191,15 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
           message = "An account with this email already exists.";
           break;
         case 'invalid-email':
-          message = "Invalid email address.";
+          message = AppLabels.invalidEmail(context);
           break;
         case 'weak-password':
           message = "Password is too weak.";
           break;
         case 'network-request-failed':
-          message = "No internet connection.";
+          message = AppLabels.noInternet(context);
           break;
         default:
-          message = "Registration failed. Try again later.";
           message = e.toString();
       }
 
@@ -219,8 +209,8 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Something went wrong."),
+        SnackBar(
+          content: Text(AppLabels.somethingWentWrong(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -234,7 +224,6 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      // Matching the consistent premium background
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -251,7 +240,6 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             child: Column(
               children: [
-                /// 🔙 Header with Back Button
                 Row(
                   children: [
                     IconButton(
@@ -269,7 +257,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                 const SizedBox(height: 20),
 
                 Text(
-                  "Create Account",
+                  AppLabels.createAccount(context),
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -277,13 +265,12 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Join ${AppConstants.appName} today",
+                  "${AppLabels.joinToday(context)}",
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 15),
                 ),
 
                 const SizedBox(height: 30),
 
-                /// 📝 Registration Card
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -306,7 +293,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                           obscureText: false,
                           controller: nameCtrl,
                           prefixIcon: Icons.person_outline_rounded,
-                          label: "Full Name",
+                          label: AppLabels.fullName(context),
                           hint: "John Doe",
                           keyboardType: TextInputType.name,
                         ),
@@ -315,7 +302,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                           autofillHints: const [AutofillHints.email],
                           controller: emailCtrl,
                           prefixIcon: Icons.alternate_email_rounded,
-                          label: "Email",
+                          label: AppLabels.email(context),
                           hint: "example@mail.com",
                           keyboardType: TextInputType.emailAddress,
                           iconColor: theme.colorScheme.primary,
@@ -328,7 +315,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           validator: (value) =>
-                              Validators.validatePhoneNumber(value),
+                              Validators.validatePhoneNumber(context, value),
                           showWordCount: true,
 
                           counterType: CounterType.characters,
@@ -337,7 +324,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                           maxLimit: 10,
 
                           prefixIcon: Icons.phone_android_rounded,
-                          label: "Phone",
+                          label: AppLabels.phone(context),
                           hint: "1234 567 890",
                           keyboardType: TextInputType.phone,
                           obscureText: false,
@@ -349,12 +336,12 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                           obscureText: true,
                           iconColor: theme.colorScheme.primary,
                           validator: (value) =>
-                              Validators.validatePassword(value),
+                              Validators.validatePassword(context, value),
 
                           controller: pwCtrl,
                           prefixIcon: Icons.lock_outline_rounded,
-                          label: "Password",
-                          hint: "••••••••",
+                          label: AppLabels.password(context),
+                          hint: AppLabels.passwordHint(context),
                           keyboardType: TextInputType.visiblePassword,
                         ),
                         const SizedBox(height: 16),
@@ -366,25 +353,25 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                           iconColor: theme.colorScheme.primary,
                           validator: (value) =>
                               Validators.validateConfirmPassword(
+                                context,
                                 value,
                                 pwCtrl.text,
                               ),
 
                           prefixIcon: Icons.verified_user_outlined,
-                          label: "Confirm Password",
-                          hint: "••••••••",
+                          label: AppLabels.confirmPassword(context),
+                          hint: AppLabels.passwordHint(context),
 
                           keyboardType: TextInputType.visiblePassword,
                         ),
 
-                        // create gender
                         const SizedBox(height: 16),
                         AppTextField(
                           autofillHints: const [AutofillHints.newPassword],
                           controller: agentIdCtrl,
                           prefixIcon: Icons.verified_user_outlined,
-                          label: "Agent Id  ",
-                          hint: "optinal",
+                          label: AppLabels.staffId(context),
+                          hint: AppLabels.optional(context),
                           obscureText: false,
                           keyboardType: TextInputType.visiblePassword,
                           iconColor: theme.colorScheme.primary,
@@ -393,17 +380,17 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            genderCard(context, "Male", "male", ref),
-                            Spacer(),
-                            genderCard(context, "Female", "female", ref),
+                            genderCard(context, AppLabels.male(context), "male", ref),
+                            const Spacer(),
+                            genderCard(context, AppLabels.female(context), "female", ref),
                           ],
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         SizedBox(
                           width: double.infinity,
                           height: 56,
                           child: AppButton(
-                            text: isLoading ? "Registering..." : "Register",
+                            text: isLoading ? AppLabels.registering(context) : AppLabels.register(context),
                             onPressed: () => _register(context),
                           ),
                         ),
@@ -414,19 +401,18 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
 
                 const SizedBox(height: 24),
 
-                /// 🔗 Footer
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Already a member?",
+                      AppLabels.alreadyAMember(context),
                       style: TextStyle(color: Colors.grey.shade600),
                     ),
                     TextButton(
                       onPressed: () => context.router.back(),
-                      child: const Text(
-                        "Login Now",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      child: Text(
+                        AppLabels.loginNow(context),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],

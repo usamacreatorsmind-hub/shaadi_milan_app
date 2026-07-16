@@ -34,7 +34,7 @@ class AgentFirestoreDs {
     return docId;
   }
 
-  // fetch AgentEntity using agent id
+  // fetch AgentEntity using Staff Id
   Future<AgentEntity> fetchAgentByUid(String agentId) async {
     final querySnapshot = await _firestore
         .collection(_collection)
@@ -50,7 +50,7 @@ class AgentFirestoreDs {
     return querySnapshot;
   }
 
-  // fetch agent doumetn using agent id
+  // fetch agent doumetn using Staff Id
   Future<AgentEntity> fetchAgentbyAgentId(String agentId) async {
     final querySnapshot = await _firestore
         .collection(_collection)

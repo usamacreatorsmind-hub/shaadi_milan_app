@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import 'image_picker_controller.dart';
 
@@ -17,14 +19,14 @@ class ExpandableImagePickerList extends ConsumerWidget {
       children: [
         // ================= MATRIMONY IMAGE =================
         _ExpandableTile(
-          title: "Profile Image",
+          title: AppLabels.profileImage(context),
           isSelected: state.profileImage != null,
           onTapPick: () => controller.pickProfileImage(context),
 
           child: _profileImagePreview(state.profileImage),
         ),
         _ExpandableTile(
-          title: 'Matrimony Image',
+          title: AppLabels.matrimonyImage(context),
           isSelected: state.primaryImage != null,
           onTapPick: () => controller.pickPrimaryImage(context),
           child: _singleImagePreview(state.primaryImage),
@@ -32,15 +34,15 @@ class ExpandableImagePickerList extends ConsumerWidget {
 
         // ================= AGENT IMAGE =================
         _ExpandableTile(
-          title: 'Image with Agent',
+          title: AppLabels.imageWithAgent(context),
           isSelected: state.imageWithAgentUrl != null,
-          onTapPick: controller.pickImageWithAgent,
+          onTapPick: () => controller.pickImageWithAgent(context),
           child: _singleImagePreview(state.imageWithAgentUrl),
         ),
 
         // ================= GALLERY =================
         _ExpandableTile(
-          title: 'Gallery Images',
+          title: AppLabels.galleryImages(context),
           isSelected: state.secondaryImages.isNotEmpty,
           onTapPick: () => controller.pickSecondaryImages(context),
           child: _galleryPreview(
@@ -51,7 +53,7 @@ class ExpandableImagePickerList extends ConsumerWidget {
 
         // ================= AADHAR =================
         _ExpandableTile(
-          title: 'Aadhar Document',
+          title: AppLabels.aadharDocument(context),
           isSelected: state.aadharPdfPath != null,
           onTapPick: controller.pickAadharImages,
           child: _aadharPreview(state.aadharPdfPath),

@@ -2,18 +2,36 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
+enum AgentDesignation {
+  staff('staff', 'Staff'),
+  fieldManager('field_manager', 'Field Manager'),
+  areaManager('area_manager', 'Area Manager');
+
+  final String value;
+  final String label;
+  const AgentDesignation(this.value, this.label);
+
+  static AgentDesignation fromString(String? value) {
+    return AgentDesignation.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => AgentDesignation.staff,
+    );
+  }
+}
+
 class AgentEntity {
   // 🔹 Auth / Role
   final String uid;
   final String role;
   final String agentEmail;
 
-  // 🔹 Agent Identity
+  // 🔹 Staff Identity
   final String agentId;
   final String agentName;
   final String agentAadhar;
   final String agentLicenseNumber;
   final String agentMobile;
+  final AgentDesignation designation;
 
   // 🔹 Address
   final String agentAddress;
@@ -40,6 +58,7 @@ class AgentEntity {
     required this.agentAadhar,
     required this.agentLicenseNumber,
     required this.agentMobile,
+    required this.designation,
     required this.agentAddress,
     required this.agentCity,
     required this.agentState,
@@ -48,7 +67,6 @@ class AgentEntity {
     required this.isRejected,
     required this.registrationDate,
     required this.profileImageUrl,
-
     required this.primaryImageUrl,
     required this.aadharUrl,
   });
@@ -64,6 +82,7 @@ class AgentEntity {
       agentAadhar: '',
       agentLicenseNumber: '',
       agentMobile: '',
+      designation: AgentDesignation.staff,
       agentAddress: '',
       agentCity: '',
       agentState: '',
@@ -88,6 +107,7 @@ class AgentEntity {
       'agentAadhar': agentAadhar,
       'agentLicenseNumber': agentLicenseNumber,
       'agentMobile': agentMobile,
+      'designation': designation.value,
       'agentAddress': agentAddress,
       'agentCity': agentCity,
       'agentState': agentState,
@@ -96,7 +116,6 @@ class AgentEntity {
       'isRejected': isRejected,
       'registrationDate': Timestamp.fromDate(registrationDate),
       'profileImageUrl': profileImageUrl,
-
       'primaryImageUrl': primaryImageUrl,
       'aadharUrl': aadharUrl,
     };
@@ -125,6 +144,7 @@ class AgentEntity {
       agentAadhar: map['agentAadhar'] ?? '',
       agentLicenseNumber: map['agentLicenseNumber'] ?? '',
       agentMobile: map['agentMobile'] ?? '',
+      designation: AgentDesignation.fromString(map['designation']),
       agentAddress: map['agentAddress'] ?? '',
       agentCity: map['agentCity'] ?? '',
       agentState: map['agentState'] ?? '',
@@ -132,7 +152,6 @@ class AgentEntity {
       isApproved: map['isApproved'] ?? false,
       isRejected: map['isRejected'] ?? false,
       registrationDate: parseDate(map['registrationDate']),
-
       profileImageUrl: map['profileImageUrl'] ?? '',
       primaryImageUrl: map['primaryImageUrl'] ?? '',
       aadharUrl: map['aadharUrl'] ?? '',
@@ -155,6 +174,7 @@ class AgentEntity {
     String? agentAadhar,
     String? agentLicenseNumber,
     String? agentMobile,
+    AgentDesignation? designation,
     String? agentAddress,
     String? agentCity,
     String? agentState,
@@ -162,7 +182,6 @@ class AgentEntity {
     bool? isApproved,
     bool? isRejected,
     DateTime? registrationDate,
-
     String? profileImageUrl,
     String? primaryImageUrl,
     String? aadharUrl,
@@ -176,6 +195,7 @@ class AgentEntity {
       agentAadhar: agentAadhar ?? this.agentAadhar,
       agentLicenseNumber: agentLicenseNumber ?? this.agentLicenseNumber,
       agentMobile: agentMobile ?? this.agentMobile,
+      designation: designation ?? this.designation,
       agentAddress: agentAddress ?? this.agentAddress,
       agentCity: agentCity ?? this.agentCity,
       agentState: agentState ?? this.agentState,
@@ -189,10 +209,36 @@ class AgentEntity {
     );
   }
 
+  /// ---------------- COMPENSATION LOGIC ----------------
+  bool get isEligibleForCommission {
+    // Staff always gets commission as per "Salary + Commission"
+    if (designation == AgentDesignation.staff) return true;
+
+    // For Managers, commission starts after 3 months (approx 90 days)
+    final threeMonthsAfterJoining = registrationDate.add(const Duration(days: 90));
+    return DateTime.now().isAfter(threeMonthsAfterJoining);
+  }
+
+  double get commissionRate {
+    switch (designation) {
+      case AgentDesignation.staff:
+        // Staff commission not explicitly specified in %, using a placeholder or default if needed
+        return 0.05; // Example: 5%
+      case AgentDesignation.fieldManager:
+        return isEligibleForCommission ? 0.20 : 0.0;
+      case AgentDesignation.areaManager:
+        return isEligibleForCommission ? 0.05 : 0.0;
+    }
+  }
+
+  double calculateCommission(double totalRevenue) {
+    return totalRevenue * commissionRate;
+  }
+
   /// ---------------- OVERRIDES ----------------
   @override
   String toString() {
-    return 'AgentEntity(agentId: $agentId, name: $agentName, approved: $isApproved)';
+    return 'AgentEntity(agentId: $agentId, name: $agentName, designation: ${designation.label}, approved: $isApproved)';
   }
 
   @override
@@ -208,6 +254,7 @@ class AgentEntity {
         other.agentAadhar == agentAadhar &&
         other.agentLicenseNumber == agentLicenseNumber &&
         other.agentMobile == agentMobile &&
+        other.designation == designation &&
         other.agentAddress == agentAddress &&
         other.agentCity == agentCity &&
         other.agentState == agentState &&
@@ -230,6 +277,7 @@ class AgentEntity {
         agentAadhar.hashCode ^
         agentLicenseNumber.hashCode ^
         agentMobile.hashCode ^
+        designation.hashCode ^
         agentAddress.hashCode ^
         agentCity.hashCode ^
         agentState.hashCode ^
@@ -242,6 +290,7 @@ class AgentEntity {
         aadharUrl.hashCode;
   }
 }
+
 
 class AgentState {
   final AgentEntity? agentEntity;

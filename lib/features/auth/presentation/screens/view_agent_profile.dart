@@ -39,7 +39,7 @@ class ViewAgentProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 Text(agent.agentName),
-                _info('Agent ID', agent.agentId),
+                _info('Staff Id', agent.agentId),
                 _info('Email', agent.agentEmail),
                 _info('Phone', agent.agentMobile),
                 _info('Address', agent.agentAddress),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import '../../features/agent/agent_app/presentation/screens/agent_users_screen.dart';
 import '../../features/user/user_app/domain/states/state_city.dart';
@@ -17,7 +19,7 @@ void showClientFilterSheet(BuildContext context) {
   showGeneralDialog(
     context: context,
     barrierDismissible: true,
-    barrierLabel: 'Client Filter',
+    barrierLabel: AppLabels.filterClients(context),
     barrierColor: Colors.black54,
     transitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (context, animation, secondaryAnimation) => const ClientFilterRightSheet(),
@@ -69,9 +71,9 @@ class ClientFilterRightSheet extends ConsumerWidget {
                             size: 22,
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Filter Clients',
-                            style: TextStyle(
+                          Text(
+                            AppLabels.filterClients(context),
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
@@ -84,7 +86,7 @@ class ClientFilterRightSheet extends ConsumerWidget {
                             TextButton(
                               onPressed: () => notifier.reset(),
                               child: Text(
-                                'Reset',
+                                AppLabels.reset(context),
                                 style: TextStyle(color: theme.primaryColor),
                               ),
                             ),
@@ -112,7 +114,7 @@ class ClientFilterRightSheet extends ConsumerWidget {
                         ),
                       ),
                       child: Text(
-                        '${filter.activeFilterCount} filter${filter.activeFilterCount > 1 ? 's' : ''} active',
+                        '${filter.activeFilterCount} ${filter.activeFilterCount > 1 ? AppLabels.filters(context) : AppLabels.filter(context)} ${AppLabels.active(context)}',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -132,7 +134,7 @@ class ClientFilterRightSheet extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // ══ LOCATION ═════════════════════════
-                          _sectionLabel('Location'),
+                          _sectionLabel(AppLabels.location(context)),
                           const SizedBox(height: 10),
                           _LocationSection(
                             selectedState: filter.state,
@@ -147,7 +149,7 @@ class ClientFilterRightSheet extends ConsumerWidget {
                           const SizedBox(height: 24),
 
                           // ══ RELIGION & CASTE ═════════════════
-                          _sectionLabel('Religion & Caste'),
+                          _sectionLabel(AppLabels.religionAndCaste(context)),
                           const SizedBox(height: 10),
                           _CulturalSection(
                             selectedReligion: filter.religion,
@@ -162,7 +164,7 @@ class ClientFilterRightSheet extends ConsumerWidget {
                           const SizedBox(height: 24),
 
                           // ══ MY CLIENTS ONLY TOGGLE ══════════
-                          _sectionLabel('Scope'),
+                          _sectionLabel(AppLabels.scope(context)),
                           const SizedBox(height: 8),
                           _MyClientsTile(
                             value: filter.myClientsOnly,
@@ -171,15 +173,15 @@ class ClientFilterRightSheet extends ConsumerWidget {
                           const SizedBox(height: 24),
 
                           // ══ GENDER ═══════════════════════════
-                          _sectionLabel('Gender'),
+                          _sectionLabel(AppLabels.gender(context)),
                           const SizedBox(height: 10),
                           _SegmentGroup<GenderFilter>(
-                            options: const [
-                              _SegOpt(GenderFilter.all, 'All', Icons.people),
-                              _SegOpt(GenderFilter.male, 'Male', Icons.male),
+                            options: [
+                              _SegOpt(GenderFilter.all, AppLabels.all(context), Icons.people),
+                              _SegOpt(GenderFilter.male, AppLabels.male(context), Icons.male),
                               _SegOpt(
                                 GenderFilter.female,
-                                'Female',
+                                AppLabels.female(context),
                                 Icons.female,
                               ),
                             ],
@@ -189,44 +191,44 @@ class ClientFilterRightSheet extends ConsumerWidget {
                           const SizedBox(height: 24),
 
                           // ══ PAYMENT STATUS ════════════════════
-                          _sectionLabel('Payment Status'),
+                          _sectionLabel(AppLabels.paymentStatus(context)),
                           const SizedBox(height: 10),
                           _buildDropdown(
                             context: context,
-                            title: 'Payment',
-                            value: _paymentLabel(filter.paymentStatus),
-                            items: const [
-                              'All',
-                              'Paid',
-                              'Pending',
-                              'Not Started',
+                            title: AppLabels.payment(context),
+                            value: _paymentLabel(context, filter.paymentStatus),
+                            items: [
+                              AppLabels.all(context),
+                              AppLabels.paid(context),
+                              AppLabels.pending(context),
+                              AppLabels.notStarted(context),
                             ],
                             onChanged: (val) {
                               notifier.setPaymentStatus(
-                                _paymentFromLabel(val),
+                                _paymentFromLabel(context, val),
                               );
                             },
                           ),
                           const SizedBox(height: 24),
 
                           // ══ PROFILE STATUS ════════════════════
-                          _sectionLabel('Profile Status'),
+                          _sectionLabel(AppLabels.profileStatus(context)),
                           const SizedBox(height: 10),
                           _SegmentGroup<ProfileStatusFilter>(
-                            options: const [
+                            options: [
                               _SegOpt(
                                 ProfileStatusFilter.all,
-                                'All',
+                                AppLabels.all(context),
                                 Icons.remove_circle_outline,
                               ),
                               _SegOpt(
                                 ProfileStatusFilter.active,
-                                'Active',
+                                AppLabels.active(context),
                                 Icons.check_circle_outline,
                               ),
                               _SegOpt(
                                 ProfileStatusFilter.closed,
-                                'Closed',
+                                AppLabels.closed(context),
                                 Icons.cancel_outlined,
                               ),
                             ],
@@ -236,23 +238,23 @@ class ClientFilterRightSheet extends ConsumerWidget {
                           const SizedBox(height: 24),
 
                           // ══ MATRIMONY PROFILE ═════════════════
-                          _sectionLabel('Matrimony Profile'),
+                          _sectionLabel(AppLabels.matrimonyProfile(context)),
                           const SizedBox(height: 10),
                           _SegmentGroup<ProfileCreatedFilter>(
-                            options: const [
+                            options: [
                               _SegOpt(
                                 ProfileCreatedFilter.all,
-                                'All',
+                                AppLabels.all(context),
                                 Icons.remove_circle_outline,
                               ),
                               _SegOpt(
                                 ProfileCreatedFilter.created,
-                                'Created',
+                                AppLabels.created(context),
                                 Icons.person,
                               ),
                               _SegOpt(
                                 ProfileCreatedFilter.notCreated,
-                                'Pending',
+                                AppLabels.notCreated(context),
                                 Icons.person_off_outlined,
                               ),
                             ],
@@ -281,8 +283,8 @@ class ClientFilterRightSheet extends ConsumerWidget {
                       ),
                       child: Text(
                         filter.isDefault
-                            ? 'Apply'
-                            : 'Apply  •  ${filter.activeFilterCount} active',
+                            ? AppLabels.apply(context)
+                            : '${AppLabels.apply(context)}  •  ${filter.activeFilterCount} ${AppLabels.active(context)}',
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -338,30 +340,24 @@ class ClientFilterRightSheet extends ConsumerWidget {
   }
 
   // ─── PAYMENT LABEL HELPERS ─────────────────────────────
-  static String _paymentLabel(PaymentStatusFilter f) {
+  static String _paymentLabel(BuildContext context, PaymentStatusFilter f) {
     switch (f) {
       case PaymentStatusFilter.paid:
-        return 'Paid';
+        return AppLabels.paid(context);
       case PaymentStatusFilter.pending:
-        return 'Pending';
+        return AppLabels.pending(context);
       case PaymentStatusFilter.notStarted:
-        return 'Not Started';
+        return AppLabels.notStarted(context);
       default:
-        return 'All';
+        return AppLabels.all(context);
     }
   }
 
-  static PaymentStatusFilter _paymentFromLabel(String? label) {
-    switch (label) {
-      case 'Paid':
-        return PaymentStatusFilter.paid;
-      case 'Pending':
-        return PaymentStatusFilter.pending;
-      case 'Not Started':
-        return PaymentStatusFilter.notStarted;
-      default:
-        return PaymentStatusFilter.all;
-    }
+  static PaymentStatusFilter _paymentFromLabel(BuildContext context, String? label) {
+    if (label == AppLabels.paid(context)) return PaymentStatusFilter.paid;
+    if (label == AppLabels.pending(context)) return PaymentStatusFilter.pending;
+    if (label == AppLabels.notStarted(context)) return PaymentStatusFilter.notStarted;
+    return PaymentStatusFilter.all;
   }
 }
 
@@ -389,7 +385,7 @@ class _LocationSection extends ConsumerWidget {
     return locationAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Text(
-        'Could not load locations: $e',
+        '${AppLabels.couldNotLoadLocations(context)}: $e',
         style: const TextStyle(color: Colors.red, fontSize: 12),
       ),
       data: (states) {
@@ -407,17 +403,17 @@ class _LocationSection extends ConsumerWidget {
             // ── STATE ──────────────────────────────────
             DropdownButtonFormField<String>(
               value: selectedState.isEmpty ? null : selectedState,
-              hint: const Text('Select State'),
+              hint: Text(AppLabels.selectState(context)),
               isExpanded: true,
               items: [
-                const DropdownMenuItem(value: '', child: Text('All States')),
+                DropdownMenuItem(value: '', child: Text(AppLabels.allStates(context))),
                 ...stateNames.map(
                   (s) => DropdownMenuItem(value: s, child: Text(s)),
                 ),
               ],
               onChanged: onStateChanged,
               decoration: InputDecoration(
-                labelText: 'State',
+                labelText: AppLabels.state(context),
                 prefixIcon: const Icon(Icons.location_on_outlined, size: 18),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -433,21 +429,21 @@ class _LocationSection extends ConsumerWidget {
             // ── CITY / DISTRICT ────────────────────────
             DropdownButtonFormField<String>(
               value: selectedCity.isEmpty ? null : selectedCity,
-              hint: const Text('Select City / District'),
+              hint: Text(AppLabels.selectCityDistrict(context)),
               isExpanded: true,
               // disable city picker until a state is chosen
               onChanged: selectedState.isEmpty ? null : onCityChanged,
               items: [
-                const DropdownMenuItem(
+                DropdownMenuItem(
                   value: '',
-                  child: Text('All Cities'),
+                  child: Text(AppLabels.allCities(context)),
                 ),
                 ...cityNames.map(
                   (c) => DropdownMenuItem(value: c, child: Text(c)),
                 ),
               ],
               decoration: InputDecoration(
-                labelText: 'City / District',
+                labelText: AppLabels.cityDistrict(context),
                 prefixIcon: const Icon(
                   Icons.location_city_outlined,
                   size: 18,
@@ -492,7 +488,7 @@ class _CulturalSection extends ConsumerWidget {
     return religionsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Text(
-        'Could not load religions: $e',
+        '${AppLabels.couldNotLoadReligions(context)}: $e',
         style: const TextStyle(color: Colors.red, fontSize: 12),
       ),
       data: (religions) {
@@ -510,17 +506,17 @@ class _CulturalSection extends ConsumerWidget {
             // ── RELIGION ───────────────────────────────
             DropdownButtonFormField<String>(
               value: selectedReligion.isEmpty ? null : selectedReligion,
-              hint: const Text('Select Religion'),
+              hint: Text(AppLabels.selectReligion(context)),
               isExpanded: true,
               items: [
-                const DropdownMenuItem(value: '', child: Text('All Religions')),
+                DropdownMenuItem(value: '', child: Text(AppLabels.allReligions(context))),
                 ...religionNames.map(
                   (r) => DropdownMenuItem(value: r, child: Text(r)),
                 ),
               ],
               onChanged: onReligionChanged,
               decoration: InputDecoration(
-                labelText: 'Religion',
+                labelText: AppLabels.religion(context),
                 prefixIcon: const Icon(Icons.temple_hindu_outlined, size: 18),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -536,18 +532,18 @@ class _CulturalSection extends ConsumerWidget {
             // ── CASTE ──────────────────────────────────
             DropdownButtonFormField<String>(
               value: selectedCaste.isEmpty ? null : selectedCaste,
-              hint: const Text('Select Caste'),
+              hint: Text(AppLabels.selectCaste(context)),
               isExpanded: true,
               // disable caste picker until a religion is chosen
               onChanged: selectedReligion.isEmpty ? null : onCasteChanged,
               items: [
-                const DropdownMenuItem(value: '', child: Text('All Castes')),
+                DropdownMenuItem(value: '', child: Text(AppLabels.allCastes(context))),
                 ...casteNames.map(
                   (c) => DropdownMenuItem(value: c, child: Text(c)),
                 ),
               ],
               decoration: InputDecoration(
-                labelText: 'Caste',
+                labelText: AppLabels.caste(context),
                 prefixIcon: const Icon(Icons.people_alt_outlined, size: 18),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -613,7 +609,7 @@ class _MyClientsTile extends StatelessWidget {
           ),
         ),
         title: Text(
-          'My Clients Only',
+          AppLabels.myClientsOnly(context),
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 14,
@@ -621,7 +617,7 @@ class _MyClientsTile extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          value ? 'Assigned to you only' : 'All agents',
+          value ? AppLabels.assignedToYouOnly(context) : AppLabels.allAgents(context),
           style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
         ),
         value: value,

@@ -1,3 +1,4 @@
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'home_filter_state.dart';
@@ -11,7 +12,7 @@ final homeFilterProvider =
     );
 
 class HomeFilterController extends StateNotifier<HomeFilterState> {
-  HomeFilterController() : super(const HomeFilterState());
+  HomeFilterController() : super(   HomeFilterState());
 
   void updateState(String value) {
     // reset city when state changes

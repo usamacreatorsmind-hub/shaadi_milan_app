@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../core/enums/enum.dart';
 import '../../domain/states/cultural_state.dart';
@@ -74,7 +75,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
       if (manual.isEmpty) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Please enter caste')));
+        ).showSnackBar(SnackBar(content: Text(AppLabels.pleaseSelectCaste(context))));
         return;
       }
       caste = manual;
@@ -116,18 +117,17 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
           current.error == null &&
           previous?.isLoading == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cultural details saved successfully')),
+          SnackBar(content: Text(AppLabels.culturalDetailsSavedSuccessfully(context))),
         );
       }
     });
-
-    return Scaffold(
+ return  Scaffold(
       appBar: AppBar(
         title: Text(
           style: Theme.of(context).textTheme.headlineMedium,
           widget.mode == FormMode.create
-              ? 'Add Cultural Details'
-              : 'Edit Cultural Details',
+              ? AppLabels.addCulturalDetails(context)
+              : AppLabels.editCulturalDetails(context),
         ),
       ),
       body: Padding(
@@ -146,7 +146,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
 
                   return religionsAsyncValue.when(
                     data: (religions) => AppDropDown(
-                      label: "Religion",
+                      label: AppLabels.religion(context),
                       items: religions.map((r) => r.name).toList(),
                       value: religionState.religion.isEmpty
                           ? null
@@ -162,7 +162,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                         }
                       },
                       validator: (value) => value == null || value.isEmpty
-                          ? 'Please select a religion'
+                          ? AppLabels.pleaseSelectReligion(context)
                           : null,
                     ),
                     loading: () => const CircularProgressIndicator(),
@@ -189,7 +189,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                   return castesAsyncValue.when(
                     data: (castes) {
                       return AppDropDown(
-                        label: "Caste",
+                        label: AppLabels.caste(context),
                         items: castes,
                         value: religionState.caste.isEmpty
                             ? null
@@ -202,7 +202,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                           }
                         },
                         validator: (value) => value == null || value.isEmpty
-                            ? 'Please select a caste'
+                            ? AppLabels.pleaseSelectCaste(context)
                             : null,
                       );
                     },
@@ -222,21 +222,21 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                   padding: const EdgeInsets.only(bottom: 12.0),
                   child: AppTextField(
                     controller: _manualCasteController,
-                    label: 'Specify Caste',
-                    hint: 'Enter your caste',
+                    label: AppLabels.specifyCaste(context),
+                    hint: AppLabels.specifyCasteHint(context),
                     prefixIcon: Icons.edit,
                     iconColor: Theme.of(context).colorScheme.primary,
                     obscureText: false,
                     keyboardType: TextInputType.text,
-                    validator: (v) => v?.isEmpty == true ? 'Required' : null,
+                    validator: (v) => v?.isEmpty == true ? AppLabels.isRequired(context) : null,
                   ),
                 ),
               AppTextField(
                 controller: _subCasteController,
-                label: "Sub-Caste",
-                hint: "Enter sub-caste",
+                label: AppLabels.subCasteLabel(context),
+                hint: AppLabels.subCasteHint(context),
                 prefixIcon: Icons.group_add,
-                validator: (v) => v?.isEmpty == true ? "Required" : null,
+                validator: (v) => v?.isEmpty == true ? AppLabels.isRequired(context) : null,
                 iconColor: Theme.of(context).colorScheme.primary,
                 obscureText: false,
                 keyboardType: TextInputType.text,
@@ -248,10 +248,10 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                   ? const Center(child: CircularProgressIndicator())
                   : (widget.registerSubmit != null
                         ? const SizedBox.shrink()
-                        : AppButton(text: "Save", onPressed: _submitForm)),
+                        : AppButton(text: AppLabels.apply(context), onPressed: _submitForm)),
 
               // ========== EXTRA QUALIFICATION SECTION ==========
-              _sectionHeader('Additional Qualifications'),
+              _sectionHeader(AppLabels.additionalQualifications(context)),
               const SizedBox(height: 16),
 
               _extraCourseInput(),
@@ -263,6 +263,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
             ],
           ),
         ),
+
       ),
     );
   }
@@ -292,8 +293,8 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
             controller: _languagesController,
             prefixIcon: Icons.language,
             iconColor: Theme.of(context).colorScheme.primary,
-            label: 'Add Known Languages',
-            hint: 'e.g., Hindi, English, Mathili etc',
+            label: AppLabels.addKnownLanguages(context),
+            hint: AppLabels.languagesHint(context),
             obscureText: false,
             keyboardType: TextInputType.text,
             validator: (_) => null,

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import '../../features/user/user_app/domain/states/religion_state.dart';
 import '../../features/user/user_app/domain/states/state_city.dart';
 import 'revenue_filter_controller.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 class RevenueFilterRightSheet extends ConsumerWidget {
   const RevenueFilterRightSheet({super.key});
 
@@ -27,9 +29,9 @@ class RevenueFilterRightSheet extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Filter Revenue',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Text(
+                    AppLabels.filterRevenue(context),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Row(
                     children: [
@@ -37,7 +39,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                         onPressed: () {
                           ref.read(revenueFilterProvider.notifier).reset();
                         },
-                        child: const Text('Reset'),
+                        child: Text(AppLabels.reset(context)),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -57,9 +59,9 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                       // datepivker for start and end
 
                       // ================= DATE RANGE SECTION =================
-                      const Text(
-                        'Date Range',
-                        style: TextStyle(
+                      Text(
+                        AppLabels.dateRange(context),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey,
@@ -71,7 +73,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                           Expanded(
                             child: _buildDatePicker(
                               context: context,
-                              title: 'Start Date',
+                              title: AppLabels.startDate(context),
                               selectedDate: filter.startDate,
                               onChanged: (date) {
                                 ref
@@ -84,7 +86,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                           Expanded(
                             child: _buildDatePicker(
                               context: context,
-                              title: 'End Date',
+                              title: AppLabels.endDate(context),
                               selectedDate: filter.endDate,
 
                               onChanged: (date) {
@@ -99,9 +101,9 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                       const SizedBox(height: 24),
 
                       // ================= LOCATION SECTION =================
-                      const Text(
-                        'Location',
-                        style: TextStyle(
+                      Text(
+                        AppLabels.location(context),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey,
@@ -111,7 +113,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                       locationAsync.when(
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => Text('Error: $e'),
+                        error: (e, _) => Text('${AppLabels.errorOccurred(context)}: $e'),
                         data: (states) {
                           /// All state names from JSON
                           final stateNames = states.map((e) => e.name).toList();
@@ -125,7 +127,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                           return Column(
                             children: [
                               _buildDropdown(
-                                title: 'State',
+                                title: AppLabels.state(context),
                                 value: filter.state.isEmpty
                                     ? null
                                     : filter.state,
@@ -140,7 +142,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                               ),
                               const SizedBox(height: 12),
                               _buildDropdown(
-                                title: 'City',
+                                title: AppLabels.city(context),
                                 value: filter.city.isEmpty ? null : filter.city,
                                 items: selectedState.cities,
                                 onChanged: (val) {
@@ -159,9 +161,9 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                       const SizedBox(height: 24),
 
                       // ================= RELIGION SECTION =================
-                      const Text(
-                        'Cultural',
-                        style: TextStyle(
+                      Text(
+                        AppLabels.cultural(context),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey,
@@ -171,7 +173,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                       religionsAsync.when(
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => Text('Error: $e'),
+                        error: (e, _) => Text('${AppLabels.errorOccurred(context)}: $e'),
                         data: (religions) {
                           final religionNames = religions
                               .map((r) => r.name)
@@ -186,7 +188,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                           return Column(
                             children: [
                               _buildDropdown(
-                                title: 'Religion',
+                                title: AppLabels.religion(context),
                                 value: filter.religion.isEmpty
                                     ? null
                                     : filter.religion,
@@ -201,7 +203,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                               ),
                               const SizedBox(height: 12),
                               _buildDropdown(
-                                title: 'Caste',
+                                title: AppLabels.caste(context),
                                 value: filter.caste.isEmpty
                                     ? null
                                     : filter.caste,
@@ -220,15 +222,17 @@ class RevenueFilterRightSheet extends ConsumerWidget {
 
                               const SizedBox(height: 8),
                               _buildDropdown(
-                                title: 'Gender',
+                                title: AppLabels.gender(context),
                                 value: filter.gender.isEmpty
                                     ? null
                                     : filter.gender,
-                                items: const ['Male', 'Female'],
+                                items: [AppLabels.male(context), AppLabels.female(context)],
                                 onChanged: (val) {
-                                  ref
-                                      .read(revenueFilterProvider.notifier)
-                                      .updateGender(val);
+                                  if (val != null) {
+                                    ref
+                                        .read(revenueFilterProvider.notifier)
+                                        .updateGender(val);
+                                  }
                                 },
                               ),
                             ],
@@ -246,7 +250,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Apply Filters'),
+                  child: Text(AppLabels.applyFilters(context)),
                 ),
               ),
             ],
@@ -301,7 +305,7 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                 : DateFormat('dd/MM/yyyy').format(selectedDate),
           ),
           decoration: InputDecoration(
-            hintText: 'Select $title',
+            hintText: '${AppLabels.select(context)} $title',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             suffixIcon: const Icon(Icons.calendar_today),
           ),

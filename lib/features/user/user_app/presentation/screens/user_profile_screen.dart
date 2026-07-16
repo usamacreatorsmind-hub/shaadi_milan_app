@@ -39,7 +39,7 @@ final userProfileScreenProvider =
             agent = null;
           }
         } else {
-          debugPrint('Agent ID is empty for user: $userId');
+          debugPrint('Staff Id is empty for user: $userId');
         }
 
         return MetrimonyProfileViewModel(
@@ -569,7 +569,7 @@ class _PremiumCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (profile != null) {
-          // if agent id not present
+          // if Staff Id not present
           if (profile!.user.agentId.isEmpty) {
             // create a model bottom sheet  to take user id or  show contact details if he does not know
             print(" inside bottom sheet");
@@ -724,7 +724,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                 Expanded(
                   child: _ActionTab(
                     icon: Icons.person_add_alt_1_outlined,
-                    title: "Enter Agent ID",
+                    title: "Enter Staff Id",
                     isSelected: selectedTab == 1,
                     onTap: () {
                       ref.read(agentSetupProvider.notifier).state = 1;
@@ -763,7 +763,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
     if (agentId.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Please enter Agent ID")));
+      ).showSnackBar(const SnackBar(content: Text("Please enter Staff Id")));
       return;
     }
 
@@ -806,8 +806,8 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
           TextField(
             controller: _agentIdController,
             decoration: InputDecoration(
-              labelText: "Agent ID",
-              hintText: "Enter Agent ID (e.g., AGT-12345)",
+              labelText: "Staff Id",
+              hintText: "Enter Staff Id (e.g., AGT-12345)",
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -881,7 +881,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
 
-                        "Agent ID: ${_fetchedAgent!.agentId}",
+                        "Staff Id: ${_fetchedAgent!.agentId}",
                       ),
                       Text(
                         maxLines: 2,
@@ -926,7 +926,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
       child: Column(
         children: [
           Text(
-            "If you don't have an Agent ID, you can contact our support team for assistance.",
+            "If you don't have an Staff Id, you can contact our support team for assistance.",
             style: TextStyle(
               fontSize: 16,
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),

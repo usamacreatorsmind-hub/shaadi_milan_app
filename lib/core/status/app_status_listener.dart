@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'app_status.dart';
 import 'app_status_provider.dart';
 
@@ -45,7 +47,7 @@ class AppStatusListener extends ConsumerWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(statusData.message ?? 'Status updated'),
+              child: Text(statusData.message ?? AppLabels.statusUpdated(context)),
             ),
           ],
         ),

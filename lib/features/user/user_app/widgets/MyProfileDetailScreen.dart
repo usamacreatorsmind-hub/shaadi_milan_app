@@ -34,7 +34,7 @@ class _MyProfileCardState extends ConsumerState<MyProfileDetailScreen> {
                     _buildInfoRow('Email', widget.user.email),
 
                     _buildInfoRow('Phone', widget.user.phone),
-                    _buildInfoRow('Agent ID', widget.user.agentId),
+                    _buildInfoRow('Staff Id', widget.user.agentId),
                   ]),
 
                   _buildInfoCard(context, 'Verification Status', []),

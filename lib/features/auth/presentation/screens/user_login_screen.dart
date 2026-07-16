@@ -1,4 +1,5 @@
 import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/core/notification/notification_service.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,8 +36,8 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
   Future<void> _login(BuildContext context) async {
     if (emailCtrl.text.isEmpty || pwCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter email and password"),
+        SnackBar(
+          content: Text(AppLabels.enterEmailPassword(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -56,8 +57,8 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("🎉 Welcome back! Login successful."),
+        SnackBar(
+          content: Text(AppLabels.loginSuccessful(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -155,7 +156,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
 
                 // only name
                 Text(
-                  "Welcome",
+                  AppLabels.welcome(context),
                   style: theme.textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -163,7 +164,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Sign in to continue your journey",
+                  AppLabels.welcomeSubtitle(context),
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
                 ),
@@ -203,7 +204,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
 
                           controller: emailCtrl,
                           prefixIcon: Icons.email_outlined,
-                          label: "Email Address",
+                          label: AppLabels.email(context),
                           hint: "name@example.com",
                           keyboardType: TextInputType.emailAddress,
                         ),
@@ -216,7 +217,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
 
                           controller: pwCtrl,
                           prefixIcon: Icons.lock_open_rounded,
-                          label: "Password",
+                          label: AppLabels.password(context),
                           hint: "••••••••",
 
                           keyboardType: TextInputType.visiblePassword,
@@ -226,9 +227,9 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () =>
-                                context.navigateTo( ResetPasswordRoute()),
+                                context.navigateTo(ResetPasswordRoute()),
                             child: Text(
-                              "Forgot Password?",
+                              AppLabels.forgotPassword(context),
                               style: TextStyle(
                                 color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.w600,
@@ -243,7 +244,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                           width: double.infinity,
                           height: 56,
                           child: AppButton(
-                            text: isLoading ? "Logging in..." : "Login",
+                            text: isLoading ?  AppLabels.loggingIn(context) : AppLabels.login(context),
                             onPressed: () => _login(context),
                           ),
                         ),
@@ -258,15 +259,14 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                 Column(
                   children: [
                     Text(
-                      "Don't have an account?",
+                      AppLabels.dontHaveAccount(context),
                       style: TextStyle(color: Colors.grey.shade600),
                     ),
                     const SizedBox(height: 4),
                     TextButton(
-                      onPressed: () =>
-                          context.navigateTo( UserRegisterRoute()),
+                      onPressed: () => context.navigateTo(UserRegisterRoute()),
                       child: Text(
-                        "Create a New Profile",
+                        AppLabels.createNewProfile(context),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -318,20 +318,20 @@ class _TermsPrivacyFooter extends StatelessWidget {
         alignment: WrapAlignment.center,
         children: [
           Text(
-            'By continuing, you agree to our ',
+            AppLabels.byContinuingAgree(context),
             style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
           ),
           GestureDetector(
-            onTap: null,
-            child: Text('Terms & Conditions', style: linkStyle),
+            onTap: null, // TODO: Add navigation to Terms and Conditions
+            child: Text(AppLabels.termsAndConditions(context), style: linkStyle),
           ),
           Text(
-            ' and ',
+            AppLabels.andLabel(context),
             style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
           ),
           GestureDetector(
             onTap: _openPrivacy,
-            child: Text('Privacy Policy', style: linkStyle),
+            child: Text(AppLabels.privacyPolicy(context), style: linkStyle),
           ),
         ],
       ),

@@ -241,7 +241,7 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                         const Divider(height: 24),
                         _DetailRow(
                           icon: Icons.supervisor_account,
-                          label: 'Agent ID',
+                          label: 'Staff Id',
                           value: user.agentId.isNotEmpty
                               ? user.agentId
                               : 'Not assigned',
@@ -779,7 +779,7 @@ class _WishlistUserTile extends ConsumerWidget {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
-                                    'Agent ID not available for this user.',
+                                    'Staff Id not available for this user.',
                                   ),
                                 ),
                               );
@@ -1042,7 +1042,7 @@ class _AgentDialog extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // _buildInfoRow(Icons.badge, 'Agent ID', agent.agentId),
+              // _buildInfoRow(Icons.badge, 'Staff Id', agent.agentId),
               _buildInfoRow(Icons.phone, 'Phone', agent.agentMobile),
               const Divider(),
               _buildInfoRow(Icons.email, 'Email', agent.agentEmail),

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import '../../../../auth/domain/states/user_state.dart';
+import '../../../../../../core/constants/app_labels.dart';
 import '../../widgets/pdf_viewer_bottomsheet.dart';
 
 import '../../../../../app/custom/image_picker/image_picker_controller.dart';
@@ -46,7 +47,7 @@ class _UserBiodataCheckScreenState
         automaticallyImplyLeading: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(
-          'Verify Your Profile',
+          AppLabels.verifyYourProfile(context),
 
           style: Theme.of(context).textTheme.headlineMedium,
         ),
@@ -57,89 +58,89 @@ class _UserBiodataCheckScreenState
         children: [
           _warningCard(),
 
-          _section('User Details', Icons.person, [
-            _infoRow('Full Name', currentUser?.fullName),
-            _infoRow('Phone', currentUser?.phone),
-            _infoRow('Email', currentUser?.email),
+          _section(AppLabels.details(context), Icons.person, [
+            _infoRow(AppLabels.fullName(context), currentUser?.fullName),
+            _infoRow(AppLabels.phone(context), currentUser?.phone),
+            _infoRow(AppLabels.email(context), currentUser?.email),
           ]),
 
-          _section('Identity', Icons.badge, [
-            _infoRow('Gender', profile.identity.gender),
+          _section(AppLabels.saveIdentity(context), Icons.badge, [
+            _infoRow(AppLabels.gender(context), profile.identity.gender),
             _infoRow(
-              'Date of Birth',
+              AppLabels.selectDateOfBirth(context),
               DateFormat('dd MMM yyyy').format(profile.identity.dob),
             ),
-            _infoRow('Age', '${profile.identity.age} Years'),
-            _infoRow('Aadhar', profile.identity.aadhar),
-            _infoRow('About me ', profile.identity.aboutMe),
+            _infoRow(AppLabels.ageYrs(context), AppLabels.ageYears(context, profile.identity.age)),
+            _infoRow(AppLabels.aadharNumber(context), profile.identity.aadhar),
+            _infoRow(AppLabels.aboutMe(context), profile.identity.aboutMe),
           ]),
 
-          _section('Physical', Icons.accessibility_new, [
-            _infoRow('Height', profile.physical.height),
-            _infoRow('Weight', profile.physical.weight),
-            _infoRow('Complexion', profile.physical.complexion),
-            _infoRow('Body Type', profile.physical.bodyType),
+          _section(AppLabels.physicalProfile(context), Icons.accessibility_new, [
+            _infoRow(AppLabels.height(context), profile.physical.height),
+            _infoRow(AppLabels.weightKg(context), profile.physical.weight),
+            _infoRow(AppLabels.selectComplexion(context), profile.physical.complexion),
+            _infoRow(AppLabels.selectBodyType(context), profile.physical.bodyType),
             if (profile.physical.physicallyChallenged)
-              _infoRow('Disability', "Yes"),
+              _infoRow(AppLabels.physicallyChallenged(context), AppLabels.success(context)),
             if (profile.physical.physicallyChallenged &&
                 profile.physical.disabilityDetails != null)
-              _infoRow('Details', profile.physical.disabilityDetails),
+              _infoRow(AppLabels.details(context), profile.physical.disabilityDetails),
           ]),
 
-          _section('Cultural', Icons.temple_hindu, [
-            _infoRow('Religion', profile.cultural.religion),
-            _infoRow('Caste', profile.cultural.caste),
-            _infoRow('Sub Caste', profile.cultural.subCaste),
+          _section(AppLabels.religionAndCaste(context), Icons.temple_hindu, [
+            _infoRow(AppLabels.religion(context), profile.cultural.religion),
+            _infoRow(AppLabels.caste(context), profile.cultural.caste),
+            _infoRow(AppLabels.subCasteLabel(context), profile.cultural.subCaste),
             // _infoRow('Mother Tongue', profile.cultural.motherTongue),
-            _chipWrap('Languages Known', profile.cultural.languages),
+            _chipWrap(AppLabels.languagesKnown(context), profile.cultural.languages),
           ]),
 
-          _section('Education', Icons.school, [
-            _infoRow('College', profile.education.education?.college),
-            _infoRow('course', profile.education.education?.course),
-            _infoRow('Percentage ', profile.education.education?.percentage),
-            _infoRow('Passing Year', profile.education.education?.passingYear),
+          _section(AppLabels.education(context), Icons.school, [
+            _infoRow(AppLabels.collegeUniversity(context), profile.education.education?.college),
+            _infoRow(AppLabels.degreeCourse(context), profile.education.education?.course),
+            _infoRow(AppLabels.percentageCGPA(context), profile.education.education?.percentage),
+            _infoRow(AppLabels.passingYear(context), profile.education.education?.passingYear),
 
             // add additional courses
             // Languages
 
             // Additional Courses (Firebase)
             _chipWrap(
-              'Additional Courses',
+              AppLabels.additionalQualifications(context),
               profile.education.extraQualification?.qualifications ?? [],
             ),
           ]),
 
-          _section('Employment', Icons.work, [
-            _infoRow('Company', profile.employment.company),
-            _infoRow('Role', profile.employment.designation),
-            _infoRow('Annual Income', profile.employment.annualIncome),
-            _infoRow('Designation', profile.employment.designation),
-            _infoRow('Job Type', profile.employment.jobType),
+          _section(AppLabels.employmentDetails(context), Icons.work, [
+            _infoRow(AppLabels.organization(context), profile.employment.company),
+            _infoRow(AppLabels.role(context), profile.employment.designation),
+            _infoRow(AppLabels.annualIncome(context), profile.employment.annualIncome),
+            _infoRow(AppLabels.designation(context), profile.employment.designation),
+            _infoRow(AppLabels.jobType(context), profile.employment.jobType),
           ]),
 
-          _section('Family', Icons.family_restroom, [
-            _infoRow('Father Name', profile.family.fatherName),
-            _infoRow('Mother Name', profile.family.motherName),
-            _infoRow('Brothers', profile.family.numberOfBrothers),
-            _infoRow('Sisters', profile.family.numberOfSisters),
-            _infoRow('Family Type', profile.family.familyType),
-            _infoRow('Family Status', profile.family.familyStatus),
+          _section(AppLabels.familyDetails(context), Icons.family_restroom, [
+            _infoRow(AppLabels.fatherName(context), profile.family.fatherName),
+            _infoRow(AppLabels.motherName(context), profile.family.motherName),
+            _infoRow(AppLabels.numberOfBrothers(context), profile.family.numberOfBrothers),
+            _infoRow(AppLabels.numberOfSisters(context), profile.family.numberOfSisters),
+            _infoRow(AppLabels.familyType(context), profile.family.familyType),
+            _infoRow(AppLabels.lifeStyleStatus(context), profile.family.familyStatus),
           ]),
 
-          _section('Address', Icons.location_on, [
-            _infoRow('Address', profile.address.addressLine1),
-            _infoRow('Post', profile.address.post),
-            _infoRow('City', profile.address.city),
-            _infoRow('State', profile.address.state),
-            _infoRow('Pincode', profile.address.pincode),
+          _section(AppLabels.location(context), Icons.location_on, [
+            _infoRow(AppLabels.location(context), profile.address.addressLine1),
+            _infoRow(AppLabels.post(context), profile.address.post),
+            _infoRow(AppLabels.city(context), profile.address.city),
+            _infoRow(AppLabels.state(context), profile.address.state),
+            _infoRow(AppLabels.pinCodeLabel(context), profile.address.pincode),
           ]),
 
           _imageSection(profile.images, imageState),
 
           if (imageState.aadharPdfPath != null &&
               imageState.aadharPdfPath!.isNotEmpty)
-            _section('Aadhar Document', Icons.document_scanner, [
+            _section(AppLabels.aadharDocument(context), Icons.document_scanner, [
               imageState.aadharPdfPath!.toLowerCase().endsWith('.pdf')
                   ? GestureDetector(
                       onTap: () {
@@ -148,7 +149,7 @@ class _UserBiodataCheckScreenState
                           isScrollControlled: true,
                           builder: (_) => PdfViewerBottomsheet(
                             source: imageState.aadharPdfPath!,
-                            title: 'Aadhar PDF',
+                            title: AppLabels.aadharDocument(context),
                             isLocal: true,
                           ),
                         );
@@ -161,7 +162,7 @@ class _UserBiodataCheckScreenState
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'View Aadhar PDF',
+                            AppLabels.document(context),
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,
                               decoration: TextDecoration.underline,
@@ -201,9 +202,9 @@ class _UserBiodataCheckScreenState
                   contentPadding: EdgeInsets.zero,
                   value: isAgreed,
                   onChanged: (v) => setState(() => isAgreed = v ?? false),
-                  title: const Text(
-                    'I confirm all details are correct',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                  title: Text(
+                    AppLabels.confirmDetailsCorrect(context),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -215,9 +216,9 @@ class _UserBiodataCheckScreenState
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  child: const Text(
-                    'FINAL SUBMIT',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  child: Text(
+                    AppLabels.finalSubmit(context),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -343,7 +344,7 @@ class _UserBiodataCheckScreenState
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Please verify carefully. Once submitted, profile cannot be edited.',
+              AppLabels.verifyCarefullyWarning(context),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -362,7 +363,7 @@ class _UserBiodataCheckScreenState
 
     if (images == null && !hasLocalPrimary) return const SizedBox();
 
-    return _section('Profile Images', Icons.photo, [
+    return _section(AppLabels.profileImage(context), Icons.photo, [
       if (hasLocalPrimary)
         ClipRRect(
           borderRadius: BorderRadius.circular(14),
@@ -446,7 +447,7 @@ class _UserBiodataCheckScreenState
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text("Uploading Images..."),
+                  Text(AppLabels.uploadingImages(context)),
                   const SizedBox(height: 20),
                   LinearProgressIndicator(value: progress),
                   const SizedBox(height: 10),
@@ -459,7 +460,7 @@ class _UserBiodataCheckScreenState
       );
 
       try {
-        await ref.read(imagePickerProvider.notifier).uploadImages(user.uid);
+        await ref.read(imagePickerProvider.notifier).uploadImages(context, user.uid);
         if (context.mounted) Navigator.pop(context); // Close dialog
       } catch (e) {
         if (context.mounted) {

@@ -54,6 +54,9 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
     required String paymentType,
     required String district,
     required String gender,
+    required double agentCommission,
+    required double commissionRate,
+    required String agentDesignation,
   }) async {
     try {
       state = state.copyWith(status: PayStatus.loading);
@@ -68,6 +71,9 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
       debugPrint("Region: $region");
       debugPrint("District: $district");
       debugPrint("Gender: $gender");
+      debugPrint("AgentCommission: $agentCommission");
+      debugPrint("CommissionRate: $commissionRate");
+      debugPrint("AgentDesignation: $agentDesignation");
 
       // Razorpay expects amount in paisa (multiply by 100)
       final amountInPaisa = (amount * 100).toInt();
@@ -83,6 +89,9 @@ class PaymentApiNotifier extends StateNotifier<PaymentState> {
         region: region,
         district: district,
         gender: gender,
+        agentCommission: agentCommission,
+        commissionRate: commissionRate,
+        agentDesignation: agentDesignation,
       );
 
       // print response

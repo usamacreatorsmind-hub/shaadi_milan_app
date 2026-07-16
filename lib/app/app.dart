@@ -69,13 +69,17 @@
 //   Widget build(BuildContext context) => widget.child;
 // }
 import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
+ 
 import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/features/user/user_razorpay/data/firestore/payment_api._firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sizer/sizer.dart';
 
 import '../core/themes/app_theme.dart';
+import '../features/l10n/app_localizations.dart';
+import '../features/l10n/app_translation_service.dart';
 import 'providers/global_providers.dart';
 import 'router/app_router.dart';
 
@@ -122,11 +126,17 @@ class _AppState extends ConsumerState<App> {
 
   @override
   Widget build(BuildContext context) {
+    final locale = ref.watch(localeProvider);
+
     return Sizer(
       builder: (context, orientation, deviceType) {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          title: AppConstants.appName,
+          onGenerateTitle: (context) => AppLabels.appName(context),
+          locale: locale,
+
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
 
           /// THEME
           theme: AppTheme.lightTheme,

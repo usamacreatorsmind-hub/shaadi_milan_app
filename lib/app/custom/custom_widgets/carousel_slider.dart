@@ -1,6 +1,9 @@
+import 'package:shadi_milan/core/constants/app_labels.dart';
+
 import 'carusel_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
 
 class CustomCarouselSlider extends StatelessWidget {
   final List<String> imageUrls;
@@ -9,7 +12,7 @@ class CustomCarouselSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (imageUrls.isEmpty) {
-      return const Center(child: Text('No images to display'));
+      return Center(child: Text(AppLabels.noImagesToDisplay(context)));
     }
 
     return CarouselSlider(

@@ -1,7 +1,10 @@
 import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
 import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import '../../../../../app/custom/custom_widgets/drawer.dart';
+
+import '../../../../l10n/app_translation_service.dart';
 import '../notifier/analytics_provider.dart';
 import '../notifier/user_nofier.dart';
 import 'agen_profile.screen.dart';
@@ -46,7 +49,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final analyticsAsync = ref.watch(analyticsProvider);
+    final analyticsAsync = ref.watch(analyticsProvider(widget.agentId));
     final usersAsync = ref.watch(agentUsersNotifierProvider);
     final theme = Theme.of(context);
 
@@ -74,9 +77,9 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
 
             floating: false,
             pinned: true,
-            title: const Text(
-              AppConstants.dashboardTitle,
-              style: TextStyle(
+            title: Text(
+              AppLabels.dashboardTitle(context),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -100,7 +103,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                     children: [
                       const SizedBox(height: 30),
                       Text(
-                        AppConstants.welcome,
+                        AppLabels.welcome(context),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.9),
                           fontSize: 16,
@@ -116,16 +119,16 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        loading: () => const Text(
-                          AppConstants.loading,
-                          style: TextStyle(
+                        loading: () => Text(
+                          AppLabels.loading(context),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         error: (error, stack) => const Text(
-                          'Agent',
+                          'Staff Member',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 28,
@@ -139,6 +142,24 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
               ),
             ),
             actions: [
+              // 🌐 Language Toggle
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.translate, color: Colors.white),
+                onSelected: (String code) {
+                  ref.read(appTranslationServiceProvider).setLanguageCode(code);
+                  ref.read(localeProvider.notifier).state = Locale(code);
+                },
+                itemBuilder: (BuildContext context) => AppTranslation
+                    .supportedTranslations
+                    .map(
+                      (lang) => PopupMenuItem<String>(
+                        value: lang.languageCode,
+                        child: Text(lang.nativeName),
+                      ),
+                    )
+                    .toList(),
+              ),
+
               // notificattion
               IconButton(
                 icon: const Icon(Icons.notifications, color: Colors.white),
@@ -147,7 +168,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                 },
               ),
 
-              SizedBox(width: 20),
+              const SizedBox(width: 20),
               IconButton(
                 icon: const Icon(Icons.logout, color: Colors.white),
                 onPressed: () => _showLogoutDialog(context),
@@ -163,7 +184,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                   _buildStatsGrid(analyticsAsync, usersAsync),
                   const SizedBox(height: 24),
                   Text(
-                    AppConstants.quickActions,
+                    AppLabels.quickActions(context),
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -175,18 +196,16 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        AppConstants.recentClients,
+                        AppLabels.recentClients(context),
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       TextButton(
                         onPressed: () {
-                          context.navigateTo(
-                            AgentUserRoute(agentId: widget.agentId),
-                          );
+                          AutoTabsRouter.of(context).setActiveIndex(1);
                         },
-                        child: const Text(AppConstants.viewAll),
+                        child: Text(AppLabels.viewAll(context)),
                       ),
                     ],
                   ),
@@ -215,7 +234,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
       physics: const NeverScrollableScrollPhysics(),
       children: [
         _buildStatCard(
-          title: AppConstants.totalRevenue,
+          title: AppLabels.totalRevenue(context),
           value: analyticsAsync.when(
             data: (data) => '₹${data.totalRevenue}',
             loading: () => '...',
@@ -225,7 +244,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           color: Colors.green,
         ),
         _buildStatCard(
-          title: AppConstants.totalClients,
+          title: AppLabels.totalClients(context),
           value: usersAsync.when(
             data: (data) => '${data.length}',
             loading: () => '...',
@@ -236,18 +255,18 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
         ),
 
         _buildStatCard(
-          title: AppConstants.success,
+          title: AppLabels.totalCommission(context),
           value: analyticsAsync.when(
-            data: (data) => '${data.successCount}',
+            data: (data) => '₹${data.totalCommission.toStringAsFixed(0)}',
             loading: () => '...',
             error: (_, __) => 'Error',
           ),
-          icon: Icons.check_circle,
-          color: Colors.green,
+          icon: Icons.account_balance_wallet,
+          color: Colors.orange,
         ),
 
         _buildStatCard(
-          title: AppConstants.pending,
+          title: AppLabels.pending(context),
           value: analyticsAsync.when(
             data: (data) => '${data.pendingCount}',
             loading: () => '...',
@@ -324,16 +343,16 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
         _buildActionButton(
           context,
           icon: Icons.analytics,
-          label: AppConstants.reports,
+          label: AppLabels.reports(context),
           color: Colors.blue,
           onTap: () {
-            context.navigateTo(AgentRevenueRoute(agentId: widget.agentId));
+            AutoTabsRouter.of(context).setActiveIndex(2);
           },
         ),
         _buildActionButton(
           context,
           icon: Icons.support_agent,
-          label: AppConstants.support,
+          label: AppLabels.support(context),
           color: Colors.teal,
           onTap: () {
             context.router.push(const ContactUsRoute());
@@ -381,10 +400,10 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
     return usersAsync.when(
       data: (users) {
         if (users.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(AppConstants.noClientsYet),
+              padding: const EdgeInsets.all(16.0),
+              child: Text(AppLabels.noClientsYet(context)),
             ),
           );
         }
@@ -451,12 +470,12 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(AppConstants.logout),
-          content: const Text(AppConstants.logoutConfirm),
+          title: Text(AppLabels.logout(context)),
+          content: Text(AppLabels.logoutConfirm(context)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text(AppConstants.cancel),
+              child: Text(AppLabels.cancel(context)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -464,9 +483,9 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                 Navigator.pop(context);
                 FirebaseAuth.instance.signOut();
               },
-              child: const Text(
-                AppConstants.logout,
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                AppLabels.logout(context),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ],

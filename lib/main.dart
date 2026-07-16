@@ -89,6 +89,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenshot_blocker/flutter_screenshot_blocker.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'features/l10n/app_translation_service.dart';
+
 import 'app/app.dart';
 import 'core/env/app_env.dart';
 import 'core/env/app_env_config.dart';
@@ -130,6 +133,9 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  /// SHARED PREFERENCES
+  final sharedPreferences = await SharedPreferences.getInstance();
 
   /// ENV
   AppEnvConfig.init(environment: AppEnvironment.prod);
@@ -193,5 +199,12 @@ Future<void> main() async {
     debugPrint(details.exceptionAsString());
   };
 
-  runApp(const ProviderScope(child: App()));
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+      child: const App(),
+    ),
+  );
 }

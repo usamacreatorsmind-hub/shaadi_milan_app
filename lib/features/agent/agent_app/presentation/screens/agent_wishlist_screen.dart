@@ -186,8 +186,8 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
             const SizedBox(height: 16),
             Text(
               isMyUsersSender
-                  ? "No wishlists from your users"
-                  : "No leads for your users",
+                  ? "No wishlists from your client"
+                  : "No leads for your client",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

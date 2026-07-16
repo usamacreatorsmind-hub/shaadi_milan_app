@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'app_status.dart';
 
 /// Widget to display status messages to users
@@ -109,7 +111,7 @@ class StatusMessageWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  statusData.message ?? 'No message',
+                  statusData.message ?? AppLabels.noMessage(context),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,

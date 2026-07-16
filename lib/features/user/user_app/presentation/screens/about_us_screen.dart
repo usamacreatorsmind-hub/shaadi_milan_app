@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 
 @RoutePage()
 class AboutUsScreen extends StatelessWidget {
@@ -20,7 +21,7 @@ class AboutUsScreen extends StatelessWidget {
             pinned: true,
             backgroundColor: theme.primaryColor,
             flexibleSpace: FlexibleSpaceBar(
-              title: const Text('About Us'),
+              title: Text(AppLabels.aboutUs(context)),
               centerTitle: true,
               background: Container(
                 padding: const EdgeInsets.only(bottom: 40),
@@ -35,7 +36,7 @@ class AboutUsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      AppConstants.appName,
+                      AppLabels.appName(context),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
@@ -44,7 +45,7 @@ class AboutUsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      AppConstants.appTagline,
+                      AppLabels.appTagline(context),
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
@@ -65,33 +66,29 @@ class AboutUsScreen extends StatelessWidget {
                   _infoSection(
                     context,
                     icon: Icons.groups,
-                    title: 'Who We Are',
-                    description:
-                        '${AppConstants.appName} is a trusted matrimonial service '
-                        'dedicated to helping individuals and families find compatible life partners. '
-                        'We believe marriage is not just a bond between two individuals, '
-                        'but a union of families, values, and traditions.',
+                    title: AppLabels.whoWeAre(context),
+                    description: AppLabels.whoWeAreDescription(context),
                   ),
 
                   _infoSection(
                     context,
                     icon: Icons.flag,
-                    title: AppConstants.missionTitle,
-                    description: AppConstants.missionContent,
+                    title: AppLabels.missionTitle(context),
+                    description: AppLabels.missionContent(context),
                   ),
 
                   _infoSection(
                     context,
                     icon: Icons.verified,
-                    title: AppConstants.valuesTitle,
-                    description: AppConstants.valuesContent,
+                    title: AppLabels.valuesTitle(context),
+                    description: AppLabels.valuesContent(context),
                   ),
 
                   _infoSection(
                     context,
                     icon: Icons.thumb_up_alt,
-                    title: AppConstants.whyChooseUsTitle,
-                    description: AppConstants.whyChooseUsContent,
+                    title: AppLabels.whyChooseUsTitle(context),
+                    description: AppLabels.whyChooseUsContent(context),
                   ),
 
                   const SizedBox(height: 24),
@@ -100,9 +97,9 @@ class AboutUsScreen extends StatelessWidget {
                   Center(
                     child: Column(
                       children: [
-                        const Text(
-                          'Made with ❤️ for meaningful connections',
-                          style: TextStyle(
+                        Text(
+                          AppLabels.madeWithLove(context),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: Colors.black54,
@@ -110,7 +107,7 @@ class AboutUsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          AppConstants.copyright,
+                          AppLabels.copyright(context),
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.black45,

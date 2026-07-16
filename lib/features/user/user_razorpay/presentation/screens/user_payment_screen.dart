@@ -9,7 +9,9 @@ import 'package:shadi_milan/features/auth/domain/states/user_state.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_state.dart';
 import 'package:shadi_milan/features/user/user_app/presentation/screens/user_profile_screen.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../user_app/domain/states/metrimony_profile_view_model.dart';
+
 import '../../domain/states/payment.dart';
 import '../notifier/amount_notifier.dart';
 import '../notifier/payment_api_notifier.dart';
@@ -145,7 +147,7 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                 children: [
                   // 🔹 Title
                   Text(
-                    "Go Premium",
+                    AppLocalizations.of(context)!.goPremium,
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -157,7 +159,7 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
 
                   // 🔹 Subtitle
                   Text(
-                    "Get better matches & faster connections",
+                    AppLocalizations.of(context)!.premiumSubtitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                   ),
@@ -174,9 +176,9 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                       color: theme.primaryColor,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
-                      "MOST POPULAR",
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(context)!.mostPopular,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1,
@@ -313,11 +315,16 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                               ? "Not Provided"
                               : profile.identity.gender;
 
+                          final amount = amountState.amount!.amount.toDouble();
+                          final agentCommission = data.agentEntity?.calculateCommission(amount) ?? 0.0;
+                          final commissionRate = data.agentEntity?.commissionRate ?? 0.0;
+                          final agentDesignation = data.agentEntity?.designation.label ?? 'N/A';
+
                           ref
                               .read(paymentProvider.notifier)
                               .startPayment(
                                 paymentType: amountState.amount!.paymentType,
-                                amount: amountState.amount!.amount.toDouble(),
+                                amount: amount,
                                 uid: user.uid,
                                 email: user.email,
                                 fullName: user.fullName,
@@ -326,9 +333,12 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                                 region: region,
                                 district: district,
                                 gender: gender,
+                                agentCommission: agentCommission,
+                                commissionRate: commissionRate,
+                                agentDesignation: agentDesignation,
                               );
                         },
-                        child: const Text("Pay Once & Unlock Premium"),
+                        child: Text(AppLocalizations.of(context)!.payOnceUnlockPremium),
                       ),
                     ),
                   ),
@@ -337,7 +347,7 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
-                      "Secure payment • Cancel anytime • No hidden charges",
+                      AppLocalizations.of(context)!.securePaymentNote,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                     ),

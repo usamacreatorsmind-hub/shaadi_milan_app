@@ -1,4 +1,5 @@
 import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/core/notification/notification_service.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -36,8 +37,8 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
   Future<void> _login(BuildContext context) async {
     if (emailCtrl.text.isEmpty || pwCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter email and password"),
+        SnackBar(
+          content: Text(AppLabels.enterEmailPassword(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -57,8 +58,8 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Welcome Agent! Login successful."),
+        SnackBar(
+          content: Text(AppLabels.loginSuccessfulAgent(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -70,8 +71,6 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
 
       if (user != null) {
         NotificationService.saveAdminTokenToFirestore(user.uid);
- 
-
 
         context.router.replace(AuthWrapperRoute());
       }
@@ -82,22 +81,21 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
 
       switch (e.code) {
         case 'user-not-found':
-          message = "No agent account found with this email.";
+          message = AppLabels.agentNotFound(context);
           break;
         case 'wrong-password':
-          message = "Incorrect password.";
+          message = AppLabels.incorrectPassword(context);
           break;
         case 'invalid-email':
-          message = "Invalid email address.";
+          message = AppLabels.invalidEmail(context);
           break;
         case 'user-disabled':
-          message = "This account has been disabled.";
+          message = AppLabels.accountDisabled(context);
           break;
         case 'network-request-failed':
-          message = "No internet connection.";
+          message = AppLabels.noInternet(context);
           break;
         default:
-          message = "Login failed. Try again later.";
           message = e.toString();
       }
 
@@ -154,7 +152,7 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                 const SizedBox(height: 40),
 
                 Text(
-                  "Agent Login",
+                  AppLabels.staffLogin(context),
                   style: theme.textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -162,7 +160,7 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Access your agent portal",
+                  AppLabels.accessStaffPortal(context),
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
                 ),
@@ -193,8 +191,8 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                           ],
                           controller: emailCtrl,
                           prefixIcon: Icons.alternate_email_rounded,
-                          label: "Work Email",
-                          hint: "agent@example.com",
+                          label: AppLabels.workEmail(context),
+                          hint: AppLabels.workEmailHint(context),
                           keyboardType: TextInputType.emailAddress,
                           iconColor: theme.colorScheme.primary,
                           obscureText: false,
@@ -204,8 +202,8 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                           autofillHints: const [AutofillHints.password],
                           controller: pwCtrl,
                           prefixIcon: Icons.lock_outline_rounded,
-                          label: "Password",
-                          hint: "••••••••",
+                          label: AppLabels.password(context),
+                          hint: AppLabels.passwordHint(context),
                           keyboardType: TextInputType.visiblePassword,
                           obscureText: true,
                           iconColor: theme.colorScheme.primary,
@@ -215,7 +213,9 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                           width: double.infinity,
                           height: 56,
                           child: AppButton(
-                            text: isLoading ? "Logging in..." : "Login",
+                            text: isLoading
+                                ? AppLabels.loggingIn(context)
+                                : AppLabels.login(context),
                             onPressed: () => _login(context),
                           ),
                         ),
@@ -228,7 +228,7 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                             onPressed: () =>
                                 context.navigateTo(ResetPasswordRoute()),
                             child: Text(
-                              "Forgot Password?",
+                              AppLabels.forgotPassword(context),
                               style: TextStyle(
                                 color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.w600,
@@ -250,22 +250,22 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Not an agent?",
+                      AppLabels.notAStaffMember(context),
                       style: TextStyle(color: Colors.grey.shade600),
                     ),
                     TextButton(
                       onPressed: () => context.router.replace(UserLoginRoute()),
-                      child: const Text(
-                        "User Login",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      child: Text(
+                        AppLabels.userLogin(context),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
 
-                /// 📄 Terms & Privacy
-                _TermsPrivacyFooter(),
+                /// 推 Terms & Privacy
+                const _TermsPrivacyFooter(),
 
                 const SizedBox(height: 16),
               ],
@@ -303,20 +303,23 @@ class _TermsPrivacyFooter extends StatelessWidget {
         alignment: WrapAlignment.center,
         children: [
           Text(
-            'By continuing, you agree to our ',
+            AppLabels.byContinuingAgree(context),
             style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
           ),
           GestureDetector(
             onTap: null,
-            child: Text('Terms & Conditions', style: linkStyle),
+            child: Text(
+              AppLabels.termsAndConditions(context),
+              style: linkStyle,
+            ),
           ),
           Text(
-            ' and ',
+            AppLabels.andLabel(context),
             style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
           ),
           GestureDetector(
             onTap: _openPrivacy,
-            child: Text('Privacy Policy', style: linkStyle),
+            child: Text(AppLabels.privacyPolicy(context), style: linkStyle),
           ),
         ],
       ),

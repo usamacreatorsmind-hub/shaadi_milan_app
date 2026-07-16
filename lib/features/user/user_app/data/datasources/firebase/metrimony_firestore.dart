@@ -1,3 +1,4 @@
+import 'package:shadi_milan/core/constants/app_collections.dart';
 import 'package:shadi_milan/core/constants/app_constants.dart';
 
 import '../../../../../auth/domain/states/agent_state.dart';
@@ -22,7 +23,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
   MatrimonyFirestoreDS(this._firestore);
 
   CollectionReference<Map<String, dynamic>> get _profiles =>
-      _firestore.collection(AppConstants.collProfiles);
+      _firestore.collection(AppCollections.metrimonyProfiles);
 
   Future<void> _updateProfileSection(
     String uid,
@@ -120,7 +121,10 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
 
     // Fetch only active profiles from metrimony_profiles collection
     final querySnapshot = await _profiles
-        .where(AppConstants.fieldProfileStatus, isEqualTo: AppConstants.statusActive)
+        .where(
+          AppConstants.fieldProfileStatus,
+          isEqualTo: AppConstants.statusActive,
+        )
         .get();
 
     final profiles = querySnapshot.docs
@@ -133,9 +137,13 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
         .toList();
 
     // Get current user's gender
-    final userDoc = await _firestore.collection(AppConstants.collUsers).doc(currentUid).get();
+    final userDoc = await _firestore
+        .collection(AppCollections.users)
+        .doc(currentUid)
+        .get();
 
-    final userGender = (userDoc.data()?[AppConstants.fieldGender] as String?)?.toLowerCase();
+    final userGender = (userDoc.data()?[AppConstants.fieldGender] as String?)
+        ?.toLowerCase();
 
     if (userGender == null) return profileData;
 
@@ -152,8 +160,6 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
     profileData = profileData
         // .where((profile) => profile.identity.gender.toLowerCase() == 'male')
         .toList();
-
-
 
     return profileData;
   }
@@ -183,7 +189,10 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
 
     // Watch only active matrimony profiles and filter by userIds
     return _profiles
-        .where(AppConstants.fieldProfileStatus, isEqualTo: AppConstants.statusActive)
+        .where(
+          AppConstants.fieldProfileStatus,
+          isEqualTo: AppConstants.statusActive,
+        )
         .snapshots()
         .map((snapshot) {
           return snapshot.docs

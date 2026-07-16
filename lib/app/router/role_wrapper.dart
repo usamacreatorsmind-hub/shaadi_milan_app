@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
+ 
 import '../../core/constants/app_constants.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 import 'app_router.dart';
@@ -130,7 +132,7 @@ class _AuthWrapperScreenState extends ConsumerState<AuthWrapperScreen>
               child: Column(
                 children: [
                   Text(
-                    AppConstants.appName,
+                    AppLabels.appName (context),
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: theme.primaryColor,
                       fontWeight: FontWeight.bold,
@@ -138,7 +140,7 @@ class _AuthWrapperScreenState extends ConsumerState<AuthWrapperScreen>
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    AppConstants.splashTagline,
+                    AppLabels.splashTagline(context),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: Colors.grey[600],

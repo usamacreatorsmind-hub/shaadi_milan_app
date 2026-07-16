@@ -1,16 +1,24 @@
+import 'package:shadi_milan/core/constants/app_labels.dart';
+
 import '../../../../app/custom/custom_widgets/app_logo.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../core/constants/app_constants.dart';
+
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
-import 'dart:ui'; // Required for ImageFilter
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:ui';
+
+import '../../../l10n/app_translation_service.dart';
 
 @RoutePage()
-class RoleSelectionScreen extends StatelessWidget {
+class RoleSelectionScreen extends ConsumerWidget {
   const RoleSelectionScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentLocale = ref.watch(localeProvider);
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -28,6 +36,43 @@ class RoleSelectionScreen extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
+              // 🌐 Language Toggle
+              Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16, top: 8),
+                  child: PopupMenuButton<String>(
+                    initialValue: currentLocale.languageCode,
+                    icon: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.8),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.pink.withOpacity(0.1)),
+                      ),
+                      child: const Icon(Icons.language, color: Colors.pink, size: 20),
+                    ),
+                    onSelected: (String code) {
+                      ref.read(appTranslationServiceProvider).setLanguageCode(code);
+                      ref.read(localeProvider.notifier).state = Locale(code);
+                    },
+                    itemBuilder: (BuildContext context) => AppTranslation.supportedTranslations
+                        .map((lang) => PopupMenuItem<String>(
+                              value: lang.languageCode,
+                              child: Row(
+                                children: [
+                                  Text(lang.nativeName),
+                                  const SizedBox(width: 8),
+                                  if (currentLocale.languageCode == lang.languageCode)
+                                    const Icon(Icons.check, color: Colors.green, size: 16),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ),
+
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -53,7 +98,7 @@ class RoleSelectionScreen extends StatelessWidget {
                             const AppLogo(size: 200),
                             const SizedBox(height: 20),
                             Text(
-                              AppConstants.appName,
+                              AppLabels.appName(context),
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -63,7 +108,7 @@ class RoleSelectionScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              AppConstants.splashTagline,
+                              AppLabels.splashTagline(context),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 // theme color
@@ -79,8 +124,8 @@ class RoleSelectionScreen extends StatelessWidget {
 
                       /// 👔 Agent Card
                       _EnhancedRoleCard(
-                        title: "Agent Portal",
-                        subtitle: "Manage leads and match profiles",
+                        title: AppLabels.staffPortal(context),
+                        subtitle: AppLabels.manageLeadsSubtitle(context),
                         icon: Icons.business_center_rounded,
                         beginColor: const Color(0xFF6A11CB),
                         endColor: const Color(0xFF2575FC),
@@ -92,8 +137,8 @@ class RoleSelectionScreen extends StatelessWidget {
 
                       /// ❤️ User Card
                       _EnhancedRoleCard(
-                        title: "Member Portal",
-                        subtitle: "Find your perfect soulmate",
+                        title: AppLabels.memberPortal(context),
+                        subtitle: AppLabels.findSoulmateSubtitle(context),
                         icon: Icons.favorite_rounded,
                         beginColor: const Color(0xFFFF512F),
                         endColor: const Color(0xFFDD2476),
@@ -132,9 +177,9 @@ class RoleSelectionScreen extends StatelessWidget {
                                   color: Colors.green,
                                 ),
                                 const SizedBox(width: 6),
-                                const Text(
-                                  "100% Verified & Secure Profiles",
-                                  style: TextStyle(
+                                Text(
+                                  AppLabels.verifiedProfiles(context),
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.black54,
@@ -148,7 +193,7 @@ class RoleSelectionScreen extends StatelessWidget {
                                 context.pushRoute(const ContactUsRoute());
                               },
                               child: Text(
-                                "Need Help ? Contact Us",
+                                AppLabels.needHelpContactUs(context),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -167,7 +212,7 @@ class RoleSelectionScreen extends StatelessWidget {
                               onTap: () =>
                                   context.pushRoute(const PrivacyPolicyRoute()),
                               child: Text(
-                                "Privacy Policy",
+                                AppLabels.privacyPolicy(context),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -181,7 +226,7 @@ class RoleSelectionScreen extends StatelessWidget {
                                 const TermsAndConditionsRoute(),
                               ),
                               child: Text(
-                                "Terms & Conditions",
+                                AppLabels.termsAndConditions(context),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -222,7 +267,6 @@ class _EnhancedRoleCard extends StatefulWidget {
     required this.endColor,
     required this.delay,
     required this.onTap,
-    l,
   });
 
   @override

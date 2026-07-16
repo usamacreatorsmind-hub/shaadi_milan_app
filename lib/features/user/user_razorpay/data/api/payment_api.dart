@@ -17,6 +17,9 @@ class PaymentApi {
     required String region,
     required String district,
     required String gender,
+    required double agentCommission,
+    required double commissionRate,
+    required String agentDesignation,
   }) async {
     try {
       final response = await _dio.post(
@@ -32,6 +35,9 @@ class PaymentApi {
           "region": region,
           "district": district,
           "gender": gender,
+          "agentCommission": agentCommission,
+          "commissionRate": commissionRate,
+          "agentDesignation": agentDesignation,
         },
       );
       return response.data;

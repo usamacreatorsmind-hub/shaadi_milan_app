@@ -1,3 +1,7 @@
+ 
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
+
 import '../../../features/auth/presentation/controllers/auth_controller.dart';
 import '../../../features/user/user_razorpay/domain/states/payment.dart';
 import '../../../features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
@@ -9,7 +13,6 @@ import '../../router/app_router.dart';
 import '../../../features/auth/domain/states/user_state.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:riverpod/src/framework.dart';
 
 class UserDrawer extends ConsumerWidget {
   final AsyncValue<UserEntity?> userAsync;
@@ -23,10 +26,10 @@ class UserDrawer extends ConsumerWidget {
     return Drawer(
       child: userAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => const Center(child: Text("Something went wrong")),
+        error: (e, _) => Center(child: Text(AppLabels.somethingWentWrong(context))),
         data: (user) {
           if (user == null) {
-            return const Center(child: Text("No user data"));
+            return Center(child: Text(AppLabels.noUserData(context)));
           }
 
           final paymentState = ref.watch(paymentNotifierProvider(user.uid));
@@ -36,8 +39,8 @@ class UserDrawer extends ConsumerWidget {
           void requirePayment() {
             context.maybePop();
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Please subscribe to access this feature'),
+              SnackBar(
+                content: Text(AppLabels.pleaseSubscribe(context)),
                 backgroundColor: Colors.red,
               ),
             );
@@ -60,11 +63,11 @@ class UserDrawer extends ConsumerWidget {
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
-                    const _SectionTitle(title: "Main"),
+                    _SectionTitle(title: AppLabels.mainSection(context)),
 
                     DrawerItem(
                       icon: Icons.dashboard_outlined,
-                      title: "Dashboard",
+                      title: AppLabels.dashboard(context),
                       onTap: () => guardedTap(() {
                         context.maybePop();
                         context.pushRoute(UserMainShellRoute());
@@ -73,7 +76,7 @@ class UserDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.person_outline,
-                      title: "My Profile",
+                      title: AppLabels.myProfile(context),
                       onTap: () => guardedTap(() {
                         context.maybePop();
                         context.pushRoute(MyProfileDetailRoute(user: user));
@@ -82,7 +85,7 @@ class UserDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.favorite_border,
-                      title: "Wishlist",
+                      title: AppLabels.navWishlist(context),
                       onTap: () => guardedTap(() {
                         context.maybePop();
                         context.pushRoute(UserWishListRoute(userId: user.uid));
@@ -91,8 +94,8 @@ class UserDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.notifications_outlined,
-                      title: "Notifications",
-                      trailing: _NotificationBadge(count: 3),
+                      title: AppLabels.notifications(context),
+                      trailing: const _NotificationBadge(count: 3),
                       onTap: () => guardedTap(() {
                         context.maybePop();
                         context.pushRoute(const UserNotificationRoute());
@@ -101,17 +104,17 @@ class UserDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.settings_outlined,
-                      title: "Settings",
+                      title: AppLabels.settings(context),
                       onTap: () => guardedTap(() {
                         context.maybePop();
                       }),
                     ),
 
-                    const _SectionTitle(title: "Legal & Info"),
+                    _SectionTitle(title: AppLabels.legalAndInfo(context)),
 
                     DrawerItem(
                       icon: Icons.description_outlined,
-                      title: "Terms & Conditions",
+                      title: AppLabels.termsAndConditions(context),
                       onTap: () {
                         context.maybePop();
                         context.pushRoute(const TermsAndConditionsRoute());
@@ -120,7 +123,7 @@ class UserDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.privacy_tip_outlined,
-                      title: "Privacy Policy",
+                      title: AppLabels.privacyPolicy(context),
                       onTap: () {
                         context.maybePop();
                         context.pushRoute(const PrivacyPolicyRoute());
@@ -129,18 +132,18 @@ class UserDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.info_outline,
-                      title: "About Us",
+                      title: AppLabels.aboutUs(context),
                       onTap: () {
                         context.maybePop();
                         context.pushRoute(const AboutUsRoute());
                       },
                     ),
 
-                    const _SectionTitle(title: "Support"),
+                    _SectionTitle(title: AppLabels.support(context)),
 
                     DrawerItem(
                       icon: Icons.support_agent,
-                      title: 'Support Tickets',
+                      title: AppLabels.supportTickets(context),
                       onTap: () => guardedTap(() {
                         context.maybePop();
                         context.router.push(
@@ -151,7 +154,7 @@ class UserDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.help_outline,
-                      title: "Help & Support",
+                      title: AppLabels.helpAndSupport(context),
                       onTap: () {
                         context.maybePop();
                         context.pushRoute(const ContactUsRoute());
@@ -160,28 +163,28 @@ class UserDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.share_outlined,
-                      title: "Share App",
+                      title: AppLabels.shareApp(context),
                       onTap: () async {
                         // 1. Close the drawer first
                         context.maybePop();
 
                         // 2. Define your app's Play Store link
                         const String packageName =
-                            "com.your.package.name"; // Replace with your package name
+                            "com.shaadimilan.app"; // Replace with your package name
                         const String playStoreLink =
                             "https://play.google.com/store/apps/details?id=$packageName";
 
                         // 3. Trigger the native share sheet
                         await Share.share(
-                          'Check out Metrimony! Find your perfect match here: $playStoreLink',
+                          'Check out ${AppConstants.appName}! Find your perfect match here: $playStoreLink',
                           subject:
-                              'Download Metrimony App', // Subject is used for Email sharing
+                              'Download ${AppConstants.appNameRaw} App', // Subject is used for Email sharing
                         );
                       },
                     ),
                     DrawerItem(
                       icon: Icons.star_rate_outlined,
-                      title: "Rate Us",
+                      title: AppLabels.rateUs(context),
                       onTap: () async {
                         final InAppReview inAppReview = InAppReview.instance;
 
@@ -317,7 +320,7 @@ class DrawerHeader1 extends StatelessWidget {
                 : null,
             child: !hasImage
                 ? Text(
-                    user.fullName[0].toUpperCase(),
+                    user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : '?',
                     style: TextStyle(fontSize: 28, color: theme.primaryColor),
                   )
                 : null,
@@ -355,7 +358,7 @@ class _LogoutButton extends StatelessWidget {
         width: double.infinity,
         child: OutlinedButton.icon(
           icon: const Icon(Icons.logout, size: 20),
-          label: const Text("Logout", style: TextStyle(fontSize: 16)),
+          label: Text(AppLabels.logout(context), style: const TextStyle(fontSize: 16)),
           style: OutlinedButton.styleFrom(
             foregroundColor: Theme.of(context).colorScheme.error,
             side: BorderSide(color: Theme.of(context).colorScheme.error),
@@ -366,7 +369,7 @@ class _LogoutButton extends StatelessWidget {
           ),
           onPressed: () {
             ref.read(authControllerProvider.notifier).signOut();
-            context.router.replace( UserLoginRoute());
+            context.router.replace(UserLoginRoute());
           },
         ),
       ),

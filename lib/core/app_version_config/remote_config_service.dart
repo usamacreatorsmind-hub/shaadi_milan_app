@@ -3,6 +3,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class RemoteConfigService {
@@ -79,12 +80,12 @@ class RemoteConfigService {
       builder: (_) => PopScope(
         canPop: true,
         child: AlertDialog(
-          title: const Text(AppConstants.updateRequiredTitle),
-          content: const Text(AppConstants.updateRequiredMessage),
+          title: Text(AppLabels.updateRequiredTitle(context)),
+          content: Text(AppLabels.updateRequiredMessage(context)),
           actions: [
             TextButton(
               onPressed: () => _openStore(packageName),
-              child: const Text(AppConstants.updateNowButton),
+              child: Text(AppLabels.updateNowButton(context)),
             ),
           ],
         ),
@@ -141,10 +142,10 @@ class RemoteConfigService {
 
                 const SizedBox(height: 20),
 
-                const Text(
-                  AppConstants.maintenanceModeTitle,
+                Text(
+                  AppLabels.maintenanceModeTitle(context),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -163,7 +164,7 @@ class RemoteConfigService {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    AppConstants.maintenanceModeSubtitle,
+                    AppLabels.maintenanceModeSubtitle(context),
                     style: TextStyle(
                       color: Colors.orange.shade800,
                       fontWeight: FontWeight.w600,
@@ -175,7 +176,7 @@ class RemoteConfigService {
                 const SizedBox(height: 18),
 
                 Text(
-                  AppConstants.maintenanceModeMessage,
+                  AppLabels.maintenanceModeMessage(context),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
@@ -198,7 +199,7 @@ class RemoteConfigService {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          AppConstants.maintenanceRestoringMessage,
+                          AppLabels.maintenanceRestoringMessage(context),
                           style: TextStyle(
                             color: Colors.blue.shade700,
                             fontSize: 13,
@@ -220,7 +221,7 @@ class RemoteConfigService {
                 const SizedBox(height: 12),
 
                 Text(
-                  AppConstants.pleaseWait,
+                  AppLabels.pleaseWait(context),
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontWeight: FontWeight.w500,

@@ -28,7 +28,7 @@ final matrimonyProfileProvider =
 
         if (user.agentId.isNotEmpty) {
           // print agetn id
-          print("This is agent id");
+          print("This is Staff Id");
           print(user.agentId);
 
           agent = await agentRepo.fetchAgent(user.agentId);
@@ -492,7 +492,7 @@ class MyProfileScreen extends ConsumerWidget {
                 //       _DetailRow("Name", profile.agent!.agentName),
                 //       _DetailRow("Mobile", profile.agent!.agentMobile),
                 //       _DetailRow("Email", profile.agent!.email),
-                //       _DetailRow("Agent ID", profile.agent!.agentId),
+                //       _DetailRow("Staff Id", profile.agent!.agentId),
                 //     ],
                 //   ),
                 // ],

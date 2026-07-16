@@ -1,4 +1,5 @@
 import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -45,31 +46,31 @@ class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
             currentIndex: tabsRouter.activeIndex,
             onTap: tabsRouter.setActiveIndex,
             type: BottomNavigationBarType.fixed,
-            items: const [
+            items: [
               BottomNavigationBarItem(
-                icon: Icon(Icons.analytics_outlined),
-                activeIcon: Icon(Icons.analytics),
-                label: AppConstants.navDashboard,
+                icon: const Icon(Icons.analytics_outlined),
+                activeIcon: const Icon(Icons.analytics),
+                label: AppLabels.navDashboard(context),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.groups_3_outlined),
-                activeIcon: Icon(Icons.groups_3),
-                label: AppConstants.navClients,
+                icon: const Icon(Icons.groups_3_outlined),
+                activeIcon: const Icon(Icons.groups_3),
+                label: AppLabels.navClients(context),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.payments_outlined),
-                activeIcon: Icon(Icons.payments),
-                label: AppConstants.navRevenue,
+                icon: const Icon(Icons.payments_outlined),
+                activeIcon: const Icon(Icons.payments),
+                label: AppLabels.navRevenue(context),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.favorite_outline),
-                activeIcon: Icon(Icons.favorite),
-                label: AppConstants.navWishlist,
+                icon: const Icon(Icons.favorite_outline),
+                activeIcon: const Icon(Icons.favorite),
+                label: AppLabels.navWishlist(context),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
-                label: AppConstants.myProfile,
+                icon: const Icon(Icons.person_outline),
+                activeIcon: const Icon(Icons.person),
+                label: AppLabels.myProfile(context),
               ),
             ],
           ),

@@ -1,3 +1,6 @@
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
+
 import '../../../features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
 import '../../../features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +37,7 @@ void openMedia(BuildContext context, String url) async {
         builder: (_) {
           return PdfViewerBottomsheet(
             source: url,
-            title: 'Document', // You might want to pass a more specific title
+            title: AppLabels.document(context), // You might want to pass a more specific title
             isLocal: false,
           );
         },

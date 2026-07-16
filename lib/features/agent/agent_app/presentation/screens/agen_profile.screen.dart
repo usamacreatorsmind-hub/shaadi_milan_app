@@ -2,6 +2,7 @@ import 'package:shadi_milan/app/custom/custom_widgets/drawer.dart';
 import 'package:shadi_milan/features/user/user_app/presentation/screens/user_details_screen.dart';
 
 import '../../../../../app/custom/custom_widgets/mime_type.dart';
+import '../../../../../core/constants/app_constants.dart';
 import '../../../../user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -234,12 +235,20 @@ class OverviewCard extends StatelessWidget {
             // You can add navigation to a map application or just display the address
             // For now, let's just show a snackbar or copy to clipboard
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Agent ID: ${agent.agentId}')),
+              SnackBar(content: Text('Staff Id: ${agent.agentId}')),
             );
           },
           icon: Icons.person_outline,
-          label: "Agent ID",
+          label: "Staff Id",
           value: agent.agentId,
+        ),
+        SizedBox(height: 10),
+        _ContactTile(
+          color: primary,
+          onTap: () {},
+          icon: Icons.work_outline_rounded,
+          label: "Designation",
+          value: agent.designation.label,
         ),
         // build all with contact tile
         SizedBox(height: 10),
@@ -402,6 +411,20 @@ class ProfileHeader extends StatelessWidget {
         ),
 
         const SizedBox(height: 4),
+
+        // Designation
+        Text(
+          agent.designation.label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.white70,
+            letterSpacing: 1.1,
+          ),
+          textAlign: TextAlign.center,
+        ),
+
+        const SizedBox(height: 8),
 
         // Email — slightly translucent white
         Text(

@@ -10,7 +10,9 @@ import 'package:shadi_milan/features/auth/domain/states/user_state.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_state.dart';
 import 'package:shadi_milan/features/user/user_app/presentation/screens/user_profile_screen.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../user_app/domain/states/metrimony_profile_view_model.dart';
+
 import '../../domain/states/payment.dart';
 import '../notifier/amount_notifier.dart';
 import '../notifier/payment_api_notifier.dart';
@@ -169,7 +171,7 @@ class _UserPaymentScreenState
                   children: [
                     // 🔹 Title
                     Text(
-                      "Happy Marriage",
+                      AppLocalizations.of(context)!.happyMarriage,
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -181,7 +183,7 @@ class _UserPaymentScreenState
 
                     // 🔹 Subtitle
                     Text(
-                      "Congratulations on your marriage!",
+                      AppLocalizations.of(context)!.marriageCongratulations,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                     ),
@@ -198,9 +200,9 @@ class _UserPaymentScreenState
                         color: Colors.green,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
-                        "SUCCESS FEE",
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.successFee,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1,
@@ -365,17 +367,22 @@ class _UserPaymentScreenState
                             debugPrint("Full Name: ${user.fullName}");
                             debugPrint("Email: ${user.email}");
                             debugPrint("Phone: ${user.phone}");
-                            debugPrint("Agent ID: ${user.agentId}");
+                            debugPrint("Staff Id: ${user.agentId}");
                             debugPrint("Region/State: $region");
                             debugPrint("District/City: $district");
                             debugPrint("Gender: $gender");
                             debugPrint("Amount: ${amountState.amount!.amount}");
                             debugPrint("=====================SA=\n");
 
+                            final amount = amountState.amount!.amount.toDouble();
+                            final agentCommission = data.agentEntity?.calculateCommission(amount) ?? 0.0;
+                            final commissionRate = data.agentEntity?.commissionRate ?? 0.0;
+                            final agentDesignation = data.agentEntity?.designation.label ?? 'N/A';
+
                             ref
                                 .read(paymentProvider.notifier)
                                 .startPayment(
-                                  amount: amountState.amount!.amount.toDouble(),
+                                  amount: amount,
                                   uid: user.uid,
                                   email: user.email ?? "N/A",
                                   fullName: user.fullName ?? "N/A",
@@ -384,11 +391,13 @@ class _UserPaymentScreenState
                                   region: region,
                                   district: district,
                                   paymentType: amountState.amount!.paymentType,
-
                                   gender: gender,
+                                  agentCommission: agentCommission,
+                                  commissionRate: commissionRate,
+                                  agentDesignation: agentDesignation,
                                 );
                           },
-                          child: const Text("Pay Success Fee"),
+                          child: Text(AppLocalizations.of(context)!.paySuccessFee),
                         ),
                       ),
                     ),
@@ -397,7 +406,7 @@ class _UserPaymentScreenState
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Text(
-                        "Secure payment • Cancel anytime • No hidden charges",
+                        AppLocalizations.of(context)!.securePaymentNote,
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                       ),

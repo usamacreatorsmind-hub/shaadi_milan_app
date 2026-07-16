@@ -1,3 +1,4 @@
+import '../../../../../core/constants/app_labels.dart';
 import 'package:auto_route/auto_route.dart';
 
 import '../../../../../core/enums/enum.dart';
@@ -133,7 +134,7 @@ class _UserEducationFormScreenState
 
       if (next.education != null && prev?.education == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Education saved successfully')),
+          SnackBar(content: Text(AppLabels.educationSavedSuccessfully(context))),
         );
       }
     });
@@ -146,8 +147,8 @@ class _UserEducationFormScreenState
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(
           widget.mode == FormMode.create
-              ? 'Education Details'
-              : 'Edit Education',
+              ? AppLabels.educationDetails(context)
+              : AppLabels.editEducation(context),
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
@@ -172,14 +173,14 @@ class _UserEducationFormScreenState
                   selectedColor: Colors.white,
                   fillColor: Theme.of(context).colorScheme.primary,
                   color: Theme.of(context).colorScheme.primary,
-                  children: const [
+                  children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text('Literate'),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(AppLabels.literate(context)),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text('Illiterate'),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(AppLabels.illiterate(context)),
                     ),
                   ],
                 ),
@@ -188,19 +189,19 @@ class _UserEducationFormScreenState
 
                 if (!isIlliterate) ...[
                   // ========== QUALIFICATION SECTION ==========
-                  _sectionHeader('Highest Qualification'),
+                  _sectionHeader(AppLabels.highestQualification(context)),
                   const SizedBox(height: 16),
 
                   AppTextField(
                     controller: _collegeCtrl,
                     prefixIcon: Icons.school,
                     iconColor: Theme.of(context).colorScheme.primary,
-                    label: 'College / University',
-                    hint: 'Enter college or university name',
+                    label: AppLabels.collegeUniversity(context),
+                    hint: AppLabels.collegeHint(context),
                     obscureText: false,
                     keyboardType: TextInputType.text,
                     validator: (v) =>
-                        v == null || v.isEmpty ? 'Required' : null,
+                        v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
                   ),
 
                   const SizedBox(height: 12),
@@ -209,12 +210,12 @@ class _UserEducationFormScreenState
                     controller: _courseCtrl,
                     prefixIcon: Icons.book,
                     iconColor: Theme.of(context).colorScheme.primary,
-                    label: 'Degree / Course',
-                    hint: 'Enter degree or course name',
+                    label: AppLabels.degreeCourse(context),
+                    hint: AppLabels.degreeHint(context),
                     obscureText: false,
                     keyboardType: TextInputType.text,
                     validator: (v) =>
-                        v == null || v.isEmpty ? 'Required' : null,
+                        v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
                   ),
 
                   const SizedBox(height: 12),
@@ -226,12 +227,12 @@ class _UserEducationFormScreenState
                           controller: _percentageCtrl,
                           prefixIcon: Icons.percent,
                           iconColor: Theme.of(context).colorScheme.primary,
-                          label: 'Percentage / CGPA',
-                          hint: 'e.g., 75.5',
+                          label: AppLabels.percentageCGPA(context),
+                          hint: AppLabels.percentageHint(context),
                           obscureText: false,
                           keyboardType: TextInputType.number,
                           validator: (v) => double.tryParse(v ?? '') == null
-                              ? 'Invalid number'
+                              ? AppLabels.mustBeNumber(context)
                               : null,
                         ),
                       ),
@@ -241,12 +242,12 @@ class _UserEducationFormScreenState
                           controller: _passingYearCtrl,
                           prefixIcon: Icons.calendar_today,
                           iconColor: Theme.of(context).colorScheme.primary,
-                          label: 'Passing Year',
-                          hint: 'e.g., 2023',
+                          label: AppLabels.passingYear(context),
+                          hint: AppLabels.yearHint(context),
                           obscureText: false,
                           keyboardType: TextInputType.number,
                           validator: (v) => int.tryParse(v ?? '') == null
-                              ? 'Invalid year'
+                              ? AppLabels.mustBeNumber(context)
                               : null,
                         ),
                       ),
@@ -256,7 +257,7 @@ class _UserEducationFormScreenState
                   const SizedBox(height: 24),
 
                   // ========== EXTRA QUALIFICATION SECTION ==========
-                  _sectionHeader('Additional Qualifications'),
+                  _sectionHeader(AppLabels.additionalQualifications(context)),
                   const SizedBox(height: 16),
 
                   _extraCourseInput(),
@@ -275,8 +276,8 @@ class _UserEducationFormScreenState
                   AppButton(
                     onPressed: _submitForm,
                     text: widget.mode == FormMode.create
-                        ? 'Save Education'
-                        : 'Update Education',
+                        ? AppLabels.saveEducation(context)
+                        : AppLabels.updateEducation(context),
                   ),
 
                 const SizedBox(height: 20),
@@ -315,8 +316,8 @@ class _UserEducationFormScreenState
             controller: _extraCourseCtrl,
             prefixIcon: Icons.add_box,
             iconColor: Theme.of(context).colorScheme.primary,
-            label: 'Add Extra Qualification',
-            hint: 'e.g., Computer Course, Diploma',
+            label: AppLabels.addExtraQualification(context),
+            hint: AppLabels.extraQualificationHint(context),
             obscureText: false,
             keyboardType: TextInputType.text,
             validator: (_) => null,

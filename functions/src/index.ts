@@ -70,7 +70,7 @@ export const notifyAgentOnUserRegister = onDocumentCreated(
     }
 
     if (!agentId || agentId.trim() === "") {
-      logger.info("User registered without agent ID", { userId });
+      logger.info("User registered without Staff Id", { userId });
       return;
     }
 
@@ -92,7 +92,7 @@ export const notifyAgentOnUserRegister = onDocumentCreated(
       token: agentFcmToken,
       notification: {
         title: "New User Registered",
-        body: `${user.fullName ?? "A new user"} registered with your Agent ID`,
+        body: `${user.fullName ?? "A new user"} registered with your Staff Id`,
       },
       data: {
         click_action: "FLUTTER_NOTIFICATION_CLICK",

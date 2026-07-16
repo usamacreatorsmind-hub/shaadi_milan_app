@@ -23,6 +23,9 @@ class Payment {
   final String district;
   final String gender;
   final int amount;
+  final double agentCommission;
+  final double commissionRate;
+  final String agentDesignation;
   final String status; // PENDING | SUCCESS | FAILED
   final String gateway;
   final DateTime createdAt;
@@ -49,6 +52,9 @@ class Payment {
     required this.phone,
     required this.fullName,
     required this.amount,
+    this.agentCommission = 0.0,
+    this.commissionRate = 0.0,
+    this.agentDesignation = '',
     required this.status,
     this.gateway = 'razorpay',
     required this.createdAt,
@@ -83,6 +89,9 @@ class Payment {
       phone: map['phone'] ?? '',
       fullName: map['fullName'] ?? '',
       amount: _parseAmount(map['amount']),
+      agentCommission: (map['agentCommission'] ?? 0.0).toDouble(),
+      commissionRate: (map['commissionRate'] ?? 0.0).toDouble(),
+      agentDesignation: map['agentDesignation'] ?? '',
       status: map['status'] ?? '',
       gateway: map['gateway'] ?? 'razorpay',
       createdAt: map['createdAt'] is Timestamp
@@ -112,11 +121,66 @@ class Payment {
       'phone': phone,
       'fullName': fullName,
       'amount': amount,
+      'agentCommission': agentCommission,
+      'commissionRate': commissionRate,
+      'agentDesignation': agentDesignation,
       'status': status,
       'gateway': gateway,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
+  }
+
+  Payment copyWith({
+    String? orderId,
+    String? razorpayOrderId,
+    String? userId,
+    String? email,
+    String? phone,
+    String? fullName,
+    String? paymentType,
+    String? razorpayPaymentId,
+    String? razorpaySignature,
+    String? agentId,
+    String? region,
+    String? district,
+    String? gender,
+    int? amount,
+    double? agentCommission,
+    double? commissionRate,
+    String? agentDesignation,
+    String? status,
+    String? gateway,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? religion,
+    String? caste,
+  }) {
+    return Payment(
+      orderId: orderId ?? this.orderId,
+      razorpayOrderId: razorpayOrderId ?? this.razorpayOrderId,
+      userId: userId ?? this.userId,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      fullName: fullName ?? this.fullName,
+      paymentType: paymentType ?? this.paymentType,
+      razorpayPaymentId: razorpayPaymentId ?? this.razorpayPaymentId,
+      razorpaySignature: razorpaySignature ?? this.razorpaySignature,
+      agentId: agentId ?? this.agentId,
+      region: region ?? this.region,
+      district: district ?? this.district,
+      gender: gender ?? this.gender,
+      amount: amount ?? this.amount,
+      agentCommission: agentCommission ?? this.agentCommission,
+      commissionRate: commissionRate ?? this.commissionRate,
+      agentDesignation: agentDesignation ?? this.agentDesignation,
+      status: status ?? this.status,
+      gateway: gateway ?? this.gateway,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      religion: religion ?? this.religion,
+      caste: caste ?? this.caste,
+    );
   }
 }
 

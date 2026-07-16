@@ -1,3 +1,4 @@
+import '../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../core/enums/enum.dart';
 import 'package:auto_route/auto_route.dart';
@@ -137,7 +138,7 @@ class _UserPhysicalFormScreenState
         ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
       } else if (current.physical != null && !physicalState.isLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Physical profile saved successfully!')),
+          SnackBar(content: Text(AppLabels.physicalProfileSavedSuccessfully(context))),
         );
       }
     });
@@ -145,7 +146,7 @@ class _UserPhysicalFormScreenState
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Physical Details',
+          AppLabels.physicalDetails(context),
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
@@ -159,11 +160,11 @@ class _UserPhysicalFormScreenState
                 controller: _heightController,
                 prefixIcon: Icons.height,
                 iconColor: Theme.of(context).colorScheme.primary,
-                label: "Height (in cm)",
-                hint: "Enter your height in centimeters",
+                label: AppLabels.heightCm(context),
+                hint: AppLabels.heightHint(context),
                 obscureText: false,
                 keyboardType: TextInputType.number,
-                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
               ),
 
               const SizedBox(height: 16),
@@ -171,23 +172,23 @@ class _UserPhysicalFormScreenState
                 controller: _weightController,
                 prefixIcon: Icons.monitor_weight,
                 iconColor: Theme.of(context).colorScheme.primary,
-                label: "Weight (in kg)",
-                hint: "Enter your weight in kilograms",
+                label: AppLabels.weightKg(context),
+                hint: AppLabels.weightHint(context),
                 obscureText: false,
                 keyboardType: TextInputType.number,
-                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
               ),
               const SizedBox(height: 16),
 
               AppDropDown(
-                label: "Body Type",
-                items: const [
-                  'Slim',
-                  'Athletic',
-                  'Average',
-                  'Heavy',
-                  'Muscular',
-                  'Obese',
+                label: AppLabels.selectBodyType(context),
+                items: [
+                  AppLabels.slim(context),
+                  AppLabels.athletic(context),
+                  AppLabels.average(context),
+                  AppLabels.heavy(context),
+                  AppLabels.muscular(context),
+                  AppLabels.obese(context),
                 ],
 
                 value: _bodyTypeController.text.isEmpty
@@ -198,7 +199,7 @@ class _UserPhysicalFormScreenState
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select a body type';
+                    return AppLabels.selectBodyType(context);
                   }
                   return null;
                 },
@@ -206,17 +207,17 @@ class _UserPhysicalFormScreenState
 
               const SizedBox(height: 16),
               AppDropDown(
-                label: "Complexion",
+                label: AppLabels.selectComplexion(context),
 
-                items: const [
-                  'Very Fair',
-                  'Fair',
-                  'Wheatish',
-                  'Dark',
-                  'Brown',
-                  'Duskey',
-                  'Dark Brown',
-                  'Black',
+                items: [
+                  AppLabels.veryFair(context),
+                  AppLabels.fair(context),
+                  AppLabels.wheatish(context),
+                  AppLabels.dark(context),
+                  AppLabels.brown(context),
+                  AppLabels.dusky(context),
+                  AppLabels.darkBrown(context),
+                  AppLabels.blackComplexion(context),
                 ],
 
                 value: _complexionController.text.isEmpty
@@ -227,7 +228,7 @@ class _UserPhysicalFormScreenState
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select a complexion';
+                    return AppLabels.selectComplexion(context);
                   }
                   return null;
                 },
@@ -235,7 +236,7 @@ class _UserPhysicalFormScreenState
 
               const SizedBox(height: 16),
               AppSwitch(
-                title: "Physically Challenged",
+                title: AppLabels.physicallyChallenged(context),
                 value: _physicallyChallenged,
                 onChanged: (value) {
                   setState(() {
@@ -250,12 +251,12 @@ class _UserPhysicalFormScreenState
                   controller: _disabilityDetailsController,
                   prefixIcon: Icons.accessible,
                   iconColor: Theme.of(context).colorScheme.primary,
-                  label: "Disability Details",
-                  hint: "Please specify details",
+                  label: AppLabels.disabilityDetails(context),
+                  hint: AppLabels.disabilityDetailsHint(context),
                   obscureText: false,
                   keyboardType: TextInputType.text,
                   validator: (v) =>
-                      v == null || v.isEmpty ? 'Please enter details' : null,
+                      v == null || v.isEmpty ? AppLabels.pleaseEnter(context) : null,
                 ),
               ],
 
@@ -267,7 +268,7 @@ class _UserPhysicalFormScreenState
                     ? const SizedBox.shrink()
                     : AppButton(
                         onPressed: _submitForm,
-                        text: 'Physical Profile',
+                        text: AppLabels.physicalProfile(context),
                       )),
             ],
           ),

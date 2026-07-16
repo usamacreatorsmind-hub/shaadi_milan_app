@@ -1,4 +1,5 @@
 import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/features/auth/presentation/providers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -77,7 +78,17 @@ class AppDrawer extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "${AppConstants.agentIdLabel}${data.agentId}",
+                      data.designation.label,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "${AppLabels.agentIdLabel(context)}${data.agentId}",
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 13,
@@ -96,14 +107,14 @@ class AppDrawer extends ConsumerWidget {
                   children: [
                     DrawerItem(
                       icon: Icons.dashboard_outlined,
-                      title: AppConstants.dashboard,
+                      title: AppLabels.dashboard(context),
                       onTap: () {
                         context.maybePop();
                       },
                     ),
                     DrawerItem(
                       icon: Icons.people_outline,
-                      title: AppConstants.myClients,
+                      title: AppLabels.myClients(context),
                       onTap: () {
                         context.maybePop();
                       },
@@ -111,7 +122,7 @@ class AppDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.bar_chart_outlined,
-                      title: AppConstants.analytics,
+                      title: AppLabels.analytics(context),
                       onTap: () {
                         context.maybePop();
                       },
@@ -127,7 +138,7 @@ class AppDrawer extends ConsumerWidget {
                     // ),
                     DrawerItem(
                       icon: Icons.support_agent,
-                      title: AppConstants.supportTickets,
+                      title: AppLabels.supportTickets(context),
                       onTap: () {
                         context.maybePop();
                         context.pushRoute(
@@ -138,7 +149,7 @@ class AppDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.description_outlined,
-                      title: AppConstants.documents,
+                      title: AppLabels.documents(context),
                       onTap: () {
                         context.maybePop();
                       },
@@ -146,7 +157,7 @@ class AppDrawer extends ConsumerWidget {
                     const Divider(),
                     DrawerItem(
                       icon: Icons.settings_outlined,
-                      title: AppConstants.settings,
+                      title: AppLabels.settings(context),
                       onTap: () {
                         context.maybePop();
                         context.pushRoute(AgentSettingsRoute());
@@ -155,7 +166,7 @@ class AppDrawer extends ConsumerWidget {
 
                     DrawerItem(
                       icon: Icons.person_outline,
-                      title: AppConstants.myProfile,
+                      title: AppLabels.myProfile(context),
                       onTap: () {
                         context.maybePop();
                         context.pushRoute(AgentEntityRoute(uid: data.agentId));
@@ -169,6 +180,40 @@ class AppDrawer extends ConsumerWidget {
                     //     context.pushRoute(MyReviewRoute());
                     //   },
                     // ),
+                    const Divider(),
+                    DrawerItem(
+                      icon: Icons.logout_rounded,
+                      title: AppLabels.logout(context),
+                      onTap: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(AppLabels.logout(context)),
+                            content: Text(AppLabels.logoutConfirm(context)),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text(AppLabels.cancel(context)),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: Text(
+                                  AppLabels.logout(context),
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true) {
+                          await ref.read(authRepositoryProvider).signOut();
+                          if (context.mounted) {
+                            context.router.replaceAll([const AuthWrapperRoute()]);
+                          }
+                        }
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -176,10 +221,10 @@ class AppDrawer extends ConsumerWidget {
           );
         },
         error: (Object error, StackTrace stackTrace) {
-          return Text("error occurred");
+          return Text(AppLabels.errorOccurred(context));
         },
         loading: () {
-          return CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         },
       ),
     );

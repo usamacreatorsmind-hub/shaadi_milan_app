@@ -1,9 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../app/router/app_router.dart';
+import '../../../app/router/app_router.dart';  
 import '../../../core/constants/app_constants.dart';
 
 @RoutePage()
@@ -24,7 +25,7 @@ class ContactUsScreen extends StatelessWidget {
             backgroundColor: theme.primaryColor,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: true,
-              title: const Text("Contact Us"),
+              title: Text(AppLabels.contactUs(context)),
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -54,7 +55,7 @@ class ContactUsScreen extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 Text(
-                  "We're here to help 💙",
+                  AppLabels.hereToHelp(context),
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -62,7 +63,7 @@ class ContactUsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Have questions, feedback, or need assistance?\nReach out to us through any of the channels below.",
+                  AppLabels.contactDescription(context),
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.grey.shade600,
@@ -73,7 +74,7 @@ class ContactUsScreen extends StatelessWidget {
                 _ContactTile(
                   iconWidget: const Icon(Icons.email_outlined, color: Colors.redAccent),
                   color: Colors.redAccent,
-                  title: "Email Us",
+                  title: AppLabels.emailUs(context),
                   subtitle: AppConstants.supportEmail,
                   onTap: () => _launchUrl(AppConstants.emailLink),
                 ),
@@ -81,24 +82,24 @@ class ContactUsScreen extends StatelessWidget {
                 _ContactTile(
                   iconWidget: const Icon(Icons.phone_outlined, color: Colors.blueAccent),
                   color: Colors.blueAccent,
-                  title: "Call Us",
-                  subtitle: AppConstants.phone,
+                  title: AppLabels.callUs(context),
+                  subtitle: AppLabels.phone(context),
                   onTap: () => _launchUrl(AppConstants.phoneLink),
                 ),
 
                 _ContactTile(
                   iconWidget: const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
                   color: Colors.green,
-                  title: "WhatsApp",
-                  subtitle: AppConstants.phone,
+                  title: AppLabels.whatsapp(context),
+                  subtitle: AppLabels.phone(context),
                   onTap: () => _launchUrl(AppConstants.whatsappLink),
                 ),
 
                 _ContactTile(
                   iconWidget: const Icon(Icons.message_outlined, color: Colors.deepPurple),
                   color: Colors.deepPurple,
-                  title: "Send a Message",
-                  subtitle: "We'll get back to you shortly",
+                  title: AppLabels.sendAMessage(context),
+                  subtitle: AppLabels.getBackShortly(context),
                   onTap: () {
                     context.pushRoute(SupportTicketFormRoute());
                   },
@@ -119,7 +120,7 @@ class ContactUsScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          "Our support team is available\n${AppConstants.supportHours}",
+                          "${AppLabels.supportTeamAvailable(context)}\n${AppConstants.supportHours}",
                           style: theme.textTheme.bodySmall,
                         ),
                       ),

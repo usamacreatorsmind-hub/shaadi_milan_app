@@ -1,7 +1,10 @@
 import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+
+ 
 
 /// Glass morphism app bar with animated blur and gradient effects
 class AnimatedGlassAppBar extends StatelessWidget {
@@ -119,7 +122,7 @@ class AnimatedGlassAppBar extends StatelessWidget {
                                   ],
                                 ).createShader(bounds),
                                 child: Text(
-                                  title ?? AppConstants.appName,
+                                  title ?? AppLabels.appName(context),
                                   style: const TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.w800,
@@ -170,6 +173,8 @@ class AnimatedGlassAppBar extends StatelessWidget {
     );
   }
 }
+
+ 
 
 /// Modern gradient app bar with smooth animations
 class ModernGradientAppBar extends StatelessWidget {
@@ -436,7 +441,7 @@ class _SearchableAppBarState extends State<SearchableAppBar>
                 autofocus: widget.autoFocusSearch,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: widget.searchHint ?? 'Search...',
+                  hintText: widget.searchHint ?? AppLabels.searchHint(context),
                   hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
                   border: InputBorder.none,
                 ),

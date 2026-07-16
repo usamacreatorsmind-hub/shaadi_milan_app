@@ -1,3 +1,4 @@
+import '../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/image_picker/image_picker_widget.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../../../../app/custom/image_picker/image_picker_controller.dart';
@@ -20,7 +21,7 @@ class UserImageFormScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 40, 16, 120),
             children: [
               Text(
-                'Upload Profile Images',
+                AppLabels.uploadProfileImages(context),
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: 20),

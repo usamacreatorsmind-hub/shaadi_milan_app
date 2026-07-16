@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../../../../core/enums/enum.dart';
 
+import '../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/validators.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import 'package:intl/intl.dart';
@@ -69,9 +70,9 @@ class _UserIdentityFormScreenState
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
-      helpText: "Select your date of birth",
-      cancelText: "Cancel",
-      confirmText: "Select",
+      helpText: AppLabels.selectDobHelp(context),
+      cancelText: AppLabels.cancel(context),
+      confirmText: AppLabels.selectDobConfirm(context),
     );
 
     if (picked != null) {
@@ -121,15 +122,15 @@ class _UserIdentityFormScreenState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error fetching user data: $e')));
+        ).showSnackBar(SnackBar(content: Text(AppLabels.errorFetchingUserData(context, e.toString()))));
       }
       return;
     }
 
     if (gender.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Gender not found. Please update your profile.'),
+        SnackBar(
+          content: Text(AppLabels.genderNotFound(context)),
         ),
       );
       return;
@@ -138,14 +139,14 @@ class _UserIdentityFormScreenState
 
     if (_selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select date of birth')),
+        SnackBar(content: Text(AppLabels.pleaseSelectDob(context))),
       );
       return;
     }
 
     if (_age! < 18) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You must be at least 18 years old')),
+        SnackBar(content: Text(AppLabels.mustBe18(context))),
       );
       return;
     }
@@ -199,7 +200,7 @@ class _UserIdentityFormScreenState
 
       if (current.identity != null && previous?.identity == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Identity saved successfully')),
+          SnackBar(content: Text(AppLabels.identitySavedSuccessfully(context))),
         );
       }
     });
@@ -210,7 +211,7 @@ class _UserIdentityFormScreenState
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
         title: Text(
-          widget.mode == FormMode.create ? 'Create Identity' : 'Edit Identity',
+          widget.mode == FormMode.create ? AppLabels.createIdentity(context) : AppLabels.editIdentity(context),
 
           style: Theme.of(context).textTheme.headlineMedium,
         ),
@@ -229,8 +230,8 @@ class _UserIdentityFormScreenState
                 controller: _aboutMeController,
                 prefixIcon: Icons.person_outline,
                 iconColor: Theme.of(context).colorScheme.primary,
-                label: "About Me",
-                hint: "Tell us about yourself",
+                label: AppLabels.aboutMe(context),
+                hint: AppLabels.tellUsAboutYourself(context),
 
                 showWordCount: true,
                 counterType: CounterType.words,
@@ -238,7 +239,7 @@ class _UserIdentityFormScreenState
                 obscureText: false,
                 keyboardType: TextInputType.multiline,
                 maxLines: 3,
-                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
               ),
               const SizedBox(height: 16),
 
@@ -258,11 +259,11 @@ class _UserIdentityFormScreenState
 
                 prefixIcon: Icons.credit_card,
                 iconColor: Theme.of(context).colorScheme.primary,
-                label: "Aadhar Number",
-                hint: "Enter your Aadhar number",
+                label: AppLabels.aadharNumber(context),
+                hint: AppLabels.enterAadharNumber(context),
                 obscureText: false,
                 keyboardType: TextInputType.number,
-                validator: Validators.validateAadhar,
+                validator: (value) => Validators.validateAadhar(context, value),
               ),
               const SizedBox(height: 12),
 
@@ -289,10 +290,10 @@ class _UserIdentityFormScreenState
                 ),
                 title: Text(
                   _selectedDate == null
-                      ? 'Select Date of Birth'
-                      : 'DOB: ${DateFormat('dd/MM/yyyy').format(_selectedDate!)}',
+                      ? AppLabels.selectDateOfBirth(context)
+                      : AppLabels.dobValue(context, DateFormat('dd/MM/yyyy').format(_selectedDate!)),
                 ),
-                subtitle: _age == null ? null : Text('Age: $_age years'),
+                subtitle: _age == null ? null : Text(AppLabels.ageYears(context, _age!)),
                 onTap: () => _selectDate(context),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
@@ -319,14 +320,14 @@ class _UserIdentityFormScreenState
                           : AppButton(
                               onPressed: _submitForm,
                               text: widget.mode == FormMode.create
-                                  ? 'Save Identity'
-                                  : 'Update Identity',
+                                  ? AppLabels.saveIdentity(context)
+                                  : AppLabels.updateIdentity(context),
                             ))
               else
-                const Text(
-                  "You are not eligible to create a profile as you are under 18 years old.",
+                Text(
+                  AppLabels.notEligibleUnder18(context),
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
 
               const SizedBox(height: 16),

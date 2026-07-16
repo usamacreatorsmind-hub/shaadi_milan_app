@@ -1,3 +1,4 @@
+import '../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../core/enums/enum.dart';
 
@@ -55,7 +56,7 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
     if (_formKey.currentState!.validate()) {
       if (_familyType == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a family type')),
+          SnackBar(content: Text(AppLabels.selectFamilyType(context))),
         );
         return;
       }
@@ -96,7 +97,7 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
         ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
       } else if (current.family != null && previous?.family == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Family profile saved successfully!')),
+          SnackBar(content: Text(AppLabels.familyProfileSavedSuccessfully(context))),
         );
       }
     });
@@ -104,7 +105,7 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Family Details',
+          AppLabels.familyDetails(context),
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
@@ -118,8 +119,8 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
                 controller: _fatherNameController,
                 prefixIcon: Icons.person,
                 iconColor: Theme.of(context).colorScheme.primary,
-                label: "Father's Name",
-                hint: "Enter your father's name",
+                label: AppLabels.fatherName(context),
+                hint: AppLabels.fatherNameHint(context),
                 obscureText: false,
                 keyboardType: TextInputType.text,
               ),
@@ -128,8 +129,8 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
                 controller: _motherNameController,
                 prefixIcon: Icons.person,
                 iconColor: Theme.of(context).colorScheme.primary,
-                label: "Mother's Name",
-                hint: "Enter your mother's name",
+                label: AppLabels.motherName(context),
+                hint: AppLabels.motherNameHint(context),
                 obscureText: false,
                 keyboardType: TextInputType.text,
               ),
@@ -138,8 +139,8 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
                 controller: _brothersController,
                 prefixIcon: Icons.people,
                 iconColor: Theme.of(context).colorScheme.primary,
-                label: "Number of Brothers",
-                hint: "Enter number of brothers",
+                label: AppLabels.numberOfBrothers(context),
+                hint: AppLabels.brothersHint(context),
                 obscureText: false,
                 keyboardType: TextInputType.number,
               ),
@@ -148,8 +149,8 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
                 controller: _sistersController,
                 prefixIcon: Icons.people_alt,
                 iconColor: Theme.of(context).colorScheme.primary,
-                label: "Number of Sisters",
-                hint: "Enter number of sisters",
+                label: AppLabels.numberOfSisters(context),
+                hint: AppLabels.sistersHint(context),
                 obscureText: false,
                 keyboardType: TextInputType.number,
               ),
@@ -157,15 +158,15 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
               const SizedBox(height: 20),
 
               AppDropDown(
-                label: "Family Type",
-                items: const ['Joint Family', 'Nuclear Family'],
+                label: AppLabels.familyType(context),
+                items: [AppLabels.jointFamily(context), AppLabels.nuclearFamily(context)],
                 value: _familyType,
                 onChanged: (value) {
                   setState(() => _familyType = value);
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select a family type';
+                    return AppLabels.selectFamilyType(context);
                   }
                   return null;
                 },
@@ -174,13 +175,13 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
 
               // use dropdown
               AppDropDown(
-                label: "LifeStyle Status",
-                items: const [
-                  'Prefer not to say',
-                  'Simple Lifestyle',
-                  'Moderate Lifestyle',
-                  'Comfortable Lifestyle',
-                  'Well-established Lifestyle',
+                label: AppLabels.lifeStyleStatus(context),
+                items: [
+                  AppLabels.preferNotToSay(context),
+                  AppLabels.simpleLifestyle(context),
+                  AppLabels.moderateLifestyle(context),
+                  AppLabels.comfortableLifestyle(context),
+                  AppLabels.wellEstablishedLifestyle(context),
                 ],
                 value: _familyStatusController.text.isEmpty
                     ? null
@@ -190,7 +191,7 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select a family status';
+                    return AppLabels.selectLifeStyleStatus(context);
                   }
                   return null;
                 },
@@ -202,7 +203,7 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
               else
                 (widget.registerSubmit != null
                     ? const SizedBox.shrink()
-                    : AppButton(onPressed: _submitForm, text: 'Save Family')),
+                    : AppButton(onPressed: _submitForm, text: AppLabels.saveFamily(context))),
             ],
           ),
         ),

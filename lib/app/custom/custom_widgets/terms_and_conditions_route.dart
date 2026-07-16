@@ -1,5 +1,6 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_constants.dart';
@@ -14,7 +15,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Terms & Conditions"),
+        title: Text(AppLabels.termsAndConditions(context)),
         centerTitle: true,
         backgroundColor: theme.primaryColor,
         foregroundColor: theme.colorScheme.onPrimary,
@@ -25,103 +26,85 @@ class TermsAndConditionsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Terms and Conditions for ${AppConstants.appName}",
+              "${AppLabels.termsAndConditionsFor(context)} ${AppLabels.appName(context)}",
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.primary,
               ),
             ),
             const SizedBox(height: 20),
-            // Text(
-            //   "Last updated: ${AppConstants.termsLastUpdated}",
-            //   style: theme.textTheme.bodySmall?.copyWith(
-            //     color: Colors.grey.shade600,
-            //   ),
-            // ),
-            const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "1. Acceptance of Terms",
-              content:
-                  "By accessing or using the ${AppConstants.appName} website and services, you agree to be bound by these Terms and Conditions and our Privacy Policy. If you do not agree to all the terms and conditions of this agreement, then you may not access the website or use any services.",
+              title: AppLabels.acceptanceTermsTitle(context),
+              content: AppLabels.acceptanceTermsContent(context),
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "2. Eligibility",
-              content:
-                  "You must be at least 18 years old and of legal marriageable age as per the laws of India to register and use our services. By using the service, you represent and warrant that you have the right, authority, and capacity to enter into this agreement and to abide by all of the terms and conditions of this agreement.",
+              title: AppLabels.eligibilityTitle(context),
+              content: AppLabels.eligibilityContent(context),
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "3. Account Registration",
-              content:
-                  "To use certain features of the service, you must register for an account. You agree to provide accurate, current, and complete information during the registration process and to update such information to keep it accurate, current, and complete. You are responsible for safeguarding your password and for all activities that occur under your account.",
+              title: AppLabels.accountRegistrationTitle(context),
+              content: AppLabels.accountRegistrationContent(context),
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "4. User Conduct",
-              content:
-                  "You agree to use the service only for lawful purposes and in a way that does not infringe the rights of, restrict, or inhibit anyone else's use and enjoyment of the service. Prohibited behavior includes harassing or causing distress or inconvenience to any other user, transmitting obscene or offensive content, or disrupting the normal flow of dialogue within the service.",
+              title: AppLabels.userConductTitle(context),
+              content: AppLabels.userConductContent(context),
             ),
 
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "5. Content Ownership and License",
-              content:
-                  "You retain all ownership rights to the content you submit to the service. By submitting content, you grant ${AppConstants.appName} a worldwide, non-exclusive, royalty-free, transferable license to use, reproduce, distribute, prepare derivative works of, display, and perform the content in connection with the service and ${AppConstants.appName}'s (and its successors' and affiliates') business, including without limitation for promoting and redistributing part or all of the service (and derivative works thereof) in any media formats and through any media channels.",
+              title: AppLabels.contentOwnershipTitle(context),
+              content: AppLabels.contentOwnershipContent(context),
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "6. Premium Services and Payments",
-              content:
-                  "${AppConstants.appName} may offer premium services that require payment. All fees are non-refundable unless otherwise stated. We reserve the right to change our prices at any time. Your subscription to premium services will automatically renew unless you cancel it before the end of the current subscription period.",
+              title: AppLabels.premiumServicesTitle(context),
+              content: AppLabels.premiumServicesContent(context),
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "7. Disclaimer of Warranties",
-              content:
-                  "The service is provided on an 'as is' and 'as available' basis. ${AppConstants.appName} makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties, including without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.",
+              title: AppLabels.disclaimerWarrantiesTitle(context),
+              content: AppLabels.disclaimerWarrantiesContent(context),
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "8. Limitation of Liability",
-              content:
-                  "In no event shall ${AppConstants.appName} or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on ${AppConstants.appName}'s website, even if ${AppConstants.appName}  or a ${AppConstants.appName} authorized representative has been notified orally or in writing of the possibility of such damage. Because some jurisdictions do not allow limitations on implied warranties, or limitations of liability for consequential or incidental damages, these limitations may not apply to you.",
+              title: AppLabels.limitationLiabilityTitle(context),
+              content: AppLabels.limitationLiabilityContent(context),
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "9. Indemnification",
-              content:
-                  "You agree to indemnify, defend, and hold harmless ${AppConstants.appName}, its officers, directors, employees, agents, and third parties, for any losses, costs, liabilities, and expenses (including reasonable attorneys' fees) relating to or arising out of your use of or inability to use the Site or services, any user postings made by you, your violation of any terms of this Agreement or your violation of any rights of a third party, or your violation of any applicable laws, rules or regulations. ${AppConstants.appName} reserves the right, at its own cost, to assume the exclusive defense and control of any matter otherwise subject to indemnification by you, in which event you will fully cooperate with ${AppConstants.appName} in asserting any available defenses.",
+              title: AppLabels.indemnificationTitle(context),
+              content: AppLabels.indemnificationContent(context),
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "10. Changes to Terms",
-              content:
-                  "${AppConstants.appName} reserves the right, in its sole discretion, to change the Terms under which this application is offered. The most current version of the Terms will supersede all previous versions. ${AppConstants.appName} encourages you to periodically review the Terms to stay informed of our updates.",
+              title: AppLabels.changesTermsTitle(context),
+              content: AppLabels.changesTermsContent(context),
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "11. Governing Law",
-              content:
-                  "These Terms shall be governed and construed in accordance with the laws of India, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of these Terms will remain in effect. These Terms constitute the entire agreement between us regarding our Service, and supersede and replace any prior agreements we might have between us regarding the Service.",
+              title: AppLabels.governingLawTitle(context),
+              content: AppLabels.governingLawContent(context),
             ),
             const SizedBox(height: 20),
             _buildSection(
               context,
-              title: "12. Contact Us",
+              title: AppLabels.contactUsTitle(context),
               content:
-                  "${AppConstants.appName} welcomes your questions or comments regarding the Terms: Email: ${AppConstants.supportEmail}",
+                  "${AppLabels.contactUsContent(context)} Email: ${AppConstants.supportEmail}",
             ),
 
             const SizedBox(height: 20),
@@ -169,7 +152,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Privacy Policy",
+          AppLabels.privacyPolicy(context),
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: theme.colorScheme.onSurface,
@@ -177,7 +160,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          "Your privacy is important to us. Please review our Privacy Policy to understand how we collect, use, and protect your personal information.",
+          AppLabels.privacyImportantMessage(context),
           textAlign: TextAlign.justify,
           style: theme.textTheme.bodyMedium?.copyWith(
             height: 1.5,
@@ -204,6 +187,4 @@ class TermsAndConditionsScreen extends StatelessWidget {
       ],
     );
   }
-
-
 }

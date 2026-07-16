@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_labels.dart';
 import '../../../../app/custom/custom_widgets/validators.dart';
 import '../providers/auth_providers.dart';
 
@@ -58,8 +59,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Password changed successfully!"),
+        SnackBar(
+          content: Text(AppLabels.passwordChangedSuccessfully(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -69,18 +70,16 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       String message;
       switch (e.code) {
         case 'requires-recent-login':
-          message =
-              "Please log in again to change your password. For security reasons, this operation requires a recent authentication.";
+          message = AppLabels.reauthenticateForSecurity(context);
           break;
         case 'wrong-password':
-          message = "The current password you entered is incorrect.";
+          message = AppLabels.incorrectCurrentPassword(context);
           break;
         case 'weak-password':
-          message =
-              "The new password is too weak. Please use a stronger password.";
+          message = AppLabels.weakNewPassword(context);
           break;
         case 'network-request-failed':
-          message = "No internet connection. Please check your network.";
+          message = AppLabels.noInternet(context);
           break;
         default:
           message = "Failed to change password: ${e.message}";
@@ -92,7 +91,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("An unexpected error occurred: $e"),
+          content: Text("${AppLabels.somethingWentWrong(context)}: $e"),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -104,7 +103,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Change Password"), centerTitle: true),
+      appBar: AppBar(title: Text(AppLabels.changePassword(context)), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Form(
@@ -119,14 +118,14 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               ),
               const SizedBox(height: 10),
               Text(
-                "Update Your Password",
+                AppLabels.updateYourPassword(context),
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
-                "Enter your current password and a new password to update.",
+                AppLabels.changePasswordSubtitle(context),
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: Colors.grey.shade600,
@@ -152,13 +151,13 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       controller: _currentPasswordController,
                       prefixIcon: Icons.lock,
                       iconColor: theme.colorScheme.primary,
-                      label: "Current Password",
-                      hint: "Enter your current password",
+                      label: AppLabels.currentPassword(context),
+                      hint: "••••••••",
                       obscureText: true,
                       keyboardType: TextInputType.visiblePassword,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your current password';
+                          return AppLabels.passwordRequired(context);
                         }
                         return null;
                       },
@@ -168,23 +167,24 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       controller: _newPasswordController,
                       prefixIcon: Icons.lock_outline,
                       iconColor: theme.colorScheme.primary,
-                      label: "New Password",
-                      hint: "Enter your new password",
+                      label: AppLabels.newPassword(context),
+                      hint: "••••••••",
                       obscureText: true,
 
                       keyboardType: TextInputType.visiblePassword,
-                      validator: (value) => Validators.validatePassword(value),
+                      validator: (value) => Validators.validatePassword(context, value),
                     ),
                     const SizedBox(height: 16),
                     AppTextField(
                       controller: _confirmNewPasswordController,
                       prefixIcon: Icons.lock_reset,
                       iconColor: theme.colorScheme.primary,
-                      label: "Confirm New Password",
-                      hint: "Confirm your new password",
+                      label: AppLabels.confirmNewPassword(context),
+                      hint: "••••••••",
                       obscureText: true,
                       keyboardType: TextInputType.visiblePassword,
                       validator: (value) => Validators.validateConfirmPassword(
+                        context,
                         value,
                         _newPasswordController.text,
                       ),
@@ -197,7 +197,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 width: double.infinity,
                 height: 55,
                 child: AppButton(
-                  text: "Change Password",
+                  text: AppLabels.changePassword(context),
                   onPressed: _changePassword,
                 ),
               ),
@@ -210,9 +210,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   if (user == null || user.email == null) {
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
-                          "You must be logged in to reset your password.",
+                          AppLabels.mustBeLoggedInToReset(context),
                         ),
                         behavior: SnackBarBehavior.floating,
                       ),
@@ -226,7 +226,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          "Password reset email sent to ${user.email}. Please check your inbox.",
+                          AppLabels.resetEmailSentTo(context, user.email!),
                         ),
                         behavior: SnackBarBehavior.floating,
                       ),
@@ -236,12 +236,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     String message;
                     switch (e.code) {
                       case 'network-request-failed':
-                        message =
-                            "No internet connection. Please check your network.";
+                        message = AppLabels.noInternet(context);
                         break;
                       case 'user-not-found':
-                        message =
-                            "No user found with this email. Please ensure you are logged in.";
+                        message = AppLabels.userNotFound(context);
                         break;
                       default:
                         message = "Failed to send reset email: ${e.message}";
@@ -256,14 +254,14 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text("An unexpected error occurred: $e"),
+                        content: Text("${AppLabels.somethingWentWrong(context)}: $e"),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
                   }
                 },
                 child: Text(
-                  "Forgot Password? Reset via Email",
+                  AppLabels.forgotPasswordResetViaEmail(context),
                   style: TextStyle(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w600,

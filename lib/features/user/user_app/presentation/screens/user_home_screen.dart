@@ -1,5 +1,6 @@
 import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
 import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/features/user/user_app/domain/repositories/user_recemmonded_repository.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_state.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
@@ -120,7 +121,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (user) {
-          if (user == null) return const Center(child: Text("User not found"));
+          if (user == null) return Center(child: Text(AppLabels.userNotFound(context)));
 
           // Watch the payment status directly for this user.
           // The PaymentNotifier fetches the status from Firebase.
@@ -138,8 +139,8 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
             return CustomScrollView(
               slivers: [
                 ModernGradientAppBar(
-                  title: AppConstants.home,
-                  subtitle: AppConstants.homeSubtitle,
+                  title: AppLabels.home(context),
+                  subtitle: AppLabels.homeSubtitle(context),
                   leading: Builder(
                     builder: (context) => IconButton(
                       icon: const Icon(Icons.menu, color: Colors.white),
@@ -186,11 +187,11 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Marquee(
-                                    pauseDuration: Duration(milliseconds: 500),
+                                    pauseDuration: const Duration(milliseconds: 500),
                                     velocity: 50,
 
                                     filterText.isEmpty
-                                        ? AppConstants.allProfiles
+                                        ? AppLabels.allProfiles(context)
                                         : filterText,
                                     style: const TextStyle(
                                       fontSize: 13,
@@ -245,7 +246,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                       fullName: user.fullName,
                       hasFilter: filterText.isNotEmpty,
                       filterText: filterText.isEmpty
-                          ? AppConstants.allProfiles
+                          ? AppLabels.allProfiles(context)
                           : filterText,
                     ),
                   ),
@@ -279,7 +280,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    AppConstants.completeProfileTitle,
+                                    AppLabels.completeProfileTitle(context),
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
@@ -290,7 +291,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    AppConstants.completeProfileMessage,
+                                    AppLabels.completeProfileMessage(context),
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: Theme.of(
@@ -304,8 +305,8 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                       const MatrimonyFormFlowRoute(),
                                     ),
                                     icon: const Icon(Icons.edit_note_rounded),
-                                    label: const Text(
-                                      AppConstants.completeProfileButton,
+                                    label: Text(
+                                      AppLabels.completeProfileButton(context),
                                     ),
                                   ),
                                 ],
@@ -367,7 +368,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                             (currentUserGender == 'male') ? 'female' : 'male';
                         genderMatch =
                             profile.identity.gender.toLowerCase() == opposite;
-                      } else if (filterGender == AppConstants.allProfiles) {
+                      } else if (filterGender == AppLabels.allProfiles(context)) {
                         // Explicitly show all
                         genderMatch = true;
                       } else {
@@ -412,9 +413,9 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
                                 const SizedBox(height: 10),
-                                const Text(
-                                  AppConstants.noProfilesFound,
-                                  style: TextStyle(
+                                Text(
+                                  AppLabels.noProfilesFound(context),
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -427,7 +428,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                         .reset();
                                   },
                                   icon: const Icon(Icons.refresh_rounded),
-                                  label: const Text('Reset filters'),
+                                  label: Text(AppLabels.resetFilters(context)),
                                 ),
                               ],
                             ),
@@ -443,6 +444,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                           final viewModel = visibleProfiles[index];
                           final profile = viewModel.profile;
                           final user = viewModel.user;
+                          final agent = viewModel.agent;
                           final displayName = user?.fullName ?? 'N/A';
                           final designation = profile.employment.designation;
 
@@ -457,9 +459,10 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                               age: profile.identity.age,
                               designation:
                                   (designation == null || designation.isEmpty)
-                                  ? 'N/A'
-                                  : designation,
+                                      ? 'N/A'
+                                      : designation,
                               imageUrl: profile.images.primaryImageUrl,
+                              agentDesignation: agent != null ? agent.designation.label : null,
                             ),
                           );
                         }, childCount: visibleProfiles.length),
@@ -511,14 +514,14 @@ class _HomeSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${AppConstants.welcomeLabel}${fullName.isEmpty ? 'User' : fullName.split(' ').first}',
+            '${AppLabels.welcomeLabel(context)}${fullName.isEmpty ? 'User' : fullName.split(' ').first}',
             style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 6),
           Text(
             hasFilter
-                ? AppConstants.showingFiltered
-                : AppConstants.showingAllMatches,
+                ? AppLabels.showingFiltered(context)
+                : AppLabels.showingAllMatches(context),
             style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13),
           ),
           const SizedBox(height: 12),
@@ -573,9 +576,9 @@ class FilterRightSheet extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    AppConstants.filterProfiles,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Text(
+                    AppLabels.filterProfiles(context),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Row(
                     children: [
@@ -583,7 +586,7 @@ class FilterRightSheet extends ConsumerWidget {
                         onPressed: () {
                           ref.read(homeFilterProvider.notifier).reset();
                         },
-                        child: const Text(AppConstants.reset),
+                        child: Text(AppLabels.reset(context)),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -601,9 +604,9 @@ class FilterRightSheet extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // ================= LOCATION SECTION =================
-                      const Text(
-                        'Location',
-                        style: TextStyle(
+                      Text(
+                        AppLabels.location(context),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey,
@@ -627,7 +630,7 @@ class FilterRightSheet extends ConsumerWidget {
                           return Column(
                             children: [
                               _buildDropdown(
-                                title: 'State',
+                                title: AppLabels.state(context),
                                 value: filter.state.isEmpty
                                     ? null
                                     : filter.state,
@@ -642,7 +645,7 @@ class FilterRightSheet extends ConsumerWidget {
                               ),
                               const SizedBox(height: 12),
                               _buildDropdown(
-                                title: 'City',
+                                title: AppLabels.city(context),
                                 value: filter.city.isEmpty ? null : filter.city,
                                 items: selectedState.cities,
                                 onChanged: (val) {
@@ -661,9 +664,9 @@ class FilterRightSheet extends ConsumerWidget {
                       const SizedBox(height: 24),
 
                       // ================= GENDER SECTION =================
-                      const Text(
-                        'Gender',
-                        style: TextStyle(
+                      Text(
+                        AppLabels.gender(context),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey,
@@ -671,9 +674,9 @@ class FilterRightSheet extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       _buildDropdown(
-                        title: 'Gender',
+                        title: AppLabels.gender(context),
                         value: (filter.gender ?? '').isEmpty ? null : filter.gender,
-                        items: [AppConstants.allProfiles, AppConstants.male, AppConstants.female],
+                        items: [AppLabels.allProfiles(context), AppLabels.male(context), AppLabels.female(context)],
                         onChanged: (val) {
                           if (val != null) {
                             ref
@@ -686,9 +689,9 @@ class FilterRightSheet extends ConsumerWidget {
                       const SizedBox(height: 24),
 
                       // ================= RELIGION SECTION =================
-                      const Text(
-                        'Cultural',
-                        style: TextStyle(
+                      Text(
+                        AppLabels.cultural(context),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey,
@@ -713,7 +716,7 @@ class FilterRightSheet extends ConsumerWidget {
                           return Column(
                             children: [
                               _buildDropdown(
-                                title: 'Religion',
+                                title: AppLabels.religion(context),
                                 value: filter.religion.isEmpty
                                     ? null
                                     : filter.religion,
@@ -728,7 +731,7 @@ class FilterRightSheet extends ConsumerWidget {
                               ),
                               const SizedBox(height: 12),
                               _buildDropdown(
-                                title: 'Caste',
+                                title: AppLabels.caste(context),
                                 value: filter.caste.isEmpty
                                     ? null
                                     : filter.caste,
@@ -756,7 +759,7 @@ class FilterRightSheet extends ConsumerWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text(AppConstants.applyFilters),
+                  child: Text(AppLabels.applyFilters(context)),
                 ),
               ),
             ],
@@ -802,6 +805,7 @@ class ProfileCard extends StatelessWidget {
   final int age;
   final String designation;
   final String imageUrl;
+  final String? agentDesignation;
 
   const ProfileCard({
     super.key,
@@ -809,8 +813,8 @@ class ProfileCard extends StatelessWidget {
     required this.name,
     required this.age,
     required this.designation,
-
     required this.imageUrl,
+    this.agentDesignation,
   });
 
   @override
@@ -883,6 +887,27 @@ class ProfileCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (agentDesignation != null)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colors.primary.withValues(alpha: 0.8),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                agentDesignation!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ),
                           Text(
                             name,
                             maxLines: 1,
@@ -903,7 +928,7 @@ class ProfileCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 5),
                               Text(
-                                '$age yrs',
+                                '$age ${AppLabels.ageYrs(context)}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -943,7 +968,7 @@ class ProfileCard extends StatelessWidget {
                     onPressed: () =>
                         context.router.push(UserDetailRoute(uid: uid)),
                     icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                    label: const Text(AppConstants.viewProfile),
+                    label: Text(AppLabels.viewProfile(context)),
                   ),
                 ),
               ),

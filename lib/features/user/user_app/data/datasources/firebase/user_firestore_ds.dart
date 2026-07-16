@@ -12,7 +12,7 @@ class UserFirestoreDS {
   UserFirestoreDS(this._firestore);
 
   CollectionReference<Map<String, dynamic>> get _users =>
-      _firestore.collection(AppConstants.collUsers);
+      _firestore.collection("users");
 
   Future<List<Map<String, dynamic>>> fetchUsers() async {
     final querySnapshot = await _users.get();
@@ -26,8 +26,9 @@ class UserFirestoreDS {
     final currentUserDoc = await _users.doc(currentUid).get();
     if (!currentUserDoc.exists) throw Exception('Current user not found');
 
-    final currentUserGender = (currentUserDoc.data()?[AppConstants.fieldGender] as String?)
-        ?.toLowerCase();
+    final currentUserGender =
+        (currentUserDoc.data()?[AppConstants.fieldGender] as String?)
+            ?.toLowerCase();
     if (currentUserGender == null || currentUserGender.isEmpty) {
       yield [];
       return;

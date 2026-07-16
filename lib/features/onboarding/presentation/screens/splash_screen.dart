@@ -1,3 +1,5 @@
+import 'package:shadi_milan/core/constants/app_labels.dart';
+
 import '../../../../app/custom/custom_widgets/app_logo.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../core/app_version_config/remote_config_service.dart';
@@ -101,7 +103,7 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 children: [
                   Text(
-                    AppConstants.appName,
+                    AppLabels.appName(context),
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: theme.primaryColor,
                       fontWeight: FontWeight.bold,
@@ -109,7 +111,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    AppConstants.splashTagline,
+                    AppLabels.splashTagline(context),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: Colors.grey[600],

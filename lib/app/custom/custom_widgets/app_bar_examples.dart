@@ -1,5 +1,7 @@
 import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
+ 
 import 'animated_app_bar.dart';
 
 /// Example usage of all modern app bars
@@ -17,11 +19,11 @@ class AppBarExamplesScreen extends StatelessWidget {
         slivers: [
           // Example 1: Glass Morphism App Bar (Default)
           AnimatedGlassAppBar(
-            title: AppConstants.appName,
-            subtitle: AppConstants.homeSubtitle,
+            title: AppLabels.appName(context),
+            subtitle: AppLabels.homeSubtitle(context),
             showLogo: true,
             logoAsset: AppConstants.appLogoPath,
-            actions: [
+            actions: const [
               Icon(Icons.notifications_outlined, color: Colors.black54),
               SizedBox(width: 16),
             ],
@@ -30,7 +32,7 @@ class AppBarExamplesScreen extends StatelessWidget {
           // Content
           SliverList(
             delegate: SliverChildListDelegate([
-              _buildSection('Glass Morphism App Bar',
+              _buildSection(context, 'Glass Morphism App Bar',
                   'Beautiful glass effect with blur and gradient. Perfect for hero sections.'),
             ]),
           ),
@@ -39,7 +41,7 @@ class AppBarExamplesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(String title, String description) {
+  Widget _buildSection(BuildContext context, String title, String description) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Card(
@@ -74,8 +76,8 @@ class AppBarExamplesScreen extends StatelessWidget {
 /// CustomScrollView(
 ///   slivers: [
 ///     AnimatedGlassAppBar(
-///       title: 'Welcome',
-///       subtitle: 'Find your match',
+///       title: AppLabels.welcome(context),
+///       subtitle: AppLabels.homeSubtitle(context),
 ///       showLogo: true,
 ///       actions: [
 ///         IconButton(
@@ -96,7 +98,7 @@ class AppBarExamplesScreen extends StatelessWidget {
 /// CustomScrollView(
 ///   slivers: [
 ///     ModernGradientAppBar(
-///       title: 'My Profile',
+///       title: AppLabels.myProfile(context),
 ///       subtitle: 'Edit your details',
 ///       centerTitle: true,
 ///       actions: [
@@ -118,7 +120,7 @@ class AppBarExamplesScreen extends StatelessWidget {
 /// CustomScrollView(
 ///   slivers: [
 ///     MinimalAppBar(
-///       title: 'Settings',
+///       title: AppLabels.settings(context),
 ///       showShadow: true,
 ///       actions: [
 ///         IconButton(
@@ -160,8 +162,8 @@ class AppBarExamplesScreen extends StatelessWidget {
 /// CustomScrollView(
 ///   slivers: [
 ///     SearchableAppBar(
-///       title: 'Find Profiles',
-///       searchHint: 'Search by name...',
+///       title: AppLabels.filterProfiles(context),
+///       searchHint: AppLabels.searchHint(context),
 ///       onSearch: (query) {
 ///         print('Searching: $query');
 ///       },
@@ -215,8 +217,8 @@ class UserHomeWithGlassAppBar extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           AnimatedGlassAppBar(
-            title: AppConstants.appName,
-            subtitle: AppConstants.homeSubtitle,
+            title: AppLabels.appName(context),
+            subtitle: AppLabels.homeSubtitle(context),
             showLogo: true,
             leading: Builder(
               builder: (context) => IconButton(
@@ -235,8 +237,8 @@ class UserHomeWithGlassAppBar extends StatelessWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, index) => Card(
                   child: ListTile(
-                    title: Text('Profile ${index + 1}'),
-                    subtitle: const Text('Tap to view details'),
+                    title: Text('${AppLabels.profile(context)} ${index + 1}'),
+                    subtitle: Text(AppLabels.tapToViewDetails(context)),
                   ),
                 ),
                 childCount: 20,
@@ -268,8 +270,8 @@ class _SearchScreenWithSearchableAppBarState
       body: CustomScrollView(
         slivers: [
           SearchableAppBar(
-            title: 'Find Profiles',
-            searchHint: 'Search by name, age, location...',
+            title: AppLabels.filterProfiles(context),
+            searchHint: AppLabels.searchHintFull(context),
             autoFocusSearch: false,
             onSearch: (query) {
               setState(() {
@@ -291,8 +293,8 @@ class _SearchScreenWithSearchableAppBarState
               delegate: SliverChildBuilderDelegate(
                 (context, index) => Card(
                   child: ListTile(
-                    title: Text('Result ${index + 1}'),
-                    subtitle: Text('Matches: $_searchQuery'),
+                    title: Text('${AppLabels.result(context)} ${index + 1}'),
+                    subtitle: Text('${AppLabels.matches(context)}: $_searchQuery'),
                   ),
                 ),
                 childCount: 15,
@@ -337,24 +339,24 @@ class ProfileDetailWithHeroAppBar extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                const Text(
-                  'About',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  AppLabels.about(context),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Software engineer with a passion for travel and photography...',
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Details',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  AppLabels.details(context),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                _buildDetailRow('Height', '5\'10"'),
-                _buildDetailRow('Education', 'B.Tech Computer Science'),
-                _buildDetailRow('Occupation', 'Software Engineer'),
-                _buildDetailRow('Location', 'Mumbai, Maharashtra'),
+                _buildDetailRow(AppLabels.height(context), '5\'10"'),
+                _buildDetailRow(AppLabels.education(context), 'B.Tech Computer Science'),
+                _buildDetailRow(AppLabels.occupation(context), 'Software Engineer'),
+                _buildDetailRow(AppLabels.location(context), 'Mumbai, Maharashtra'),
               ]),
             ),
           ),

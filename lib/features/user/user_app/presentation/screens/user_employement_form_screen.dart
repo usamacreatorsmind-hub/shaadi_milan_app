@@ -1,3 +1,4 @@
+import '../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../core/enums/enum.dart';
 import 'package:auto_route/auto_route.dart';
@@ -61,12 +62,12 @@ class _UserEmploymentFormScreenState
     if (_jobType == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a job type')));
+      ).showSnackBar(SnackBar(content: Text(AppLabels.selectJobType(context))));
       return;
     }
 
     // If "Not Working", skip validation and submit with null values
-    if (_jobType == 'Not Working') {
+    if (_jobType == AppLabels.notWorking(context)) {
       final notifier = ref.read(userEmploymentControllerProvider.notifier);
 
       if (widget.mode == FormMode.create) {
@@ -140,8 +141,8 @@ class _UserEmploymentFormScreenState
         ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
       } else if (current.employment != null && previous?.employment == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Employment profile saved successfully!'),
+          SnackBar(
+            content: Text(AppLabels.employmentSavedSuccessfully(context)),
           ),
         );
       }
@@ -155,8 +156,8 @@ class _UserEmploymentFormScreenState
             controller: _companyController,
             prefixIcon: Icons.business,
             iconColor: Theme.of(context).colorScheme.primary,
-            label: "Organaization",
-            hint: "Enter your Organaization name",
+            label: AppLabels.organization(context),
+            hint: AppLabels.organizationHint(context),
             obscureText: false,
             keyboardType: TextInputType.text,
           ),
@@ -166,8 +167,8 @@ class _UserEmploymentFormScreenState
             controller: _designationController,
             prefixIcon: Icons.work,
             iconColor: Theme.of(context).colorScheme.primary,
-            label: "Designation",
-            hint: "Enter your designation",
+            label: AppLabels.designation(context),
+            hint: AppLabels.designationHint(context),
             obscureText: false,
             keyboardType: TextInputType.text,
           ),
@@ -177,8 +178,8 @@ class _UserEmploymentFormScreenState
             controller: _workLocationController,
             prefixIcon: Icons.location_on,
             iconColor: Theme.of(context).colorScheme.primary,
-            label: "Work Location",
-            hint: "Enter your work location",
+            label: AppLabels.workLocation(context),
+            hint: AppLabels.workLocationHint(context),
             obscureText: false,
             keyboardType: TextInputType.text,
           ),
@@ -191,8 +192,8 @@ class _UserEmploymentFormScreenState
             prefixIcon: Icons.currency_rupee,
 
             iconColor: Theme.of(context).colorScheme.primary,
-            label: "Annual Income",
-            hint: "Enter your annual income",
+            label: AppLabels.annualIncome(context),
+            hint: AppLabels.annualIncomeHint(context),
             obscureText: false,
             keyboardType: TextInputType.number,
           ),
@@ -203,7 +204,7 @@ class _UserEmploymentFormScreenState
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Employment Details',
+          AppLabels.employmentDetails(context),
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
@@ -214,14 +215,14 @@ class _UserEmploymentFormScreenState
           child: ListView(
             children: [
               AppDropDown(
-                label: "Job Type",
-                items: const [
-                  'Private',
-                  'Government',
-                  'Business',
-                  'Defence',
-                  'Self Employed',
-                  'Not Working',
+                label: AppLabels.jobType(context),
+                items: [
+                  AppLabels.private(context),
+                  AppLabels.government(context),
+                  AppLabels.business(context),
+                  AppLabels.defence(context),
+                  AppLabels.selfEmployed(context),
+                  AppLabels.notWorking(context),
                 ],
                 value: _jobType,
                 onChanged: (value) {
@@ -229,9 +230,9 @@ class _UserEmploymentFormScreenState
                 },
               ),
               const SizedBox(height: 16),
-              _jobType == "Not Working" ? SizedBox() : buildEmploymentForm(),
+              _jobType == AppLabels.notWorking(context) ? const SizedBox() : buildEmploymentForm(),
 
-              SizedBox(height: 25),
+              const SizedBox(height: 25),
 
               const SizedBox(height: 20),
               if (employmentState.isLoading)
@@ -243,7 +244,7 @@ class _UserEmploymentFormScreenState
                         width: double.infinity,
                         child: AppButton(
                           onPressed: _submitForm,
-                          text: 'Save Employment',
+                          text: AppLabels.saveEmployment(context),
                         ),
                       )),
             ],

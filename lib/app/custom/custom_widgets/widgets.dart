@@ -2,6 +2,8 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 
 enum CounterType { words, characters }
 
@@ -177,10 +179,12 @@ class AppTextField extends ConsumerStatefulWidget {
 
 class _TextFormWidgetState extends ConsumerState<AppTextField> {
   int _currentCount = 0;
+  late bool _isObscured;
 
   @override
   void initState() {
     super.initState();
+    _isObscured = widget.obscureText;
     widget.controller?.addListener(_updateCount);
   }
 
@@ -217,6 +221,23 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
         MaxLengthFormatter(max: widget.maxLimit!),
     ];
 
+    String? counterText;
+    if (widget.showWordCount) {
+      if (widget.counterType == CounterType.words) {
+        if (widget.maxLimit != null) {
+          counterText = '$_currentCount / ${widget.maxLimit} ${AppLabels.words(context)}';
+        } else {
+          counterText = '$_currentCount ${AppLabels.words(context)}';
+        }
+      } else {
+        if (widget.maxLimit != null) {
+          counterText = '$_currentCount / ${widget.maxLimit} ${AppLabels.characters(context)}';
+        } else {
+          counterText = '$_currentCount ${AppLabels.characters(context)}';
+        }
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.all(4),
       child: SizedBox(
@@ -225,7 +246,7 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
           controller: widget.controller,
           onTap: widget.ontap,
           readOnly: widget.ontap != null,
-          obscureText: widget.obscureText,
+          obscureText: _isObscured,
           inputFormatters: formatters,
           keyboardType: widget.keyboardType,
           maxLines: widget.maxLines,
@@ -243,15 +264,22 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
           decoration: InputDecoration(
             labelText: widget.label,
             hintText: widget.hint,
-            counterText: widget.showWordCount
-                ? widget.counterType == CounterType.words
-                      ? widget.maxLimit != null
-                            ? '$_currentCount / ${widget.maxLimit} words'
-                            : '$_currentCount words'
-                      : widget.maxLimit != null
-                      ? '$_currentCount / ${widget.maxLimit} characters'
-                      : '$_currentCount characters'
+            suffixIcon: widget.obscureText
+                ? IconButton(
+                    icon: Icon(
+                      _isObscured
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isObscured = !_isObscured;
+                      });
+                    },
+                  )
                 : null,
+            counterText: counterText,
             counterStyle: TextStyle(
               fontSize: 12,
               color:
@@ -305,7 +333,7 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
               widget.validator ??
               (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter ${widget.label.toLowerCase()}';
+                  return '${AppLabels.pleaseEnter(context)} ${widget.label.toLowerCase()}';
                 }
                 return null;
               },
@@ -326,7 +354,7 @@ class _SearchWidgetState extends ConsumerState<SearchWidget> {
   Widget build(BuildContext context) {
     return TextFormField(
       decoration: InputDecoration(
-        hintText: "Search",
+        hintText: AppLabels.searchLabel(context),
         prefixIcon: const Icon(Icons.search),
         filled: true,
         fillColor: Colors.grey[200],
@@ -363,7 +391,7 @@ class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
       value: widget.items.contains(widget.value) ? widget.value : null,
       decoration: InputDecoration(
         labelText: widget.label,
-        hintText: 'Select ${widget.label.toLowerCase()}',
+        hintText: '${AppLabels.select(context)} ${widget.label.toLowerCase()}',
         prefixIcon: Padding(
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
@@ -419,7 +447,7 @@ class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
           widget.validator ??
           (value) {
             if (value == null || value.isEmpty) {
-              return 'Please select ${widget.label.toLowerCase()}';
+              return '${AppLabels.pleaseSelect(context)} ${widget.label.toLowerCase()}';
             }
             return null;
           },

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/app_labels.dart';
 import '../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../app/router/app_router.dart';
 import '../providers/auth_providers.dart';
@@ -31,7 +32,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     final authRepo = ref.watch(authRepositoryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Reset Password"), centerTitle: true),
+      appBar: AppBar(title: Text(AppLabels.resetPassword(context)), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Column(
@@ -41,14 +42,14 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
             Icon(Icons.lock_reset, size: 80, color: theme.colorScheme.primary),
             const SizedBox(height: 10),
             Text(
-              "Forgot your password?",
+              AppLabels.forgotPassword(context),
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 6),
             Text(
-              "Enter your email to receive a password reset link.",
+              AppLabels.resetPasswordSubtitle(context),
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.grey.shade600,
@@ -77,8 +78,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     controller: emailCtrl,
                     prefixIcon: Icons.email,
                     iconColor: theme.colorScheme.primary,
-                    label: "Email",
-                    hint: "Enter your email",
+                    label: AppLabels.email(context),
+                    hint: "name@example.com",
                     obscureText: false,
                     keyboardType: TextInputType.emailAddress,
                   ),
@@ -88,7 +89,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     width: double.infinity,
                     height: 55,
                     child: AppButton(
-                      text: "Send Reset Link",
+                      text: AppLabels.sendResetLink(context),
                       onPressed: () async {
                         try {
                           await authRepo.sendPasswordResetEmail(
@@ -98,9 +99,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                           if (!mounted) return;
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
-                                "Password reset link sent to your email. Please check your inbox.",
+                                AppLabels.resetLinkSent(context),
                               ),
                               behavior: SnackBarBehavior.floating,
                             ),
@@ -114,22 +115,19 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                           switch (e.code) {
                             case 'user-not-found':
-                              message =
-                                  "No account found with this email. Please register first.";
+                              message = AppLabels.userNotFoundWithEmail(context);
                               break;
 
                             case 'invalid-email':
-                              message = "Please enter a valid email address.";
+                              message = AppLabels.invalidEmail(context);
                               break;
 
                             case 'network-request-failed':
-                              message =
-                                  "No internet connection. Please check your network.";
+                              message = AppLabels.noInternet(context);
                               break;
 
                             default:
-                              message =
-                                  "Unable to send reset link right now. Please try again later.";
+                              message = AppLabels.unableToSendResetLink(context);
                           }
 
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -142,9 +140,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                           if (!mounted) return;
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
-                                "Something went wrong. Please try again.",
+                                AppLabels.somethingWentWrong(context),
                               ),
                               behavior: SnackBarBehavior.floating,
                             ),
@@ -153,7 +151,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       },
                     ),
                   ),
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -166,11 +164,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
             //  going to password   screen
             TextButton(
               onPressed: () {
-                context.navigateTo( ChangePasswordRoute());
+                context.navigateTo(const ChangePasswordRoute());
               },
-              child: const Text(
-                "Change Password",
-                style: TextStyle(fontWeight: FontWeight.w600),
+              child: Text(
+                AppLabels.changePassword(context),
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
             const SizedBox(height: 20),
@@ -180,9 +178,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               onPressed: () {
                 context.router.maybePop();
               },
-              child: const Text(
-                "Back to Login",
-                style: TextStyle(fontWeight: FontWeight.w600),
+              child: Text(
+                AppLabels.backToLogin(context),
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
           ],

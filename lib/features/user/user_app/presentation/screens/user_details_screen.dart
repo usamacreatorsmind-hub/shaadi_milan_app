@@ -17,6 +17,7 @@ import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
+
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../../../widgets/marquee.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
@@ -649,7 +650,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                         //             ),
 
                         //             _InfoTile(
-                        //               label: 'Agent ID',
+                        //               label: 'Staff Id',
                         //               icon: Icons.perm_identity,
                         //               value: viewModel.agent!.agentId,
                         //             ),
@@ -712,7 +713,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
-                                      'User ID or Profile ID or Agent ID is missing.',
+                                      'User ID or Profile ID or Staff Id is missing.',
                                     ),
                                   ),
                                 );
