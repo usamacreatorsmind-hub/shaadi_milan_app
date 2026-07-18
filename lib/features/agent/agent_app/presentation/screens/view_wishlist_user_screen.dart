@@ -1,12 +1,14 @@
-import 'package:shadi_milan/app/router/app_router.dart';
-import 'package:shadi_milan/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
-import 'package:sizer/sizer.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../notifier/user_nofier.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
+import 'package:shadi_milan/features/auth/domain/states/agent_state.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+import 'package:sizer/sizer.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../l10n/l10n_helper.dart';
+import '../notifier/user_nofier.dart';
 
 @RoutePage()
 class ViewWishListUserScreen extends ConsumerStatefulWidget {
@@ -34,7 +36,7 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Details'),
+        title: Text(context.l10n.userDetails),
         elevation: 0,
         backgroundColor: theme.primaryColor,
         foregroundColor: theme.colorScheme.onPrimary,
@@ -53,7 +55,7 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'User Not Found',
+                    context.l10n.userNotFound,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ],
@@ -80,7 +82,6 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                       padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
                       child: Column(
                         children: [
-                          // Positioned(child: child),
                           // Avatar
                           Hero(
                             tag: 'user-avatar-${user.uid}',
@@ -103,28 +104,32 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                                   width: 4,
                                 ),
                               ),
-                              child: Center(),
+                              child: const Center(),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // Name
-                          Text(
-                            user.fullName,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.onPrimary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                        
+                        
+                      
+                      
+                         BilingualParser(
+                    value:  user.fullName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                        
+                         
                           const SizedBox(height: 8),
                           // Email
                           Text(
                             user.email,
                             style: TextStyle(
                               fontSize: 14,
-                              color: theme.colorScheme.onPrimary.withOpacity(
-                                0.9,
+                              color: theme.colorScheme.onPrimary.withValues(
+                                alpha: 0.9,
                               ),
                             ),
                             textAlign: TextAlign.center,
@@ -149,10 +154,10 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                             children: [
                               _StatusItem(
                                 icon: Icons.check_circle,
-                                label: 'Profile Status',
+                                label: context.l10n.profileStatus,
                                 value: user.isProfileCreated
-                                    ? 'Created'
-                                    : 'Pending',
+                                    ? context.l10n.created
+                                    : context.l10n.notCreated,
                                 color: user.isProfileCreated
                                     ? Colors.green
                                     : Colors.orange,
@@ -164,8 +169,10 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                               ),
                               _StatusItem(
                                 icon: Icons.favorite,
-                                label: 'Profile',
-                                value: user.isProfileCreated ? 'Active' : 'Pending',
+                                label: context.l10n.profile,
+                                value: user.isProfileCreated
+                                    ? context.l10n.active
+                                    : context.l10n.notCreated,
                                 color: Colors.pink,
                               ),
                             ],
@@ -177,20 +184,20 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
 
                     // Contact Information
                     _SectionCard(
-                      title: 'Contact Information',
+                      title: context.l10n.contactInformation,
                       icon: Icons.contact_mail,
                       children: [
                         _DetailRow(
                           icon: Icons.phone,
-                          label: 'Phone',
+                          label: context.l10n.phone,
                           value: user.phone.isNotEmpty
                               ? user.phone
-                              : 'Not provided',
+                              : context.l10n.notProvided,
                         ),
                         const Divider(height: 24),
                         _DetailRow(
                           icon: Icons.email,
-                          label: 'Email',
+                          label: context.l10n.email,
                           value: user.email,
                         ),
                       ],
@@ -198,14 +205,16 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
 
                     // Account Information
                     _SectionCard(
-                      title: 'Account Information',
+                      title: context.l10n.accountInformation,
                       icon: Icons.account_box,
                       children: [
                         const Divider(height: 24),
                         _DetailRow(
                           icon: Icons.verified_user,
-                          label: 'Role',
-                          value: user.role.isNotEmpty ? user.role : 'User',
+                          label: context.l10n.role,
+                          value: user.role.isNotEmpty
+                              ? user.role
+                              : context.l10n.userRole,
                         ),
                         const Divider(height: 24),
                         _DetailRow(
@@ -213,14 +222,14 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                           label: 'User Type',
                           value: user.userType.isNotEmpty
                               ? user.userType
-                              : 'Not specified',
+                              : context.l10n.notSpecified,
                         ),
                       ],
                     ),
 
                     // Matrimony Information
                     _SectionCard(
-                      title: 'Matrimony Information',
+                      title: context.l10n.matrimonyInformation,
                       icon: Icons.favorite_border,
                       children: [
                         _DetailRow(
@@ -228,7 +237,7 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                           label: 'Matrimony ID',
                           value: user.metrimonyId.isNotEmpty
                               ? user.metrimonyId
-                              : 'Not assigned',
+                              : context.l10n.notAssigned,
                         ),
                         const Divider(height: 24),
                         _DetailRow(
@@ -236,107 +245,37 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                           label: 'Profile ID',
                           value: user.profileId.isNotEmpty
                               ? user.profileId
-                              : 'Not assigned',
+                              : context.l10n.notAssigned,
                         ),
                         const Divider(height: 24),
                         _DetailRow(
                           icon: Icons.supervisor_account,
-                          label: 'Staff Id',
+                          label: context.l10n.staffId,
                           value: user.agentId.isNotEmpty
                               ? user.agentId
-                              : 'Not assigned',
+                              : context.l10n.notAssigned,
                         ),
                       ],
                     ),
 
                     // Activity Information
                     _SectionCard(
-                      title: 'Activity',
+                      title: context.l10n.activity,
                       icon: Icons.history,
                       children: [
                         _DetailRow(
                           icon: Icons.calendar_today,
-                          label: 'Created At',
-                          value: _formatDateTime(user.createdAt),
+                          label: context.l10n.createdAt,
+                          value: _formatDateTime(user.createdAt, context),
                         ),
                         const Divider(height: 24),
                         _DetailRow(
                           icon: Icons.access_time,
-                          label: 'Last Seen',
-                          value: _formatDateTime(user.lastSeen),
+                          label: context.l10n.lastSeen,
+                          value: _formatDateTime(user.lastSeen, context),
                         ),
                       ],
                     ),
-
-                    // Payment Information
-
-                    // Wishlists Section
-                    // if (user.wishlists.isNotEmpty)
-                    //   _SectionCard(
-                    //     title: 'Wishlists',
-                    //     icon: Icons.list,
-                    //     children: [
-                    //       ...user.wishlists.asMap().entries.map((entry) {
-                    //         final index = entry.key;
-                    //         final wishlistId = entry.value;
-
-                    //         return Padding(
-                    //           padding: EdgeInsets.only(
-                    //             bottom: index < user.wishlists.length - 1
-                    //                 ? 12
-                    //                 : 0,
-                    //           ),
-                    //           child: Row(
-                    //             children: [
-                    //               Container(
-                    //                 width: 32,
-                    //                 height: 32,
-                    //                 decoration: BoxDecoration(
-                    //                   color: theme.primaryColor.withOpacity(
-                    //                     0.1,
-                    //                   ),
-                    //                   borderRadius: BorderRadius.circular(8),
-                    //                 ),
-                    //                 child: Center(
-                    //                   child: Text(
-                    //                     '${index + 1}',
-                    //                     style: TextStyle(
-                    //                       fontWeight: FontWeight.bold,
-                    //                       color: theme.primaryColor,
-                    //                     ),
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //               const SizedBox(width: 12),
-                    //               Expanded(
-                    //                 child: _WishlistUserTile(
-                    //                   profileId: wishlistId.profileId,
-
-                    //                   currentUserAgentId: user.agentId,
-                    //                   status: wishlistId.status,
-                    //                   updatedAt: wishlistId.updatedAt,
-                    //                   formatDateTime: _formatDateTime,
-                    //                   onTap: () {
-                    //                     context.router.push(
-                    //                       ViewUserRoute(
-                    //                         userId: wishlistId.profileId,
-                    //                       ),
-                    //                     );
-                    //                   },
-                    //                 ),
-                    //               ),
-
-                    //               // _DetailRow(
-                    //               //   icon: Icons.person_add,
-                    //               //   label: 'Wishlist Item ${index + 1}',
-                    //               //   value: wishlistId.profileId,
-                    //               // ),
-                    //             ],
-                    //           ),
-                    //         );
-                    //       }),
-                    //     ],
-                    //   ),
                   ],
                 ),
               ),
@@ -349,24 +288,24 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  decoration: BoxDecoration(color: Colors.transparent),
+                  decoration: const BoxDecoration(color: Colors.transparent),
                   child: Row(
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            // Handle call action
                             launchUrl(Uri.parse('tel:${user.phone}'));
-
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Contacting ${user.fullName}...'),
+                                content: Text(
+                                  context.l10n.contactingUser(user.fullName.en),
+                                ),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
                           },
                           icon: const Icon(Icons.phone),
-                          label: const Text('Call'),
+                          label: Text(context.l10n.call),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: theme.primaryColor,
                             foregroundColor: theme.colorScheme.onPrimary,
@@ -382,17 +321,17 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             launchUrl(Uri.parse('mailto:${user.email}'));
-
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Mailing ${user.fullName}...'),
-
+                                content: Text(
+                                  context.l10n.mailingUser(user.fullName.en),
+                                ),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
                           },
                           icon: const Icon(Icons.post_add),
-                          label: const Text('Mail'),
+                          label: Text(context.l10n.mail),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.teal,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -418,7 +357,7 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                 Icon(Icons.error_outline, size: 80, color: Colors.red[400]),
                 const SizedBox(height: 16),
                 Text(
-                  'Error Loading User',
+                  context.l10n.errorLoadingUser,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
@@ -438,7 +377,7 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                         .fetchUserById(widget.userId);
                   },
                   icon: const Icon(Icons.refresh),
-                  label: const Text('Retry'),
+                  label: Text(context.l10n.retry),
                 ),
               ],
             ),
@@ -454,7 +393,7 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Loading User...',
+                  context.l10n.loadingUser,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -465,17 +404,14 @@ class _ViewUserScreenState extends ConsumerState<ViewWishListUserScreen> {
     );
   }
 
-  String _formatDateTime(DateTime dateTime) {
+  String _formatDateTime(DateTime dateTime, BuildContext context) {
     if (dateTime.millisecondsSinceEpoch == 0) {
-      return 'Not available';
+      return context.l10n.notAvailable;
     }
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 }
 
-// ==========================================
-// Status Item Widget
-// ==========================================
 class _StatusItem extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -518,9 +454,6 @@ class _StatusItem extends StatelessWidget {
   }
 }
 
-// ==========================================
-// Section Card Widget
-// ==========================================
 class _SectionCard extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -569,9 +502,6 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-// ==========================================
-// Detail Row Widget
-// ==========================================
 class _DetailRow extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -618,21 +548,16 @@ class _DetailRow extends StatelessWidget {
   }
 }
 
-// ==========================================
-// Wishlist User Tile Widget
-// ==========================================
 class _WishlistUserTile extends ConsumerWidget {
   final String profileId;
   final String status;
   final DateTime updatedAt;
   final String currentUserAgentId;
-
-  final String Function(DateTime) formatDateTime;
+  final String Function(DateTime, BuildContext) formatDateTime;
   final VoidCallback onTap;
 
   const _WishlistUserTile({
     required this.profileId,
-
     required this.currentUserAgentId,
     required this.status,
     required this.updatedAt,
@@ -650,9 +575,8 @@ class _WishlistUserTile extends ConsumerWidget {
       child: userAsync.when(
         data: (user) {
           if (user == null) {
-            return _buildPlaceholder('User not found');
+            return _buildPlaceholder(context.l10n.userNotFound);
           }
-
           isSameAgent = currentUserAgentId == user.agentId;
 
           return Container(
@@ -661,7 +585,7 @@ class _WishlistUserTile extends ConsumerWidget {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   spreadRadius: 1,
                   blurRadius: 5,
                   offset: const Offset(0, 2),
@@ -669,14 +593,11 @@ class _WishlistUserTile extends ConsumerWidget {
               ],
             ),
             padding: const EdgeInsets.all(12),
-
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // User Info Row
                 Row(
                   children: [
-                    // Profile Image
                     CircleAvatar(
                       radius: 24,
                       backgroundColor: Colors.grey[300],
@@ -688,19 +609,18 @@ class _WishlistUserTile extends ConsumerWidget {
                           : null,
                     ),
                     const SizedBox(width: 12),
-                    // User Info
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            user.fullName.isNotEmpty
-                                ? user.fullName
-                                : 'No Name',
+
+                          
+                          BilingualParser(
+                          
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                            ),
+                            ), value:    user.fullName,
                           ),
                           const SizedBox(height: 2),
                           Row(
@@ -712,7 +632,9 @@ class _WishlistUserTile extends ConsumerWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                user.phone.isNotEmpty ? user.phone : 'No phone',
+                                user.phone.isNotEmpty
+                                    ? user.phone
+                                    : context.l10n.noPhone,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.grey[700],
@@ -735,7 +657,7 @@ class _WishlistUserTile extends ConsumerWidget {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
-                                  status,
+                                  _getLocalizedStatus(status, context),
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w500,
@@ -745,7 +667,7 @@ class _WishlistUserTile extends ConsumerWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                formatDateTime(updatedAt),
+                                formatDateTime(updatedAt, context),
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: Colors.grey[500],
@@ -759,7 +681,6 @@ class _WishlistUserTile extends ConsumerWidget {
                     Icon(Icons.chevron_right, color: Colors.grey[400]),
                   ],
                 ),
-                // Agent Contact Button
                 if (user.agentId.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
@@ -767,34 +688,21 @@ class _WishlistUserTile extends ConsumerWidget {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: () {
-                          final isSameAgent =
-                              currentUserAgentId == user.agentId;
-
-                          if (isSameAgent) {
+                          if (currentUserAgentId == user.agentId) {
                             _showSameAgentDialog(context);
                           } else {
-                            if (user.agentId.isNotEmpty) {
-                              showAgentDialog(context, ref, user.agentId);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Staff Id not available for this user.',
-                                  ),
-                                ),
-                              );
-                            }
+                            showAgentDialog(context, ref, user.agentId);
                           }
                         },
-
                         icon: Icon(
                           isSameAgent
                               ? Icons.check_circle_outline
                               : Icons.person,
                         ),
-
                         label: Text(
-                          isSameAgent ? 'Same Agent' : 'Contact Agent',
+                          isSameAgent
+                              ? context.l10n.sameAgent
+                              : context.l10n.contactAgent,
                         ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: isSameAgent
@@ -850,7 +758,7 @@ class _WishlistUserTile extends ConsumerWidget {
             ),
           ],
         ),
-        error: (_, _) => _buildPlaceholder('Error loading user'),
+        error: (_, _) => _buildPlaceholder(context.l10n.errorLoadingUser),
       ),
     );
   }
@@ -867,6 +775,23 @@ class _WishlistUserTile extends ConsumerWidget {
         Text(message, style: TextStyle(color: Colors.grey[600])),
       ],
     );
+  }
+
+  String _getLocalizedStatus(String status, BuildContext context) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return context.l10n.pending;
+      case 'contacted':
+        return context.l10n.statusContacted;
+      case 'interested':
+        return context.l10n.statusInterested;
+      case 'notinterested':
+        return context.l10n.statusNotInterested;
+      case 'closed':
+        return context.l10n.closed;
+      default:
+        return status;
+    }
   }
 
   Color _getStatusColor(String status) {
@@ -891,14 +816,12 @@ class _WishlistUserTile extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
-        title: const Text('Same Agent'),
-        content: const Text(
-          'This user is registered under the same agent. No need to contact another agent for the matrimony process.',
-        ),
+        title: Text(context.l10n.sameAgent),
+        content: Text(context.l10n.sameAgentMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text(context.l10n.ok),
           ),
         ],
       ),
@@ -912,86 +835,12 @@ class _WishlistUserTile extends ConsumerWidget {
       builder: (_) => _AgentDialog(agentId: agentId),
     );
   }
-
-  Widget _buildAgentInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: Colors.grey[600]),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                ),
-                Text(
-                  value.isNotEmpty ? value : 'Not available',
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _AgentDialog extends ConsumerWidget {
   final String agentId;
 
   const _AgentDialog({required this.agentId});
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 18, color: Colors.grey),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatusChip(agent) {
-    if (agent.isApproved) {
-      return const Chip(
-        label: Text('Approved'),
-        backgroundColor: Colors.greenAccent,
-      );
-    }
-    if (agent.isRejected) {
-      return const Chip(
-        label: Text('Rejected'),
-        backgroundColor: Colors.redAccent,
-      );
-    }
-    return const Chip(
-      label: Text('Pending'),
-      backgroundColor: Colors.orangeAccent,
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1026,34 +875,44 @@ class _AgentDialog extends ConsumerWidget {
             ),
           ],
         ),
-        loading: () => const Text('Agent Details'),
-        error: (_, __) => const Text('Agent Details'),
+        loading: () => Text(context.l10n.agentDetails),
+        error: (error, stackTrace) => Text(context.l10n.agentDetails),
       ),
       content: agentAsync.when(
         loading: () => const SizedBox(
           height: 120,
           child: Center(child: CircularProgressIndicator()),
         ),
-        error: (_, __) => const SizedBox(
+        error: (error, stackTrace) => SizedBox(
           height: 120,
-          child: Center(child: Text('Failed to load agent info')),
+          child: Center(child: Text(context.l10n.failedToLoadAgentInfo)),
         ),
         data: (agent) => SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // _buildInfoRow(Icons.badge, 'Staff Id', agent.agentId),
-              _buildInfoRow(Icons.phone, 'Phone', agent.agentMobile),
+              _buildInfoRow(
+                Icons.phone,
+                context.l10n.phone,
+                agent.agentMobile,
+                context,
+              ),
               const Divider(),
-              _buildInfoRow(Icons.email, 'Email', agent.agentEmail),
+              _buildInfoRow(
+                Icons.email,
+                context.l10n.email,
+                agent.agentEmail,
+                context,
+              ),
               const Divider(),
               _buildInfoRow(
                 Icons.location_on,
-                'Location',
+                context.l10n.location,
                 '${agent.agentCity}, ${agent.agentState}',
+                context,
               ),
               const Divider(),
-              _buildStatusChip(agent),
+              _buildStatusChip(agent, context),
             ],
           ),
         ),
@@ -1062,7 +921,7 @@ class _AgentDialog extends ConsumerWidget {
         data: (agent) => [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(context.l10n.cancel),
           ),
           if (agent.agentMobile.isNotEmpty) ...[
             TextButton.icon(
@@ -1072,11 +931,11 @@ class _AgentDialog extends ConsumerWidget {
                   '',
                 );
                 final url =
-                    'https://wa.me/$number?text=Hi, I am contacting you regarding a matrimony profile.';
+                    'https://wa.me/$number?text=${Uri.encodeComponent(context.l10n.whatsappContactMessage)}';
                 launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
               },
               icon: const Icon(Icons.message, size: 18),
-              label: const Text('WhatsApp'),
+              label: Text(context.l10n.whatsapp),
             ),
             ElevatedButton.icon(
               onPressed: () {
@@ -1086,18 +945,71 @@ class _AgentDialog extends ConsumerWidget {
                 );
               },
               icon: const Icon(Icons.phone, size: 18),
-              label: const Text('Call'),
+              label: Text(context.l10n.call),
             ),
           ],
         ],
         loading: () => [],
-        error: (_, __) => [
+        error: (error, stackTrace) => [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(context.l10n.cancel),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildInfoRow(
+    IconData icon,
+    String label,
+    String value,
+    BuildContext context,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: Colors.grey),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value.isNotEmpty ? value : context.l10n.notAvailable,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusChip(AgentEntity agent, BuildContext context) {
+    if (agent.isApproved) {
+      return Chip(
+        label: Text(context.l10n.approved),
+        backgroundColor: Colors.greenAccent,
+      );
+    }
+    if (agent.isRejected) {
+      return Chip(
+        label: Text(context.l10n.rejected),
+        backgroundColor: Colors.redAccent,
+      );
+    }
+    return Chip(
+      label: Text(context.l10n.pending),
+      backgroundColor: Colors.orangeAccent,
     );
   }
 }

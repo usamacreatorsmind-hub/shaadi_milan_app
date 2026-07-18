@@ -1,14 +1,14 @@
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../../../../core/enums/enum.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../controllers/user_employment_controllers.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../core/constants/app_labels.dart';
+import '../../../../../core/enums/enum.dart';
+import '../../../../translitration/models/bilingual_value.dart';
+import '../../../../translitration/widgets/bilingual_text_field.dart';
 import '../../domain/states/employee_state.dart';
+import '../controllers/user_employment_controllers.dart';
 
-@RoutePage()
 class UserEmploymentFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final EmploymentProfile? existingEmploymentProfile;
@@ -29,12 +29,26 @@ class _UserEmploymentFormScreenState
     extends ConsumerState<UserEmploymentFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _companyController = TextEditingController();
+  final _companyEnController = TextEditingController();
+
   final _annualIncomeController = TextEditingController();
 
   final _designationController = TextEditingController();
-  final _workLocationController = TextEditingController();
+  final _designationEnController = TextEditingController();
 
-  String? _jobType;
+  final _workLocationController = TextEditingController();
+  final _workLocationEnController = TextEditingController();
+
+  BilingualValue? _selectedJobType;
+
+  final Map<String, BilingualValue> _jobTypeOptions = {
+    'Private': BilingualValue(hi: 'निजी', en: 'Private'),
+    'Government': BilingualValue(hi: 'सरकारी', en: 'Government'),
+    'Business': BilingualValue(hi: 'व्यापार', en: 'Business'),
+    'Defence': BilingualValue(hi: 'रक्षा', en: 'Defence'),
+    'Self Employed': BilingualValue(hi: 'स्व-नियोजित', en: 'Self Employed'),
+    'Not Working': BilingualValue(hi: 'कार्य नहीं कर रहे', en: 'Not Working'),
+  };
 
   @override
   void initState() {
@@ -43,23 +57,38 @@ class _UserEmploymentFormScreenState
     if (widget.mode == FormMode.edit &&
         widget.existingEmploymentProfile != null) {
       final profile = widget.existingEmploymentProfile!;
-      _companyController.text = profile.company ?? "";
-      _designationController.text = profile.designation ?? "";
-      _annualIncomeController.text = profile.annualIncome.toString();
-      _workLocationController.text = profile.workLocation ?? "";
-      _jobType = profile.jobType;
+      _companyController.text = profile.company?.hi ?? "";
+      _companyEnController.text = profile.company?.en ?? "";
+
+      _designationController.text = profile.designation?.hi ?? "";
+      _designationEnController.text = profile.designation?.en ?? "";
+
+      _annualIncomeController.text = profile.annualIncome?.toString() ?? "";
+
+      _workLocationController.text = profile.workLocation?.hi ?? "";
+      _workLocationEnController.text = profile.workLocation?.en ?? "";
+
+      _selectedJobType = _jobTypeOptions.values.firstWhere(
+        (e) => e.en == profile.jobType.en,
+        orElse: () => profile.jobType,
+      );
     }
   }
 
-  // @override
-  // void dispose() {
-  //   _companyController.dispose();
-  //   _annualIncomeController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    _companyController.dispose();
+    _companyEnController.dispose();
+    _annualIncomeController.dispose();
+    _designationController.dispose();
+    _designationEnController.dispose();
+    _workLocationController.dispose();
+    _workLocationEnController.dispose();
+    super.dispose();
+  }
 
   void _submitForm() {
-    if (_jobType == null) {
+    if (_selectedJobType == null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(AppLabels.selectJobType(context))));
@@ -67,12 +96,12 @@ class _UserEmploymentFormScreenState
     }
 
     // If "Not Working", skip validation and submit with null values
-    if (_jobType == AppLabels.notWorking(context)) {
+    if (_selectedJobType!.en == 'Not Working') {
       final notifier = ref.read(userEmploymentControllerProvider.notifier);
 
       if (widget.mode == FormMode.create) {
         notifier.saveEmployment(
-          jobType: _jobType!,
+          jobType: _selectedJobType!,
           company: null,
           designation: null,
           annualIncome: null,
@@ -80,7 +109,7 @@ class _UserEmploymentFormScreenState
         );
       } else {
         notifier.updateEmployment(
-          jobType: _jobType!,
+          jobType: _selectedJobType!,
           company: null,
           designation: null,
           annualIncome: null,
@@ -95,33 +124,40 @@ class _UserEmploymentFormScreenState
     if (_formKey.currentState!.validate()) {
       final notifier = ref.read(userEmploymentControllerProvider.notifier);
 
+      final company = _companyController.text.isEmpty
+          ? null
+          : BilingualValue(
+              hi: _companyController.text,
+              en: _companyEnController.text,
+            );
+      final designation = _designationController.text.isEmpty
+          ? null
+          : BilingualValue(
+              hi: _designationController.text,
+              en: _designationEnController.text,
+            );
+      final workLocation = _workLocationController.text.isEmpty
+          ? null
+          : BilingualValue(
+              hi: _workLocationController.text,
+              en: _workLocationEnController.text,
+            );
+
       if (widget.mode == FormMode.create) {
         notifier.saveEmployment(
-          jobType: _jobType!,
-          company: _companyController.text.isEmpty
-              ? null
-              : _companyController.text,
-          designation: _designationController.text.isEmpty
-              ? null
-              : _designationController.text,
+          jobType: _selectedJobType!,
+          company: company,
+          designation: designation,
           annualIncome: int.tryParse(_annualIncomeController.text),
-          workLocation: _workLocationController.text.isEmpty
-              ? null
-              : _workLocationController.text,
+          workLocation: workLocation,
         );
       } else {
         notifier.updateEmployment(
-          jobType: _jobType!,
-          company: _companyController.text.isEmpty
-              ? null
-              : _companyController.text,
-          designation: _designationController.text.isEmpty
-              ? null
-              : _designationController.text,
+          jobType: _selectedJobType!,
+          company: company,
+          designation: designation,
           annualIncome: int.tryParse(_annualIncomeController.text),
-          workLocation: _workLocationController.text.isEmpty
-              ? null
-              : _workLocationController.text,
+          workLocation: workLocation,
         );
       }
     }
@@ -130,6 +166,7 @@ class _UserEmploymentFormScreenState
   @override
   Widget build(BuildContext context) {
     final employmentState = ref.watch(userEmploymentControllerProvider);
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
     ref.listen<EmploymentState>(userEmploymentControllerProvider, (
       previous,
@@ -149,48 +186,44 @@ class _UserEmploymentFormScreenState
     });
 
     Widget buildEmploymentForm() {
-      return ListView(
-        shrinkWrap: true,
+      return Column(
         children: [
-          AppTextField(
+          BilingualTextField(
             controller: _companyController,
+            englishController: _companyEnController,
             prefixIcon: Icons.business,
-            iconColor: Theme.of(context).colorScheme.primary,
             label: AppLabels.organization(context),
             hint: AppLabels.organizationHint(context),
-            obscureText: false,
-            keyboardType: TextInputType.text,
+            validator: (v) =>
+                v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
           ),
           const SizedBox(height: 16),
 
-          AppTextField(
+          BilingualTextField(
             controller: _designationController,
+            englishController: _designationEnController,
             prefixIcon: Icons.work,
-            iconColor: Theme.of(context).colorScheme.primary,
             label: AppLabels.designation(context),
             hint: AppLabels.designationHint(context),
-            obscureText: false,
-            keyboardType: TextInputType.text,
+            validator: (v) =>
+                v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
           ),
           const SizedBox(height: 16),
 
-          AppTextField(
+          BilingualTextField(
             controller: _workLocationController,
+            englishController: _workLocationEnController,
             prefixIcon: Icons.location_on,
-            iconColor: Theme.of(context).colorScheme.primary,
             label: AppLabels.workLocation(context),
             hint: AppLabels.workLocationHint(context),
-            obscureText: false,
-            keyboardType: TextInputType.text,
+            validator: (v) =>
+                v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
           ),
           const SizedBox(height: 16),
 
           AppTextField(
             controller: _annualIncomeController,
-
-            // indian currency
             prefixIcon: Icons.currency_rupee,
-
             iconColor: Theme.of(context).colorScheme.primary,
             label: AppLabels.annualIncome(context),
             hint: AppLabels.annualIncomeHint(context),
@@ -214,23 +247,19 @@ class _UserEmploymentFormScreenState
           key: _formKey,
           child: ListView(
             children: [
-              AppDropDown(
+              AppDropDown<BilingualValue>(
                 label: AppLabels.jobType(context),
-                items: [
-                  AppLabels.private(context),
-                  AppLabels.government(context),
-                  AppLabels.business(context),
-                  AppLabels.defence(context),
-                  AppLabels.selfEmployed(context),
-                  AppLabels.notWorking(context),
-                ],
-                value: _jobType,
+                items: _jobTypeOptions.values.toList(),
+                value: _selectedJobType,
+                itemLabel: (job) => isHindi ? job.hi : job.en,
                 onChanged: (value) {
-                  setState(() => _jobType = value);
+                  setState(() => _selectedJobType = value);
                 },
               ),
               const SizedBox(height: 16),
-              _jobType == AppLabels.notWorking(context) ? const SizedBox() : buildEmploymentForm(),
+              _selectedJobType?.en == 'Not Working'
+                  ? const SizedBox()
+                  : buildEmploymentForm(),
 
               const SizedBox(height: 25),
 

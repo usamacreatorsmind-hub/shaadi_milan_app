@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../app/custom/image_picker/image_picker_controller.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../../../../core/enums/enum.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../l10n/app_translation_service.dart';
 import '../../domain/states/image_state.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../controllers/metrimony_profile_controller.dart';
@@ -35,22 +37,22 @@ class _MatrimonyFormFlowScreenState
     _submitCallbacks[step] = callback;
   }
 
-  String? _validateImageStep(ImagesState imageState) {
+  String? _validateImageStep(ImagesState imageState, BuildContext context) {
     if (imageState.profileImage == null || imageState.profileImage!.isEmpty) {
-      return 'Please select a profile image';
+      return AppLocalizations.of(context)!.profileImageRequired;
     }
     if (imageState.primaryImage == null || imageState.primaryImage!.isEmpty) {
-      return 'Please select a matrimony image';
+      return AppLocalizations.of(context)!.primaryImageRequired;
     }
     if (imageState.imageWithAgentUrl == null ||
         imageState.imageWithAgentUrl!.isEmpty) {
-      return 'Please select an image with agent';
+      return AppLocalizations.of(context)!.imageWithAgentRequired;
     }
     if (imageState.secondaryImages.isEmpty) {
-      return 'Please select at least one gallery image';
+      return AppLocalizations.of(context)!.atLeastOneGalleryImageRequired;
     }
     if (imageState.aadharPdfPath == null || imageState.aadharPdfPath!.isEmpty) {
-      return 'Please select Aadhar document';
+      return AppLocalizations.of(context)!.aadharDocumentRequired;
     }
     return null;
   }
@@ -70,10 +72,29 @@ class _MatrimonyFormFlowScreenState
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          'Step ${MatrimonyStep.values.indexOf(state.step) + 1} / ${MatrimonyStep.values.length }',
-
+          '${AppLocalizations.of(context)!.step} ${MatrimonyStep.values.indexOf(state.step) + 1} / ${MatrimonyStep.values.length}',
           style: Theme.of(context).textTheme.headlineMedium,
         ),
+
+        actions: [
+          // 🌐 Language Toggle
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.translate),
+            onSelected: (String code) {
+              ref.read(appTranslationServiceProvider).setLanguageCode(code);
+              ref.read(localeProvider.notifier).state = Locale(code);
+            },
+            itemBuilder: (BuildContext context) => AppTranslation
+                .supportedTranslations
+                .map(
+                  (lang) => PopupMenuItem<String>(
+                    value: lang.languageCode,
+                    child: Text(lang.nativeName),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -102,7 +123,7 @@ class _MatrimonyFormFlowScreenState
                               .read(metrimonyControllerProvider.notifier)
                               .previousStep();
                         },
-                        child: const Text('Back'),
+                        child: Text(AppLocalizations.of(context)!.back),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -119,6 +140,7 @@ class _MatrimonyFormFlowScreenState
                           } else if (state.step == MatrimonyStep.image) {
                             final validationError = _validateImageStep(
                               imageState,
+                              context,
                             );
                             if (validationError != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -145,7 +167,7 @@ class _MatrimonyFormFlowScreenState
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Next'),
+                            : Text(AppLocalizations.of(context)!.next),
                       ),
                     ),
                 ],
@@ -196,7 +218,7 @@ class _MatrimonyFormFlowScreenState
         registerSubmit: (cb) => _registerSubmit(MatrimonyStep.physical, cb),
       ),
       const UserImageFormScreen(),
-      
+
       const UserBiodataCheckScreen(isAgreed: false),
     ];
   }

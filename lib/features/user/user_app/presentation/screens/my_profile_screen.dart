@@ -1,16 +1,17 @@
-import 'package:shadi_milan/app/custom/custom_widgets/shimmer.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/app/custom/custom_widgets/shimmer.dart';
 
-import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart'; 
 import '../../../../../app/router/app_router.dart';
-import '../../../../../core/enums/enum.dart';
 import '../../../../auth/domain/states/agent_state.dart';
+import '../../../../translitration/models/bilingual_value.dart';
 import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
+import '../../domain/states/religion_state.dart';
+import '../../domain/states/state_city.dart';
 import '../../widgets/pdf_viewer_bottomsheet.dart';
 
 final matrimonyProfileProvider =
@@ -51,6 +52,8 @@ class MyProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final locationAsync = ref.watch(locationJsonProvider);
+    final religionsAsync = ref.watch(religionsProvider);
     final profileAsync = ref.watch(matrimonyProfileProvider(uid));
     print("inside my profile view");
 
@@ -72,11 +75,62 @@ class MyProfileScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text("Error: $e")),
         data: (profile) {
+          String resolvedState = profile.address.state.en;
+          String resolvedCity = profile.address.city.en;
+          String resolvedReligion = profile.cultural.religion.en;
+          String resolvedCaste = profile.cultural.caste.en;
+
+          if (locationAsync.hasValue) {
+            final states = locationAsync.value!;
+            final stateObj = states
+                .where((s) => s.name == profile.address.state.en)
+                .firstOrNull;
+            if (stateObj != null) {
+              resolvedState = stateObj.name;
+              final cityObj = stateObj.cities
+                  .where(
+                    (c) =>
+                        c.id == profile.address.city.en ||
+                        c.name == profile.address.city.en,
+                  )
+                  .firstOrNull;
+              if (cityObj != null) {
+                resolvedCity = cityObj.name;
+              }
+            }
+          }
+
+          if (religionsAsync.hasValue) {
+            final religions = religionsAsync.value!;
+            final religionObj = religions
+                .where(
+                  (r) =>
+                      r.id == profile.cultural.religion ||
+                      r.name == profile.cultural.religion,
+                )
+                .firstOrNull;
+            if (religionObj != null) {
+              resolvedReligion = religionObj.name;
+              final casteObj = religionObj.castes
+                  .where(
+                    (c) =>
+                        c.id == profile.cultural.caste ||
+                        c.name == profile.cultural.caste,
+                  )
+                  .firstOrNull;
+              if (casteObj != null) {
+                resolvedCaste = casteObj.name;
+              }
+            }
+          }
+
           print((" these all are details"));
           print(profile.toString());
           print(profile.user.toString());
           print("this is agent ");
           print(profile.agentEntity);
+
+          final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
           return SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 40),
@@ -92,13 +146,6 @@ class MyProfileScreen extends ConsumerWidget {
                 // build Image card that display all images of user
                 _DetailSection(
                   title: "Photos",
-                  // actionChip: AppChip(
-                  //   label: "Upload",
-                  //   icon: Icons.upload,
-                  //   onTap: () {
-                  //     // AutoRouter.of(context).push(UserImageFormRoute());
-                  //   },
-                  // ),
                   children: [
                     profile.images.secondaryImageUrls.isNotEmpty
                         ? SizedBox(
@@ -168,18 +215,6 @@ class MyProfileScreen extends ConsumerWidget {
                 // show aadhar widget with file name and a download url and a button to view the pdf
                 _DetailSection(
                   title: "ID Cards",
-                  // actionChip: AppChip(
-                  //   label: "Download",
-                  //   icon: Icons.download,
-                  //   onTap: () {
-                  //     // SHOW  snack bar
-                  //     ScaffoldMessenger.of(context).showSnackBar(
-                  //       const SnackBar(
-                  //         content: Text("Download functionality coming soon!"),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
                   children: [
                     if (profile
                         .metrimonyProfile
@@ -217,49 +252,28 @@ class MyProfileScreen extends ConsumerWidget {
                 // 📝 ABOUT ME
                 _DetailSection(
                   title: "About Me",
-
-                  // actionChip: AppChip(
-                  //   label: "Edit",
-                  //   icon: Icons.edit,
-                  //   onTap: () => AutoRouter.of(context).push(
-                  //     UserIdentityFormRoute(
-                  //       mode: FormMode.edit,
-                  //       existingIdentityProfile: profile.identity,
-                  //     ),
-                  //   ),
-                  // ),
                   children: [
-                    Text(
-                      profile.identity.aboutMe ?? "No description available.",
-                      textAlign: TextAlign.justify,
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
+                    if (profile.identity.aboutMe.isNotEmpty)
+                      BilingualParser(
+                        value: profile.identity.aboutMe,
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(color: Colors.grey[700]),
+                      )
+                    else
+                      Text(
+                        "No description available.",
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+ 
                   ],
                 ),
 
                 // 📋 BASIC INFO
                 _DetailSection(
                   title: "Basic Information",
-
-                  // actionChip: AppChip(
-                  //   label: "Edit",
-                  //   icon: Icons.edit,
-
-                  //   onTap: () => AutoRouter.of(context).push(
-                  //     UserIdentityFormRoute(
-                  //       mode: FormMode.edit,
-                  //       existingIdentityProfile: profile.identity,
-                  //     ),
-                  //   ),
-                  // ),
                   children: [
-                    _DetailRow(
-                      "Aadhar",
-                      profile.identity.aadhar.toString() ?? 'N/A',
-
-                      // SHOW  snack bar
-                    ),
-
+                    _DetailRow("Aadhar", profile.identity.aadhar ?? 'N/A'),
                     _DetailRow("Age", "${profile.identity.age ?? 'N/A'} years"),
                     _DetailRow("Gender", profile.identity.gender ?? 'N/A'),
                     _DetailRow(
@@ -272,25 +286,18 @@ class MyProfileScreen extends ConsumerWidget {
                 // 🎓 EDUCATION
                 _DetailSection(
                   title: "Education",
-
-                  // actionChip: AppChip(
-                  //   label: "Edit",
-                  //   icon: Icons.edit,
-                  //   onTap: () => AutoRouter.of(context).push(
-                  //     UserEducationFormRoute(
-                  //       mode: FormMode.edit,
-                  //       existingEducationProfile: profile.education,
-                  //     ),
-                  //   ),
-                  // ),
                   children: [
                     _DetailRow(
                       "Course",
-                      profile.education.education?.course ?? "N/A",
+                      isHindi
+                          ? profile.education.education?.course.hi ?? "N/A"
+                          : profile.education.education?.course.en ?? "N/A",
                     ),
                     _DetailRow(
                       "College",
-                      profile.education.education?.college ?? "N/A",
+                      isHindi
+                          ? profile.education.education?.college.hi ?? "N/A"
+                          : profile.education.education?.college.en ?? "N/A",
                     ),
                     _DetailRow(
                       "Passing Year",
@@ -302,8 +309,6 @@ class MyProfileScreen extends ConsumerWidget {
                       profile.education.education?.percentage.toString() ??
                           "N/A",
                     ),
-
-                    // show extra qualification in chip  style
                   ],
                 ),
 
@@ -316,16 +321,6 @@ class MyProfileScreen extends ConsumerWidget {
                     false)
                   _DetailSection(
                     title: "Additional Qualifications",
-                    // actionChip: AppChip(
-                    //   label: "Edit",
-                    //   icon: Icons.edit,
-                    //   onTap: () => AutoRouter.of(context).push(
-                    //     UserEducationFormRoute(
-                    //       mode: FormMode.edit,
-                    //       existingEducationProfile: profile.education,
-                    //     ),
-                    //   ),
-                    // ),
                     children: [
                       Wrap(
                         spacing: 10.0,
@@ -337,7 +332,7 @@ class MyProfileScreen extends ConsumerWidget {
                             .map(
                               (course) => Chip(
                                 backgroundColor: Theme.of(context).canvasColor,
-                                label: Text(course),
+                                label: Text(isHindi ? course.hi : course.en),
                               ),
                             )
                             .toList(),
@@ -387,8 +382,8 @@ class MyProfileScreen extends ConsumerWidget {
                   //   icon: Icons.edit,
                   // ),
                   children: [
-                    _DetailRow("City", profile.address.city ?? "N/A"),
-                    _DetailRow("State", profile.address.state ?? "N/A"),
+                    _DetailRow("City", resolvedCity),
+                    _DetailRow("State", resolvedState),
                   ],
                 ),
 
@@ -452,33 +447,29 @@ class MyProfileScreen extends ConsumerWidget {
                   ],
                 ),
 
-                // 🌟 RELIGIOUS & ASTROLOGICAL
+                //  RELIGIOUS & ASTROLOGICAL
                 _DetailSection(
                   title: "Religious & Astrological",
-
-                  // actionChip: AppChip(
-                  //   label: "Edit",
-                  //   icon: Icons.edit,
-                  //   onTap: () => AutoRouter.of(context).push(
-                  //     UserCultureFormRoute(
-                  //       mode: FormMode.edit,
-                  //       existingCulturalProfile: profile.cultural,
-                  //     ),
-                  //   ),
-                  // ),
                   children: [
-                    _DetailRow("Religion", profile.cultural.religion ?? "N/A"),
-                    _DetailRow("Caste", profile.cultural.caste ?? "N/A"),
-                    _DetailRow("Sub-caste", profile.cultural.subCaste ?? "N/A"),
-
+                    _DetailRow("Religion", resolvedReligion),
+                    _DetailRow("Caste", resolvedCaste),
+                    _DetailRow(
+                      "Sub-caste",
+                      isHindi
+                          ? profile.cultural.subCaste.hi
+                          : profile.cultural.subCaste.en,
+                    ),
                     _DetailRow(
                       "Languages",
-                      profile.cultural.languages.join(", ") ?? "N/A",
+                      profile.cultural.languages
+                              .map((l) => isHindi ? l.hi : l.en)
+                              .join(", ") ??
+                          "N/A",
                     ),
                   ],
                 ),
 
-                // // 🕵️ AGENT DETAILS
+                // //  AGENT DETAILS
                 // if (profile.agent != null) ...[
                 //   const SizedBox(height: 24),
                 //   _DetailSection(
@@ -724,12 +715,12 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
                                         widget
                                                 .profile
                                                 .userProfile
-                                                .fullName
+                                                .fullName.en
                                                 .isNotEmpty
                                             ? widget
                                                   .profile
                                                   .userProfile
-                                                  .fullName[0]
+                                                  .fullName.en[0]
                                                   .toUpperCase()
                                             : '?',
                                         style: TextStyle(
@@ -771,7 +762,7 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      widget.profile.user.fullName ?? "N/A",
+                                      widget.profile.user.fullName.en.isEmpty ? "N/A" : widget.profile.user.fullName.en,
                                       style: Theme.of(context)
                                           .textTheme
                                           .headlineSmall
@@ -890,7 +881,7 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
   }
 
   Widget _buildAttributeChip({
-    required String label,
+    required dynamic label,
     required IconData icon,
     required ThemeData theme,
   }) {
@@ -914,14 +905,23 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
         children: [
           Icon(icon, size: 16, color: theme.primaryColor),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: theme.primaryColor,
-            ),
-          ),
+          label is BilingualValue
+              ? BilingualParser(
+                  value: label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: theme.primaryColor,
+                  ),
+                )
+              : Text(
+                  label.toString(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: theme.primaryColor,
+                  ),
+                ),
         ],
       ),
     );
@@ -1018,7 +1018,7 @@ class _DetailSection extends StatelessWidget {
 
 class _DetailRow extends StatelessWidget {
   final String label;
-  final String value;
+  final dynamic value;
 
   const _DetailRow(this.label, this.value);
 
@@ -1031,7 +1031,14 @@ class _DetailRow extends StatelessWidget {
           Expanded(
             child: Text(label, style: TextStyle(color: Colors.grey[600])),
           ),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+          value is BilingualValue
+              ? BilingualParser(value: value as BilingualValue)
+              : Text(
+                  (value == null || value.toString().isEmpty)
+                      ? 'N/A'
+                      : value.toString(),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
         ],
       ),
     );

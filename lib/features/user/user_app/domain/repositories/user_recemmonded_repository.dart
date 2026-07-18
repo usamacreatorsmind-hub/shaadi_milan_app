@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/recemonded_profiles.dart';
 
 class UserRecemmondedRepository {
@@ -67,13 +68,13 @@ class UserRecemmondedRepository {
 
   Future<bool> updateMutualRecommendedProfiles({
     required String sourceUid,
-    required String sourceName,
+    required BilingualValue sourceName,
     required String sourcePhone,
-    required String sourceGender,
+    required BilingualValue sourceGender,
     required String targetUid,
-    required String targetName,
+    required BilingualValue targetName,
     required String targetPhone,
-    required String targetGender,
+    required BilingualValue targetGender,
   }) async {
     try {
       final batch = firestore.batch();
@@ -86,18 +87,18 @@ class UserRecemmondedRepository {
 
       batch.set(sourceRef, {
         'userId': sourceUid,
-        'name': sourceName,
+        'name': sourceName.toMap(),
         'phone': sourcePhone,
-        'gender': sourceGender,
+        'gender': sourceGender.toMap(),
         'ids': FieldValue.arrayUnion([targetUid]),
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
       batch.set(targetRef, {
         'userId': targetUid,
-        'name': targetName,
+        'name': targetName.toMap(),
         'phone': targetPhone,
-        'gender': targetGender,
+        'gender': targetGender.toMap(),
         'ids': FieldValue.arrayUnion([sourceUid]),
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));

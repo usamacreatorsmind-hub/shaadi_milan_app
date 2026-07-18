@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';
+import '../../../../translitration/models/bilingual_value.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import '../../domain/states/cultural_state.dart';
@@ -16,18 +17,16 @@ class UserCulturalController extends StateNotifier<CulturalState> {
     : super(CulturalState.initial);
 
   Future<void> saveCultural({
-    required String religion,
-    required String caste,
-    required String subCaste,
-    // required String motherTongue,
-    required List<String> languages,
+    required BilingualValue religion,
+    required BilingualValue caste,
+    required BilingualValue subCaste,
+    required List<BilingualValue> languages,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     final culturalProfile = CulturalProfile(
       religion: religion,
       caste: caste,
       subCaste: subCaste,
-      // motherTongue: motherTongue,
       languages: languages,
     );
 
@@ -47,10 +46,10 @@ class UserCulturalController extends StateNotifier<CulturalState> {
   }
 
   void updateCultural({
-    required String religion,
-    required String caste,
-    required String subCaste,
-    required List<String> languages,
+    required BilingualValue religion,
+    required BilingualValue caste,
+    required BilingualValue subCaste,
+    required List<BilingualValue> languages,
   }) {
     state = state.copyWith(isLoading: true, error: null);
     final culturalProfile = CulturalProfile(

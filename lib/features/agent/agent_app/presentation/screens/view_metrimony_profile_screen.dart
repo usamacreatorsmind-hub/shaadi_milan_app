@@ -1,13 +1,15 @@
-import 'package:shadi_milan/app/router/app_router.dart';
-import 'package:shadi_milan/features/agent/agent_app/presentation/screens/profile_match_screen.dart';
-
-import '../../../../user/user_app/domain/states/image_state.dart';
-import '../../../../user/user_app/domain/states/metrimony_profile_view_model.dart';
-import '../../../../user/user_app/presentation/screens/my_profile_screen.dart';
-import '../../../../user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/app/router/app_router.dart';
+
+import '../../../../l10n/l10n_helper.dart';
+import '../../../../translitration/models/bilingual_value.dart';
+import '../../../../user/user_app/domain/states/image_state.dart';
+import '../../../../user/user_app/domain/states/metrimony_profile_view_model.dart';
+import '../../../../user/user_app/domain/states/religion_state.dart';
+import '../../../../user/user_app/domain/states/state_city.dart';
+import '../../../../user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import '../notifier/metrimony_notifier.dart';
 
 @RoutePage()
@@ -35,6 +37,8 @@ class _ViewMetrimonyProfileScreenState
 
   @override
   Widget build(BuildContext context) {
+    final locationAsync = ref.watch(locationJsonProvider);
+    final religionsAsync = ref.watch(religionsProvider);
     final profileAsync = ref.watch(
       matrimonyProfileViewModelProvider(widget.userId),
     );
@@ -52,7 +56,7 @@ class _ViewMetrimonyProfileScreenState
                 context.router.push(ProfileMatchRoute(profile: profile));
               },
               icon: const Icon(Icons.search),
-              label: const Text('Match Profiles'),
+              label: Text(context.l10n.matchProfiles),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
                 shape: RoundedRectangleBorder(
@@ -66,7 +70,7 @@ class _ViewMetrimonyProfileScreenState
       ),
 
       appBar: AppBar(
-        title: const Text('Matrimony Profile'),
+        title: Text(context.l10n.matrimonyProfile),
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         elevation: 0,
@@ -81,7 +85,7 @@ class _ViewMetrimonyProfileScreenState
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
               Text(
-                'Error loading profile',
+                context.l10n.errorLoadingUser,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
@@ -98,24 +102,78 @@ class _ViewMetrimonyProfileScreenState
                   );
                 },
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: Text(context.l10n.retry),
               ),
             ],
           ),
         ),
         data: (profile) {
           if (profile == null) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.favorite_border, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('Matrimony profile not created yet'),
+                  const Icon(
+                    Icons.favorite_border,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(context.l10n.matrimonyProfileNotCreatedYet),
                 ],
               ),
             );
           }
+
+          String resolvedState = profile.address.state.en;
+          String resolvedCity = profile.address.city.en;
+          String resolvedReligion = profile.cultural.religion.en;
+          String resolvedCaste = profile.cultural.caste.en;
+
+          if (locationAsync.hasValue) {
+            final states = locationAsync.value!;
+            final stateObj = states
+                .where((s) => s.name == profile.address.state)
+                .firstOrNull;
+            if (stateObj != null) {
+              resolvedState = stateObj.name;
+              final cityObj = stateObj.cities
+                  .where(
+                    (c) =>
+                        c.id == profile.address.city ||
+                        c.name == profile.address.city,
+                  )
+                  .firstOrNull;
+              if (cityObj != null) {
+                resolvedCity = cityObj.name;
+              }
+            }
+          }
+
+          if (religionsAsync.hasValue) {
+            final religions = religionsAsync.value!;
+            final religionObj = religions
+                .where(
+                  (r) =>
+                      r.id == profile.cultural.religion ||
+                      r.name == profile.cultural.religion,
+                )
+                .firstOrNull;
+            if (religionObj != null) {
+              resolvedReligion = religionObj.name;
+              final casteObj = religionObj.castes
+                  .where(
+                    (c) =>
+                        c.id == profile.cultural.caste ||
+                        c.name == profile.cultural.caste,
+                  )
+                  .firstOrNull;
+              if (casteObj != null) {
+                resolvedCaste = casteObj.name;
+              }
+            }
+          }
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -127,37 +185,57 @@ class _ViewMetrimonyProfileScreenState
 
                 // Identity Section
                 _SectionCard(
-                  title: 'Identity Information',
+                  title: context.l10n.identityInformation,
                   icon: Icons.person,
                   children: [
-                    _InfoRow('Full Name', profile.user.fullName),
                     _InfoRow(
-                      'Date of Birth',
+                      context.l10n.fullName,
+                      profile.user.fullName,
+                    ),
+                    _InfoRow(
+                      context.l10n.dateOfBirth,
                       profile.identity.dob.toLocal().toString().split(' ')[0],
                     ),
-                    _InfoRow('Age', '${profile.identity.age} years'),
-                    _InfoRow('Gender', profile.identity.gender),
-                    _InfoRow('Aadhar', profile.identity.aadhar),
+                    _InfoRow(
+                      context.l10n.age,
+                      context.l10n.yearsOld(profile.identity.age),
+                    ),
+                    _InfoRow(context.l10n.gender, profile.identity.gender),
+                    _InfoRow(
+                      context.l10n.aadharNumber,
+                      profile.identity.aadhar,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
 
                 // Physical Section
                 _SectionCard(
-                  title: 'Physical Information',
+                  title: context.l10n.physicalInformation,
                   icon: Icons.accessibility,
                   children: [
-                    _InfoRow('Height', '${profile.physical.height} cm'),
-                    _InfoRow('Weight', '${profile.physical.weight} kg'),
-                    _InfoRow('Body Type', profile.physical.bodyType),
-                    _InfoRow('Complexion', profile.physical.complexion),
                     _InfoRow(
-                      'Physically Challenged',
-                      profile.physical.physicallyChallenged ? 'Yes' : 'No',
+                      context.l10n.height,
+                      '${profile.physical.height} cm',
+                    ),
+                    _InfoRow(
+                      context.l10n.weightKg,
+                      '${profile.physical.weight} kg',
+                    ),
+                    _InfoRow(context.l10n.bodyType, profile.physical.bodyType),
+                    _InfoRow(
+                      context.l10n.complexion,
+                      profile.physical.complexion,
+                    ),
+                    _InfoRow(
+                      context.l10n.physicallyChallenged,
+                      profile.physical.physicallyChallenged
+                          ? context.l10n.yesLabel
+                          : context.l10n.noLabel,
                     ),
                     if (profile.physical.disabilityDetails != null)
                       _InfoRow(
-                        'Disability Details',
+                        context.l10n.disabilityDetails,
                         profile.physical.disabilityDetails ?? '',
                       ),
                   ],
@@ -166,14 +244,17 @@ class _ViewMetrimonyProfileScreenState
 
                 // Cultural Section
                 _SectionCard(
-                  title: 'Cultural Information',
+                  title: context.l10n.culturalInformation,
                   icon: Icons.temple_hindu,
                   children: [
-                    _InfoRow('Religion', profile.cultural.religion),
-                    _InfoRow('Caste', profile.cultural.caste),
-                    _InfoRow('Sub Caste', profile.cultural.subCaste),
+                    _InfoRow(context.l10n.religion, resolvedReligion),
+                    _InfoRow(context.l10n.caste, resolvedCaste),
                     _InfoRow(
-                      'Languages',
+                      context.l10n.subCaste,
+                      profile.cultural.subCaste as String,
+                    ),
+                    _InfoRow(
+                      context.l10n.languages,
                       profile.cultural.languages.join(', '),
                     ),
                   ],
@@ -182,26 +263,31 @@ class _ViewMetrimonyProfileScreenState
 
                 // Education Section
                 _SectionCard(
-                  title: 'Education',
+                  title: context.l10n.education,
                   icon: Icons.school,
                   children: [
                     _InfoRow(
-                      'Is Illiterate',
-                      profile.education.isIlletrate ? 'Yes' : 'No',
+                      context.l10n.isIlliterate,
+                      profile.education.isIlletrate
+                          ? context.l10n.yesLabel
+                          : context.l10n.noLabel,
                     ),
                     if (!profile.education.isIlletrate &&
                         profile.education.education != null) ...[
-                      _InfoRow('Course', profile.education.education!.course),
                       _InfoRow(
-                        'College/University',
-                        profile.education.education!.college,
+                        context.l10n.course,
+                        profile.education.education!.course  ,
                       ),
                       _InfoRow(
-                        'Passing Year',
+                        context.l10n.collegeUniversity,
+                        profile.education.education!.college as String,
+                      ),
+                      _InfoRow(
+                        context.l10n.passingYear,
                         '${profile.education.education!.passingYear}',
                       ),
                       _InfoRow(
-                        'Percentage',
+                        context.l10n.percentage,
                         '${profile.education.education!.percentage}%',
                       ),
                     ],
@@ -212,7 +298,7 @@ class _ViewMetrimonyProfileScreenState
                             .qualifications
                             .isNotEmpty)
                       _InfoRow(
-                        'Extra Qualifications',
+                        context.l10n.extraQualifications,
                         profile.education.extraQualification!.qualifications
                             .join(', '),
                       ),
@@ -222,25 +308,28 @@ class _ViewMetrimonyProfileScreenState
 
                 // Employment Section
                 _SectionCard(
-                  title: 'Employment',
+                  title: context.l10n.employmentDetails,
                   icon: Icons.work,
                   children: [
-                    _InfoRow('Job Type', profile.employment.jobType),
+                    _InfoRow(context.l10n.jobType, profile.employment.jobType),
                     if (profile.employment.company != null)
-                      _InfoRow('Company', profile.employment.company ?? ''),
+                      _InfoRow(
+                        context.l10n.organization,
+                        profile.employment.company,
+                      ),
                     if (profile.employment.designation != null)
                       _InfoRow(
-                        'Designation',
+                        context.l10n.designation,
                         profile.employment.designation ?? '',
                       ),
                     if (profile.employment.annualIncome != null)
                       _InfoRow(
-                        'Annual Income',
+                        context.l10n.annualIncome,
                         '₹${profile.employment.annualIncome}',
                       ),
                     if (profile.employment.workLocation != null)
                       _InfoRow(
-                        'Work Location',
+                        context.l10n.workLocation,
                         profile.employment.workLocation ?? '',
                       ),
                   ],
@@ -249,36 +338,54 @@ class _ViewMetrimonyProfileScreenState
 
                 // Family Section
                 _SectionCard(
-                  title: 'Family Information',
+                  title: context.l10n.familyInformation,
                   icon: Icons.family_restroom,
                   children: [
-                    _InfoRow("Father's Name", profile.family.fatherName),
-                    _InfoRow("Mother's Name", profile.family.motherName),
                     _InfoRow(
-                      'Number of Brothers',
+                      context.l10n.fatherName,
+                      profile.family.fatherName,
+                    ),
+                    _InfoRow(
+                      context.l10n.motherName,
+                      profile.family.motherName,
+                    ),
+                    _InfoRow(
+                      context.l10n.numberOfBrothers,
                       '${profile.family.numberOfBrothers}',
                     ),
                     _InfoRow(
-                      'Number of Sisters',
+                      context.l10n.numberOfSisters,
                       '${profile.family.numberOfSisters}',
                     ),
-                    _InfoRow('Family Type', profile.family.familyType),
-                    _InfoRow('Family Status', profile.family.familyStatus),
+                    _InfoRow(
+                      context.l10n.familyType,
+                      profile.family.familyType,
+                    ),
+                    _InfoRow(
+                      context.l10n.familyStatus,
+                      profile.family.familyStatus,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
 
                 // Address Section
                 _SectionCard(
-                  title: 'Address',
+                  title: context.l10n.address,
                   icon: Icons.location_on,
                   children: [
-                    _InfoRow('Address', profile.address.addressLine1),
-                    _InfoRow('Post', profile.address.post),
-                    _InfoRow('Police Station', profile.address.policeStation),
-                    _InfoRow('City', profile.address.city),
-                    _InfoRow('State', profile.address.state),
-                    _InfoRow('Pincode', profile.address.pincode),
+                    _InfoRow(
+                      context.l10n.address,
+                      profile.address.addressLine1,
+                    ),
+                    _InfoRow(context.l10n.post, profile.address.post),
+                    _InfoRow(
+                      context.l10n.policeStation,
+                      profile.address.policeStation,
+                    ),
+                    _InfoRow(context.l10n.city, resolvedCity),
+                    _InfoRow(context.l10n.state, resolvedState),
+                    _InfoRow(context.l10n.pincode, profile.address.pincode),
                   ],
                 ),
 
@@ -287,17 +394,29 @@ class _ViewMetrimonyProfileScreenState
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
                     child: _SectionCard(
-                      title: 'Agent Information',
+                      title: context.l10n.agentInformation,
                       icon: Icons.support_agent,
                       children: [
-                        _InfoRow('Agent Name', profile.agentEntity!.agentName),
-                        _InfoRow('Phone', profile.agentEntity!.agentMobile),
-                        _InfoRow('Email', profile.agentEntity!.agentEmail),
                         _InfoRow(
-                          'License Number',
+                          context.l10n.agentName,
+                          profile.agentEntity!.agentName,
+                        ),
+                        _InfoRow(
+                          context.l10n.phone,
+                          profile.agentEntity!.agentMobile,
+                        ),
+                        _InfoRow(
+                          context.l10n.email,
+                          profile.agentEntity!.agentEmail,
+                        ),
+                        _InfoRow(
+                          context.l10n.license,
                           profile.agentEntity!.agentLicenseNumber,
                         ),
-                        _InfoRow('City', profile.agentEntity!.agentCity),
+                        _InfoRow(
+                          context.l10n.city,
+                          profile.agentEntity!.agentCity,
+                        ),
                       ],
                     ),
                   ),
@@ -352,8 +471,8 @@ class _UserInfoCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    profile.user.fullName,
+                  BilingualParser(
+                    value: profile.user.fullName,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -361,7 +480,7 @@ class _UserInfoCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${profile.identity.gender} • ${profile.identity.age} years old',
+                    context.l10n.yearsOld(profile.identity.age),
                     style: TextStyle(color: Colors.grey[600], fontSize: 14),
                   ),
                   const SizedBox(height: 4),
@@ -430,9 +549,10 @@ class _SectionCard extends StatelessWidget {
 // Info Row Widget
 class _InfoRow extends StatelessWidget {
   final String label;
-  final String value;
+  final dynamic value;
+  final String? textToDisplay;
 
-  const _InfoRow(this.label, this.value);
+  const _InfoRow(this.label, this.value, {this.textToDisplay});
 
   @override
   Widget build(BuildContext context) {
@@ -450,10 +570,9 @@ class _InfoRow extends StatelessWidget {
           ),
           Expanded(
             flex: 3,
-            child: Text(
-              value.isEmpty ? 'Not provided' : value,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-            ),
+            child: value is BilingualValue
+                ? BilingualParser(value: value as BilingualValue)
+                : Text(value?.toString() ?? ''),
           ),
         ],
       ),
@@ -473,18 +592,29 @@ class _ImagesTabSection extends StatelessWidget {
     final List<MapEntry<String, String>> allImages = [];
 
     if (images.primaryImageUrl.isNotEmpty) {
-      allImages.add(MapEntry('Primary Photo', images.primaryImageUrl));
+      allImages.add(
+        MapEntry(context.l10n.primaryPhoto, images.primaryImageUrl),
+      );
     }
     if (images.profileImageUrl.isNotEmpty) {
-      allImages.add(MapEntry('Profile Photo', images.profileImageUrl));
+      allImages.add(
+        MapEntry(context.l10n.profilePhoto, images.profileImageUrl),
+      );
     }
     if (images.imageWithAgentUrl.isNotEmpty) {
-      allImages.add(MapEntry('Photo with Agent', images.imageWithAgentUrl));
+      allImages.add(
+        MapEntry(context.l10n.photoWithAgent, images.imageWithAgentUrl),
+      );
     }
 
     // Add all secondary images
     for (int i = 0; i < images.secondaryImageUrls.length; i++) {
-      allImages.add(MapEntry('Gallery ${i + 1}', images.secondaryImageUrls[i]));
+      allImages.add(
+        MapEntry(
+          '${context.l10n.gallery} ${i + 1}',
+          images.secondaryImageUrls[i],
+        ),
+      );
     }
 
     final hasAadhar = images.aadharCardUrl.isNotEmpty;
@@ -515,9 +645,9 @@ class _ImagesTabSection extends StatelessWidget {
                       color: Theme.of(context).primaryColor,
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Photos & Documents',
-                      style: TextStyle(
+                    Text(
+                      context.l10n.photosAndDocuments,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -536,7 +666,7 @@ class _ImagesTabSection extends StatelessWidget {
                 tabs: [
                   ...allImages.map((entry) => Tab(text: entry.key)),
                   if (images.aadharCardUrl.isNotEmpty)
-                    const Tab(text: 'Aadhar Card'),
+                    Tab(text: context.l10n.aadharCard),
                 ],
               ),
 
@@ -555,7 +685,7 @@ class _ImagesTabSection extends StatelessWidget {
                     // if (images.aadharCardUrl.isNotEmpty)
                     _DocumentViewer(
                       documentUrl: images.aadharCardUrl,
-                      label: 'Aadhar Card',
+                      label: context.l10n.aadharCard,
                     ),
                   ],
                 ),
@@ -588,7 +718,7 @@ class _ImageError extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '$label not available',
+              '${label} ${context.l10n.notAvailable}',
               style: TextStyle(color: Colors.grey[600]),
             ),
           ],
@@ -639,7 +769,7 @@ class _ImageViewer extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Tap to view fullscreen',
+            context.l10n.tapToViewFullscreen,
             style: TextStyle(color: Colors.grey[600], fontSize: 12),
           ),
         ],
@@ -727,7 +857,9 @@ class _DocumentViewer extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: () => _openDocument(context, isPdf),
             icon: const Icon(Icons.open_in_new),
-            label: Text(isPdf ? 'Open PDF' : 'View Document'),
+            label: Text(
+              isPdf ? context.l10n.openPdf : context.l10n.viewDocument,
+            ),
           ),
           const SizedBox(height: 12),
           Text(

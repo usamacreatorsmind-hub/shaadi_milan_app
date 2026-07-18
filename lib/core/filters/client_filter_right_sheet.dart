@@ -439,7 +439,7 @@ class _LocationSection extends ConsumerWidget {
                   child: Text(AppLabels.allCities(context)),
                 ),
                 ...cityNames.map(
-                  (c) => DropdownMenuItem(value: c, child: Text(c)),
+                  (c) => DropdownMenuItem(value: c.name, child: Text(c.name)),
                 ),
               ],
               decoration: InputDecoration(
@@ -496,7 +496,7 @@ class _CulturalSection extends ConsumerWidget {
 
         final selectedReligionObj = religions.firstWhere(
           (r) => r.name == selectedReligion,
-          orElse: () => ReligionModel(id: '', name: '', castes: []),
+          orElse: () => ReligionCasteModel(id: '', name: '', castes: []),
         );
         final casteNames = selectedReligionObj.castes;
 
@@ -539,7 +539,7 @@ class _CulturalSection extends ConsumerWidget {
               items: [
                 DropdownMenuItem(value: '', child: Text(AppLabels.allCastes(context))),
                 ...casteNames.map(
-                  (c) => DropdownMenuItem(value: c, child: Text(c)),
+                  (c) => DropdownMenuItem(value: c.name, child: Text(c.name)),
                 ),
               ],
               decoration: InputDecoration(

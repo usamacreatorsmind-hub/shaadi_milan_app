@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';
+import '../../../../translitration/models/bilingual_value.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import '../../domain/states/identity_state.dart';
@@ -16,14 +16,12 @@ class UserIdentityController extends StateNotifier<IdentityState> {
   UserIdentityController(this._matrimonyRepository, this._uid, this._ref)
     : super(IdentityState.initial);
 
-  // update identity proifile with metrimony repository
-
   Future<void> updateIdentity({
-    required String gender,
+    required BilingualValue gender,
     required DateTime dob,
     required int age,
     required String aadhar,
-    required String aboutMe,
+    required BilingualValue aboutMe,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -37,61 +35,49 @@ class UserIdentityController extends StateNotifier<IdentityState> {
     );
 
     try {
-      _ref
+      await _ref
           .read(matrimonyRepositoryProvider)
           .updateIdentityProfile(_uid, identityProfile);
 
       state = state.copyWith(identity: identityProfile, isLoading: false);
 
-      debugPrint('✅ Identity Updated Successfully');
-      debugPrint(identityProfile.toString());
-      // update ui also
       _ref
           .read(metrimonyControllerProvider.notifier)
           .saveIdentity(identityProfile);
     } catch (e) {
-      debugPrint('❌ Identity Update Failed: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   Future<void> saveIdentity({
-    required String gender,
+    required BilingualValue gender,
     required DateTime dob,
     required int age,
     required String aadhar,
-    required String aboutMe,
+    required BilingualValue aboutMe,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     final identityProfile = IdentityProfile(
       profileId: _uid,
-
       aboutMe: aboutMe,
       gender: gender,
       dob: dob,
       age: age,
-
       aadhar: aadhar,
     );
 
     try {
-      // Update gender in users collection
       await FirebaseFirestore.instance.collection('users').doc(_uid).update({
-        'gender': gender,
+        'gender': gender.toMap(),
       });
 
-      // Update Matrimony Profile
       _ref
           .read(metrimonyControllerProvider.notifier)
           .saveIdentity(identityProfile);
 
       state = state.copyWith(identity: identityProfile, isLoading: false);
-
-      debugPrint('✅ Identity Saved Successfully');
-      debugPrint(identityProfile.toString());
     } catch (e) {
-      debugPrint('❌ Identity Save Failed: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }

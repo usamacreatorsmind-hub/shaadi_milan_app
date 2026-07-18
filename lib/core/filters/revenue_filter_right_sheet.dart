@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import '../../features/user/user_app/domain/states/religion_state.dart';
 import '../../features/user/user_app/domain/states/state_city.dart';
 import 'revenue_filter_controller.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 class RevenueFilterRightSheet extends ConsumerWidget {
   const RevenueFilterRightSheet({super.key});
 
@@ -115,41 +113,41 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                             const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('${AppLabels.errorOccurred(context)}: $e'),
                         data: (states) {
-                          /// All state names from JSON
-                          final stateNames = states.map((e) => e.name).toList();
-
                           /// Selected state object
-                          final selectedState = states.firstWhere(
-                            (s) => s.name == filter.state,
-                            orElse: () => StateCityModel(name: '', cities: []),
-                          );
+                          final selectedState = states
+                              .where((s) => s.name == filter.state)
+                              .firstOrNull;
+
+                          final selectedCity = selectedState?.cities
+                              .where((c) => c.id == filter.city || c.name == filter.city)
+                              .firstOrNull;
 
                           return Column(
                             children: [
-                              _buildDropdown(
+                              _buildDropdown<StateCityModel>(
                                 title: AppLabels.state(context),
-                                value: filter.state.isEmpty
-                                    ? null
-                                    : filter.state,
-                                items: stateNames,
+                                value: selectedState,
+                                items: states,
+                                itemLabel: (s) => s.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
                                         .read(revenueFilterProvider.notifier)
-                                        .updateState(val);
+                                        .updateState(val.name);
                                   }
                                 },
                               ),
                               const SizedBox(height: 12),
-                              _buildDropdown(
+                              _buildDropdown<CityModel>(
                                 title: AppLabels.city(context),
-                                value: filter.city.isEmpty ? null : filter.city,
-                                items: selectedState.cities,
+                                value: selectedCity,
+                                items: selectedState?.cities ?? [],
+                                itemLabel: (c) => c.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
                                         .read(revenueFilterProvider.notifier)
-                                        .updateCity(val);
+                                        .updateCity(val.id);
                                   }
                                 },
                               ),
@@ -175,44 +173,40 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                             const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('${AppLabels.errorOccurred(context)}: $e'),
                         data: (religions) {
-                          final religionNames = religions
-                              .map((r) => r.name)
-                              .toList();
+                          final selectedReligion = religions
+                              .where((r) => r.id == filter.religion || r.name == filter.religion)
+                              .firstOrNull;
 
-                          final selectedReligion = religions.firstWhere(
-                            (r) => r.name == filter.religion,
-                            orElse: () =>
-                                ReligionModel(id: '', name: '', castes: []),
-                          );
+                          final selectedCaste = selectedReligion?.castes
+                              .where((c) => c.id == filter.caste || c.name == filter.caste)
+                              .firstOrNull;
 
                           return Column(
                             children: [
-                              _buildDropdown(
+                              _buildDropdown<ReligionCasteModel>(
                                 title: AppLabels.religion(context),
-                                value: filter.religion.isEmpty
-                                    ? null
-                                    : filter.religion,
-                                items: religionNames,
+                                value: selectedReligion,
+                                items: religions,
+                                itemLabel: (r) => r.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
                                         .read(revenueFilterProvider.notifier)
-                                        .updateReligion(val);
+                                        .updateReligion(val.id);
                                   }
                                 },
                               ),
                               const SizedBox(height: 12),
-                              _buildDropdown(
+                              _buildDropdown<CasteModel>(
                                 title: AppLabels.caste(context),
-                                value: filter.caste.isEmpty
-                                    ? null
-                                    : filter.caste,
-                                items: selectedReligion.castes,
+                                value: selectedCaste,
+                                items: selectedReligion?.castes ?? [],
+                                itemLabel: (c) => c.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
                                         .read(revenueFilterProvider.notifier)
-                                        .updateCaste(val);
+                                        .updateCaste(val.id);
                                   }
                                 },
                               ),
@@ -221,12 +215,13 @@ class RevenueFilterRightSheet extends ConsumerWidget {
                               const SizedBox(height: 24),
 
                               const SizedBox(height: 8),
-                              _buildDropdown(
+                              _buildDropdown<String>(
                                 title: AppLabels.gender(context),
                                 value: filter.gender.isEmpty
                                     ? null
                                     : filter.gender,
                                 items: [AppLabels.male(context), AppLabels.female(context)],
+                                itemLabel: (g) => g,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
@@ -261,21 +256,23 @@ class RevenueFilterRightSheet extends ConsumerWidget {
   }
 
   /// ================= DROPDOWN BUILDER =================
-  static Widget _buildDropdown({
+  static Widget _buildDropdown<T>({
     required String title,
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
+    required T? value,
+    required List<T> items,
+    required String Function(T) itemLabel,
+    required ValueChanged<T?> onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
-        DropdownButtonFormField<String>(
-          value: value,
+        DropdownButtonFormField<T>(
+          isExpanded: true,
+          value: items.contains(value) ? value : null,
           items: items
-              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .map((e) => DropdownMenuItem<T>(value: e, child: Text(itemLabel(e))))
               .toList(),
           onChanged: onChanged,
           decoration: InputDecoration(

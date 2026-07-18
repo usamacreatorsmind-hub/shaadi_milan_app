@@ -1,17 +1,19 @@
-import '../../../../../app/custom/custom_widgets/drawer.dart';
-import '../../../../../core/filters/client_filter_right_sheet.dart';
-import 'agen_profile.screen.dart';
-
-import '../../../../../app/router/app_router.dart';
-import '../notifier/user_nofier.dart';
-import '../../../../auth/domain/states/user_state.dart';
-import '../../../../user/user_app/domain/states/address_state.dart';
-import '../../../../user/user_app/domain/states/cultural_state.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+
+import '../../../../../app/custom/custom_widgets/drawer.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../../../../core/filters/client_filter_right_sheet.dart';
+import '../../../../auth/domain/states/user_state.dart';
+import '../../../../l10n/l10n_helper.dart';
+import '../../../../user/user_app/domain/states/address_state.dart';
+import '../../../../user/user_app/domain/states/cultural_state.dart';
 import '../../../../user/user_razorpay/domain/states/payment.dart';
 import '../../data/datasources/metrimony_firestore_ds.dart';
+import '../notifier/user_nofier.dart';
+import 'agen_profile.screen.dart';
 
 // =====================================================
 // ADDRESS PROVIDER — fetches state/city from
@@ -225,7 +227,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
         slivers: [
           // ─── APP BAR ───────────────────────────────────────
           SliverAppBar(
-            title: const Text('My Clients'),
+            title: Text(context.l10n.myClients),
             floating: true,
             pinned: true,
             backgroundColor: theme.primaryColor,
@@ -270,7 +272,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        'My Clients',
+                        context.l10n.myClients,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -329,7 +331,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.filter_list),
-                    tooltip: 'Filter Clients',
+                    tooltip: context.l10n.filterClients,
                     onPressed: () => showClientFilterSheet(context),
                   ),
                   if (filter.activeFilterCount > 0)
@@ -363,9 +365,9 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                     ref.read(clientFilterProvider.notifier).reset();
                     _searchController.clear();
                   },
-                  child: const Text(
-                    'Reset',
-                    style: TextStyle(color: Colors.white),
+                  child: Text(
+                    context.l10n.reset,
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
             ],
@@ -384,7 +386,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 onChanged: (v) =>
                     ref.read(clientFilterProvider.notifier).setSearch(v),
                 decoration: InputDecoration(
-                  hintText: 'Search by name or phone…',
+                  hintText: context.l10n.searchClientsHint,
                   prefixIcon: const Icon(Icons.search, size: 20),
                   suffixIcon: filter.searchQuery.isNotEmpty
                       ? IconButton(
@@ -515,7 +517,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 )) {
                   return 'PENDING';
                 }
-                return 'Not Started';
+                return context.l10n.notStarted;
               }
 
               // ── APPLY FILTERS ──────────────────────────────
@@ -527,7 +529,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
 
                 // Gender
                 if (filter.gender != GenderFilter.all) {
-                  final g = user.gender.toLowerCase();
+                  final g = user.gender.en.toLowerCase();
                   if (filter.gender == GenderFilter.male && g != 'male') {
                     return false;
                   }
@@ -547,7 +549,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                       if (ps != 'PENDING') return false;
                       break;
                     case PaymentStatusFilter.notStarted:
-                      if (ps != 'Not Started') return false;
+                      if (ps != context.l10n.notStarted) return false;
                       break;
                     default:
                       break;
@@ -583,7 +585,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 // Search
                 if (filter.searchQuery.isNotEmpty) {
                   final q = filter.searchQuery.toLowerCase();
-                  if (!user.fullName.toLowerCase().contains(q) &&
+                  if (!user.fullName.en.toLowerCase().contains(q) &&
                       !user.phone.toLowerCase().contains(q) &&
                       !user.email.toLowerCase().contains(q)) {
                     return false;
@@ -594,14 +596,14 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 if (filter.state.isNotEmpty) {
                   final addr = addressMap[user.uid];
                   if (addr == null) return false;
-                  if (addr.state.toLowerCase() != filter.state.toLowerCase()) {
+                  if (addr.state.en.toLowerCase() != filter.state.toLowerCase()) {
                     return false;
                   }
                 }
                 if (filter.city.isNotEmpty) {
                   final addr = addressMap[user.uid];
                   if (addr == null) return false;
-                  if (addr.city.toLowerCase() != filter.city.toLowerCase()) {
+                  if (addr.city.en.toLowerCase() != filter.city.toLowerCase()) {
                     return false;
                   }
                 }
@@ -610,7 +612,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 if (filter.religion.isNotEmpty) {
                   final cult = culturalMap[user.uid];
                   if (cult == null) return false;
-                  if (cult.religion.toLowerCase() !=
+                  if (cult.religion.en.toLowerCase() !=
                       filter.religion.toLowerCase()) {
                     return false;
                   }
@@ -618,7 +620,7 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 if (filter.caste.isNotEmpty) {
                   final cult = culturalMap[user.uid];
                   if (cult == null) return false;
-                  if (cult.caste.toLowerCase() != filter.caste.toLowerCase()) {
+                  if (cult.caste.en.toLowerCase() != filter.caste.toLowerCase()) {
                     return false;
                   }
                 }
@@ -719,9 +721,9 @@ class _QuickGenderChips extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Row(
         children: [
-          chip('All', GenderFilter.all, Icons.people),
-          chip('Male', GenderFilter.male, Icons.male),
-          chip('Female', GenderFilter.female, Icons.female),
+          chip(context.l10n.all, GenderFilter.all, Icons.people),
+          chip(context.l10n.male, GenderFilter.male, Icons.male),
+          chip(context.l10n.female, GenderFilter.female, Icons.female),
         ],
       ),
     );
@@ -749,7 +751,7 @@ class _ActiveFilterChips extends ConsumerWidget {
     if (filter.myClientsOnly) {
       chips.add(
         _chip(
-          'My Clients Only',
+          context.l10n.myClientsOnly,
           Icons.person,
           Colors.indigo,
           () => notifier.toggleMyClientsOnly(),
@@ -799,7 +801,7 @@ class _ActiveFilterChips extends ConsumerWidget {
     if (filter.paymentStatus != PaymentStatusFilter.all) {
       chips.add(
         _chip(
-          _paymentLabel(filter.paymentStatus),
+          _paymentLabel(filter.paymentStatus, context),
           Icons.payments_outlined,
           Colors.green,
           () => notifier.setPaymentStatus(PaymentStatusFilter.all),
@@ -809,7 +811,7 @@ class _ActiveFilterChips extends ConsumerWidget {
     if (filter.profileStatus != ProfileStatusFilter.all) {
       chips.add(
         _chip(
-          _profileStatusLabel(filter.profileStatus),
+          _profileStatusLabel(filter.profileStatus, context),
           Icons.person_pin,
           Colors.blue,
           () => notifier.setProfileStatus(ProfileStatusFilter.all),
@@ -819,7 +821,7 @@ class _ActiveFilterChips extends ConsumerWidget {
     if (filter.profileCreated != ProfileCreatedFilter.all) {
       chips.add(
         _chip(
-          _profileCreatedLabel(filter.profileCreated),
+          _profileCreatedLabel(filter.profileCreated, context),
           Icons.create_outlined,
           Colors.orange,
           () => notifier.setProfileCreated(ProfileCreatedFilter.all),
@@ -871,36 +873,36 @@ class _ActiveFilterChips extends ConsumerWidget {
     );
   }
 
-  String _paymentLabel(PaymentStatusFilter f) {
+  String _paymentLabel(PaymentStatusFilter f, BuildContext context) {
     switch (f) {
       case PaymentStatusFilter.paid:
-        return 'Paid';
+        return context.l10n.paid;
       case PaymentStatusFilter.pending:
-        return 'Payment Pending';
+        return context.l10n.paymentPendingLabel;
       case PaymentStatusFilter.notStarted:
-        return 'Not Started';
+        return context.l10n.notStarted;
       default:
         return '';
     }
   }
 
-  String _profileStatusLabel(ProfileStatusFilter f) {
+  String _profileStatusLabel(ProfileStatusFilter f, BuildContext context) {
     switch (f) {
       case ProfileStatusFilter.active:
-        return 'Active';
+        return context.l10n.active;
       case ProfileStatusFilter.closed:
-        return 'Closed';
+        return context.l10n.closed;
       default:
         return '';
     }
   }
 
-  String _profileCreatedLabel(ProfileCreatedFilter f) {
+  String _profileCreatedLabel(ProfileCreatedFilter f, BuildContext context) {
     switch (f) {
       case ProfileCreatedFilter.created:
-        return 'Profile Created';
+        return context.l10n.profileCreatedLabel;
       case ProfileCreatedFilter.notCreated:
-        return 'Profile Pending';
+        return context.l10n.profilePendingLabel;
       default:
         return '';
     }
@@ -962,29 +964,35 @@ class UserCard extends StatelessWidget {
                 child: imageUrl.isEmpty
                     ? Text(
                         user.fullName.isNotEmpty
-                            ? user.fullName[0].toUpperCase()
+                            ? BilingualParser(
+                              value: user.fullName,
+                              style: TextStyle(
+                                color: theme.colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ).toString()
                             : '?',
-                        style: TextStyle(
-                          color: theme.colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
+                       
                       )
                     : null,
               ),
             ),
-            title: Text(
-              user.fullName,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            title: 
+            
+            BilingualParser(value: user.fullName,style: const TextStyle(fontWeight: FontWeight.bold),
               maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+              overflow: TextOverflow.ellipsis,),
+            
+         
             subtitle: Text(
               user.email,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             trailing: _StatusBadge(
-              label: isProfileCreated ? 'Created' : 'Pending',
+              label: isProfileCreated
+                  ? context.l10n.created
+                  : context.l10n.pending,
               color: isProfileCreated ? Colors.green : Colors.orange,
             ),
           ),
@@ -994,10 +1002,12 @@ class UserCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Icon(Icons.phone_outlined, size: 16, color: Colors.grey),
+                const Icon(Icons.phone_outlined, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text(
-                  user.phone.isNotEmpty ? user.phone : 'N/A',
+                  user.phone.isNotEmpty
+                      ? user.phone
+                      : context.l10n.notAvailable,
                   style: const TextStyle(fontSize: 13),
                 ),
                 const Spacer(),
@@ -1016,7 +1026,7 @@ class UserCard extends StatelessWidget {
               Expanded(
                 child: _TextActionButton(
                   icon: Icons.person_outline,
-                  label: 'Profile',
+                  label: context.l10n.profile,
                   onTap: onViewUserProfile,
                 ),
               ),
@@ -1024,7 +1034,7 @@ class UserCard extends StatelessWidget {
               Expanded(
                 child: _TextActionButton(
                   icon: Icons.favorite_border,
-                  label: 'Matrimony',
+                  label: context.l10n.matrimony,
                   onTap: onViewMatrimonyProfile,
                 ),
               ),
@@ -1032,7 +1042,7 @@ class UserCard extends StatelessWidget {
               Expanded(
                 child: _TextActionButton(
                   icon: Icons.receipt_long_outlined,
-                  label: 'Payment',
+                  label: context.l10n.payment,
                   onTap: onViewPayment,
                 ),
               ),
@@ -1063,7 +1073,7 @@ class _PaymentBadge extends StatelessWidget {
           Icon(Icons.payments_outlined, size: 14, color: color),
           const SizedBox(width: 4),
           Text(
-            status ?? 'N/A',
+            _localizedStatus(status, context),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -1073,6 +1083,20 @@ class _PaymentBadge extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _localizedStatus(String? s, BuildContext context) {
+    switch (s?.toUpperCase()) {
+      case 'PAID':
+      case 'SUCCESS':
+        return context.l10n.paid;
+      case 'PENDING':
+        return context.l10n.pending;
+      case 'NOT STARTED':
+        return context.l10n.notStarted;
+      default:
+        return s ?? context.l10n.notAvailable;
+    }
   }
 
   Color _color(String? s) {
@@ -1109,7 +1133,7 @@ class _ProfileStatusBadge extends StatelessWidget {
           Icon(Icons.person_pin, size: 14, color: color),
           const SizedBox(width: 4),
           Text(
-            (status ?? 'N/A').toUpperCase(),
+            _localizedStatus(status, context),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -1119,6 +1143,17 @@ class _ProfileStatusBadge extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _localizedStatus(String? s, BuildContext context) {
+    switch (s?.toUpperCase()) {
+      case 'ACTIVE':
+        return context.l10n.active;
+      case 'CLOSED':
+        return context.l10n.closed;
+      default:
+        return (status ?? context.l10n.notAvailable).toUpperCase();
+    }
   }
 
   Color _color(String? s) {
@@ -1224,7 +1259,7 @@ class _EmptyView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No Clients Found',
+            context.l10n.noClientsFound,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -1252,7 +1287,7 @@ class _NoResultsView extends StatelessWidget {
             Icon(Icons.search_off, size: 64, color: Colors.grey.shade300),
             const SizedBox(height: 16),
             Text(
-              'No Matching Clients',
+              context.l10n.noMatchingClients,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -1261,7 +1296,7 @@ class _NoResultsView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Try adjusting your filters to find what you\'re looking for.',
+              context.l10n.adjustFiltersToFind,
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
             ),
@@ -1269,7 +1304,7 @@ class _NoResultsView extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onClearFilters,
               icon: const Icon(Icons.clear_all),
-              label: const Text('Clear All Filters'),
+              label: Text(context.l10n.clearAllFilters),
             ),
           ],
         ),
@@ -1307,9 +1342,9 @@ class _ErrorView extends StatelessWidget {
           children: [
             const Icon(Icons.error_outline, size: 80, color: Colors.red),
             const SizedBox(height: 16),
-            const Text(
-              'Error Loading Clients',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            Text(
+              context.l10n.errorLoadingClients,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(
@@ -1321,7 +1356,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: Text(context.l10n.retry),
             ),
           ],
         ),

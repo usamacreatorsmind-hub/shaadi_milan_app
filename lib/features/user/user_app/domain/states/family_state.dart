@@ -1,10 +1,12 @@
+import '../../../../translitration/models/bilingual_value.dart';
+
 class FamilyProfile {
-  final String fatherName;
-  final String motherName;
+  final BilingualValue fatherName;
+  final BilingualValue motherName;
   final int numberOfBrothers;
   final int numberOfSisters;
-  final String familyType;
-  final String familyStatus;
+  final BilingualValue familyType;
+  final BilingualValue familyStatus;
 
   FamilyProfile({
     required this.fatherName,
@@ -17,28 +19,32 @@ class FamilyProfile {
 
   Map<String, dynamic> toMap() {
     return {
-      'fatherName': fatherName,
-      'motherName': motherName,
+      'fatherName': fatherName.toMap(),
+      'motherName': motherName.toMap(),
       'numberOfBrothers': numberOfBrothers,
       'numberOfSisters': numberOfSisters,
-
-      'familyType': familyType,
-      'familyStatus': familyStatus,
+      'familyType': familyType.toMap(),
+      'familyStatus': familyStatus.toMap(),
     };
   }
 
   factory FamilyProfile.fromMap(Map<String, dynamic> map) {
-    return FamilyProfile(
-      fatherName: map['fatherName'] as String? ?? '',
-      motherName: map['motherName'] as String? ?? '',
+    BilingualValue parseBilingual(dynamic val) {
+      if (val is Map) {
+        return BilingualValue.fromMap(Map<String, dynamic>.from(val));
+      }
+      return BilingualValue(en: val?.toString() ?? '', hi: '');
+    }
 
+    return FamilyProfile(
+      fatherName: parseBilingual(map['fatherName']),
+      motherName: parseBilingual(map['motherName']),
       numberOfBrothers:
           int.tryParse(map['numberOfBrothers']?.toString() ?? '') ?? 0,
       numberOfSisters:
           int.tryParse(map['numberOfSisters']?.toString() ?? '') ?? 0,
-
-      familyType: map['familyType'] as String? ?? '',
-      familyStatus: map['familyStatus'] as String? ?? '',
+      familyType: parseBilingual(map['familyType']),
+      familyStatus: parseBilingual(map['familyStatus']),
     );
   }
 
@@ -48,12 +54,12 @@ class FamilyProfile {
   }
 
   FamilyProfile copyWith({
-    String? fatherName,
-    String? motherName,
+    BilingualValue? fatherName,
+    BilingualValue? motherName,
     int? numberOfBrothers,
     int? numberOfSisters,
-    String? familyType,
-    String? familyStatus,
+    BilingualValue? familyType,
+    BilingualValue? familyStatus,
   }) {
     return FamilyProfile(
       fatherName: fatherName ?? this.fatherName,
@@ -63,20 +69,21 @@ class FamilyProfile {
       numberOfSisters: numberOfSisters ?? this.numberOfSisters,
 
       familyType: familyType ?? this.familyType,
+
       familyStatus: familyStatus ?? this.familyStatus,
     );
   }
 
   factory FamilyProfile.empty() {
     return FamilyProfile(
-      fatherName: '',
-      motherName: '',
+      fatherName: BilingualValue.empty(),
+      motherName: BilingualValue.empty(),
 
       numberOfBrothers: 0,
       numberOfSisters: 0,
 
-      familyType: '',
-      familyStatus: '',
+      familyType: BilingualValue.empty(),
+      familyStatus: BilingualValue.empty(),
     );
   }
 }

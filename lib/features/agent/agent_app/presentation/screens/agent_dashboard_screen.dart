@@ -1,18 +1,16 @@
-import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
-import 'package:shadi_milan/core/constants/app_constants.dart';
-import 'package:shadi_milan/core/constants/app_labels.dart';
-
-import '../../../../../app/custom/custom_widgets/drawer.dart';
-
-import '../../../../l10n/app_translation_service.dart';
-import '../notifier/analytics_provider.dart';
-import '../notifier/user_nofier.dart';
-import 'agen_profile.screen.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
+
+import '../../../../../app/custom/custom_widgets/drawer.dart';
 import '../../../../../app/router/app_router.dart';
+import '../../../../l10n/app_translation_service.dart';
+import '../notifier/analytics_provider.dart';
+import '../notifier/user_nofier.dart';
+import 'agen_profile.screen.dart';
 
 @RoutePage()
 class AgentDashboardScreen extends ConsumerStatefulWidget {
@@ -127,9 +125,9 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        error: (error, stack) => const Text(
-                          'Staff Member',
-                          style: TextStyle(
+                        error: (error, stack) => Text(
+                          AppLabels.staffMember(context),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -238,7 +236,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           value: analyticsAsync.when(
             data: (data) => '₹${data.totalRevenue}',
             loading: () => '...',
-            error: (_, __) => 'Error',
+            error: (_, __) => AppLabels.somethingWentWrong(context),
           ),
           icon: Icons.currency_rupee,
           color: Colors.green,
@@ -248,7 +246,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           value: usersAsync.when(
             data: (data) => '${data.length}',
             loading: () => '...',
-            error: (_, __) => 'Error',
+            error: (_, __) => AppLabels.somethingWentWrong(context),
           ),
           icon: Icons.people,
           color: Colors.blue,
@@ -259,7 +257,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           value: analyticsAsync.when(
             data: (data) => '₹${data.totalCommission.toStringAsFixed(0)}',
             loading: () => '...',
-            error: (_, __) => 'Error',
+            error: (_, __) => AppLabels.somethingWentWrong(context),
           ),
           icon: Icons.account_balance_wallet,
           color: Colors.orange,
@@ -270,7 +268,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           value: analyticsAsync.when(
             data: (data) => '${data.pendingCount}',
             loading: () => '...',
-            error: (_, __) => 'Error',
+            error: (_, __) => AppLabels.somethingWentWrong(context),
           ),
           icon: Icons.pending_actions,
           color: Colors.redAccent,
@@ -461,7 +459,8 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) =>
+          Center(child: Text('${AppLabels.errorOccurred(context)}: $e')),
     );
   }
 

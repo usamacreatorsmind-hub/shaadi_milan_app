@@ -1,11 +1,12 @@
-import '../../../../../core/constants/app_labels.dart';
 import 'package:auto_route/auto_route.dart';
-
-import '../../../../../core/enums/enum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../core/constants/app_labels.dart';
+import '../../../../../core/enums/enum.dart';
+import '../../../../translitration/models/bilingual_value.dart';
+import '../../../../translitration/widgets/bilingual_text_field.dart';
 import '../../domain/states/education_state.dart';
 import '../controllers/user_education_controllers.dart';
 
@@ -33,12 +34,18 @@ class _UserEducationFormScreenState
 
   // ---------------- Controllers ----------------
   final _collegeCtrl = TextEditingController();
+  final _collegeEnCtrl = TextEditingController();
+
   final _courseCtrl = TextEditingController();
+  final _courseEnCtrl = TextEditingController();
+
   final _percentageCtrl = TextEditingController();
   final _passingYearCtrl = TextEditingController();
-  final _extraCourseCtrl = TextEditingController();
 
-  final List<String> extraCourses = [];
+  final _extraCourseCtrl = TextEditingController();
+  final _extraCourseEnCtrl = TextEditingController();
+
+  final List<BilingualValue> extraCourses = [];
 
   final isIlliterateProvider = StateProvider<bool>((ref) => false);
 
@@ -56,8 +63,12 @@ class _UserEducationFormScreenState
       });
 
       if (!profile.isIlletrate && profile.education != null) {
-        _collegeCtrl.text = profile.education!.college;
-        _courseCtrl.text = profile.education!.course;
+        _collegeCtrl.text = profile.education!.college.hi;
+        _collegeEnCtrl.text = profile.education!.college.en;
+
+        _courseCtrl.text = profile.education!.course.hi;
+        _courseEnCtrl.text = profile.education!.course.en;
+
         _percentageCtrl.text = profile.education!.percentage.toString();
         _passingYearCtrl.text = profile.education!.passingYear.toString();
       }
@@ -71,10 +82,13 @@ class _UserEducationFormScreenState
   @override
   void dispose() {
     _collegeCtrl.dispose();
+    _collegeEnCtrl.dispose();
     _courseCtrl.dispose();
+    _courseEnCtrl.dispose();
     _percentageCtrl.dispose();
     _passingYearCtrl.dispose();
     _extraCourseCtrl.dispose();
+    _extraCourseEnCtrl.dispose();
     super.dispose();
   }
 
@@ -96,21 +110,32 @@ class _UserEducationFormScreenState
     }
 
     if (!_formKey.currentState!.validate()) return;
-    if (_extraCourseCtrl.text.isNotEmpty) {
-      extraCourses.add(_extraCourseCtrl.text.trim());
+
+    List<BilingualValue> finalExtraCourses = List.from(extraCourses);
+    final hiExtra = _extraCourseCtrl.text.trim();
+    final enExtra = _extraCourseEnCtrl.text.trim();
+
+    if (hiExtra.isNotEmpty || enExtra.isNotEmpty) {
+      finalExtraCourses.add(BilingualValue(hi: hiExtra, en: enExtra));
     }
 
     final profile = EducationProfile(
       isIlletrate: false,
       education: Education(
-        college: _collegeCtrl.text.trim(),
-        course: _courseCtrl.text.trim(),
-        percentage: double.parse(_percentageCtrl.text),
-        passingYear: int.parse(_passingYearCtrl.text),
+        college: BilingualValue(
+          hi: _collegeCtrl.text.trim(),
+          en: _collegeEnCtrl.text.trim(),
+        ),
+        course: BilingualValue(
+          hi: _courseCtrl.text.trim(),
+          en: _courseEnCtrl.text.trim(),
+        ),
+        percentage: double.tryParse(_percentageCtrl.text) ?? 0.0,
+        passingYear: int.tryParse(_passingYearCtrl.text) ?? 0,
       ),
-      extraQualification: ExtraQualification(
-        qualifications: List.from(extraCourses),
-      ),
+      extraQualification: finalExtraCourses.isEmpty
+          ? null
+          : ExtraQualification(qualifications: finalExtraCourses),
     );
 
     final notifier = ref.read(userEducationControllerProvider.notifier);
@@ -134,7 +159,9 @@ class _UserEducationFormScreenState
 
       if (next.education != null && prev?.education == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLabels.educationSavedSuccessfully(context))),
+          SnackBar(
+            content: Text(AppLabels.educationSavedSuccessfully(context)),
+          ),
         );
       }
     });
@@ -159,13 +186,11 @@ class _UserEducationFormScreenState
             key: _formKey,
             child: ListView(
               children: [
-                // ========== LITERACY TOGGLE ==========
                 ToggleButtons(
                   constraints: BoxConstraints(
                     minHeight: 40,
                     minWidth: (MediaQuery.of(context).size.width - 48) / 2,
                   ),
-
                   isSelected: [!isIlliterate, isIlliterate],
                   onPressed: (i) =>
                       ref.read(isIlliterateProvider.notifier).state = i == 1,
@@ -184,42 +209,32 @@ class _UserEducationFormScreenState
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 28),
-
                 if (!isIlliterate) ...[
-                  // ========== QUALIFICATION SECTION ==========
                   _sectionHeader(AppLabels.highestQualification(context)),
                   const SizedBox(height: 16),
-
-                  AppTextField(
+                  BilingualTextField(
                     controller: _collegeCtrl,
+                    englishController: _collegeEnCtrl,
                     prefixIcon: Icons.school,
-                    iconColor: Theme.of(context).colorScheme.primary,
                     label: AppLabels.collegeUniversity(context),
                     hint: AppLabels.collegeHint(context),
-                    obscureText: false,
-                    keyboardType: TextInputType.text,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
+                    validator: (v) => v == null || v.isEmpty
+                        ? AppLabels.isRequired(context)
+                        : null,
                   ),
-
                   const SizedBox(height: 12),
-
-                  AppTextField(
+                  BilingualTextField(
                     controller: _courseCtrl,
+                    englishController: _courseEnCtrl,
                     prefixIcon: Icons.book,
-                    iconColor: Theme.of(context).colorScheme.primary,
                     label: AppLabels.degreeCourse(context),
                     hint: AppLabels.degreeHint(context),
-                    obscureText: false,
-                    keyboardType: TextInputType.text,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
+                    validator: (v) => v == null || v.isEmpty
+                        ? AppLabels.isRequired(context)
+                        : null,
                   ),
-
                   const SizedBox(height: 12),
-
                   Row(
                     children: [
                       Expanded(
@@ -253,23 +268,16 @@ class _UserEducationFormScreenState
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 24),
-
-                  // ========== EXTRA QUALIFICATION SECTION ==========
                   _sectionHeader(AppLabels.additionalQualifications(context)),
                   const SizedBox(height: 16),
-
                   _extraCourseInput(),
-
                   if (extraCourses.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _extraCourseChips(),
                   ],
                 ],
-
                 const SizedBox(height: 32),
-
                 if (state.isLoading)
                   const Center(child: CircularProgressIndicator())
                 else if (widget.registerSubmit == null)
@@ -279,7 +287,6 @@ class _UserEducationFormScreenState
                         ? AppLabels.saveEducation(context)
                         : AppLabels.updateEducation(context),
                   ),
-
                 const SizedBox(height: 20),
               ],
             ),
@@ -288,8 +295,6 @@ class _UserEducationFormScreenState
       ),
     );
   }
-
-  // ========== UI HELPERS ==========
 
   Widget _sectionHeader(String title) {
     return Container(
@@ -309,40 +314,33 @@ class _UserEducationFormScreenState
   }
 
   Widget _extraCourseInput() {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: AppTextField(
-            controller: _extraCourseCtrl,
-            prefixIcon: Icons.add_box,
-            iconColor: Theme.of(context).colorScheme.primary,
-            label: AppLabels.addExtraQualification(context),
-            hint: AppLabels.extraQualificationHint(context),
-            obscureText: false,
-            keyboardType: TextInputType.text,
-            validator: (_) => null,
-          ),
+        BilingualTextField(
+          controller: _extraCourseCtrl,
+          englishController: _extraCourseEnCtrl,
+          prefixIcon: Icons.add_box,
+          label: AppLabels.addExtraQualification(context),
+          hint: AppLabels.extraQualificationHint(context),
+          validator: (v) => null,
         ),
-        const SizedBox(width: 8),
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-          ),
-          child: IconButton(
-            icon: Icon(
-              Icons.add_circle,
-              size: 28,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.center,
+          child: AppButton(
+            color: Colors.red,
+            width: double.infinity,
             onPressed: () {
-              final value = _extraCourseCtrl.text.trim();
-              if (value.isEmpty || extraCourses.contains(value)) return;
+              final hi = _extraCourseCtrl.text.trim();
+              final en = _extraCourseEnCtrl.text.trim();
+              if (hi.isEmpty && en.isEmpty) return;
               setState(() {
-                extraCourses.add(value);
+                extraCourses.add(BilingualValue(hi: hi, en: en));
                 _extraCourseCtrl.clear();
+                _extraCourseEnCtrl.clear();
               });
             },
+            text: "Add Qualification",
           ),
         ),
       ],
@@ -354,8 +352,9 @@ class _UserEducationFormScreenState
       spacing: 8,
       runSpacing: 8,
       children: extraCourses.map((course) {
+        final label = course.hi.isNotEmpty ? course.hi : course.en;
         return Chip(
-          label: Text(course),
+          label: Text(label),
           deleteIcon: const Icon(Icons.close, size: 18),
           onDeleted: () => setState(() => extraCourses.remove(course)),
           backgroundColor: Theme.of(

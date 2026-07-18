@@ -1,13 +1,14 @@
 import 'dart:async';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+
+import '../../../auth/domain/states/user_state.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/states/agent_state.dart';
 import '../providers/auth_providers.dart';
-import 'package:dartz/dartz.dart';
-
-import '../../../auth/domain/states/user_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthController extends StateNotifier<User?> {
   bool isProfileCreated = false;
@@ -27,11 +28,11 @@ class AuthController extends StateNotifier<User?> {
       _authRepository.authStateChanges();
 
   Future<void> signUpWithEmail(
-    String fullName,
+    BilingualValue fullName,
     String email,
     String password,
     String agentId,
-    String gender,
+    BilingualValue gender,
     String phone,
   ) async {
     await _authRepository.signUpUserWithEmail(

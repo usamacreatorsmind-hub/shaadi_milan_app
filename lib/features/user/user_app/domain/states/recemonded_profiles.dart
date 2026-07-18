@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 
 class RecommendedProfiles {
   final String userId;
-  final String name;
+  final BilingualValue name;
   final String phone;
-  final String gender;
+  final BilingualValue gender;
   final List<String> ids;
   final DateTime? updatedAt;
 
@@ -21,10 +22,10 @@ class RecommendedProfiles {
   factory RecommendedProfiles.empty() {
     return RecommendedProfiles(
       userId: '',
-      name: '',
+      name: BilingualValue.empty(),
       phone: '',
       ids: [],
-      gender: '',
+      gender: BilingualValue.empty(),
       updatedAt: null,
     );
   }
@@ -33,14 +34,16 @@ class RecommendedProfiles {
   factory RecommendedProfiles.fromJson(Map<String, dynamic> json) {
     return RecommendedProfiles(
       userId: json['userId']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
+      name: json['name'] != null && json['name'] is Map
+          ? BilingualValue.fromMap(Map<String, dynamic>.from(json['name']))
+          : BilingualValue.empty(),
       phone: json['phone']?.toString() ?? '',
       ids: List<String>.from(json['ids'] ?? []),
       updatedAt: json['updatedAt'] != null
           ? (json['updatedAt'] as Timestamp).toDate()
           : null,
 
-      gender: json['gender']?.toString() ?? '',
+      gender: json['gender'] ,
     );
   }
 
@@ -59,11 +62,11 @@ class RecommendedProfiles {
   /// CopyWith
   RecommendedProfiles copyWith({
     String? userId,
-    String? name,
+    BilingualValue? name,
     String? phone,
     List<String>? ids,
     DateTime? updatedAt,
-    String? gender,
+    BilingualValue? gender,
   }) {
     return RecommendedProfiles(
       userId: userId ?? this.userId,

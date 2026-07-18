@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 @RoutePage()
 class AgentHomeScreen extends ConsumerStatefulWidget {
   const AgentHomeScreen({super.key});
@@ -29,6 +31,6 @@ class _AgentHomeScreenState extends ConsumerState<AgentHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(child: Center(child: Text('Agent Home Screen')));
+    return Center(child: Text(AppLocalizations.of(context)!.navHome));
   }
 }

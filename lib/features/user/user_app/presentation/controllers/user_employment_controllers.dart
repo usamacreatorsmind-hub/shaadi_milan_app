@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';
+import '../../../../translitration/models/bilingual_value.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import '../../domain/states/employee_state.dart';
@@ -15,20 +16,12 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
     : super(EmploymentState.initial);
 
   Future<void> saveEmployment({
-    required String jobType,
-    String? company,
-    String? designation,
+    required BilingualValue jobType,
+    BilingualValue? company,
+    BilingualValue? designation,
     int? annualIncome,
-    String? workLocation,
+    BilingualValue? workLocation,
   }) async {
-    // print data
-    print('Saving Employment:');
-    print('Job Type: $jobType');
-    print('Company: $company');
-    print('Designation: $designation');
-    print('Annual Income: $annualIncome');
-    print('Work Location: $workLocation');
-
     state = state.copyWith(isLoading: true, error: null);
     final employmentProfile = EmploymentProfile(
       jobType: jobType,
@@ -45,17 +38,16 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
 
       state = state.copyWith(employment: employmentProfile, isLoading: false);
     } catch (e) {
-      print('❌ Employment Save Failed: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   void updateEmployment({
-    required String jobType,
-    String? company,
-    String? designation,
+    required BilingualValue jobType,
+    BilingualValue? company,
+    BilingualValue? designation,
     int? annualIncome,
-    String? workLocation,
+    BilingualValue? workLocation,
   }) {
     state = state.copyWith(isLoading: true, error: null);
     final employmentProfile = EmploymentProfile(
@@ -67,25 +59,15 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
     );
 
     try {
-      // print       print('Updating Employment:');
-      print('Job Type: $jobType');
-      print('Company: $company');
-      print('Designation: $designation');
-      print('Annual Income: $annualIncome');
-      print('Work Location: $workLocation');
-
       _ref
           .read(matrimonyRepositoryProvider)
           .updateEmploymentProfile(_uid, employmentProfile);
 
       state = state.copyWith(employment: employmentProfile, isLoading: false);
-      print('✅ Employment Updated Successfully');
-      print(employmentProfile.toString());
       _ref
           .read(metrimonyControllerProvider.notifier)
           .saveEmployment(employmentProfile);
     } catch (e) {
-      print('❌ Employment Update Failed: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }

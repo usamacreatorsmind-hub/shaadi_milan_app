@@ -1,8 +1,8 @@
-import 'package:shadi_milan/features/user/user_razorpay/data/firestore/payment_firestore.dart';
-import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/user/user_razorpay/data/firestore/payment_firestore.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 
 import '../../data/datasources/firebase/agent_firestore_ds.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
@@ -114,7 +114,14 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
         .collection('users')
         .doc(uid)
         .get();
-    final fullName = userDoc.data()?['fullName'] ?? '';
+    final userData = userDoc.data();
+    final fullNameMap = userData?['fullName'];
+    String fullName = '';
+    if (fullNameMap is Map) {
+      fullName = fullNameMap['en'] ?? '';
+    } else {
+      fullName = fullNameMap?.toString() ?? '';
+    }
 
     debugPrint('Fetched User Full Name: $fullName');
 
@@ -155,9 +162,16 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
         .collection('users')
         .doc(uid)
         .get();
-    final fullName = userDoc.data()?['fullName'] ?? '';
-    final email = userDoc.data()?['email'] ?? '';
-    final phone = userDoc.data()?['phone'] ?? '';
+    final userData = userDoc.data();
+    final fullNameMap = userData?['fullName'];
+    String fullName = '';
+    if (fullNameMap is Map) {
+      fullName = fullNameMap['en'] ?? '';
+    } else {
+      fullName = fullNameMap?.toString() ?? '';
+    }
+    final email = userData?['email'] ?? '';
+    final phone = userData?['phone'] ?? '';
 
     debugPrint('Fetched User Full Name: $fullName');
 
@@ -170,11 +184,11 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
         razorpayPaymentId: '',
         paymentType: '',
         agentId: agentId,
-        region: profile.address.state,
-        district: profile.address.city,
-        gender: profile.identity.gender,
-        religion: profile.cultural.religion,
-        caste: profile.cultural.caste,
+        region: profile.address.state.en,
+        district: profile.address.city.en,
+        gender: profile.identity.gender.en,
+        religion: profile.cultural.religion.en,
+        caste: profile.cultural.caste.en,
         orderId: '',
         razorpayOrderId: '',
         userId: uid,

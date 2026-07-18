@@ -1,19 +1,19 @@
-import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-import '../../../../../app/router/app_router.dart';
-import '../../../../../core/enums/enum.dart';
-
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../app/custom/custom_widgets/validators.dart';
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import 'package:intl/intl.dart';
-import '../controllers/user_identity_controllers.dart';
-import '../../domain/states/identity_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:auto_route/auto_route.dart';
+import 'package:intl/intl.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+
+import '../../../../../app/custom/custom_widgets/validators.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../core/constants/app_labels.dart';
+import '../../../../../core/enums/enum.dart';
+import '../../../../translitration/widgets/bilingual_text_field.dart';
+import '../../domain/states/identity_state.dart';
+import '../controllers/user_identity_controllers.dart';
 
 @RoutePage()
 class UserIdentityFormScreen extends ConsumerStatefulWidget {
@@ -37,8 +37,8 @@ class _UserIdentityFormScreenState
   final _formKey = GlobalKey<FormState>();
   final _aadharController = TextEditingController();
   final _aboutMeController = TextEditingController();
+  final _aboutMeEnController = TextEditingController();
 
-  // prefile controlles
   DateTime? _selectedDate;
 
   @override
@@ -47,8 +47,9 @@ class _UserIdentityFormScreenState
     widget.registerSubmit?.call(_submitForm);
     if (widget.mode == FormMode.edit &&
         widget.existingIdentityProfile != null) {
-      _aadharController.text = widget.existingIdentityProfile!.aadhar ?? '';
-      _aboutMeController.text = widget.existingIdentityProfile!.aboutMe ?? '';
+      _aadharController.text = widget.existingIdentityProfile!.aadhar;
+      _aboutMeController.text = widget.existingIdentityProfile!.aboutMe.hi;
+      _aboutMeEnController.text = widget.existingIdentityProfile!.aboutMe.en;
 
       _selectedDate = widget.existingIdentityProfile!.dob;
     }
@@ -58,12 +59,10 @@ class _UserIdentityFormScreenState
   void dispose() {
     _aadharController.dispose();
     _aboutMeController.dispose();
+    _aboutMeEnController.dispose();
     super.dispose();
   }
 
-  // ----------------------------
-  // DATE PICKER
-  // ----------------------------
   Future<void> _selectDate(BuildContext context) async {
     final picked = await showDatePicker(
       context: context,
@@ -80,9 +79,6 @@ class _UserIdentityFormScreenState
     }
   }
 
-  // ----------------------------
-  // AGE CALCULATION
-  // ----------------------------
   int _calculateAge(DateTime dob) {
     final today = DateTime.now();
     int age = today.year - dob.year;
@@ -94,44 +90,40 @@ class _UserIdentityFormScreenState
     return age;
   }
 
-  // ✅ SAFE AGE GETTER
   int? get _age {
     if (_selectedDate == null) return null;
     return _calculateAge(_selectedDate!);
   }
 
-  // ----------------------------
-  // SUBMIT
-  // ----------------------------
   Future<void> _submitForm() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return;
 
-    String gender = '';
+    BilingualValue gender = BilingualValue.empty();
     try {
       final user = await ref
           .read(userRepositoryProvider)
           .fetchUser(currentUser.uid);
 
       if (!mounted) return;
-
       gender = user.gender;
-      debugPrint(user.gender);
-      debugPrint(user.uid);
     } catch (e) {
+      print(e.toString());
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLabels.errorFetchingUserData(context, e.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLabels.errorFetchingUserData(context, e.toString()),
+            ),
+          ),
+        );
       }
       return;
     }
 
     if (gender.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLabels.genderNotFound(context)),
-        ),
+        SnackBar(content: Text(AppLabels.genderNotFound(context))),
       );
       return;
     }
@@ -145,54 +137,44 @@ class _UserIdentityFormScreenState
     }
 
     if (_age! < 18) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLabels.mustBe18(context))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppLabels.mustBe18(context))));
       return;
     }
 
-    // print all data
-    print('DOB: $_selectedDate');
-    print('Age: $_age');
-    print('Aadhar: ${_aadharController.text.trim()}');
-    print('About Me: ${_aboutMeController.text.trim()}');
-
     final notifier = ref.read(identityControllerProvider.notifier);
+    final aboutMe = BilingualValue(
+      hi: _aboutMeController.text.trim(),
+      en: _aboutMeEnController.text.trim(),
+    );
 
     if (widget.mode == FormMode.create) {
-      // fetch gender form user collection from firebase
-      //
-
       notifier.saveIdentity(
         gender: gender,
         dob: _selectedDate!,
         age: _age!,
         aadhar: _aadharController.text.trim(),
-        aboutMe: _aboutMeController.text.trim(),
+        aboutMe: aboutMe,
       );
     } else {
-      // Update logic (using saveIdentity as upsert)
       notifier.updateIdentity(
         gender: gender,
-
         dob: _selectedDate!,
         age: _age!,
         aadhar: _aadharController.text.trim(),
-
-        aboutMe: _aboutMeController.text.trim(),
+        aboutMe: aboutMe,
       );
     }
   }
 
-  // ----------------------------
-  // BUILD
-  // ----------------------------
   @override
   Widget build(BuildContext context) {
     final identityState = ref.watch(identityControllerProvider);
 
     ref.listen<IdentityState>(identityControllerProvider, (previous, current) {
       if (current.error != null) {
+        print(current.error);
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
@@ -209,10 +191,10 @@ class _UserIdentityFormScreenState
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
         title: Text(
-          widget.mode == FormMode.create ? AppLabels.createIdentity(context) : AppLabels.editIdentity(context),
-
+          widget.mode == FormMode.create
+              ? AppLabels.createIdentity(context)
+              : AppLabels.editIdentity(context),
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
@@ -223,29 +205,19 @@ class _UserIdentityFormScreenState
           child: ListView(
             children: [
               const SizedBox(height: 12),
-
-              const SizedBox(height: 12),
-              // about me field
-              AppTextField(
+              BilingualTextField(
                 controller: _aboutMeController,
+                englishController: _aboutMeEnController,
                 prefixIcon: Icons.person_outline,
-                iconColor: Theme.of(context).colorScheme.primary,
                 label: AppLabels.aboutMe(context),
                 hint: AppLabels.tellUsAboutYourself(context),
-
-                showWordCount: true,
-                counterType: CounterType.words,
-
-                obscureText: false,
                 keyboardType: TextInputType.multiline,
                 maxLines: 3,
-                validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
+                validator: (v) => v == null || v.isEmpty
+                    ? AppLabels.isRequired(context)
+                    : null,
               ),
               const SizedBox(height: 16),
-
-              // ----------------------------
-              // AADHAR
-              // ----------------------------
               AppTextField(
                 controller: _aadharController,
                 maxLines: 1,
@@ -253,10 +225,8 @@ class _UserIdentityFormScreenState
                   FilteringTextInputFormatter.digitsOnly,
                   MaxLengthFormatter(max: 12),
                 ],
-
                 showWordCount: true,
-                counterType: CounterType.characters, // ✅ IMPORTANT
-
+                counterType: CounterType.characters,
                 prefixIcon: Icons.credit_card,
                 iconColor: Theme.of(context).colorScheme.primary,
                 label: AppLabels.aadharNumber(context),
@@ -265,18 +235,7 @@ class _UserIdentityFormScreenState
                 keyboardType: TextInputType.number,
                 validator: (value) => Validators.validateAadhar(context, value),
               ),
-              const SizedBox(height: 12),
-
-              // Widget for Aadhar upload
-
-              // ----------------------------
-              // GENDER
-              // ----------------------------
               const SizedBox(height: 20),
-
-              // ----------------------------
-              // DOB PICKER
-              // ----------------------------
               ListTile(
                 leading: CircleAvatar(
                   radius: 20,
@@ -291,9 +250,14 @@ class _UserIdentityFormScreenState
                 title: Text(
                   _selectedDate == null
                       ? AppLabels.selectDateOfBirth(context)
-                      : AppLabels.dobValue(context, DateFormat('dd/MM/yyyy').format(_selectedDate!)),
+                      : AppLabels.dobValue(
+                          context,
+                          DateFormat('dd/MM/yyyy').format(_selectedDate!),
+                        ),
                 ),
-                subtitle: _age == null ? null : Text(AppLabels.ageYears(context, _age!)),
+                subtitle: _age == null
+                    ? null
+                    : Text(AppLabels.ageYears(context, _age!)),
                 onTap: () => _selectDate(context),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
@@ -304,12 +268,7 @@ class _UserIdentityFormScreenState
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // ----------------------------
-              // SUBMIT / AGE VALIDATION
-              // ----------------------------
               if (_age == null)
                 const SizedBox.shrink()
               else if (_age! >= 18)
@@ -329,7 +288,6 @@ class _UserIdentityFormScreenState
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.red),
                 ),
-
               const SizedBox(height: 16),
             ],
           ),

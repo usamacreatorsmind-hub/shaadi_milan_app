@@ -1,3 +1,5 @@
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../../../auth/domain/states/user_state.dart';
@@ -61,7 +63,7 @@ class UserEntityController extends StateNotifier<AsyncValue<UserEntity?>> {
     }
   }
 
-  Future<void> updateFullName(String fullName) async {
+  Future<void> updateFullName(BilingualValue fullName) async {
     state = const AsyncValue.loading();
     try {
       await _userRepository.updateFullName(_uid, fullName);

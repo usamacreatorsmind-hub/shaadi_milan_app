@@ -1,13 +1,17 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/app/router/app_router.dart';
 import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/metrimony_notifier.dart';
 import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/user_nofier.dart';
+import 'package:shadi_milan/features/l10n/l10n_helper.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 import 'package:shadi_milan/features/user/user_app/domain/repositories/user_recemmonded_repository.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
-import 'package:shadi_milan/features/user/user_app/domain/states/recemonded_profiles.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../user/user_app/domain/states/recemonded_profiles.dart';
+import '../../../../user/user_app/domain/states/religion_state.dart';
+import '../../../../user/user_app/domain/states/state_city.dart';
 
 // Provider to fetch all matrimony profile view models
 final allProfilesProvider = FutureProvider<List<MetrimonyProfileViewModel>>((
@@ -110,10 +114,10 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
   Future<void> _recommendProfile(MetrimonyProfileViewModel match) async {
     if (_recommendedProfiles!.ids.contains(match.user.uid)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile already recommended!'),
+        SnackBar(
+          content: Text(context.l10n.profileAlreadyRecommended),
           backgroundColor: Colors.orange,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -145,8 +149,8 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
         SnackBar(
           content: Text(
             success
-                ? 'Profile Recommended Successfully'
-                : 'Failed to Recommend Profile',
+                ? context.l10n.profileRecommendedSuccessfully
+                : context.l10n.failedToRecommendProfile,
           ),
           backgroundColor: success ? Colors.green : Colors.red,
           behavior: SnackBarBehavior.floating,
@@ -175,8 +179,8 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
         SnackBar(
           content: Text(
             success
-                ? 'Recommendation Removed Successfully'
-                : 'Failed to Remove Recommendation',
+                ? context.l10n.recommendationRemovedSuccessfully
+                : context.l10n.failedToRemoveRecommendation,
           ),
           backgroundColor: success ? Colors.green : Colors.red,
           behavior: SnackBarBehavior.floating,
@@ -188,6 +192,8 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
   @override
   Widget build(BuildContext context) {
     final allProfilesAsync = ref.watch(allProfilesProvider);
+    final locationAsync = ref.watch(locationJsonProvider);
+    final religionsAsync = ref.watch(religionsProvider);
 
     // Prevent LateInitializationError by checking if data is loaded
     if (_recommendedProfiles == null) {
@@ -195,13 +201,13 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
     }
 
     final theme = Theme.of(context);
-    final sourceGender = widget.profile.identity.gender.toLowerCase();
+    final sourceGender = widget.profile.identity.gender.en.toLowerCase();
     final targetGender = sourceGender == 'male' ? 'female' : 'male';
-    final sourceReligion = _normalize(widget.profile.cultural.religion);
+    final sourceReligion = _normalize(widget.profile.cultural.religion.en);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Suggested Matches'),
+        title: Text(context.l10n.suggestedMatches),
         backgroundColor: theme.primaryColor,
         // foregroundColor: theme.colorScheme.onPrimary,
         // ── SEARCH BAR pinned inside AppBar bottom ──────────
@@ -220,7 +226,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                 controller: _searchController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'Search by name, caste, religion, city…',
+                  hintText: context.l10n.searchMatchHint,
                   hintStyle: TextStyle(
                     color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 13,
@@ -276,13 +282,13 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
           // ── 1. Caste / region filter (existing logic) ──────
           final matches = profiles.where((p) {
             final isOppositeGender =
-                p.identity.gender.toLowerCase() == targetGender;
+                p.identity.gender.en.toLowerCase() == targetGender;
             final isNotSelf = p.user.uid != widget.profile.user.uid;
             if (!isOppositeGender || !isNotSelf) return false;
 
             final sameReligion =
                 sourceReligion.isNotEmpty &&
-                _normalize(p.cultural.religion) == sourceReligion;
+                _normalize(p.cultural.religion.en) == sourceReligion;
 
             return sameReligion;
           }).toList();
@@ -292,19 +298,19 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
           final filtered = q.isEmpty
               ? matches
               : matches.where((p) {
-                  return _normalize(p.user.fullName).contains(q) ||
-                      // _normalize(p.cultural.caste).contains(q) ||
-                      _normalize(p.cultural.religion).contains(q) ||
-                      _normalize(p.address.city).contains(q) ||
-                      _normalize(p.address.state).contains(q);
+                  return _normalize(p.user.fullName.en).contains(q) ||
+                      // _normalize(p.cultural.caste.en).contains(q) ||
+                      _normalize(p.cultural.religion.en).contains(q) ||
+                      _normalize(p.address.city.en).contains(q) ||
+                      _normalize(p.address.state.en).contains(q);
                 }).toList();
 
           if (matches.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
                 child: Text(
-                  'No matching profiles found for the same religion.',
+                  context.l10n.noMatchingReligionProfiles,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -325,7 +331,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'No results for "$_searchQuery"',
+                      context.l10n.noResultsFor(_searchQuery),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -336,7 +342,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                     TextButton.icon(
                       onPressed: () => _searchController.clear(),
                       icon: const Icon(Icons.clear),
-                      label: const Text('Clear search'),
+                      label: Text(context.l10n.clearSearch),
                     ),
                   ],
                 ),
@@ -354,7 +360,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        'Matches for ${widget.profile.user.fullName}',
+                        context.l10n.matchesFor(widget.profile.user.fullName.en),
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -372,7 +378,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                       ),
                       child: Text(
                         q.isEmpty
-                            ? '${filtered.length} match${filtered.length != 1 ? 'es' : ''}'
+                            ? '${filtered.length} ${filtered.length != 1 ? context.l10n.matches : context.l10n.match}'
                             : '${filtered.length} / ${matches.length}',
                         style: TextStyle(
                           fontSize: 12,
@@ -391,6 +397,54 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {
                     final match = filtered[index];
+
+                    String resolvedCity = match.address.city.en;
+                    String resolvedReligion = match.cultural.religion.en;
+                    String resolvedCaste = match.cultural.caste.en;
+
+                    if (locationAsync.hasValue) {
+                      final states = locationAsync.value!;
+                      final stateObj = states
+                          .where((s) => s.name == match.address.state)
+                          .firstOrNull;
+                      if (stateObj != null) {
+                        final cityObj = stateObj.cities
+                            .where(
+                              (c) =>
+                                  c.id == match.address.city ||
+                                  c.name == match.address.city,
+                            )
+                            .firstOrNull;
+                        if (cityObj != null) {
+                          resolvedCity = cityObj.name;
+                        }
+                      }
+                    }
+
+                    if (religionsAsync.hasValue) {
+                      final religions = religionsAsync.value!;
+                      final religionObj = religions
+                          .where(
+                            (r) =>
+                                r.id == match.cultural.religion ||
+                                r.name == match.cultural.religion,
+                          )
+                          .firstOrNull;
+                      if (religionObj != null) {
+                        resolvedReligion = religionObj.name;
+                        final casteObj = religionObj.castes
+                            .where(
+                              (c) =>
+                                  c.id == match.cultural.caste ||
+                                  c.name == match.cultural.caste,
+                            )
+                            .firstOrNull;
+                        if (casteObj != null) {
+                          resolvedCaste = casteObj.name;
+                        }
+                      }
+                    }
+
                     return InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () =>
@@ -445,13 +499,10 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                   Row(
                                     children: [
                                       Expanded(
-                                        child: Text(
-                                          match.user.fullName,
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                        child: 
+                                        BilingualParser(value: match.user.fullName)
+                                        
+                                  
                                       ),
 
                                       if (_recommendedProfiles!.ids.contains(
@@ -468,18 +519,18 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                               30,
                                             ),
                                           ),
-                                          child: const Row(
+                                          child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Icon(
+                                              const Icon(
                                                 Icons.check_circle,
                                                 color: Colors.green,
                                                 size: 16,
                                               ),
-                                              SizedBox(width: 4),
+                                              const SizedBox(width: 4),
                                               Text(
-                                                'Recommended',
-                                                style: TextStyle(
+                                                context.l10n.recommended,
+                                                style: const TextStyle(
                                                   color: Colors.green,
                                                   fontWeight: FontWeight.w600,
                                                 ),
@@ -499,22 +550,19 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                     children: [
                                       _infoChip(
                                         Icons.cake,
-                                        '${match.identity.age} Years',
+                                        '${match.identity.age} ${context.l10n.years}',
                                       ),
 
                                       _infoChip(
                                         Icons.temple_hindu,
-                                        match.cultural.religion,
+                                        resolvedReligion,
                                       ),
 
-                                      _infoChip(
-                                        Icons.people,
-                                        match.cultural.caste,
-                                      ),
+                                      _infoChip(Icons.people, resolvedCaste),
 
                                       _infoChip(
                                         Icons.location_on,
-                                        match.address.city,
+                                        resolvedCity,
                                       ),
                                     ],
                                   ),
@@ -542,8 +590,8 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                         _recommendedProfiles!.ids.contains(
                                               match.user.uid,
                                             )
-                                            ? 'Remove Recommendation'
-                                            : 'Recommend Profile',
+                                            ? context.l10n.removeRecommendation
+                                            : context.l10n.recommendProfile,
                                       ),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
@@ -576,7 +624,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                         ),
                                       ),
                                       icon: const Icon(Icons.person_outline),
-                                      label: const Text('View Full Profile'),
+                                      label: Text(context.l10n.viewFullProfile),
                                       style: OutlinedButton.styleFrom(
                                         minimumSize: const Size(
                                           double.infinity,

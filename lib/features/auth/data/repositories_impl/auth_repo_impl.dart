@@ -1,13 +1,14 @@
 import 'dart:async';
 
-import 'data_source/firebase_auth_ds.dart';
-import '../../domain/states/agent_state.dart';
-import '../../domain/states/user_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 
 import '../../domain/repositories/auth_repository.dart';
+import '../../domain/states/agent_state.dart';
+import '../../domain/states/user_state.dart';
+import 'data_source/firebase_auth_ds.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuthDS ds;
@@ -38,11 +39,10 @@ class AuthRepositoryImpl implements AuthRepository {
     return false;
   }
 
-
   @override
   Future<bool> checkUserExists({required String phone, required String email}) {
     return ds.checkUserIfExists(phone: phone, email: email);
-  }           
+  }
 
   @override
   Stream<Either<AgentEntity, UserEntity>?>
@@ -79,11 +79,11 @@ class AuthRepositoryImpl implements AuthRepository {
     // Authenticated but no Firestore record yet (new sign-up or fetch failed)
     return Right(
       UserEntity(
-        gender: '',
+        gender: BilingualValue.empty(),
         profileStatus: 'active',
         uid: user.uid,
         email: user.email ?? '',
-        fullName: '',
+        fullName: BilingualValue(hi: '', en: user.displayName ?? ''),
         phone: '',
         profileImageUrl: '',
         agentId: '',
@@ -132,8 +132,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> signUpUserWithEmail({
-    required String fullName,
-    required String gender,
+    required BilingualValue fullName,
+    required BilingualValue gender,
 
     required String email,
     required String password,

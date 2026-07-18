@@ -1,8 +1,10 @@
-import 'package:shadi_milan/app/router/app_router.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/app/router/app_router.dart';
+
+import '../../../../l10n/app_localizations.dart';
 
 @RoutePage()
 class AgentSettingsScreen extends ConsumerStatefulWidget {
@@ -16,12 +18,12 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: Text(AppLocalizations.of(context)!.logout),
+        content: Text(AppLocalizations.of(context)!.logoutConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -29,7 +31,10 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
               Navigator.pop(ctx);
               FirebaseAuth.instance.signOut();
             },
-            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+            child: Text(
+              AppLocalizations.of(context)!.logout,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -42,7 +47,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(AppLocalizations.of(context)!.settings),
         backgroundColor: theme.primaryColor,
         foregroundColor: theme.colorScheme.onPrimary,
       ),
@@ -60,7 +65,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
               children: [
                 ListTile(
                   leading: Icon(Icons.lock_outline, color: theme.primaryColor),
-                  title: const Text('Change Password'),
+                  title: Text(AppLocalizations.of(context)!.changePassword),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () => context.pushRoute(ChangePasswordRoute()),
                 ),
@@ -79,7 +84,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
               children: [
                 ListTile(
                   leading: Icon(Icons.info_outline, color: theme.primaryColor),
-                  title: const Text('About Us'),
+                  title: Text(AppLocalizations.of(context)!.aboutUs),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () => context.pushRoute(const AboutUsRoute()),
                 ),
@@ -89,7 +94,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
                     Icons.policy_outlined,
                     color: theme.primaryColor,
                   ),
-                  title: const Text('Privacy Policy'),
+                  title: Text(AppLocalizations.of(context)!.privacyPolicy),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () => context.pushRoute(const PrivacyPolicyRoute()),
                 ),
@@ -99,7 +104,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
                     Icons.description_outlined,
                     color: theme.primaryColor,
                   ),
-                  title: const Text('Terms and Conditions'),
+                  title: Text(AppLocalizations.of(context)!.termsAndConditions),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () =>
                       context.pushRoute(const TermsAndConditionsRoute()),
@@ -117,7 +122,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
             child: ListTile(
               leading: Icon(Icons.logout, color: theme.colorScheme.error),
               title: Text(
-                'Logout',
+                AppLocalizations.of(context)!.logout,
                 style: TextStyle(color: theme.colorScheme.error),
               ),
               onTap: () => _showLogoutDialog(context),

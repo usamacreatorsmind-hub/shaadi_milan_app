@@ -1,11 +1,11 @@
-import 'package:shadi_milan/core/constants/app_constants.dart';
-import 'package:shadi_milan/core/constants/app_labels.dart';
-import 'package:shadi_milan/core/notification/notification_service.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
+import 'package:shadi_milan/core/notification/notification_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app/custom/custom_widgets/widgets.dart';
@@ -82,23 +82,22 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
 
       switch (e.code) {
         case 'user-not-found':
-          message = "No account found with this email.";
+          message = AppLabels.userNotFoundWithEmail(context);
           break;
         case 'wrong-password':
-          message = "Incorrect password.";
+          message = AppLabels.incorrectPassword(context);
           break;
         case 'invalid-email':
-          message = "Invalid email address.";
+          message = AppLabels.invalidEmail(context);
           break;
         case 'user-disabled':
-          message = "This account has been disabled.";
+          message = AppLabels.accountDisabled(context);
           break;
         case 'network-request-failed':
-          message = "No internet connection.";
+          message = AppLabels.noInternet(context);
           break;
         default:
-          message = "Login failed. Try again later.";
-          message = e.toString();
+          message = AppLabels.loginFailedTryAgain(context);
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -205,7 +204,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                           controller: emailCtrl,
                           prefixIcon: Icons.email_outlined,
                           label: AppLabels.email(context),
-                          hint: "name@example.com",
+                          hint: AppLabels.emailHint(context),
                           keyboardType: TextInputType.emailAddress,
                         ),
                         const SizedBox(height: 20),
@@ -218,7 +217,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                           controller: pwCtrl,
                           prefixIcon: Icons.lock_open_rounded,
                           label: AppLabels.password(context),
-                          hint: "••••••••",
+                          hint: AppLabels.passwordHint(context),
 
                           keyboardType: TextInputType.visiblePassword,
                         ),
@@ -244,7 +243,9 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                           width: double.infinity,
                           height: 56,
                           child: AppButton(
-                            text: isLoading ?  AppLabels.loggingIn(context) : AppLabels.login(context),
+                            text: isLoading
+                                ? AppLabels.loggingIn(context)
+                                : AppLabels.login(context),
                             onPressed: () => _login(context),
                           ),
                         ),
@@ -323,7 +324,10 @@ class _TermsPrivacyFooter extends StatelessWidget {
           ),
           GestureDetector(
             onTap: null, // TODO: Add navigation to Terms and Conditions
-            child: Text(AppLabels.termsAndConditions(context), style: linkStyle),
+            child: Text(
+              AppLabels.termsAndConditions(context),
+              style: linkStyle,
+            ),
           ),
           Text(
             AppLabels.andLabel(context),

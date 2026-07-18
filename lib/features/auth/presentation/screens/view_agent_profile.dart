@@ -1,8 +1,9 @@
-import 'package:shadi_milan/features/auth/domain/states/agent_state.dart';
-import 'package:shadi_milan/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
+
+import '../../../../core/constants/app_labels.dart';
 
 @RoutePage()
 class ViewAgentProfileScreen extends ConsumerWidget {
@@ -15,10 +16,11 @@ class ViewAgentProfileScreen extends ConsumerWidget {
     final agentAsync = ref.watch(agentByIdProvider(agentId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Agent Profile')),
+      appBar: AppBar(title: Text(AppLabels.agentDetails(context))),
       body: agentAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text('Error: $error')),
+        error: (error, _) =>
+            Center(child: Text('${AppLabels.errorOccurred(context)}: $error')),
         data: (agent) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -39,12 +41,12 @@ class ViewAgentProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 Text(agent.agentName),
-                _info('Staff Id', agent.agentId),
-                _info('Email', agent.agentEmail),
-                _info('Phone', agent.agentMobile),
-                _info('Address', agent.agentAddress),
-                _info('City', agent.agentCity),
-                _info('State', agent.agentState),
+                _info(AppLabels.staffId(context), agent.agentId),
+                _info(AppLabels.email(context), agent.agentEmail),
+                _info(AppLabels.phone(context), agent.agentMobile),
+                _info(AppLabels.address(context), agent.agentAddress),
+                _info(AppLabels.city(context), agent.agentCity),
+                _info(AppLabels.state(context), agent.agentState),
 
                 const SizedBox(height: 10),
               ],

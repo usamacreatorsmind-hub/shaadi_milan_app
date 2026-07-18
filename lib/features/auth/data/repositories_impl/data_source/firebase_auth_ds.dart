@@ -1,8 +1,7 @@
-import 'package:flutter/foundation.dart';
-
-import 'package:shadi_milan/features/auth/domain/states/user_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 
 abstract class FirebaseAuthDs {
   User? get currentUser;
@@ -15,10 +14,10 @@ abstract class FirebaseAuthDs {
   Future<void> signOut();
 
   Future<void> signUpUserWithEmail({
-    required String fullName,
+    required BilingualValue fullName,
     required String email,
     required String password,
-    required String gender,
+    required BilingualValue gender,
     required String agentId,
     required String phone,
   });
@@ -53,12 +52,12 @@ class FirebaseAuthDS implements FirebaseAuthDs {
 
   @override
   Future<void> signUpUserWithEmail({
-    required String fullName,
+    required BilingualValue fullName,
 
     required String email,
     required String password,
     required String agentId,
-    required String gender,
+    required BilingualValue gender,
 
     required String phone,
   }) async {
@@ -71,8 +70,8 @@ class FirebaseAuthDS implements FirebaseAuthDs {
       // After successful authentication, store user data in Firestore
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
-        'fullName': fullName,
-        'gender': gender,
+        'fullName': fullName.toMap(),
+        'gender': gender.toMap(),
         'email': email,
         'phone': phone,
         'agentId': agentId,

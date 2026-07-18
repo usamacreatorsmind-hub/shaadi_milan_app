@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 import '../../../../auth/domain/states/user_state.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../domain/repositories/user_repository.dart';
@@ -71,8 +71,8 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<void> updateFullName(String uid, String fullName) {
-    return _ds.updateField(uid, 'fullName', fullName);
+  Future<void> updateFullName(String uid, BilingualValue fullName) {
+    return _ds.updateField(uid, 'fullName', fullName.toMap());
   }
 
   @override

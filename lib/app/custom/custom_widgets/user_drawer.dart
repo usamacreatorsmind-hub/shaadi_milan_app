@@ -1,6 +1,7 @@
  
 import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
+import '../../../features/translitration/models/bilingual_value.dart';
 
 import '../../../features/auth/presentation/controllers/auth_controller.dart';
 import '../../../features/user/user_razorpay/domain/states/payment.dart';
@@ -320,14 +321,14 @@ class DrawerHeader1 extends StatelessWidget {
                 : null,
             child: !hasImage
                 ? Text(
-                    user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : '?',
+                    user.fullName.en.isNotEmpty ? user.fullName.en[0].toUpperCase() : '?',
                     style: TextStyle(fontSize: 28, color: theme.primaryColor),
                   )
                 : null,
           ),
           const SizedBox(height: 12),
-          Text(
-            user.fullName,
+          BilingualParser(
+            value: user.fullName,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 18,

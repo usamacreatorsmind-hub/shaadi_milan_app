@@ -1,17 +1,14 @@
-import 'package:shadi_milan/app/custom/custom_widgets/drawer.dart';
-import 'package:shadi_milan/features/user/user_app/presentation/screens/user_details_screen.dart';
-
-import '../../../../../app/custom/custom_widgets/mime_type.dart';
-import '../../../../../core/constants/app_constants.dart';
-import '../../../../user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sizer/sizer.dart';
+import 'package:shadi_milan/app/custom/custom_widgets/drawer.dart';
+import 'package:shadi_milan/features/user/user_app/presentation/screens/user_details_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../user/user_app/data/repositories_impl/agent_repository_impl.dart';
+import '../../../../../app/custom/custom_widgets/mime_type.dart';
 import '../../../../auth/domain/states/agent_state.dart';
+import '../../../../l10n/l10n_helper.dart';
+import '../../../../user/user_app/data/repositories_impl/agent_repository_impl.dart';
 
 final agentProvider = FutureProvider.family<AgentEntity, String>((ref, uid) {
   return ref.watch(agentRepositoryProvider).fetchAgent(uid);
@@ -29,7 +26,6 @@ class AgentEntityScreen extends ConsumerWidget {
 
     return Scaffold(
       drawer: AppDrawer(agentAsync: agentAsync),
-
       body: agentAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text(e.toString())),
@@ -89,11 +85,23 @@ class AgentEntityScreen extends ConsumerWidget {
                         labelStyle: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
-                        tabs: const [
-                          TabWidget(label: 'Overview', icon: Icons.person),
-                          TabWidget(label: 'Media', icon: Icons.image),
-                          TabWidget(label: 'Contact', icon: Icons.contact_mail),
-                          TabWidget(label: 'Status', icon: Icons.verified_user),
+                        tabs: [
+                          TabWidget(
+                            label: context.l10n.overview,
+                            icon: Icons.person,
+                          ),
+                          TabWidget(
+                            label: context.l10n.media,
+                            icon: Icons.image,
+                          ),
+                          TabWidget(
+                            label: context.l10n.contact,
+                            icon: Icons.contact_mail,
+                          ),
+                          TabWidget(
+                            label: context.l10n.status,
+                            icon: Icons.verified_user,
+                          ),
                         ],
                       ),
                     ),
@@ -217,7 +225,7 @@ class OverviewCard extends StatelessWidget {
 
     return InfoSectionCard(
       icon: Icons.dashboard_customize_outlined,
-      title: "Agent Overview",
+      title: context.l10n.agentOverview,
       children: [
         _ContactTile(
           color: primary,
@@ -225,68 +233,65 @@ class OverviewCard extends StatelessWidget {
             launchUrl(Uri.parse('tel:${agent.agentMobile}'));
           },
           icon: Icons.phone_outlined,
-          label: "Mobile",
+          label: context.l10n.mobile,
           value: agent.agentMobile,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         _ContactTile(
           color: primary,
           onTap: () {
-            // You can add navigation to a map application or just display the address
-            // For now, let's just show a snackbar or copy to clipboard
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Staff Id: ${agent.agentId}')),
+              SnackBar(
+                content: Text('${context.l10n.staffId}: ${agent.agentId}'),
+              ),
             );
           },
           icon: Icons.person_outline,
-          label: "Staff Id",
+          label: context.l10n.staffId,
           value: agent.agentId,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         _ContactTile(
           color: primary,
           onTap: () {},
           icon: Icons.work_outline_rounded,
-          label: "Designation",
+          label: context.l10n.designation,
           value: agent.designation.label,
         ),
-        // build all with contact tile
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         _ContactTile(
           color: primary,
           onTap: () {
             launchUrl(Uri.parse('mailto:${agent.agentEmail}'));
           },
           icon: Icons.email_outlined,
-          label: "Email",
+          label: context.l10n.email,
           value: agent.agentEmail,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         _ContactTile(
           color: primary,
           onTap: () {
-            // You can add navigation to a map application or just display the address
-            // For now, let's just show a snackbar or copy to clipboard
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('Address: $fullAddress')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${context.l10n.address}: $fullAddress')),
+            );
           },
           icon: Icons.location_on_outlined,
-          label: "Address",
+          label: context.l10n.address,
           value: fullAddress,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         _ContactTile(
           color: primary,
           onTap: () {
-            // You can add navigation to a map application or just display the address
-            // For now, let's just show a snackbar or copy to clipboard
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Pincode: ${agent.agentPincode}')),
+              SnackBar(
+                content: Text('${context.l10n.pincode}: ${agent.agentPincode}'),
+              ),
             );
           },
           icon: Icons.location_pin,
-          label: "Pincode",
+          label: context.l10n.pincode,
           value: agent.agentPincode,
         ),
       ],
@@ -305,14 +310,17 @@ class MediaTab extends StatelessWidget {
       child: Column(
         children: [
           ImagePreviewCard(
-            title: "Profile Image",
+            title: context.l10n.profileImage,
             imageUrl: agent.profileImageUrl,
           ),
           ImagePreviewCard(
-            title: "Primary Image",
+            title: context.l10n.primaryImage,
             imageUrl: agent.primaryImageUrl,
           ),
-          DocumentCard(title: "Aadhar Document", fileUrl: agent.aadharUrl),
+          DocumentCard(
+            title: context.l10n.aadharDocument,
+            fileUrl: agent.aadharUrl,
+          ),
         ],
       ),
     );
@@ -329,7 +337,7 @@ class ContactTab extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          InfoCard(cardName: "Contact Information", agent: agent),
+          InfoCard(cardName: context.l10n.contactInformation, agent: agent),
           const SizedBox(height: 20),
           ActionButtons(agent: agent),
         ],
@@ -346,7 +354,6 @@ class StatusTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-
       child: Column(children: [StatusInfoCard(agent: agent)]),
     );
   }
@@ -394,7 +401,6 @@ class ProfileHeader extends StatelessWidget {
                 : null,
           ),
         ),
-
         const SizedBox(height: 12),
 
         // Name — white on primary background
@@ -409,7 +415,6 @@ class ProfileHeader extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
         ),
-
         const SizedBox(height: 4),
 
         // Designation
@@ -423,7 +428,6 @@ class ProfileHeader extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-
         const SizedBox(height: 8),
 
         // Email — slightly translucent white
@@ -436,7 +440,6 @@ class ProfileHeader extends StatelessWidget {
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,
         ),
-
         const SizedBox(height: 8),
 
         // Approval badge
@@ -467,7 +470,9 @@ class ProfileHeader extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                agent.isApproved ? 'Approved' : 'Not Approved',
+                agent.isApproved
+                    ? context.l10n.approved
+                    : context.l10n.notApproved,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -633,26 +638,24 @@ class InfoCard extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 20),
 
           /// ===== PHONE =====
           _ContactTile(
             icon: Icons.phone_outlined,
-            label: "Mobile",
+            label: context.l10n.mobile,
             value: agent.agentMobile,
             color: primary,
             onTap: () {
               // launchUrl(Uri.parse('tel:${agent.agentMobile}'));
             },
           ),
-
           const SizedBox(height: 12),
 
           /// ===== EMAIL =====
           _ContactTile(
             icon: Icons.email_outlined,
-            label: "Email",
+            label: context.l10n.email,
             value: agent.agentEmail,
             color: primary,
             onTap: () {
@@ -748,7 +751,7 @@ class StatusInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InfoSectionCard(
       icon: Icons.verified_outlined,
-      title: "Status",
+      title: context.l10n.status,
       children: [
         _ContactTile(
           color: Theme.of(context).colorScheme.primary,
@@ -756,16 +759,17 @@ class StatusInfoCard extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Agent is ${agent.isApproved ? "Approved" : "Not Approved"}',
+                  '${context.l10n.agentIs} ${agent.isApproved ? context.l10n.approved : context.l10n.notApproved}',
                 ),
               ),
             );
           },
           icon: Icons.verified_user_outlined,
-          label: "Approved",
-          value: agent.isApproved ? "✓ Yes" : "✗ No",
+          label: context.l10n.approved,
+          value: agent.isApproved
+              ? "✓ ${context.l10n.yesLabel}"
+              : "✗ ${context.l10n.noLabel}",
         ),
-
         const SizedBox(height: 8),
       ],
     );
@@ -850,14 +854,14 @@ class FullScreenImage extends StatelessWidget {
                 child: CircularProgressIndicator(color: Colors.white),
               );
             },
-            errorBuilder: (context, error, stackTrace) => const Column(
+            errorBuilder: (context, error, stackTrace) => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.broken_image, color: Colors.white, size: 50),
-                SizedBox(height: 8),
+                const Icon(Icons.broken_image, color: Colors.white, size: 50),
+                const SizedBox(height: 8),
                 Text(
-                  "Failed to load image",
-                  style: TextStyle(color: Colors.white),
+                  context.l10n.failedToLoadImage,
+                  style: const TextStyle(color: Colors.white),
                 ),
               ],
             ),
@@ -885,7 +889,7 @@ class DocumentCard extends StatelessWidget {
         children: [
           ElevatedButton.icon(
             icon: const Icon(Icons.picture_as_pdf),
-            label: const Text("View Document"),
+            label: Text(context.l10n.viewDocument),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               shape: RoundedRectangleBorder(
@@ -894,31 +898,6 @@ class DocumentCard extends StatelessWidget {
             ),
             onPressed: () {
               openMedia(context, fileUrl);
-
-              // if (fileUrl.toLowerCase().endsWith('.pdf')) {
-              //   // If it's a PDF, show the PDF viewer
-              //   // Check if the file is a PDF
-
-              //   showModalBottomSheet(
-              //     context: context,
-              //     isScrollControlled: true,
-              //     builder: (context) {
-              //       return PdfViewerBottomsheet(
-              //         source: fileUrl,
-              //         title: title,
-              //         isLocal: false,
-              //       );
-              //     },
-              //   );
-              // } else {
-              //   // Otherwise, assume it's an image and show the image viewer
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (_) => FullScreenImage(imageUrl: fileUrl),
-              //     ),
-              //   );
-              // }
             },
           ),
         ],
@@ -956,7 +935,7 @@ class ActionButtons extends StatelessWidget {
             ),
             child: ElevatedButton.icon(
               icon: const Icon(Icons.call, size: 20),
-              label: const Text("Call"),
+              label: Text(context.l10n.call),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
@@ -984,7 +963,7 @@ class ActionButtons extends StatelessWidget {
             ),
             child: ElevatedButton.icon(
               icon: const Icon(Icons.email, size: 20),
-              label: const Text("Email"),
+              label: Text(context.l10n.email),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,

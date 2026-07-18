@@ -450,8 +450,8 @@ class _ProfileHeaderCard extends StatelessWidget {
                               : null,
                           child: !hasImage
                               ? Text(
-                                  profile.userProfile.fullName.isNotEmpty
-                                      ? profile.userProfile.fullName[0]
+                                  profile.userProfile.fullName.en.isNotEmpty
+                                      ? profile.userProfile.fullName.en[0]
                                             .toUpperCase()
                                       : '?',
                                   style: TextStyle(
@@ -486,7 +486,7 @@ class _ProfileHeaderCard extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          profile.user.fullName ?? 'N/A',
+                          profile.user.fullName.en.isEmpty ? 'N/A' : profile.user.fullName.en,
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w900,

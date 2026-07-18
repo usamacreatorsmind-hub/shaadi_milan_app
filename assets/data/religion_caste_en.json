@@ -1,0 +1,792 @@
+[
+    {
+        "id": "buddhist_mahayana",
+        "religion": "Buddhist",
+        "caste": "Mahayana"
+    },
+    {
+        "id": "buddhist_navayana",
+        "religion": "Buddhist",
+        "caste": "Navayana"
+    },
+    {
+        "id": "buddhist_theravada",
+        "religion": "Buddhist",
+        "caste": "Theravada"
+    },
+    {
+        "id": "buddhist_tibetan_buddhist",
+        "religion": "Buddhist",
+        "caste": "Tibetan Buddhist"
+    },
+    {
+        "id": "buddhist_other",
+        "religion": "Buddhist",
+        "caste": "Other"
+    },
+    {
+        "id": "christian_anglican",
+        "religion": "Christian",
+        "caste": "Anglican"
+    },
+    {
+        "id": "christian_baptist",
+        "religion": "Christian",
+        "caste": "Baptist"
+    },
+    {
+        "id": "christian_born_again",
+        "religion": "Christian",
+        "caste": "Born Again"
+    },
+    {
+        "id": "christian_cni",
+        "religion": "Christian",
+        "caste": "CNI"
+    },
+    {
+        "id": "christian_csi",
+        "religion": "Christian",
+        "caste": "CSI"
+    },
+    {
+        "id": "christian_evangelical",
+        "religion": "Christian",
+        "caste": "Evangelical"
+    },
+    {
+        "id": "christian_jacobite",
+        "religion": "Christian",
+        "caste": "Jacobite"
+    },
+    {
+        "id": "christian_latin_catholic",
+        "religion": "Christian",
+        "caste": "Latin Catholic"
+    },
+    {
+        "id": "christian_malankara_orthodox",
+        "religion": "Christian",
+        "caste": "Malankara Orthodox"
+    },
+    {
+        "id": "christian_marthoma",
+        "religion": "Christian",
+        "caste": "Marthoma"
+    },
+    {
+        "id": "christian_pentecostal",
+        "religion": "Christian",
+        "caste": "Pentecostal"
+    },
+    {
+        "id": "christian_protestant",
+        "religion": "Christian",
+        "caste": "Protestant"
+    },
+    {
+        "id": "christian_roman_catholic",
+        "religion": "Christian",
+        "caste": "Roman Catholic"
+    },
+    {
+        "id": "christian_syrian_catholic",
+        "religion": "Christian",
+        "caste": "Syrian Catholic"
+    },
+    {
+        "id": "christian_syrian_orthodox",
+        "religion": "Christian",
+        "caste": "Syrian Orthodox"
+    },
+    {
+        "id": "christian_other",
+        "religion": "Christian",
+        "caste": "Other"
+    },
+    {
+        "id": "hindu_agrahari",
+        "religion": "Hindu",
+        "caste": "Agrahari"
+    },
+    {
+        "id": "hindu_agarwal",
+        "religion": "Hindu",
+        "caste": "Agarwal"
+    },
+    {
+        "id": "hindu_ahir",
+        "religion": "Hindu",
+        "caste": "Ahir"
+    },
+    {
+        "id": "hindu_arora",
+        "religion": "Hindu",
+        "caste": "Arora"
+    },
+    {
+        "id": "hindu_arya_vysya",
+        "religion": "Hindu",
+        "caste": "Arya Vysya"
+    },
+    {
+        "id": "hindu_bania",
+        "religion": "Hindu",
+        "caste": "Bania"
+    },
+    {
+        "id": "hindu_bhumihar",
+        "religion": "Hindu",
+        "caste": "Bhumihar"
+    },
+    {
+        "id": "hindu_bishnoi",
+        "religion": "Hindu",
+        "caste": "Bishnoi"
+    },
+    {
+        "id": "hindu_brahmin",
+        "religion": "Hindu",
+        "caste": "Brahmin"
+    },
+    {
+        "id": "hindu_chamar",
+        "religion": "Hindu",
+        "caste": "Chamar"
+    },
+    {
+        "id": "hindu_chettiar",
+        "religion": "Hindu",
+        "caste": "Chettiar"
+    },
+    {
+        "id": "hindu_chitpavan_brahmin",
+        "religion": "Hindu",
+        "caste": "Chitpavan Brahmin"
+    },
+    {
+        "id": "hindu_deshastha_brahmin",
+        "religion": "Hindu",
+        "caste": "Deshastha Brahmin"
+    },
+    {
+        "id": "hindu_dhobi",
+        "religion": "Hindu",
+        "caste": "Dhobi"
+    },
+    {
+        "id": "hindu_general",
+        "religion": "Hindu",
+        "caste": "General"
+    },
+    {
+        "id": "hindu_goswami",
+        "religion": "Hindu",
+        "caste": "Goswami"
+    },
+    {
+        "id": "hindu_gounder",
+        "religion": "Hindu",
+        "caste": "Gounder"
+    },
+    {
+        "id": "hindu_gaur_brahmin",
+        "religion": "Hindu",
+        "caste": "Gaur Brahmin"
+    },
+    {
+        "id": "hindu_gupta",
+        "religion": "Hindu",
+        "caste": "Gupta"
+    },
+    {
+        "id": "hindu_hoysala_brahmin",
+        "religion": "Hindu",
+        "caste": "Hoysala Brahmin"
+    },
+    {
+        "id": "hindu_iyer",
+        "religion": "Hindu",
+        "caste": "Iyer"
+    },
+    {
+        "id": "hindu_iyengar",
+        "religion": "Hindu",
+        "caste": "Iyengar"
+    },
+    {
+        "id": "hindu_jaiswal",
+        "religion": "Hindu",
+        "caste": "Jaiswal"
+    },
+    {
+        "id": "hindu_jat",
+        "religion": "Hindu",
+        "caste": "Jat"
+    },
+    {
+        "id": "hindu_jatav",
+        "religion": "Hindu",
+        "caste": "Jatav"
+    },
+    {
+        "id": "hindu_kalar",
+        "religion": "Hindu",
+        "caste": "Kalar"
+    },
+    {
+        "id": "hindu_kamma",
+        "religion": "Hindu",
+        "caste": "Kamma"
+    },
+    {
+        "id": "hindu_kanyakubj_brahmin",
+        "religion": "Hindu",
+        "caste": "Kanyakubj Brahmin"
+    },
+    {
+        "id": "hindu_kayastha",
+        "religion": "Hindu",
+        "caste": "Kayastha"
+    },
+    {
+        "id": "hindu_khandelwal",
+        "religion": "Hindu",
+        "caste": "Khandelwal"
+    },
+    {
+        "id": "hindu_koli",
+        "religion": "Hindu",
+        "caste": "Koli"
+    },
+    {
+        "id": "hindu_kori",
+        "religion": "Hindu",
+        "caste": "Kori"
+    },
+    {
+        "id": "hindu_kurmi",
+        "religion": "Hindu",
+        "caste": "Kurmi"
+    },
+    {
+        "id": "hindu_kunbi",
+        "religion": "Hindu",
+        "caste": "Kunbi"
+    },
+    {
+        "id": "hindu_lingayat",
+        "religion": "Hindu",
+        "caste": "Lingayat"
+    },
+    {
+        "id": "hindu_lohar",
+        "religion": "Hindu",
+        "caste": "Lohar"
+    },
+    {
+        "id": "hindu_maheshwari",
+        "religion": "Hindu",
+        "caste": "Maheshwari"
+    },
+    {
+        "id": "hindu_maithil_brahmin",
+        "religion": "Hindu",
+        "caste": "Maithil Brahmin"
+    },
+    {
+        "id": "hindu_mali",
+        "religion": "Hindu",
+        "caste": "Mali"
+    },
+    {
+        "id": "hindu_maratha",
+        "religion": "Hindu",
+        "caste": "Maratha"
+    },
+    {
+        "id": "hindu_meena",
+        "religion": "Hindu",
+        "caste": "Meena"
+    },
+    {
+        "id": "hindu_modh",
+        "religion": "Hindu",
+        "caste": "Modh"
+    },
+    {
+        "id": "hindu_mudaliar",
+        "religion": "Hindu",
+        "caste": "Mudaliar"
+    },
+    {
+        "id": "hindu_naidu",
+        "religion": "Hindu",
+        "caste": "Naidu"
+    },
+    {
+        "id": "hindu_nadar",
+        "religion": "Hindu",
+        "caste": "Nadar"
+    },
+    {
+        "id": "hindu_nair",
+        "religion": "Hindu",
+        "caste": "Nair"
+    },
+    {
+        "id": "hindu_namboodiri",
+        "religion": "Hindu",
+        "caste": "Namboodiri"
+    },
+    {
+        "id": "hindu_other_backward_class_obc",
+        "religion": "Hindu",
+        "caste": "Other Backward Class (OBC)"
+    },
+    {
+        "id": "hindu_padmashali",
+        "religion": "Hindu",
+        "caste": "Padmashali"
+    },
+    {
+        "id": "hindu_patel",
+        "religion": "Hindu",
+        "caste": "Patel"
+    },
+    {
+        "id": "hindu_pillai",
+        "religion": "Hindu",
+        "caste": "Pillai"
+    },
+    {
+        "id": "hindu_rajput",
+        "religion": "Hindu",
+        "caste": "Rajput"
+    },
+    {
+        "id": "hindu_reddy",
+        "religion": "Hindu",
+        "caste": "Reddy"
+    },
+    {
+        "id": "hindu_saini",
+        "religion": "Hindu",
+        "caste": "Saini"
+    },
+    {
+        "id": "hindu_saraswat_brahmin",
+        "religion": "Hindu",
+        "caste": "Saraswat Brahmin"
+    },
+    {
+        "id": "hindu_scheduled_caste_sc",
+        "religion": "Hindu",
+        "caste": "Scheduled Caste (SC)"
+    },
+    {
+        "id": "hindu_scheduled_tribe_st",
+        "religion": "Hindu",
+        "caste": "Scheduled Tribe (ST)"
+    },
+    {
+        "id": "hindu_shudra",
+        "religion": "Hindu",
+        "caste": "Shudra"
+    },
+    {
+        "id": "hindu_sindhi",
+        "religion": "Hindu",
+        "caste": "Sindhi"
+    },
+    {
+        "id": "hindu_smartha",
+        "religion": "Hindu",
+        "caste": "Smartha"
+    },
+    {
+        "id": "hindu_sonar",
+        "religion": "Hindu",
+        "caste": "Sonar"
+    },
+    {
+        "id": "hindu_sutar",
+        "religion": "Hindu",
+        "caste": "Sutar"
+    },
+    {
+        "id": "hindu_saryuparin_brahmin",
+        "religion": "Hindu",
+        "caste": "Saryuparin Brahmin"
+    },
+    {
+        "id": "hindu_teli",
+        "religion": "Hindu",
+        "caste": "Teli"
+    },
+    {
+        "id": "hindu_thevar",
+        "religion": "Hindu",
+        "caste": "Thevar"
+    },
+    {
+        "id": "hindu_thakur",
+        "religion": "Hindu",
+        "caste": "Thakur"
+    },
+    {
+        "id": "hindu_vaishnav",
+        "religion": "Hindu",
+        "caste": "Vaishnav"
+    },
+    {
+        "id": "hindu_vaishya",
+        "religion": "Hindu",
+        "caste": "Vaishya"
+    },
+    {
+        "id": "hindu_vanniyar",
+        "religion": "Hindu",
+        "caste": "Vanniyar"
+    },
+    {
+        "id": "hindu_vishwakarma",
+        "religion": "Hindu",
+        "caste": "Vishwakarma"
+    },
+    {
+        "id": "hindu_vokkaliga",
+        "religion": "Hindu",
+        "caste": "Vokkaliga"
+    },
+    {
+        "id": "hindu_yadav",
+        "religion": "Hindu",
+        "caste": "Yadav"
+    },
+    {
+        "id": "hindu_other",
+        "religion": "Hindu",
+        "caste": "Other"
+    },
+    {
+        "id": "jain_digambar",
+        "religion": "Jain",
+        "caste": "Digambar"
+    },
+    {
+        "id": "jain_khandelwal_jain",
+        "religion": "Jain",
+        "caste": "Khandelwal Jain"
+    },
+    {
+        "id": "jain_oswal",
+        "religion": "Jain",
+        "caste": "Oswal"
+    },
+    {
+        "id": "jain_porwal",
+        "religion": "Jain",
+        "caste": "Porwal"
+    },
+    {
+        "id": "jain_shrimal",
+        "religion": "Jain",
+        "caste": "Shrimal"
+    },
+    {
+        "id": "jain_shwetambar",
+        "religion": "Jain",
+        "caste": "Shwetambar"
+    },
+    {
+        "id": "jain_sthanakvasi",
+        "religion": "Jain",
+        "caste": "Sthanakvasi"
+    },
+    {
+        "id": "jain_terapanthi",
+        "religion": "Jain",
+        "caste": "Terapanthi"
+    },
+    {
+        "id": "jain_other",
+        "religion": "Jain",
+        "caste": "Other"
+    },
+    {
+        "id": "jewish_baghdadi_jew",
+        "religion": "Jewish",
+        "caste": "Baghdadi Jew"
+    },
+    {
+        "id": "jewish_bene_israel",
+        "religion": "Jewish",
+        "caste": "Bene Israel"
+    },
+    {
+        "id": "jewish_cochin_jew",
+        "religion": "Jewish",
+        "caste": "Cochin Jew"
+    },
+    {
+        "id": "jewish_other",
+        "religion": "Jewish",
+        "caste": "Other"
+    },
+    {
+        "id": "muslim_abbasi",
+        "religion": "Muslim",
+        "caste": "Abbasi"
+    },
+    {
+        "id": "muslim_alvi",
+        "religion": "Muslim",
+        "caste": "Alvi"
+    },
+    {
+        "id": "muslim_ansari",
+        "religion": "Muslim",
+        "caste": "Ansari"
+    },
+    {
+        "id": "muslim_bohra",
+        "religion": "Muslim",
+        "caste": "Bohra"
+    },
+    {
+        "id": "muslim_farooqui",
+        "religion": "Muslim",
+        "caste": "Farooqui"
+    },
+    {
+        "id": "muslim_hashmi",
+        "religion": "Muslim",
+        "caste": "Hashmi"
+    },
+    {
+        "id": "muslim_idrisi",
+        "religion": "Muslim",
+        "caste": "Idrisi"
+    },
+    {
+        "id": "muslim_julaha",
+        "religion": "Muslim",
+        "caste": "Julaha"
+    },
+    {
+        "id": "muslim_khan",
+        "religion": "Muslim",
+        "caste": "Khan"
+    },
+    {
+        "id": "muslim_khoja",
+        "religion": "Muslim",
+        "caste": "Khoja"
+    },
+    {
+        "id": "muslim_lohar",
+        "religion": "Muslim",
+        "caste": "Lohar"
+    },
+    {
+        "id": "muslim_malik",
+        "religion": "Muslim",
+        "caste": "Malik"
+    },
+    {
+        "id": "muslim_mansoori",
+        "religion": "Muslim",
+        "caste": "Mansoori"
+    },
+    {
+        "id": "muslim_meo",
+        "religion": "Muslim",
+        "caste": "Meo"
+    },
+    {
+        "id": "muslim_meman",
+        "religion": "Muslim",
+        "caste": "Meman"
+    },
+    {
+        "id": "muslim_mughal",
+        "religion": "Muslim",
+        "caste": "Mughal"
+    },
+    {
+        "id": "muslim_nai",
+        "religion": "Muslim",
+        "caste": "Nai"
+    },
+    {
+        "id": "muslim_pathan",
+        "religion": "Muslim",
+        "caste": "Pathan"
+    },
+    {
+        "id": "muslim_qureshi",
+        "religion": "Muslim",
+        "caste": "Qureshi"
+    },
+    {
+        "id": "muslim_rangrez",
+        "religion": "Muslim",
+        "caste": "Rangrez"
+    },
+    {
+        "id": "muslim_rizvi",
+        "religion": "Muslim",
+        "caste": "Rizvi"
+    },
+    {
+        "id": "muslim_saifi",
+        "religion": "Muslim",
+        "caste": "Saifi"
+    },
+    {
+        "id": "muslim_sheikh",
+        "religion": "Muslim",
+        "caste": "Sheikh"
+    },
+    {
+        "id": "muslim_shia",
+        "religion": "Muslim",
+        "caste": "Shia"
+    },
+    {
+        "id": "muslim_sunni",
+        "religion": "Muslim",
+        "caste": "Sunni"
+    },
+    {
+        "id": "muslim_syed",
+        "religion": "Muslim",
+        "caste": "Syed"
+    },
+    {
+        "id": "muslim_usmani",
+        "religion": "Muslim",
+        "caste": "Usmani"
+    },
+    {
+        "id": "muslim_other",
+        "religion": "Muslim",
+        "caste": "Other"
+    },
+    {
+        "id": "parsi_irani",
+        "religion": "Parsi",
+        "caste": "Irani"
+    },
+    {
+        "id": "parsi_zoroastrian",
+        "religion": "Parsi",
+        "caste": "Zoroastrian"
+    },
+    {
+        "id": "parsi_other",
+        "religion": "Parsi",
+        "caste": "Other"
+    },
+    {
+        "id": "sikh_arora",
+        "religion": "Sikh",
+        "caste": "Arora"
+    },
+    {
+        "id": "sikh_jat_sikh",
+        "religion": "Sikh",
+        "caste": "Jat Sikh"
+    },
+    {
+        "id": "sikh_khatri",
+        "religion": "Sikh",
+        "caste": "Khatri"
+    },
+    {
+        "id": "sikh_mazhabhi",
+        "religion": "Sikh",
+        "caste": "Mazhabhi"
+    },
+    {
+        "id": "sikh_namdhari",
+        "religion": "Sikh",
+        "caste": "Namdhari"
+    },
+    {
+        "id": "sikh_nai",
+        "religion": "Sikh",
+        "caste": "Nai"
+    },
+    {
+        "id": "sikh_ramgarhia",
+        "religion": "Sikh",
+        "caste": "Ramgarhia"
+    },
+    {
+        "id": "sikh_ravidasia",
+        "religion": "Sikh",
+        "caste": "Ravidasia"
+    },
+    {
+        "id": "sikh_other",
+        "religion": "Sikh",
+        "caste": "Other"
+    },
+    {
+        "id": "tribal_bhil",
+        "religion": "Tribal",
+        "caste": "Bhil"
+    },
+    {
+        "id": "tribal_garo",
+        "religion": "Tribal",
+        "caste": "Garo"
+    },
+    {
+        "id": "tribal_gond",
+        "religion": "Tribal",
+        "caste": "Gond"
+    },
+    {
+        "id": "tribal_ho",
+        "religion": "Tribal",
+        "caste": "Ho"
+    },
+    {
+        "id": "tribal_khasi",
+        "religion": "Tribal",
+        "caste": "Khasi"
+    },
+    {
+        "id": "tribal_mizo",
+        "religion": "Tribal",
+        "caste": "Mizo"
+    },
+    {
+        "id": "tribal_munda",
+        "religion": "Tribal",
+        "caste": "Munda"
+    },
+    {
+        "id": "tribal_naga",
+        "religion": "Tribal",
+        "caste": "Naga"
+    },
+    {
+        "id": "tribal_oraon",
+        "religion": "Tribal",
+        "caste": "Oraon"
+    },
+    {
+        "id": "tribal_santhal",
+        "religion": "Tribal",
+        "caste": "Santhal"
+    },
+    {
+        "id": "tribal_other",
+        "religion": "Tribal",
+        "caste": "Other"
+    }
+]

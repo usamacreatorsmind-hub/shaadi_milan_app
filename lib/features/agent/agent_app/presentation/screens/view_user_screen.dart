@@ -1,21 +1,21 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/app/router/app_router.dart';
-import 'package:shadi_milan/core/filters/home_filter_controller.dart';
 import 'package:shadi_milan/features/agent/agent_app/domain/states/match_filter_state.dart';
-import 'package:shadi_milan/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
 import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/metrimony_notifier.dart';
-import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/screens/agen_profile.screen.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/image_state.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_profile_view_model.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/religion_state.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/state_city.dart';
 import 'package:shadi_milan/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../l10n/l10n_helper.dart';
 import '../notifier/user_nofier.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 @RoutePage()
 class ViewUserScreen extends ConsumerStatefulWidget {
@@ -64,9 +64,9 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
           registrationPayment.status != 'SUCCESS') {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text(
-                'Cannot close profile: User has not completed registration payment.',
+                context.l10n.cannotCloseProfileNoRegistrationPayment,
               ),
             ),
           );
@@ -81,9 +81,9 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
       if (payments == null || payments.status != 'SUCCESS') {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text(
-                'Cannot close profile: No successful after-marriage payment found.',
+                context.l10n.cannotCloseProfileNoAfterMarriagePayment,
               ),
             ),
           );
@@ -99,15 +99,17 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile closed successfully')),
+          SnackBar(content: Text(context.l10n.profileClosedSuccessfully)),
         );
         context.router.maybePop();
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to close profile: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.failedToCloseProfile(e.toString())),
+          ),
+        );
       }
     }
   }
@@ -115,16 +117,13 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
   void _showCloseProfileDialog(BuildContext context, String userId) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Close Matrimony Profile'),
-        content: const Text(
-          'Are you sure you want to close this matrimony profile?\n\n'
-          'This user will not appear in search or receive interests.',
-        ),
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.closeMatrimonyProfile),
+        content: Text(context.l10n.closeProfileConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -132,7 +131,7 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
               Navigator.pop(context);
               await _closeProfile(context, userId);
             },
-            child: const Text('Close Profile'),
+            child: Text(context.l10n.closeProfileButton),
           ),
         ],
       ),
@@ -153,12 +152,15 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
           onPressed: () => context.router.maybePop(),
         ),
         title: userAsync.maybeWhen(
-          data: (user) => Text(
-            user?.fullName ?? 'User Profile',
+          data: (user) => BilingualParser(
+            value: user?.fullName ?? BilingualValue.empty(),
+            
             style: TextStyle(color: theme.colorScheme.onPrimary),
           ),
+
+          
           orElse: () => Text(
-            'User Profile',
+            context.l10n.userDetails,
             style: TextStyle(color: theme.colorScheme.onPrimary),
           ),
         ),
@@ -173,7 +175,7 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
                     backgroundColor: const Color.fromARGB(255, 235, 227, 227),
                   ),
                   onPressed: () => _showCloseProfileDialog(context, user.uid),
-                  child: const Text('Close Profile'),
+                  child: Text(context.l10n.closeProfileButton),
                 );
               }
               return const SizedBox.shrink();
@@ -189,9 +191,15 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
             alpha: 0.6,
           ),
           indicatorColor: theme.colorScheme.onPrimary,
-          tabs: const [
-            Tab(icon: Icon(Icons.person_outline), text: 'Profile'),
-            Tab(icon: Icon(Icons.favorite_border), text: 'Matrimony Profile'),
+          tabs: [
+            Tab(
+              icon: const Icon(Icons.person_outline),
+              text: context.l10n.profileTab,
+            ),
+            Tab(
+              icon: const Icon(Icons.favorite_border),
+              text: context.l10n.matrimonyProfileTab,
+            ),
           ],
         ),
       ),
@@ -204,7 +212,7 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
               Icon(Icons.error_outline, size: 80, color: Colors.red[400]),
               const SizedBox(height: 16),
               Text(
-                'Error Loading User',
+                context.l10n.errorLoadingUser,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
@@ -222,20 +230,24 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
                     .read(agentUserNotifierProvider.notifier)
                     .fetchUserById(widget.userId),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: Text(context.l10n.retry),
               ),
             ],
           ),
         ),
         data: (user) {
           if (user == null) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_off_outlined, size: 80, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('User Not Found'),
+                  const Icon(
+                    Icons.person_off_outlined,
+                    size: 80,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(context.l10n.userNotFound),
                 ],
               ),
             );
@@ -266,8 +278,8 @@ class _UserProfileTab extends StatelessWidget {
 
   const _UserProfileTab({required this.user});
 
-  String _formatDate(DateTime dt) {
-    if (dt.millisecondsSinceEpoch == 0) return 'Not available';
+  String _formatDate(DateTime dt, BuildContext context) {
+    if (dt.millisecondsSinceEpoch == 0) return context.l10n.notAvailable;
     return '${dt.day}/${dt.month}/${dt.year} '
         '${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
   }
@@ -363,15 +375,17 @@ class _UserProfileTab extends StatelessWidget {
                       icon: user.isProfileCreated
                           ? Icons.check_circle
                           : Icons.error,
-                      label: 'Bio Data',
-                      value: user.isProfileCreated ? 'Created' : 'Pending',
+                      label: context.l10n.bioData,
+                      value: user.isProfileCreated
+                          ? context.l10n.created
+                          : context.l10n.pending,
                       color: user.isProfileCreated
                           ? Colors.green
                           : Colors.orange,
                     ),
                     _StatusItem(
                       icon: Icons.verified_user,
-                      label: 'Profile Status',
+                      label: context.l10n.profileStatus,
                       value: user.profileStatus,
                       color: user.profileStatus == 'active'
                           ? Colors.green
@@ -386,40 +400,51 @@ class _UserProfileTab extends StatelessWidget {
 
           // Contact
           _SectionCard(
-            title: 'Contact Information',
+            title: context.l10n.contactInformation,
             icon: Icons.contact_mail,
             children: [
               _InfoRow(
-                'Phone',
-                user.phone.isNotEmpty ? user.phone : 'Not provided',
+                context.l10n.phone,
+                user.phone.isNotEmpty ? user.phone : context.l10n.notProvided,
               ),
               const Divider(height: 16),
-              _InfoRow('Email', user.email),
+              _InfoRow(context.l10n.email, user.email),
             ],
           ),
 
           // Account
           _SectionCard(
-            title: 'Account Information',
+            title: context.l10n.accountInformation,
             icon: Icons.account_box,
             children: [
-              _InfoRow('Role', user.role.isNotEmpty ? user.role : 'User'),
+              _InfoRow(
+                context.l10n.role,
+                user.role.isNotEmpty ? user.role : context.l10n.userRole,
+              ),
               const Divider(height: 16),
               _InfoRow(
-                'Gender',
-                user.gender.isNotEmpty ? user.gender : 'Not specified',
+                context.l10n.gender,
+                user.gender.isNotEmpty
+                    ? user.gender
+                    : context.l10n.notSpecified,
               ),
             ],
           ),
 
           // Activity
           _SectionCard(
-            title: 'Activity',
+            title: context.l10n.activity,
             icon: Icons.history,
             children: [
-              _InfoRow('Created At', _formatDate(user.createdAt)),
+              _InfoRow(
+                context.l10n.createdAt,
+                _formatDate(user.createdAt, context),
+              ),
               const Divider(height: 16),
-              _InfoRow('Last Seen', _formatDate(user.lastSeen)),
+              _InfoRow(
+                context.l10n.lastSeen,
+                _formatDate(user.lastSeen, context),
+              ),
             ],
           ),
 
@@ -442,23 +467,22 @@ class _MatrimonyProfileTab extends ConsumerWidget {
   void _showNoProfileDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         icon: const Icon(Icons.favorite_border, size: 56, color: Colors.grey),
-        title: const Text(
-          'Matrimony Profile Not Found',
+        title: Text(
+          context.l10n.matrimonyProfileNotFound,
           textAlign: TextAlign.center,
         ),
-        content: const Text(
-          'This user has not created a matrimony profile yet.\n\n'
-          'Please ask the user to complete their profile setup through the app.',
+        content: Text(
+          context.l10n.matrimonyProfileNotFoundContent,
           textAlign: TextAlign.center,
         ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text(context.l10n.ok),
           ),
         ],
       ),
@@ -467,6 +491,9 @@ class _MatrimonyProfileTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final locationAsync = ref.watch(locationJsonProvider);
+    final religionsAsync = ref.watch(religionsProvider);
+
     ref.listen(matrimonyProfileViewModelProvider(userId), (prev, next) {
       // Show dialog on first transition to null data (profile doesn't exist yet)
       if (next.hasValue &&
@@ -482,29 +509,79 @@ class _MatrimonyProfileTab extends ConsumerWidget {
 
     return profileAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, _) => const Center(
+      error: (_, _) => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.favorite_border, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('Matrimony profile not available'),
+            const Icon(Icons.favorite_border, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(context.l10n.matrimonyProfileNotAvailable),
           ],
         ),
       ),
       data: (profile) {
         if (profile == null) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.favorite_border, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text('Matrimony profile not created yet'),
+                const Icon(Icons.favorite_border, size: 64, color: Colors.grey),
+                const SizedBox(height: 16),
+                Text(context.l10n.matrimonyProfileNotCreatedYet),
               ],
             ),
           );
         }
+
+        String resolvedState = profile.address.state.en;
+        String resolvedCity = profile.address.city.en;
+        String resolvedReligion = profile.cultural.religion.en;
+        String resolvedCaste = profile.cultural.caste.en;
+
+        if (locationAsync.hasValue) {
+          final states = locationAsync.value!;
+          final stateObj = states
+              .where((s) => s.name == profile.address.state)
+              .firstOrNull;
+          if (stateObj != null) {
+            resolvedState = stateObj.name;
+            final cityObj = stateObj.cities
+                .where(
+                  (c) =>
+                      c.id == profile.address.city ||
+                      c.name == profile.address.city,
+                )
+                .firstOrNull;
+            if (cityObj != null) {
+              resolvedCity = cityObj.name;
+            }
+          }
+        }
+
+        if (religionsAsync.hasValue) {
+          final religions = religionsAsync.value!;
+          final religionObj = religions
+              .where(
+                (r) =>
+                    r.id == profile.cultural.religion ||
+                    r.name == profile.cultural.religion,
+              )
+              .firstOrNull;
+          if (religionObj != null) {
+            resolvedReligion = religionObj.name;
+            final casteObj = religionObj.castes
+                .where(
+                  (c) =>
+                      c.id == profile.cultural.caste ||
+                      c.name == profile.cultural.caste,
+                )
+                .firstOrNull;
+            if (casteObj != null) {
+              resolvedCaste = casteObj.name;
+            }
+          }
+        }
+
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -516,39 +593,57 @@ class _MatrimonyProfileTab extends ConsumerWidget {
 
               // Identity
               _SectionCard(
-                title: 'Identity Information',
+                title: context.l10n.identityInformation,
                 icon: Icons.person,
                 children: [
-                  _InfoRow('Full Name', profile.user.fullName),
+                  _InfoRow(context.l10n.fullName, profile.user.fullName),
                   _InfoRow(
-                    'Date of Birth',
+                    context.l10n.dateOfBirth,
                     profile.identity.dob.toLocal().toString().split(' ')[0],
                   ),
-                  _InfoRow('Age', '${profile.identity.age} years'),
-                  _InfoRow('Gender', profile.identity.gender),
-                  _InfoRow('Aadhar', profile.identity.aadhar),
-                  if (profile.identity.aboutMe.isNotEmpty)
-                    _InfoRow('About Me', profile.identity.aboutMe),
+                  _InfoRow(
+                    context.l10n.male,
+                    '${profile.identity.age} ${context.l10n.ageYrs}',
+                  ),
+                  _InfoRow(context.l10n.gender, profile.identity.gender),
+                  _InfoRow(context.l10n.aadharCard, profile.identity.aadhar),
+                  if (profile.identity.aboutMe.hi.isNotEmpty ||
+                      profile.identity.aboutMe.en.isNotEmpty)
+                    _InfoRow(
+                      context.l10n.aboutMe,
+                      profile.identity.aboutMe,
+                    ),
                 ],
               ),
               const SizedBox(height: 16),
 
               // Physical
               _SectionCard(
-                title: 'Physical Information',
+                title: context.l10n.physicalInformation,
                 icon: Icons.accessibility,
                 children: [
-                  _InfoRow('Height', '${profile.physical.height} cm'),
-                  _InfoRow('Weight', '${profile.physical.weight} kg'),
-                  _InfoRow('Body Type', profile.physical.bodyType),
-                  _InfoRow('Complexion', profile.physical.complexion),
                   _InfoRow(
-                    'Physically Challenged',
-                    profile.physical.physicallyChallenged ? 'Yes' : 'No',
+                    context.l10n.height,
+                    '${profile.physical.height} cm',
+                  ),
+                  _InfoRow(
+                    context.l10n.weightKg,
+                    '${profile.physical.weight} kg',
+                  ),
+                  _InfoRow(context.l10n.bodyType, profile.physical.bodyType),
+                  _InfoRow(
+                    context.l10n.complexion,
+                    profile.physical.complexion,
+                  ),
+                  _InfoRow(
+                    context.l10n.physicallyChallenged,
+                    profile.physical.physicallyChallenged
+                        ? context.l10n.yesLabel
+                        : context.l10n.noLabel,
                   ),
                   if (profile.physical.disabilityDetails != null)
                     _InfoRow(
-                      'Disability Details',
+                      context.l10n.disabilityDetails,
                       profile.physical.disabilityDetails!,
                     ),
                 ],
@@ -557,39 +652,50 @@ class _MatrimonyProfileTab extends ConsumerWidget {
 
               // Cultural
               _SectionCard(
-                title: 'Cultural Information',
+                title: context.l10n.culturalInformation,
                 icon: Icons.temple_hindu,
                 children: [
-                  _InfoRow('Religion', profile.cultural.religion),
-                  _InfoRow('Caste', profile.cultural.caste),
-                  _InfoRow('Sub Caste', profile.cultural.subCaste),
-                  _InfoRow('Languages', profile.cultural.languages.join(', ')),
+                  _InfoRow(context.l10n.religion, resolvedReligion),
+                  _InfoRow(context.l10n.caste, resolvedCaste),
+                  _InfoRow(
+                    context.l10n.subCaste,
+                    profile.cultural.subCaste as String,
+                  ),
+                  _InfoRow(
+                    context.l10n.languages,
+                    profile.cultural.languages.join(', '),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
 
               // Education
               _SectionCard(
-                title: 'Education',
+                title: context.l10n.education,
                 icon: Icons.school,
                 children: [
                   _InfoRow(
-                    'Is Illiterate',
-                    profile.education.isIlletrate ? 'Yes' : 'No',
+                    context.l10n.isIlliterate,
+                    profile.education.isIlletrate
+                        ? context.l10n.yesLabel
+                        : context.l10n.noLabel,
                   ),
                   if (!profile.education.isIlletrate &&
                       profile.education.education != null) ...[
-                    _InfoRow('Course', profile.education.education!.course),
                     _InfoRow(
-                      'College / University',
-                      profile.education.education!.college,
+                      context.l10n.course,
+                      profile.education.education!.course as String,
                     ),
                     _InfoRow(
-                      'Passing Year',
+                      context.l10n.collegeUniversity,
+                      profile.education.education!.college as String,
+                    ),
+                    _InfoRow(
+                      context.l10n.passingYear,
                       '${profile.education.education!.passingYear}',
                     ),
                     _InfoRow(
-                      'Percentage',
+                      context.l10n.percentage,
                       '${profile.education.education!.percentage}%',
                     ),
                   ],
@@ -600,7 +706,7 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                           .isNotEmpty ==
                       true)
                     _InfoRow(
-                      'Extra Qualifications',
+                      context.l10n.extraQualifications,
                       profile.education.extraQualification!.qualifications.join(
                         ', ',
                       ),
@@ -611,51 +717,78 @@ class _MatrimonyProfileTab extends ConsumerWidget {
 
               // Employment
               _SectionCard(
-                title: 'Employment',
+                title: context.l10n.employmentDetails,
                 icon: Icons.work,
                 children: [
-                  _InfoRow('Job Type', profile.employment.jobType),
+                  _InfoRow(context.l10n.jobType, profile.employment.jobType),
                   if (profile.employment.company != null)
-                    _InfoRow('Company', profile.employment.company!),
+                    _InfoRow(
+                      context.l10n.organization,
+                      profile.employment.company!,
+                    ),
                   if (profile.employment.designation != null)
-                    _InfoRow('Designation', profile.employment.designation!),
+                    _InfoRow(
+                      context.l10n.designation,
+                      profile.employment.designation!,
+                    ),
                   if (profile.employment.annualIncome != null)
                     _InfoRow(
-                      'Annual Income',
+                      context.l10n.annualIncome,
                       '₹${profile.employment.annualIncome}',
                     ),
                   if (profile.employment.workLocation != null)
-                    _InfoRow('Work Location', profile.employment.workLocation!),
+                    _InfoRow(
+                      context.l10n.workLocation,
+                      profile.employment.workLocation!,
+                    ),
                 ],
               ),
               const SizedBox(height: 16),
 
               // Family
               _SectionCard(
-                title: 'Family Information',
+                title: context.l10n.familyInformation,
                 icon: Icons.family_restroom,
                 children: [
-                  _InfoRow("Father's Name", profile.family.fatherName),
-                  _InfoRow("Mother's Name", profile.family.motherName),
-                  _InfoRow('Brothers', '${profile.family.numberOfBrothers}'),
-                  _InfoRow('Sisters', '${profile.family.numberOfSisters}'),
-                  _InfoRow('Family Type', profile.family.familyType),
-                  _InfoRow('Family Status', profile.family.familyStatus),
+                  _InfoRow(
+                    context.l10n.fatherName,
+                    profile.family.fatherName ?? '',
+                  ),
+                  _InfoRow(
+                    context.l10n.motherName,
+                    profile.family.motherName ?? '',
+                  ),
+                  _InfoRow(
+                    context.l10n.brothers,
+                    '${profile.family.numberOfBrothers}',
+                  ),
+                  _InfoRow(
+                    context.l10n.sisters,
+                    '${profile.family.numberOfSisters}',
+                  ),
+                  _InfoRow(context.l10n.familyType, profile.family.familyType),
+                  _InfoRow(
+                    context.l10n.familyStatus,
+                    profile.family.familyStatus,
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
 
               // Address
               _SectionCard(
-                title: 'Address',
+                title: context.l10n.address,
                 icon: Icons.location_on,
                 children: [
-                  _InfoRow('Address', profile.address.addressLine1),
-                  _InfoRow('Post', profile.address.post),
-                  _InfoRow('Police Station', profile.address.policeStation),
-                  _InfoRow('City', profile.address.city),
-                  _InfoRow('State', profile.address.state),
-                  _InfoRow('Pincode', profile.address.pincode),
+                  _InfoRow(context.l10n.address, profile.address.addressLine1),
+                  _InfoRow(context.l10n.post, profile.address.post),
+                  _InfoRow(
+                    context.l10n.policeStation,
+                    profile.address.policeStation,
+                  ),
+                  _InfoRow(context.l10n.city, resolvedCity),
+                  _InfoRow(context.l10n.state, resolvedState),  
+                  _InfoRow(context.l10n.pincode, profile.address.pincode),
                 ],
               ),
               const SizedBox(height: 16),
@@ -663,17 +796,26 @@ class _MatrimonyProfileTab extends ConsumerWidget {
               // Agent Info
               if (profile.agentEntity != null) ...[
                 _SectionCard(
-                  title: 'Agent Information',
+                  title: context.l10n.agentInformation,
                   icon: Icons.support_agent,
                   children: [
-                    _InfoRow('Agent Name', profile.agentEntity!.agentName),
-                    _InfoRow('Phone', profile.agentEntity!.agentMobile),
-                    _InfoRow('Email', profile.agentEntity!.agentEmail),
                     _InfoRow(
-                      'License',
+                      context.l10n.agentName,
+                      profile.agentEntity!.agentName,
+                    ),
+                    _InfoRow(
+                      context.l10n.phone,
+                      profile.agentEntity!.agentMobile,
+                    ),
+                    _InfoRow(
+                      context.l10n.email,
+                      profile.agentEntity!.agentEmail,
+                    ),
+                    _InfoRow(
+                      context.l10n.license,
                       profile.agentEntity!.agentLicenseNumber,
                     ),
-                    _InfoRow('City', profile.agentEntity!.agentCity),
+                    _InfoRow(context.l10n.city, profile.agentEntity!.agentCity),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -723,7 +865,7 @@ class _MatchProfilesBottomBar extends ConsumerWidget {
             onPressed: () =>
                 context.router.push(ProfileMatchRoute(profile: profile)),
             icon: const Icon(Icons.favorite),
-            label: const Text('Match Profiles'),
+            label: Text(context.l10n.matchProfiles),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.primaryColor,
               foregroundColor: theme.colorScheme.onPrimary,
@@ -771,13 +913,16 @@ class _MatrimonyHeaderCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    profile.user.fullName,
+                 
+               BilingualParser(
+                    value: profile.user.fullName,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                 
+                
                   const SizedBox(height: 4),
                   Text(
                     '${profile.identity.gender} • ${profile.identity.age} years',
@@ -862,7 +1007,7 @@ class _SectionCard extends StatelessWidget {
 
 class _InfoRow extends StatelessWidget {
   final String label;
-  final String value;
+  final dynamic value;
 
   const _InfoRow(this.label, this.value);
 
@@ -881,10 +1026,14 @@ class _InfoRow extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Text(
-              value.isEmpty ? 'Not provided' : value,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-            ),
+            child: value is BilingualValue
+                ? BilingualParser(value: value as BilingualValue)
+                : Text(
+                    (value == null || value.toString().isEmpty)
+                        ? context.l10n.notProvided
+                        : value.toString(),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                  ),
           ),
         ],
       ),
@@ -948,16 +1097,27 @@ class _ImagesTabSection extends StatelessWidget {
     final List<MapEntry<String, String>> allImages = [];
 
     if (images.primaryImageUrl.isNotEmpty) {
-      allImages.add(MapEntry('Primary Photo', images.primaryImageUrl));
+      allImages.add(
+        MapEntry(context.l10n.primaryPhoto, images.primaryImageUrl),
+      );
     }
     if (images.profileImageUrl.isNotEmpty) {
-      allImages.add(MapEntry('Profile Photo', images.profileImageUrl));
+      allImages.add(
+        MapEntry(context.l10n.profilePhoto, images.profileImageUrl),
+      );
     }
     if (images.imageWithAgentUrl.isNotEmpty) {
-      allImages.add(MapEntry('Photo with Agent', images.imageWithAgentUrl));
+      allImages.add(
+        MapEntry(context.l10n.photoWithAgent, images.imageWithAgentUrl),
+      );
     }
     for (int i = 0; i < images.secondaryImageUrls.length; i++) {
-      allImages.add(MapEntry('Gallery ${i + 1}', images.secondaryImageUrls[i]));
+      allImages.add(
+        MapEntry(
+          '${context.l10n.gallery} ${i + 1}',
+          images.secondaryImageUrls[i],
+        ),
+      );
     }
 
     final hasAadhar = images.aadharCardUrl.isNotEmpty;
@@ -986,9 +1146,9 @@ class _ImagesTabSection extends StatelessWidget {
                       color: Theme.of(context).primaryColor,
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Photos & Documents',
-                      style: TextStyle(
+                    Text(
+                      context.l10n.photosAndDocuments,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1004,7 +1164,7 @@ class _ImagesTabSection extends StatelessWidget {
                 indicatorColor: Theme.of(context).primaryColor,
                 tabs: [
                   ...allImages.map((e) => Tab(text: e.key)),
-                  if (hasAadhar) const Tab(text: 'Aadhar Card'),
+                  if (hasAadhar) Tab(text: context.l10n.aadharCard),
                 ],
               ),
               SizedBox(
@@ -1017,7 +1177,7 @@ class _ImagesTabSection extends StatelessWidget {
                     if (hasAadhar)
                       _DocumentViewer(
                         documentUrl: images.aadharCardUrl,
-                        label: 'Aadhar Card',
+                        label: context.l10n.aadharCard,
                       ),
                   ],
                 ),
@@ -1094,7 +1254,7 @@ class _ImageViewer extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Tap to view fullscreen',
+            context.l10n.tapToViewFullscreen,
             style: TextStyle(color: Colors.grey[600], fontSize: 12),
           ),
         ],
@@ -1178,7 +1338,9 @@ class _DocumentViewer extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: () => _openDocument(context, isPdf),
             icon: const Icon(Icons.open_in_new),
-            label: Text(isPdf ? 'Open PDF' : 'View Document'),
+            label: Text(
+              isPdf ? context.l10n.openPdf : context.l10n.viewDocument,
+            ),
           ),
           const SizedBox(height: 12),
           Text(
@@ -1247,7 +1409,7 @@ class MatchingOptionsSheet extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Matching Options',
+            context.l10n.matchingOptions,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 16),
@@ -1277,16 +1439,19 @@ class MatchingFilterRightSheet extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Filter Profiles',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Text(
+                    context.l10n.filterProfiles,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Row(
                     children: [
                       TextButton(
                         onPressed: () =>
                             ref.read(matchFilterProvider.notifier).reset(),
-                        child: const Text('Reset'),
+                        child: Text(context.l10n.reset),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -1302,9 +1467,9 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Location',
-                        style: TextStyle(
+                      Text(
+                        context.l10n.location,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey,
@@ -1316,37 +1481,45 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                             const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('Error: $e'),
                         data: (states) {
-                          final stateNames = states.map((e) => e.name).toList();
-                          final selectedState = states.firstWhere(
-                            (s) => s.name == filter.state,
-                            orElse: () => StateCityModel(name: '', cities: []),
-                          );
+                          /// Selected state object
+                          final selectedState = states
+                              .where((s) => s.name == filter.state)
+                              .firstOrNull;
+
+                          final selectedCity = selectedState?.cities
+                              .where(
+                                (c) =>
+                                    c.id == filter.city ||
+                                    c.name == filter.city,
+                              )
+                              .firstOrNull;
+
                           return Column(
                             children: [
-                              _buildDropdown(
-                                title: 'State',
-                                value: filter.state.isEmpty
-                                    ? null
-                                    : filter.state,
-                                items: stateNames,
+                              _buildDropdown<StateCityModel>(
+                                title: context.l10n.state,
+                                value: selectedState,
+                                items: states,
+                                itemLabel: (s) => s.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
-                                        .read(homeFilterProvider.notifier)
-                                        .updateState(val);
+                                        .read(matchFilterProvider.notifier)
+                                        .updateState(val.name);
                                   }
                                 },
                               ),
                               const SizedBox(height: 12),
-                              _buildDropdown(
-                                title: 'City',
-                                value: filter.city.isEmpty ? null : filter.city,
-                                items: selectedState.cities,
+                              _buildDropdown<CityModel>(
+                                title: context.l10n.city,
+                                value: selectedCity,
+                                items: selectedState?.cities ?? [],
+                                itemLabel: (c) => c.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
-                                        .read(homeFilterProvider.notifier)
-                                        .updateCity(val);
+                                        .read(matchFilterProvider.notifier)
+                                        .updateCity(val.id);
                                   }
                                 },
                               ),
@@ -1355,9 +1528,9 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                         },
                       ),
                       const SizedBox(height: 24),
-                      const Text(
-                        'Cultural',
-                        style: TextStyle(
+                      Text(
+                        context.l10n.cultural,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey,
@@ -1369,42 +1542,48 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                             const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('Error: $e'),
                         data: (religions) {
-                          final religionNames = religions
-                              .map((r) => r.name)
-                              .toList();
-                          final selectedReligion = religions.firstWhere(
-                            (r) => r.name == filter.religion,
-                            orElse: () =>
-                                ReligionModel(id: '', name: '', castes: []),
-                          );
+                          final selectedReligion = religions
+                              .where(
+                                (r) =>
+                                    r.id == filter.religion ||
+                                    r.name == filter.religion,
+                              )
+                              .firstOrNull;
+
+                          final selectedCaste = selectedReligion?.castes
+                              .where(
+                                (c) =>
+                                    c.id == filter.caste ||
+                                    c.name == filter.caste,
+                              )
+                              .firstOrNull;
+
                           return Column(
                             children: [
-                              _buildDropdown(
-                                title: 'Religion',
-                                value: filter.religion.isEmpty
-                                    ? null
-                                    : filter.religion,
-                                items: religionNames,
+                              _buildDropdown<ReligionCasteModel>(
+                                title: context.l10n.religion,
+                                value: selectedReligion,
+                                items: religions,
+                                itemLabel: (r) => r.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
-                                        .read(homeFilterProvider.notifier)
-                                        .updateReligion(val);
+                                        .read(matchFilterProvider.notifier)
+                                        .updateReligion(val.id);
                                   }
                                 },
                               ),
                               const SizedBox(height: 12),
-                              _buildDropdown(
-                                title: 'Caste',
-                                value: filter.caste.isEmpty
-                                    ? null
-                                    : filter.caste,
-                                items: selectedReligion.castes,
+                              _buildDropdown<CasteModel>(
+                                title: context.l10n.caste,
+                                value: selectedCaste,
+                                items: selectedReligion?.castes ?? [],
+                                itemLabel: (c) => c.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
-                                        .read(homeFilterProvider.notifier)
-                                        .updateCaste(val);
+                                        .read(matchFilterProvider.notifier)
+                                        .updateCaste(val.id);
                                   }
                                 },
                               ),
@@ -1421,7 +1600,7 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Apply Filters'),
+                  child: Text(context.l10n.applyFilters),
                 ),
               ),
             ],
@@ -1431,21 +1610,25 @@ class MatchingFilterRightSheet extends ConsumerWidget {
     );
   }
 
-  static Widget _buildDropdown({
+  static Widget _buildDropdown<T>({
     required String title,
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
+    required T? value,
+    required List<T> items,
+    required String Function(T) itemLabel,
+    required ValueChanged<T?> onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
-        DropdownButtonFormField<String>(
-          value: value,
+        DropdownButtonFormField<T>(
+          isExpanded: true,
+          value: items.contains(value) ? value : null,
           items: items
-              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .map(
+                (e) => DropdownMenuItem<T>(value: e, child: Text(itemLabel(e))),
+              )
               .toList(),
           onChanged: onChanged,
           decoration: InputDecoration(
@@ -1484,7 +1667,7 @@ class _WishlistUserTile extends ConsumerWidget {
       onTap: onTap,
       child: userAsync.when(
         data: (user) {
-          if (user == null) return _buildPlaceholder('User not found');
+          if (user == null) return _buildPlaceholder(context.l10n.userNotFound);
 
           final isSameAgent = currentUserAgentId == user.agentId;
 
@@ -1522,15 +1705,17 @@ class _WishlistUserTile extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            user.fullName.isNotEmpty
-                                ? user.fullName
-                                : 'No Name',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+
+  BilingualParser(
+                    value:  user.fullName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+
+                      
                           const SizedBox(height: 2),
                           Row(
                             children: [
@@ -1541,7 +1726,9 @@ class _WishlistUserTile extends ConsumerWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                user.phone.isNotEmpty ? user.phone : 'No phone',
+                                user.phone.isNotEmpty
+                                    ? user.phone
+                                    : context.l10n.noPhone,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.grey[700],
@@ -1607,7 +1794,9 @@ class _WishlistUserTile extends ConsumerWidget {
                               : Icons.person,
                         ),
                         label: Text(
-                          isSameAgent ? 'Same Agent' : 'Contact Agent',
+                          isSameAgent
+                              ? context.l10n.sameAgent
+                              : context.l10n.contactAgent,
                         ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: isSameAgent
@@ -1628,7 +1817,7 @@ class _WishlistUserTile extends ConsumerWidget {
                     child: OutlinedButton.icon(
                       onPressed: () => _showStatusDialog(context, ref),
                       icon: const Icon(Icons.edit_note),
-                      label: const Text('Update Status'),
+                      label: Text(context.l10n.updateStatus),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.orange,
                         side: const BorderSide(color: Colors.orange),
@@ -1679,7 +1868,7 @@ class _WishlistUserTile extends ConsumerWidget {
             ),
           ],
         ),
-        error: (_, _) => _buildPlaceholder('Error loading user'),
+        error: (_, _) => _buildPlaceholder(context.l10n.errorLoadingUser),
       ),
     );
   }
@@ -1716,26 +1905,27 @@ class _WishlistUserTile extends ConsumerWidget {
   }
 
   void _showStatusDialog(BuildContext context, WidgetRef ref) {
-    final statuses = [
-      'Pending',
-      'Contacted',
-      'Interested',
-      'NotInterested',
-      'Closed',
-    ];
+    final Map<String, String> statusOptions = {
+      'Pending': context.l10n.pending,
+      'Contacted': context.l10n.statusContacted,
+      'Interested': context.l10n.statusInterested,
+      'NotInterested': context.l10n.statusNotInterested,
+      'Closed': context.l10n.closed,
+    };
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Update Status'),
+        title: Text(context.l10n.updateStatus),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: statuses
+          children: statusOptions.entries
               .map(
-                (s) => ListTile(
-                  title: Text(s),
+                (entry) => ListTile(
+                  title: Text(entry.value),
                   onTap: () {
                     Navigator.pop(context);
-                    _updateStatus(ref, s, context);
+                    _updateStatus(ref, entry.key, context);
                   },
                 ),
               )
@@ -1760,15 +1950,17 @@ class _WishlistUserTile extends ConsumerWidget {
           );
       ref.invalidate(agentUserNotifierProvider);
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Status updated to $newStatus')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.statusUpdatedTo(newStatus))),
+        );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to update status: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.failedToUpdateStatus(e.toString())),
+          ),
+        );
       }
     }
   }
@@ -1778,14 +1970,12 @@ class _WishlistUserTile extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
-        title: const Text('Same Agent'),
-        content: const Text(
-          'This user is registered under the same agent. No need to contact another agent for the matrimony process.',
-        ),
+        title: Text(context.l10n.sameAgent),
+        content: Text(context.l10n.sameAgentMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text(context.l10n.ok),
           ),
         ],
       ),
@@ -1839,21 +2029,21 @@ class _AgentDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusChip(dynamic agent) {
+  Widget _buildStatusChip(dynamic agent, BuildContext context) {
     if (agent.isApproved) {
-      return const Chip(
-        label: Text('Approved'),
+      return Chip(
+        label: Text(context.l10n.approved),
         backgroundColor: Colors.greenAccent,
       );
     }
     if (agent.isRejected) {
-      return const Chip(
-        label: Text('Rejected'),
+      return Chip(
+        label: Text(context.l10n.rejected),
         backgroundColor: Colors.redAccent,
       );
     }
-    return const Chip(
-      label: Text('Pending'),
+    return Chip(
+      label: Text(context.l10n.pending),
       backgroundColor: Colors.orangeAccent,
     );
   }
@@ -1891,33 +2081,33 @@ class _AgentDialog extends ConsumerWidget {
             ),
           ],
         ),
-        loading: () => const Text('Agent Details'),
-        error: (_, _) => const Text('Agent Details'),
+        loading: () => Text(context.l10n.agentDetails),
+        error: (_, _) => Text(context.l10n.agentDetails),
       ),
       content: agentAsync.when(
         loading: () => const SizedBox(
           height: 120,
           child: Center(child: CircularProgressIndicator()),
         ),
-        error: (_, _) => const SizedBox(
+        error: (_, _) => SizedBox(
           height: 120,
-          child: Center(child: Text('Failed to load agent info')),
+          child: Center(child: Text(context.l10n.failedToLoadAgentInfo)),
         ),
         data: (agent) => SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildInfoRow(Icons.phone, 'Phone', agent.agentMobile),
+              _buildInfoRow(Icons.phone, context.l10n.phone, agent.agentMobile),
               const Divider(),
-              _buildInfoRow(Icons.email, 'Email', agent.agentEmail),
+              _buildInfoRow(Icons.email, context.l10n.email, agent.agentEmail),
               const Divider(),
               _buildInfoRow(
                 Icons.location_on,
-                'Location',
+                context.l10n.location,
                 '${agent.agentCity}, ${agent.agentState}',
               ),
               const Divider(),
-              _buildStatusChip(agent),
+              _buildStatusChip(agent, context),
             ],
           ),
         ),
@@ -1926,7 +2116,7 @@ class _AgentDialog extends ConsumerWidget {
         data: (agent) => [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(context.l10n.closeLabel),
           ),
           if (agent.agentMobile.isNotEmpty) ...[
             TextButton.icon(
@@ -1936,11 +2126,11 @@ class _AgentDialog extends ConsumerWidget {
                   '',
                 );
                 final url =
-                    'https://wa.me/$number?text=Hi, I am contacting you regarding a matrimony profile.';
+                    'https://wa.me/$number?text=${Uri.encodeComponent(context.l10n.whatsappContactMessage)}';
                 launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
               },
               icon: const Icon(Icons.message, size: 18),
-              label: const Text('WhatsApp'),
+              label: Text(context.l10n.whatsapp),
             ),
             ElevatedButton.icon(
               onPressed: () {
@@ -1950,7 +2140,7 @@ class _AgentDialog extends ConsumerWidget {
                 );
               },
               icon: const Icon(Icons.phone, size: 18),
-              label: const Text('Call'),
+              label: Text(context.l10n.call),
             ),
           ],
         ],
@@ -1958,7 +2148,7 @@ class _AgentDialog extends ConsumerWidget {
         error: (_, _) => [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(context.l10n.closeLabel),
           ),
         ],
       ),

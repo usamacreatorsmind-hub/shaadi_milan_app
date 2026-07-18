@@ -1,9 +1,11 @@
+import '../../../../translitration/models/bilingual_value.dart';
+
 class AddressProfile {
-  final String addressLine1;
-  final String post;
-  final String policeStation;
-  final String city;
-  final String state;
+  final BilingualValue addressLine1;
+  final BilingualValue post;
+  final BilingualValue policeStation;
+  final BilingualValue city;
+  final BilingualValue state;
   final String pincode;
 
   AddressProfile({
@@ -12,41 +14,45 @@ class AddressProfile {
     required this.city,
     required this.state,
     required this.policeStation,
-
     required this.pincode,
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'addressLine1': addressLine1,
-      'post': post,
-      'city': city,
-      'state': state,
+      'addressLine1': addressLine1.toMap(),
+      'post': post.toMap(),
+      'city': city.toMap(),
+      'state': state.toMap(),
+      'policeStation': policeStation.toMap(),
       'pincode': pincode,
     };
   }
 
   factory AddressProfile.fromMap(Map<String, dynamic> map) {
-    return AddressProfile(
-      addressLine1: map['addressLine1'] ?? '',
-      policeStation: map['policeStation'] ?? '',
+    BilingualValue parseBilingual(dynamic val) {
+      if (val is Map) {
+        return BilingualValue.fromMap(Map<String, dynamic>.from(val));
+      }
+      return BilingualValue(en: val?.toString() ?? '', hi: '');
+    }
 
-      post: map['post'] ?? '',
-      city: map['city'] ?? '',
-      state: map['state'] ?? '',
-      pincode: map['pincode'] ?? '',
+    return AddressProfile(
+      addressLine1: parseBilingual(map['addressLine1']),
+      policeStation: parseBilingual(map['policeStation']),
+      post: parseBilingual(map['post']),
+      city: parseBilingual(map['city']),
+      state: parseBilingual(map['state']),
+      pincode: map['pincode']?.toString() ?? '',
     );
   }
 
   AddressProfile copyWith({
-    String? addressLine1,
-    String? post,
-    String? city,
-    String? state,
-    String? police_station,
-
+    BilingualValue? addressLine1,
+    BilingualValue? post,
+    BilingualValue? city,
+    BilingualValue? state,
+    BilingualValue? policeStation,
     String? pincode,
-    String? country,
   }) {
     return AddressProfile(
       addressLine1: addressLine1 ?? this.addressLine1,
@@ -54,26 +60,24 @@ class AddressProfile {
       city: city ?? this.city,
       state: state ?? this.state,
       pincode: pincode ?? this.pincode,
-
-      policeStation: police_station ?? policeStation,
+      policeStation: policeStation ?? this.policeStation,
     );
   }
 
   factory AddressProfile.empty() {
     return AddressProfile(
-      addressLine1: '',
-      post: '',
-      city: '',
-      state: '',
-      policeStation: '',
-
+      addressLine1: BilingualValue.empty(),
+      post: BilingualValue.empty(),
+      city: BilingualValue.empty(),
+      state: BilingualValue.empty(),
+      policeStation: BilingualValue.empty(),
       pincode: '',
     );
   }
 
   @override
   String toString() {
-    return 'AddressProfile(addressLine1: $addressLine1, post: $post, city: $city, state: $state, pincode: $pincode, police_station: $policeStation)';
+    return 'AddressProfile(addressLine1: $addressLine1, post: $post, city: $city, state: $state, pincode: $pincode, policeStation: $policeStation)';
   }
 }
 

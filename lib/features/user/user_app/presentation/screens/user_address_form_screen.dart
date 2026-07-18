@@ -1,16 +1,17 @@
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../core/filters/home_filter_controller.dart';
-import 'package:flutter/services.dart';
-
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../../../../core/enums/enum.dart';
-import '../../domain/states/state_city.dart';
-import '../../domain/states/address_state.dart';
-import '../controllers/user_address_controllers.dart';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../core/constants/app_labels.dart';
+import '../../../../../core/enums/enum.dart';
+import '../../../../../core/filters/home_filter_controller.dart';
+import '../../../../translitration/models/bilingual_value.dart';
+import '../../../../translitration/widgets/bilingual_text_field.dart';
+import '../../domain/states/address_state.dart';
+import '../../domain/states/state_city.dart';
+import '../controllers/user_address_controllers.dart';
 
 @RoutePage()
 class UserAddressFormScreen extends ConsumerStatefulWidget {
@@ -33,8 +34,13 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _atController = TextEditingController();
+  final _atEnController = TextEditingController();
+
   final _postController = TextEditingController();
+  final _postEnController = TextEditingController();
+
   final _policeStationController = TextEditingController();
+  final _policeStationEnController = TextEditingController();
 
   final _districtController = TextEditingController();
   final _stateController = TextEditingController();
@@ -46,16 +52,22 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     widget.registerSubmit?.call(_submitForm);
     if (widget.mode == FormMode.edit && widget.existingAddressProfile != null) {
       final profile = widget.existingAddressProfile!;
-      _atController.text = profile.addressLine1;
-      _postController.text = profile.post;
-      _policeStationController.text = profile.policeStation;
-      _stateController.text = profile.state;
-      _districtController.text = profile.city;
+      _atController.text = profile.addressLine1.hi;
+      _atEnController.text = profile.addressLine1.en;
+
+      _postController.text = profile.post.hi;
+      _postEnController.text = profile.post.en;
+
+      _policeStationController.text = profile.policeStation.hi;
+      _policeStationEnController.text = profile.policeStation.en;
+
+      _stateController.text = profile.state.en;
+      _districtController.text = profile.city.en;
       _pinController.text = profile.pincode;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(homeFilterProvider.notifier).updateState(profile.state);
-        ref.read(homeFilterProvider.notifier).updateCity(profile.city);
+        ref.read(homeFilterProvider.notifier).updateState(profile.state.en);
+        ref.read(homeFilterProvider.notifier).updateCity(profile.city.en);
       });
     }
   }
@@ -63,36 +75,63 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
   @override
   void dispose() {
     _atController.dispose();
+    _atEnController.dispose();
     _postController.dispose();
+    _postEnController.dispose();
     _policeStationController.dispose();
+    _policeStationEnController.dispose();
     _districtController.dispose();
     _stateController.dispose();
     _pinController.dispose();
     super.dispose();
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
 
     final notifier = ref.read(addressControllerProvider.notifier);
+    final location = ref.read(homeFilterProvider);
+
+    final at = BilingualValue(
+      hi: _atController.text.trim(),
+      en: _atEnController.text.trim(),
+    );
+    final post = BilingualValue(
+      hi: _postController.text.trim(),
+      en: _postEnController.text.trim(),
+    );
+    final policeStation = BilingualValue(
+      hi: _policeStationController.text.trim(),
+      en: _policeStationEnController.text.trim(),
+    );
+
+    final bilingualData = await ref.read(bilingualLocationProvider.future);
+    final statesMap = bilingualData['states']!;
+    final citiesMap = bilingualData['cities']!;
+
+    final stateBilingual =
+        statesMap[location.state] ??
+        BilingualValue(hi: location.state, en: location.state);
+    final cityBilingual =
+        citiesMap[location.city] ??
+        BilingualValue(hi: location.city, en: location.city);
 
     if (widget.mode == FormMode.create) {
       notifier.saveAddress(
-        at: _atController.text.trim(),
-        post: _postController.text.trim(),
-        policeStation: _policeStationController.text.trim(),
-        district: _districtController.text.trim(),
-        stateName: _stateController.text.trim(),
+        at: at,
+        post: post,
+        policeStation: policeStation,
+        district: cityBilingual,
+        stateName: stateBilingual,
         pin: _pinController.text.trim(),
       );
     } else {
-      // Update logic (using saveIdentity as upsert)
       notifier.updateAddress(
-        at: _atController.text.trim(),
-        post: _postController.text.trim(),
-        policeStation: _policeStationController.text.trim(),
-        district: _districtController.text.trim(),
-        stateName: _stateController.text.trim(),
+        at: at,
+        post: post,
+        policeStation: policeStation,
+        district: cityBilingual,
+        stateName: stateBilingual,
         pin: _pinController.text.trim(),
       );
     }
@@ -133,91 +172,85 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
             key: _formKey,
             child: ListView(
               children: [
-                /// ================= AT =================
-                AppTextField(
+                BilingualTextField(
                   controller: _atController,
+                  englishController: _atEnController,
                   prefixIcon: Icons.location_on,
-                  iconColor: Theme.of(context).colorScheme.primary,
                   label: AppLabels.place(context),
                   hint: AppLabels.placeHint(context),
-                  obscureText: false,
-                  keyboardType: TextInputType.streetAddress,
-                  validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
+                  validator: (v) => v == null || v.isEmpty
+                      ? AppLabels.isRequired(context)
+                      : null,
                 ),
                 const SizedBox(height: 16),
-
-                /// ================= POST =================
-                AppTextField(
+                BilingualTextField(
                   controller: _postController,
+                  englishController: _postEnController,
                   prefixIcon: Icons.local_post_office,
-                  iconColor: Theme.of(context).colorScheme.primary,
                   label: AppLabels.post(context),
                   hint: AppLabels.postHint(context),
-                  obscureText: false,
-                  keyboardType: TextInputType.text,
-                  validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
+                  validator: (v) => v == null || v.isEmpty
+                      ? AppLabels.isRequired(context)
+                      : null,
                 ),
                 const SizedBox(height: 16),
-                AppTextField(
+                BilingualTextField(
                   controller: _policeStationController,
+                  englishController: _policeStationEnController,
                   prefixIcon: Icons.local_police,
-
-                  iconColor: Theme.of(context).colorScheme.primary,
                   label: AppLabels.policeStation(context),
                   hint: AppLabels.policeStationHint(context),
-                  obscureText: false,
-                  keyboardType: TextInputType.text,
-                  validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
+                  validator: (v) => v == null || v.isEmpty
+                      ? AppLabels.isRequired(context)
+                      : null,
                 ),
                 const SizedBox(height: 16),
-
-                /// ================= STATE & DISTRICT =================
                 locationAsync.when(
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   error: (e, _) => Text(e.toString()),
                   data: (states) {
-                    final stateNames = states.map((e) => e.name).toList();
+                    final selectedState = states
+                        .where((s) => s.name == location.state)
+                        .firstOrNull;
 
-                    final selectedState = states.firstWhere(
-                      (s) => s.name == (location.state ?? ''),
-                      orElse: () => StateCityModel(name: '', cities: []),
-                    );
+                    final selectedCity = selectedState?.cities
+                        .where(
+                          (c) =>
+                              c.id == location.city || c.name == location.city,
+                        )
+                        .firstOrNull;
 
                     return Column(
                       children: [
-                        _buildDropdown(
-                          context: context,
+                        AppDropDown<StateCityModel>(
                           label: AppLabels.state(context),
-                          value: stateNames.contains(location.state)
-                              ? location.state
-                              : null,
-                          items: stateNames,
+                          items: states,
+                          value: selectedState,
+                          itemLabel: (s) => s.name,
                           onChanged: (val) {
                             if (val != null) {
                               ref
                                   .read(homeFilterProvider.notifier)
-                                  .updateState(val);
-                              _stateController.text = val;
+                                  .updateState(val.name);
+                              _stateController.text = val.name;
                               _districtController.clear();
                             }
                           },
                         ),
 
                         const SizedBox(height: 12),
-                        _buildDropdown(
-                          context: context,
+                        AppDropDown<CityModel>(
                           label: AppLabels.districtLabel(context),
-                          value: selectedState.cities.contains(location.city)
-                              ? location.city
-                              : null,
-                          items: selectedState.cities,
+                          items: selectedState?.cities ?? [],
+                          value: selectedCity,
+                          itemLabel: (c) => c.name,
                           onChanged: (val) {
                             if (val != null) {
                               ref
                                   .read(homeFilterProvider.notifier)
-                                  .updateCity(val);
-                              _districtController.text = val;
+                                  .updateCity(val.id);
+                              _districtController.text = val.id;
                             }
                           },
                         ),
@@ -225,20 +258,15 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                     );
                   },
                 ),
-
                 const SizedBox(height: 16),
-
-                /// ================= PIN =================
                 AppTextField(
                   showWordCount: true,
-
                   maxLines: 1,
                   counterType: CounterType.characters,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                     MaxLengthFormatter(max: 6),
                   ],
-
                   controller: _pinController,
                   prefixIcon: Icons.numbers,
                   iconColor: Theme.of(context).colorScheme.primary,
@@ -257,8 +285,6 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-
-                /// ================= SAVE =================
                 addressState.isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : (widget.registerSubmit != null
@@ -267,95 +293,12 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                               onPressed: _submitForm,
                               text: AppLabels.saveAddress(context),
                             )),
-                // logout
                 const SizedBox(height: 16),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  /// ================= DROPDOWN BUILDER =================
-
-  static Widget _buildDropdown({
-    required BuildContext context,
-    required String label,
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-    String? Function(String?)? validator,
-    IconData icon = Icons.arrow_drop_down_circle_outlined,
-  }) {
-    return DropdownButtonFormField<String>(
-      isExpanded: true,
-      value: value,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: 'Select ${label.toLowerCase()}',
-        prefixIcon: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundColor: Theme.of(
-              context,
-            ).colorScheme.primary.withOpacity(0.15),
-            child: Icon(
-              icon,
-              color: Theme.of(context).colorScheme.primary,
-              size: 26,
-            ),
-          ),
-        ),
-        filled: true,
-        fillColor: Theme.of(context).cardColor,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.error,
-            width: 2,
-          ),
-        ),
-      ),
-
-      items: items
-          .map(
-            (item) => DropdownMenuItem<String>(
-              value: item,
-              child: Text(item, style: const TextStyle(fontSize: 14)),
-            ),
-          )
-          .toList(),
-
-      onChanged: onChanged,
-
-      validator:
-          validator ??
-          (val) {
-            if (val == null || val.isEmpty) {
-              return 'Please select ${label.toLowerCase()}';
-            }
-            return null;
-          },
     );
   }
 }

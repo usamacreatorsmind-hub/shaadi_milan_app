@@ -1,3 +1,8 @@
+import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/wishlist_notifier.dart';
 import 'package:shadi_milan/features/auth/domain/states/user_state.dart';
@@ -5,20 +10,13 @@ import 'package:shadi_milan/features/auth/presentation/providers/auth_providers.
 import 'package:shadi_milan/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart'
     show agentFirestoreDsProvider;
 import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
-import 'package:shadi_milan/features/user/user_app/presentation/screens/user_profile_screen.dart';
 import 'package:shadi_milan/features/user/user_app/widgets/agent_bottom_sheet.dart';
-import 'package:auto_route/annotations.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
-
 import '../../../../auth/domain/states/agent_state.dart';
+import '../../../../translitration/models/bilingual_value.dart';
 import '../../../../widgets/marquee.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/image_state.dart';
@@ -132,6 +130,11 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(matrimonyProfileProvider(widget.uid));
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
+    String _bText(BilingualValue val) {
+      final text = isHindi ? val.hi : val.en;
+      return text.isEmpty ? 'N/A' : text;
+    }
 
     return Scaffold(
       body: profileAsync.when(
@@ -214,7 +217,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               runSpacing: 10,
                               children: [
                                 _infoChip(
-                                  profile.employment.jobType ?? 'N/A',
+                                  _bText(profile.employment.jobType),
                                   Icons.work_outline,
                                 ),
                                 _infoChip(
@@ -222,15 +225,15 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   Icons.cake_outlined,
                                 ),
                                 _infoChip(
-                                  profile.identity.gender ?? 'N/A',
+                                  _bText(profile.identity.gender),
                                   Icons.person_outline,
                                 ),
                                 _infoChip(
-                                  profile.address.city ?? 'N/A',
+                                  _bText(profile.address.city),
                                   Icons.location_on_outlined,
                                 ),
                                 _infoChip(
-                                  profile.cultural.religion ?? 'N/A',
+                                  _bText(profile.cultural.religion),
                                   Icons.temple_hindu,
                                 ),
                                 _infoChip(
@@ -303,12 +306,12 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   _InfoTile(
                                     label: 'Gender',
                                     icon: Icons.person_outline,
-                                    value: profile.identity.gender,
+                                    bilingualValue: profile.identity.gender,
                                   ),
                                   _InfoTile(
                                     label: 'Age',
                                     icon: Icons.cake_outlined,
-                                    value: '${profile.identity.age} years',
+                                  value: profile.identity.age.toString(),
                                   ),
                                   _InfoTile(
                                     label: 'Date of Birth',
@@ -323,12 +326,18 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 title: 'About Me',
                                 icon: Icons.info_outline,
                                 children: [
-                                  Text(
-                                    profile.identity.aboutMe ??
-                                        "No description available.",
-                                    textAlign: TextAlign.justify,
-                                    style: TextStyle(color: Colors.grey[700]),
-                                  ),
+                                  (profile.identity.aboutMe.en.isNotEmpty || profile.identity.aboutMe.hi.isNotEmpty)
+                                      ? BilingualParser(
+                                          value: profile.identity.aboutMe,
+                                          textAlign: TextAlign.justify,
+                                          style: TextStyle(color: Colors.grey[700]),
+                                        )
+                                      // ignore: dead_code
+                                      : Text(
+                                          "No description available.",
+                                          textAlign: TextAlign.justify,
+                                          style: TextStyle(color: Colors.grey[700]),
+                                        ),
                                 ],
                               ),
                             ],
@@ -357,15 +366,14 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   _InfoTile(
                                     label: 'Body Type',
                                     icon: Icons.accessibility_new,
-                                    value: profile.physical.bodyType,
+                                    bilingualValue: profile.physical.bodyType,
                                   ),
                                   if (profile.physical.physicallyChallenged)
                                     _InfoTile(
                                       label: 'Disability',
                                       icon: Icons.accessible,
-                                      value:
-                                          profile.physical.disabilityDetails ??
-                                          "Yes",
+                                      value: "Yes",
+                                      bilingualValue: profile.physical.disabilityDetails,
                                     ),
                                 ],
                               ),
@@ -377,13 +385,13 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   _InfoTile(
                                     label: 'City',
                                     icon: Icons.location_city_outlined,
-                                    value: profile.address.city,
+                                    bilingualValue: profile.address.city,
                                   ),
 
                                   _InfoTile(
                                     label: 'State',
                                     icon: Icons.map_outlined,
-                                    value: profile.address.state,
+                                   bilingualValue: profile.address.state,
                                   ),
                                 ],
                               ),
@@ -403,22 +411,21 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   _InfoTile(
                                     label: 'Job Type',
                                     icon: Icons.work_outline,
-                                    value: profile.employment.jobType,
+                                    bilingualValue: profile.employment.jobType,
+                                   
                                   ),
-                                  if (profile.employment.jobType !=
-                                      "Not Working") ...[
+                                  if (profile.employment.jobType.en != "Not Working" && profile.employment.jobType.hi != "Not Working") ...[
                                     _InfoTile(
                                       label: 'Company',
                                       icon: Icons.business,
-                                      value:
-                                          profile.employment.company ?? "N/A",
+                                      bilingualValue:
+                                          profile.employment.company,
                                     ),
                                     _InfoTile(
                                       label: 'Designation',
                                       icon: Icons.work_history,
-                                      value:
-                                          profile.employment.designation ??
-                                          "N/A",
+                                      bilingualValue:
+                                          profile.employment.designation,
                                     ),
                                     _InfoTile(
                                       label: 'Income',
@@ -431,9 +438,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                     _InfoTile(
                                       label: 'Work Location',
                                       icon: Icons.location_city_outlined,
-                                      value:
-                                          profile.employment.workLocation ??
-                                          "N/A",
+                                      bilingualValue:
+                                          profile.employment.workLocation,
                                     ),
                                   ],
                                 ],
@@ -468,16 +474,32 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                       _InfoTile(
                                         label: 'College',
                                         icon: Icons.account_balance,
-                                        value: profile
-                                            .education
-                                            .education!
-                                            .college,
+                                        value: isHindi
+                                            ? profile
+                                                  .education
+                                                  .education!
+                                                  .college
+                                                  .hi
+                                            : profile
+                                                  .education
+                                                  .education!
+                                                  .college
+                                                  .en,
                                       ),
                                       _InfoTile(
                                         label: 'Course',
                                         icon: Icons.menu_book,
-                                        value:
-                                            profile.education.education!.course,
+                                        value: isHindi
+                                            ? profile
+                                                  .education
+                                                  .education!
+                                                  .course
+                                                  .hi
+                                            : profile
+                                                  .education
+                                                  .education!
+                                                  .course
+                                                  .en,
                                       ),
                                       _InfoTile(
                                         label: 'Percentage',
@@ -534,7 +556,11 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                                   .qualifications
                                                   .map(
                                                     (course) => Chip(
-                                                      label: Text(course),
+                                                      label: Text(
+                                                        isHindi
+                                                            ? course.hi
+                                                            : course.en,
+                                                      ),
                                                     ),
                                                   )
                                                   .toList(),
@@ -561,17 +587,17 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   _InfoTile(
                                     label: 'Father',
                                     icon: Icons.person_outline,
-                                    value: profile.family.fatherName,
+                                    bilingualValue: profile.family.fatherName,
                                   ),
                                   _InfoTile(
                                     label: 'Mother',
                                     icon: Icons.person_outline,
-                                    value: profile.family.motherName,
+                                    bilingualValue: profile.family.motherName,
                                   ),
                                   _InfoTile(
                                     label: 'Family Type',
                                     icon: Icons.family_restroom,
-                                    value: profile.family.familyType,
+                                    bilingualValue: profile.family.familyType,
                                   ),
                                   _InfoTile(
                                     label: 'No. of Brother',
@@ -596,26 +622,28 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   _InfoTile(
                                     label: 'Religion',
                                     icon: Icons.temple_hindu,
-                                    value: profile.cultural.religion,
+                                    bilingualValue: profile.cultural.religion,
                                   ),
                                   _InfoTile(
                                     label: 'Caste',
                                     icon: Icons.group,
-                                    value: profile.cultural.caste,
+                                    bilingualValue: profile.cultural.caste,
                                   ),
 
                                   _InfoTile(
-                                    label: 'Caste',
+                                    label: 'Sub-Caste',
                                     icon: Icons.group,
-                                    value: profile.cultural.subCaste,
+                                    value: isHindi
+                                        ? profile.cultural.subCaste.hi
+                                        : profile.cultural.subCaste.en,
                                   ),
 
                                   _InfoTile(
                                     label: 'Languages',
                                     icon: Icons.language,
-                                    value: profile.cultural.languages.join(
-                                      ', ',
-                                    ),
+                                    value: profile.cultural.languages
+                                        .map((l) => isHindi ? l.hi : l.en)
+                                        .join(', '),
                                   ),
                                 ],
                               ),
@@ -1098,12 +1126,14 @@ class _InfoCard extends StatelessWidget {
 
 class _InfoTile extends StatelessWidget {
   final String label;
-  final String value;
+  final BilingualValue? bilingualValue;
   final IconData icon;
+  final String? value;
 
   const _InfoTile({
     required this.label,
-    required this.value,
+    this.value,
+    this.bilingualValue,
     required this.icon,
   });
 
@@ -1147,15 +1177,25 @@ class _InfoTile extends StatelessWidget {
             ),
             Expanded(
               flex: 3,
-              child: Text(
-                value,
-                textAlign: TextAlign.end,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                  fontSize: 15,
-                ),
-              ),
+              child: bilingualValue != null
+                  ? BilingualParser(
+                      value: bilingualValue!,
+                      textAlign: TextAlign.end,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                        fontSize: 15,
+                      ),
+                    )
+                  : Text(
+                      value ?? 'N/A',
+                      textAlign: TextAlign.end,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                        fontSize: 15,
+                      ),
+                    ),
             ),
           ],
         ),
@@ -1204,9 +1244,12 @@ class ProfileHeaderCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// NAME
-                Text(
-                  viewModel.user?.fullName ?? 'N/A',
+                /// NAME'
+                /// 
+                /// 
+                BilingualParser(
+                  value: viewModel.user?.fullName ??
+                        BilingualValue(en: 'N/A', hi: 'N/A'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(

@@ -1,10 +1,12 @@
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+
 class PhysicalProfile {
   final double height;
   final double weight;
-  final String bodyType;
-  final String complexion;
+  final BilingualValue bodyType;
+  final BilingualValue complexion;
   final bool physicallyChallenged;
-  final String? disabilityDetails;
+  final BilingualValue? disabilityDetails;
 
   const PhysicalProfile({
     required this.height,
@@ -19,14 +21,21 @@ class PhysicalProfile {
     return {
       'height': height,
       'weight': weight,
-      'bodyType': bodyType,
-      'complexion': complexion,
+      'bodyType': bodyType.toMap(),
+      'complexion': complexion.toMap(),
       'physicallyChallenged': physicallyChallenged,
-      'disabilityDetails': disabilityDetails,
+      'disabilityDetails': disabilityDetails?.toMap(),
     };
   }
 
   factory PhysicalProfile.fromMap(Map<String, dynamic> map) {
+    BilingualValue parseBilingual(dynamic val) {
+      if (val is Map) {
+        return BilingualValue.fromMap(Map<String, dynamic>.from(val));
+      }
+      return BilingualValue(en: val?.toString() ?? '', hi: '');
+    }
+
     return PhysicalProfile(
       height: map['height'] is num
           ? (map['height'] as num).toDouble()
@@ -34,10 +43,12 @@ class PhysicalProfile {
       weight: map['weight'] is num
           ? (map['weight'] as num).toDouble()
           : double.tryParse(map['weight']?.toString() ?? '') ?? 0.0,
-      bodyType: map['bodyType'] as String? ?? '',
-      complexion: map['complexion'] as String? ?? '',
+      bodyType: parseBilingual(map['bodyType']),
+      complexion: parseBilingual(map['complexion']),
       physicallyChallenged: map['physicallyChallenged'] as bool? ?? false,
-      disabilityDetails: map['disabilityDetails'] as String?,
+      disabilityDetails: map['disabilityDetails'] != null
+          ? parseBilingual(map['disabilityDetails'])
+          : null,
     );
   }
 
@@ -49,10 +60,10 @@ class PhysicalProfile {
   PhysicalProfile copyWith({
     double? height,
     double? weight,
-    String? bodyType,
-    String? complexion,
+    BilingualValue? bodyType,
+    BilingualValue? complexion,
     bool? physicallyChallenged,
-    String? disabilityDetails,
+    BilingualValue? disabilityDetails,
   }) {
     return PhysicalProfile(
       height: height ?? this.height,
@@ -68,8 +79,8 @@ class PhysicalProfile {
     return PhysicalProfile(
       height: 0.0,
       weight: 0.0,
-      bodyType: '',
-      complexion: '',
+      bodyType: BilingualValue.empty(),
+      complexion: BilingualValue.empty(),
       physicallyChallenged: false,
       disabilityDetails: null,
     );

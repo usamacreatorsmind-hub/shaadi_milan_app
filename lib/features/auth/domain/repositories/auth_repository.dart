@@ -1,5 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+
 import '../states/agent_state.dart';
 import '../states/user_state.dart';
 
@@ -17,8 +19,8 @@ abstract class AuthRepository {
   Future<UserCredential> signInWithEmail(String email, String password);
 
   Future<void> signUpUserWithEmail({
-    required String fullName,
-    required String gender,
+    required BilingualValue fullName,
+    required BilingualValue gender,
 
     required String email,
     required String password,
@@ -29,10 +31,5 @@ abstract class AuthRepository {
   Future<void> logout();
 
   Future<dynamic> checkPhoneAlreadyRegistered(String trim) async {}
-  Future<bool> checkUserExists({
-    required String phone,
-    required String email,
-  });
-
-
+  Future<bool> checkUserExists({required String phone, required String email});
 }

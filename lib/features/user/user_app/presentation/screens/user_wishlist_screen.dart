@@ -1,18 +1,19 @@
-import 'package:shadi_milan/app/custom/custom_widgets/shimmer.dart';
-import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/wishlist_notifier.dart';
-import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
-import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
-import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/app/custom/custom_widgets/shimmer.dart';
+import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/wishlist_notifier.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 import '../../../../../app/custom/custom_widgets/user_drawer.dart';
-
 import '../../../../../app/router/app_router.dart';
 import '../../../../auth/domain/states/user_state.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
+import '../../domain/states/state_city.dart';
 import 'my_profile_screen.dart';
 
 @RoutePage()
@@ -465,6 +466,7 @@ class _WishlistItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final locationAsync = ref.watch(locationJsonProvider);
     final profileAsync = ref.watch(matrimonyProfileProvider(profileId));
     final heroTag =
         'wishlist-image-${wishlist.id}-$profileId-${isMyWishlist ? 'my' : 'me'}';
@@ -489,6 +491,29 @@ class _WishlistItemCard extends ConsumerWidget {
         data: (profile) {
           final imageUrl = profile.images.primaryImageUrl;
           final hasImage = imageUrl.isNotEmpty;
+
+          String resolvedState = profile.address.state.en;
+          String resolvedCity = profile.address.city.en;
+
+          if (locationAsync.hasValue) {
+            final states = locationAsync.value!;
+            final stateObj = states
+                .where((s) => s.name == profile.address.state.en)
+                .firstOrNull;
+            if (stateObj != null) {
+              resolvedState = stateObj.name;
+              final cityObj = stateObj.cities
+                  .where(
+                    (c) =>
+                        c.id == profile.address.city.en ||
+                        c.name == profile.address.city.en,
+                  )
+                  .firstOrNull;
+              if (cityObj != null) {
+                resolvedCity = cityObj.name;
+              }
+            }
+          }
 
           return InkWell(
             onTap: () {
@@ -525,10 +550,10 @@ class _WishlistItemCard extends ConsumerWidget {
                             Row(
                               children: [
                                 Expanded(
-                                  child: Text(
-                                    profile.user.fullName.isNotEmpty
+                                  child: BilingualParser(
+                                    value: profile.user.fullName.en.isNotEmpty
                                         ? profile.user.fullName
-                                        : 'N/A',
+                                        : BilingualValue.empty(),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -559,7 +584,7 @@ class _WishlistItemCard extends ConsumerWidget {
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
-                                    '${profile.address.city}, ${profile.address.state}',
+                                    '$resolvedCity, $resolvedState',
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: Colors.grey[600],

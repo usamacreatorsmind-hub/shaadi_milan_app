@@ -302,18 +302,18 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                           }
 
                           // Extract Address Data (Region/District/State)
-                          final region = profile.address.state.trim().isEmpty
+                          final region = profile.address.state.en.trim().isEmpty
                               ? "Not Provided"
-                              : profile.address.state;
+                              : profile.address.state.en;
 
-                          final district = profile.address.city.trim().isEmpty
+                          final district = profile.address.city.en.trim().isEmpty
                               ? "Not Provided"
-                              : profile.address.city;
+                              : profile.address.city.en;
 
                           // Extract Identity Data (Gender)
-                          final gender = profile.identity.gender.trim().isEmpty
+                          final gender = profile.identity.gender.en.trim().isEmpty
                               ? "Not Provided"
-                              : profile.identity.gender;
+                              : profile.identity.gender.en;
 
                           final amount = amountState.amount!.amount.toDouble();
                           final agentCommission = data.agentEntity?.calculateCommission(amount) ?? 0.0;
@@ -327,7 +327,7 @@ class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
                                 amount: amount,
                                 uid: user.uid,
                                 email: user.email,
-                                fullName: user.fullName,
+                                fullName: user.fullName.en,
                                 phone: user.phone,
                                 agentId: user.agentId,
                                 region: region,

@@ -55,7 +55,7 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
 
       id: '',
       userId: currentUser.value!.uid,
-      userName: currentUser.value!.fullName,
+      userName: currentUser.value!.fullName.en,
       userProfileImg: currentUser.value!.profileImageUrl,
       rating: _rating.toInt(),
       title: _titleController.text.trim(),

@@ -1,8 +1,9 @@
-import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 
+import '../../../../l10n/l10n_helper.dart';
 import '../notifier/user_nofier.dart';
 
 @RoutePage()
@@ -45,7 +46,7 @@ class _ViewPaymentDetailScreenState
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payment Details'),
+        title: Text(context.l10n.paymentDetails),
         backgroundColor: theme.primaryColor,
         foregroundColor: theme.colorScheme.onPrimary,
         elevation: 0,
@@ -64,12 +65,12 @@ class _ViewPaymentDetailScreenState
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No Payment Found',
+                    context.l10n.noPaymentFound,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'This user has not made any payments yet',
+                    context.l10n.noPaymentsYetMessage,
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ],
@@ -138,37 +139,37 @@ class _ViewPaymentDetailScreenState
 
                 // Payment Details
                 _DetailCard(
-                  title: 'Payment Information',
+                  title: context.l10n.paymentInformation,
                   icon: Icons.payment,
                   children: [
                     _DetailItem(
-                      label: 'Status',
+                      label: context.l10n.status,
                       value: payment.status,
                       icon: Icons.info_outline,
                     ),
                     const Divider(height: 24),
                     _DetailItem(
-                      label: 'Payment ID',
+                      label: context.l10n.paymentId,
                       value: payment.razorpayPaymentId.isNotEmpty
                           ? payment.razorpayPaymentId
-                          : 'Not available',
+                          : context.l10n.notAvailable,
                       icon: Icons.fingerprint,
                     ),
                     const Divider(height: 24),
                     _DetailItem(
-                      label: 'Order ID',
+                      label: context.l10n.orderId,
                       value: payment.orderId,
                       icon: Icons.receipt,
                     ),
                     const Divider(height: 24),
                     _DetailItem(
-                      label: 'Razorpay Order ID',
+                      label: context.l10n.razorpayOrderId,
                       value: payment.razorpayOrderId,
                       icon: Icons.confirmation_number,
                     ),
                     const Divider(height: 24),
                     _DetailItem(
-                      label: 'Payment Gateway',
+                      label: context.l10n.paymentGateway,
                       value: payment.gateway.toUpperCase(),
                       icon: Icons.account_balance_wallet,
                     ),
@@ -178,42 +179,42 @@ class _ViewPaymentDetailScreenState
 
                 // Customer Information
                 _DetailCard(
-                  title: 'Client Information',
+                  title: context.l10n.clientInformation,
                   icon: Icons.person,
                   children: [
                     _DetailItem(
-                      label: 'Name',
+                      label: context.l10n.fullName,
                       value: payment.fullName,
                       icon: Icons.person_outline,
                     ),
                     const Divider(height: 24),
                     _DetailItem(
-                      label: 'Email',
+                      label: context.l10n.email,
                       value: payment.email,
                       icon: Icons.email,
                     ),
                     const Divider(height: 24),
                     _DetailItem(
-                      label: 'Phone',
+                      label: context.l10n.phone,
                       value: payment.phone,
                       icon: Icons.phone,
                     ),
 
                     const Divider(height: 24),
                     _DetailItem(
-                      label: 'Gender',
+                      label: context.l10n.gender,
                       value: payment.gender!,
                       icon: Icons.people,
                     ),
                     const Divider(height: 24),
                     _DetailItem(
-                      label: 'Religion',
+                      label: context.l10n.religion,
                       value: payment.religion,
                       icon: Icons.people,
                     ),
                     const Divider(height: 24),
                     _DetailItem(
-                      label: 'Caste',
+                      label: context.l10n.caste,
                       value: payment.caste,
                       icon: Icons.people,
                     ),
@@ -225,12 +226,12 @@ class _ViewPaymentDetailScreenState
                 if ((payment.region != null && payment.region!.isNotEmpty) ||
                     (payment.district != null && payment.district!.isNotEmpty))
                   _DetailCard(
-                    title: 'Location',
+                    title: context.l10n.location,
                     icon: Icons.location_on,
                     children: [
                       if (payment.region != null && payment.region!.isNotEmpty)
                         _DetailItem(
-                          label: 'Region',
+                          label: context.l10n.region,
                           value: payment.region!,
                           icon: Icons.map,
                         ),
@@ -239,7 +240,7 @@ class _ViewPaymentDetailScreenState
                         const Divider(height: 24),
                       if (payment.district.isNotEmpty)
                         _DetailItem(
-                          label: 'District',
+                          label: context.l10n.district,
                           value: payment.district,
                           icon: Icons.place,
                         ),
@@ -251,19 +252,19 @@ class _ViewPaymentDetailScreenState
 
                 // Timestamps
                 _DetailCard(
-                  title: 'Timeline',
+                  title: context.l10n.timeline,
                   icon: Icons.history,
                   children: [
                     _DetailItem(
-                      label: 'Created At',
-                      value: _formatDateTime(payment.createdAt),
+                      label: context.l10n.createdAt,
+                      value: _formatDateTime(payment.createdAt, context),
                       icon: Icons.calendar_today,
                     ),
                     if (payment.updatedAt != null) ...[
                       const Divider(height: 24),
                       _DetailItem(
-                        label: 'Last Updated',
-                        value: _formatDateTime(payment.updatedAt!),
+                        label: context.l10n.lastUpdated,
+                        value: _formatDateTime(payment.updatedAt!, context),
                         icon: Icons.update,
                       ),
                     ],
@@ -292,7 +293,7 @@ class _ViewPaymentDetailScreenState
               Icon(Icons.error_outline, size: 80, color: Colors.red[400]),
               const SizedBox(height: 16),
               Text(
-                'Error Loading Payment',
+                context.l10n.errorLoadingPayment,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
@@ -311,9 +312,9 @@ class _ViewPaymentDetailScreenState
     );
   }
 
-  String _formatDateTime(DateTime dateTime) {
+  String _formatDateTime(DateTime dateTime, BuildContext context) {
     if (dateTime.millisecondsSinceEpoch == 0) {
-      return 'Not available';
+      return context.l10n.notAvailable;
     }
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
@@ -322,11 +323,12 @@ class _ViewPaymentDetailScreenState
     AsyncValue<Payment?> afterMarriagePaymentState,
     ThemeData theme,
   ) {
+    final context = this.context;
     return afterMarriagePaymentState.when(
       data: (payment) {
         if (payment == null) {
           return _DetailCard(
-            title: 'After Marriage Payment',
+            title: context.l10n.afterMarriagePayment,
             icon: Icons.favorite,
             children: [
               Center(
@@ -341,7 +343,7 @@ class _ViewPaymentDetailScreenState
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'No After Marriage Payment Found',
+                        context.l10n.noAfterMarriagePaymentFound,
                         style: TextStyle(color: Colors.grey[600]),
                         textAlign: TextAlign.center,
                       ),
@@ -353,13 +355,13 @@ class _ViewPaymentDetailScreenState
           );
         }
         return _DetailCard(
-          title: 'After Marriage Payment',
+          title: context.l10n.afterMarriagePayment,
           icon: Icons.favorite,
           children: [_buildAfterMarriagePaymentCard(payment, theme)],
         );
       },
       loading: () => _DetailCard(
-        title: 'After Marriage Payment',
+        title: context.l10n.afterMarriagePayment,
         icon: Icons.favorite,
         children: const [
           Center(
@@ -372,7 +374,7 @@ class _ViewPaymentDetailScreenState
       ),
 
       error: (error, stack) => _DetailCard(
-        title: 'After Marriage Payment',
+        title: context.l10n.afterMarriagePayment,
         icon: Icons.favorite,
         children: [
           Center(
@@ -383,7 +385,7 @@ class _ViewPaymentDetailScreenState
                   Icon(Icons.error_outline, size: 48, color: Colors.red[400]),
                   const SizedBox(height: 8),
                   Text(
-                    'Error loading after marriage payments',
+                    context.l10n.errorLoadingAfterMarriagePayment,
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ],
@@ -462,30 +464,32 @@ class _ViewPaymentDetailScreenState
             child: Column(
               children: [
                 _DetailItem(
-                  label: 'Payment ID',
+                  label: context.l10n.paymentId,
                   value: payment.razorpayPaymentId.isNotEmpty
                       ? payment.razorpayPaymentId
-                      : 'Not available',
+                      : context.l10n.notAvailable,
                   icon: Icons.fingerprint,
                 ),
                 const Divider(height: 24),
                 _DetailItem(
-                  label: 'Order ID',
-                  value: payment.orderId.isNotEmpty ? payment.orderId : 'N/A',
+                  label: context.l10n.orderId,
+                  value: payment.orderId.isNotEmpty
+                      ? payment.orderId
+                      : context.l10n.notAvailableShort,
                   icon: Icons.receipt,
                 ),
                 const Divider(height: 24),
                 _DetailItem(
-                  label: 'Payment Type',
+                  label: context.l10n.paymentType,
                   value: payment.paymentType.isNotEmpty
                       ? payment.paymentType
-                      : 'After Marriage',
+                      : context.l10n.afterMarriage,
                   icon: Icons.category,
                 ),
                 const Divider(height: 24),
                 _DetailItem(
-                  label: 'Created At',
-                  value: _formatDateTime(payment.createdAt),
+                  label: context.l10n.createdAt,
+                  value: _formatDateTime(payment.createdAt, context),
                   icon: Icons.calendar_today,
                 ),
               ],

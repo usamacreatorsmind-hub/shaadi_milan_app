@@ -1,3 +1,5 @@
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
@@ -15,12 +17,12 @@ class UserFamilyController extends StateNotifier<FamilyState> {
     : super(FamilyState.initial);
 
   Future<void> saveFamily({
-    required String fatherName,
-    required String motherName,
+    required BilingualValue fatherName,
+    required BilingualValue motherName,
     required int brothers,
     required int sisters,
-    required String familyType,
-    required String familyStatus,
+    required BilingualValue familyType,
+    required BilingualValue familyStatus,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     final familyProfile = FamilyProfile(
@@ -49,12 +51,12 @@ class UserFamilyController extends StateNotifier<FamilyState> {
   }
 
   void updateFamily({
-    required String fatherName,
-    required String motherName,
+    required BilingualValue fatherName,
+    required BilingualValue motherName,
     required int brothers,
     required int sisters,
-    required String familyType,
-    required String familyStatus,
+    required BilingualValue familyType,
+    required BilingualValue familyStatus,
   }) {
     state = state.copyWith(isLoading: true, error: null);
     final familyProfile = FamilyProfile(

@@ -1,21 +1,20 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+
 import '../../../../../app/custom/custom_widgets/drawer.dart';
 import '../../../../../app/custom/custom_widgets/revenue_dashboard_tabbar.dart';
 import '../../../../../core/filters/revenue_filter_controller.dart';
 import '../../../../../core/filters/revenue_filter_right_sheet.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../user/user_razorpay/domain/states/payment.dart';
 import '../../domain/states/analytics_state.dart';
 import '../notifier/analytics_provider.dart';
 import '../notifier/user_nofier.dart';
 import 'agen_profile.screen.dart';
-import '../../../../user/user_razorpay/domain/states/payment.dart';
-
-import 'package:auto_route/auto_route.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 @RoutePage()
 class AgentRevenueScreen extends ConsumerStatefulWidget {
@@ -164,7 +163,9 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            AppLocalizations.of(context)!.revenueByGender,
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.revenueByGender,
                                             style: theme.textTheme.titleMedium
                                                 ?.copyWith(
                                                   fontWeight: FontWeight.bold,
@@ -183,7 +184,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                                     value: analytics.maleRevenue
                                                         .toDouble(),
                                                     title:
-                                                        'Male\n₹${analytics.maleRevenue}',
+                                                        '${AppLocalizations.of(context)!.male}\n₹${analytics.maleRevenue}',
                                                     color: Colors.blue,
                                                     radius: 50,
                                                     titleStyle: const TextStyle(
@@ -198,7 +199,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                                         .femaleRevenue
                                                         .toDouble(),
                                                     title:
-                                                        'Female\n₹${analytics.femaleRevenue}',
+                                                        '${AppLocalizations.of(context)!.female}\n₹${analytics.femaleRevenue}',
                                                     color: Colors.pink,
                                                     radius: 50,
                                                     titleStyle: const TextStyle(
@@ -213,7 +214,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                                         .otherRevenue
                                                         .toDouble(),
                                                     title:
-                                                        'Other\n₹${analytics.otherRevenue}',
+                                                        '${AppLocalizations.of(context)!.other}\n₹${analytics.otherRevenue}',
                                                     color: Colors.purple,
                                                     radius: 50,
                                                     titleStyle: const TextStyle(
@@ -234,17 +235,23 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                             children: [
                                               _LegendItem(
                                                 color: Colors.blue,
-                                                text: 'Male',
+                                                text: AppLocalizations.of(
+                                                  context,
+                                                )!.male,
                                               ),
                                               const SizedBox(width: 16),
                                               _LegendItem(
                                                 color: Colors.pink,
-                                                text: 'Female',
+                                                text: AppLocalizations.of(
+                                                  context,
+                                                )!.female,
                                               ),
                                               const SizedBox(width: 16),
                                               _LegendItem(
                                                 color: Colors.purple,
-                                                text: 'Other',
+                                                text: AppLocalizations.of(
+                                                  context,
+                                                )!.other,
                                               ),
                                             ],
                                           ),
@@ -262,7 +269,9 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            AppLocalizations.of(context)!.revenueByReligion,
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.revenueByReligion,
                                             style: theme.textTheme.titleMedium
                                                 ?.copyWith(
                                                   fontWeight: FontWeight.bold,
@@ -344,7 +353,9 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            AppLocalizations.of(context)!.revenueByCaste,
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.revenueByCaste,
 
                                             style: theme.textTheme.titleMedium
                                                 ?.copyWith(
@@ -480,9 +491,11 @@ class _RegionRevenueBarChart extends StatelessWidget {
       return Card(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Center(child: Text("No region data available for chart")),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Text(AppLocalizations.of(context)!.noRegionDataForChart),
+          ),
         ),
       );
     }
@@ -604,7 +617,9 @@ class _TransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (payments.isEmpty) {
-      return Center(child: Text(AppLocalizations.of(context)!.noTransactionsFound));
+      return Center(
+        child: Text(AppLocalizations.of(context)!.noTransactionsFound),
+      );
     }
 
     return ListView.builder(
@@ -634,7 +649,7 @@ class _TransactionList extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "${payment.region ?? 'N/A'}, ${payment.district ?? 'N/A'}",
+                  "${payment.region ?? AppLocalizations.of(context)!.notAvailableShort}, ${payment.district ?? AppLocalizations.of(context)!.notAvailableShort}",
                   style: const TextStyle(fontSize: 12),
                 ),
                 Text(
@@ -721,9 +736,15 @@ class _RevenueRow extends StatelessWidget {
       children: [
         Row(
           children: [
-            _RevenueCard(AppLocalizations.of(context)!.totalRevenue, '₹${analytics.totalRevenue}'),
+            _RevenueCard(
+              AppLocalizations.of(context)!.totalRevenue,
+              '₹${analytics.totalRevenue}',
+            ),
             const SizedBox(width: 12),
-            _RevenueCard(AppLocalizations.of(context)!.todayRevenue, '₹${analytics.todayRevenue}'),
+            _RevenueCard(
+              AppLocalizations.of(context)!.todayRevenue,
+              '₹${analytics.todayRevenue}',
+            ),
           ],
         ),
         const SizedBox(height: 12),
@@ -780,7 +801,6 @@ class _RevenueCard extends StatelessWidget {
     );
   }
 }
-
 
 class _PaymentStatusPie extends StatelessWidget {
   final AnalyticsState analytics;
@@ -852,11 +872,20 @@ class _PaymentStatusPie extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _LegendItem(color: Colors.green, text: AppLocalizations.of(context)!.success),
+                _LegendItem(
+                  color: Colors.green,
+                  text: AppLocalizations.of(context)!.success,
+                ),
                 const SizedBox(width: 16),
-                _LegendItem(color: Colors.orange, text: AppLocalizations.of(context)!.pending),
+                _LegendItem(
+                  color: Colors.orange,
+                  text: AppLocalizations.of(context)!.pending,
+                ),
                 const SizedBox(width: 16),
-                _LegendItem(color: Colors.red, text: AppLocalizations.of(context)!.failed),
+                _LegendItem(
+                  color: Colors.red,
+                  text: AppLocalizations.of(context)!.failed,
+                ),
               ],
             ),
           ],
@@ -972,7 +1001,7 @@ class _DailyRevenueChart extends StatelessWidget {
             // add another chart
             const SizedBox(height: 24),
             Text(
-              "Revenue by Payment Status",
+              AppLocalizations.of(context)!.revenueByPaymentStatus,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -1028,11 +1057,15 @@ class _DailyRevenueChart extends StatelessWidget {
                         getTitlesWidget: (value, meta) {
                           switch (value.toInt()) {
                             case 0:
-                              return const Text('Success');
+                              return Text(
+                                AppLocalizations.of(context)!.success,
+                              );
                             case 1:
-                              return const Text('Pending');
+                              return Text(
+                                AppLocalizations.of(context)!.pending,
+                              );
                             case 2:
-                              return const Text('Failed');
+                              return Text(AppLocalizations.of(context)!.failed);
                             default:
                               return const Text('');
                           }
@@ -1050,13 +1083,13 @@ class _DailyRevenueChart extends StatelessWidget {
                         String status;
                         switch (group.x.toInt()) {
                           case 0:
-                            status = 'Success';
+                            status = AppLocalizations.of(context)!.success;
                             break;
                           case 1:
-                            status = 'Pending';
+                            status = AppLocalizations.of(context)!.pending;
                             break;
                           case 2:
-                            status = 'Failed';
+                            status = AppLocalizations.of(context)!.failed;
                             break;
                           default:
                             status = '';
@@ -1087,7 +1120,7 @@ class _DailyRevenueChart extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              "Revenue by Religion",
+              AppLocalizations.of(context)!.revenueByReligion,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -1173,7 +1206,7 @@ class _DailyRevenueChart extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              "Revenue by Caste",
+              AppLocalizations.of(context)!.revenueByCaste,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -1284,7 +1317,7 @@ class _RegionRevenueList extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Revenue by Region",
+                AppLocalizations.of(context)!.regions,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -1292,9 +1325,11 @@ class _RegionRevenueList extends StatelessWidget {
             ),
             const Divider(),
             if (regionRevenue.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: Text("No region data available")),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Center(
+                  child: Text(AppLocalizations.of(context)!.noRegionData),
+                ),
               )
             else
               ...regionRevenue.entries.map((e) {

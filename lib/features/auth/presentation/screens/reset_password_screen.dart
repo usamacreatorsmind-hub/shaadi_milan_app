@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_labels.dart';
 import '../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../app/router/app_router.dart';
+import '../../../../core/constants/app_labels.dart';
 import '../providers/auth_providers.dart';
 
 @RoutePage()
@@ -32,7 +32,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     final authRepo = ref.watch(authRepositoryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppLabels.resetPassword(context)), centerTitle: true),
+      appBar: AppBar(
+        title: Text(AppLabels.resetPassword(context)),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Column(
@@ -79,7 +82,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     prefixIcon: Icons.email,
                     iconColor: theme.colorScheme.primary,
                     label: AppLabels.email(context),
-                    hint: "name@example.com",
+                    hint: AppLabels.emailHint(context),
                     obscureText: false,
                     keyboardType: TextInputType.emailAddress,
                   ),
@@ -100,9 +103,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(
-                                AppLabels.resetLinkSent(context),
-                              ),
+                              content: Text(AppLabels.resetLinkSent(context)),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
@@ -115,7 +116,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                           switch (e.code) {
                             case 'user-not-found':
-                              message = AppLabels.userNotFoundWithEmail(context);
+                              message = AppLabels.userNotFoundWithEmail(
+                                context,
+                              );
                               break;
 
                             case 'invalid-email':
@@ -127,7 +130,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                               break;
 
                             default:
-                              message = AppLabels.unableToSendResetLink(context);
+                              message = AppLabels.unableToSendResetLink(
+                                context,
+                              );
                           }
 
                           ScaffoldMessenger.of(context).showSnackBar(

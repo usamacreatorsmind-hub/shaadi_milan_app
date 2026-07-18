@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 // WishlistEntity.fromMapForViewer(
 //   doc.data(),
 //   viewerId: userId,
@@ -210,8 +211,8 @@ class WishlistEntity {
 class UserEntity {
   final String uid;
   final String email;
-  final String gender;
-  final String fullName;
+  final BilingualValue gender;
+  final BilingualValue fullName;
   final String phone;
   final String agentId;
   final String userType;
@@ -248,10 +249,10 @@ class UserEntity {
   factory UserEntity.empty() => UserEntity(
     profileStatus: 'active',
     profileImageUrl: '',
-    gender: "",
+    gender: BilingualValue.empty(),
     uid: '',
     email: '',
-    fullName: '',
+    fullName: BilingualValue.empty(),
     phone: '',
     agentId: '',
     userType: '',
@@ -268,9 +269,9 @@ class UserEntity {
     return {
       'profileImageUrl': profileImageUrl,
       'uid': uid,
-      'gender': gender,
+      'gender': gender.toMap(),
       'email': email,
-      'fullName': fullName,
+      'fullName': fullName.toMap(),
       'phone': phone,
       'agentId': agentId,
       'userType': userType,
@@ -303,9 +304,13 @@ class UserEntity {
       profileStatus: map['profileStatus'] ?? 'active',
       profileImageUrl: map['profileImageUrl'] ?? '',
       uid: map['uid'] ?? '',
-      gender: map['gender'] ?? '',
+      gender: map['gender'] is Map
+          ? BilingualValue.fromMap(Map<String, dynamic>.from(map['gender']))
+          : BilingualValue(en: map['gender']?.toString() ?? '', hi: ''),
       email: map['email'] ?? '',
-      fullName: map['fullName'] ?? '',
+      fullName: map['fullName'] is Map
+          ? BilingualValue.fromMap(Map<String, dynamic>.from(map['fullName']))
+          : BilingualValue(en: map['fullName']?.toString() ?? '', hi: ''),
       phone: map['phone'] ?? '',
       agentId: map['agentId'] ?? '',
       userType: map['userType'] ?? '',
@@ -323,8 +328,8 @@ class UserEntity {
   UserEntity copyWith({
     String? uid,
     String? email,
-    String? fullName,
-    String? gender,
+    BilingualValue? fullName,
+    BilingualValue? gender,
     String? profileStatus,
     String? phone,
     String? agentId,

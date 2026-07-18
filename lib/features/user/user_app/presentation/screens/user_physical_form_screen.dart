@@ -1,12 +1,14 @@
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../../../../core/enums/enum.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 
-import '../controllers/user_physical_controllers.dart';
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../core/constants/app_labels.dart';
+import '../../../../../core/enums/enum.dart';
+import '../../../../translitration/widgets/bilingual_text_field.dart';
 import '../../domain/states/physical_state.dart';
+import '../controllers/user_physical_controllers.dart';
 
 @RoutePage()
 class UserPhysicalFormScreen extends ConsumerStatefulWidget {
@@ -30,11 +32,33 @@ class _UserPhysicalFormScreenState
   final _formKey = GlobalKey<FormState>();
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
-  final _bodyTypeController = TextEditingController();
-  final _complexionController = TextEditingController();
   final _disabilityDetailsController = TextEditingController();
+  final _disabilityDetailsEnController = TextEditingController();
+
+  BilingualValue? _selectedBodyType;
+  BilingualValue? _selectedComplexion;
 
   bool _physicallyChallenged = false;
+
+  final Map<String, BilingualValue> _bodyTypeOptions = {
+    'Slim': BilingualValue(hi: 'दुबला', en: 'Slim'),
+    'Athletic': BilingualValue(hi: 'एथलेटिक', en: 'Athletic'),
+    'Average': BilingualValue(hi: 'औसत', en: 'Average'),
+    'Heavy': BilingualValue(hi: 'भारी', en: 'Heavy'),
+    'Muscular': BilingualValue(hi: 'पेशी', en: 'Muscular'),
+    'Obese': BilingualValue(hi: 'मोटापा', en: 'Obese'),
+  };
+
+  final Map<String, BilingualValue> _complexionOptions = {
+    'Very Fair': BilingualValue(hi: 'बहुत गोरा', en: 'Very Fair'),
+    'Fair': BilingualValue(hi: 'गोरा', en: 'Fair'),
+    'Wheatish': BilingualValue(hi: 'गेहुँआ', en: 'Wheatish'),
+    'Dark': BilingualValue(hi: 'सांवला', en: 'Dark'),
+    'Brown': BilingualValue(hi: 'भूरा', en: 'Brown'),
+    'Dusky': BilingualValue(hi: 'सांवला-सलोना', en: 'Dusky'),
+    'Dark Brown': BilingualValue(hi: 'गहरा भूरा', en: 'Dark Brown'),
+    'Black': BilingualValue(hi: 'काला', en: 'Black'),
+  };
 
   @override
   void initState() {
@@ -46,40 +70,19 @@ class _UserPhysicalFormScreenState
       _heightController.text = profile.height.toString();
       _weightController.text = profile.weight.toString();
 
-      const bodyTypes = [
-        'Slim',
-        'Athletic',
-        'Average',
-        'Heavy',
-        'Muscular',
-        'Obese',
-      ];
-      final bodyTypeMatch = bodyTypes.where(
-        (e) => e.toLowerCase() == profile.bodyType.toLowerCase(),
+      _selectedBodyType = _bodyTypeOptions.values.firstWhere(
+        (e) => e.en == profile.bodyType.en,
+        orElse: () => profile.bodyType,
       );
-      _bodyTypeController.text = bodyTypeMatch.isNotEmpty
-          ? bodyTypeMatch.first
-          : '';
 
-      const complexions = [
-        'Very Fair',
-        'Fair',
-        'Wheatish',
-        'Dark',
-        'Brown',
-        'Duskey',
-        'Dark Brown',
-        'Black',
-      ];
-      final complexionMatch = complexions.where(
-        (e) => e.toLowerCase() == profile.complexion.toLowerCase(),
+      _selectedComplexion = _complexionOptions.values.firstWhere(
+        (e) => e.en == profile.complexion.en,
+        orElse: () => profile.complexion,
       );
-      _complexionController.text = complexionMatch.isNotEmpty
-          ? complexionMatch.first
-          : '';
 
       _physicallyChallenged = profile.physicallyChallenged;
-      _disabilityDetailsController.text = profile.disabilityDetails ?? '';
+      _disabilityDetailsController.text = profile.disabilityDetails?.hi ?? '';
+      _disabilityDetailsEnController.text = profile.disabilityDetails?.en ?? '';
     }
   }
 
@@ -87,38 +90,43 @@ class _UserPhysicalFormScreenState
   void dispose() {
     _heightController.dispose();
     _weightController.dispose();
-    _bodyTypeController.dispose();
-    _complexionController.dispose();
     _disabilityDetailsController.dispose();
+    _disabilityDetailsEnController.dispose();
     super.dispose();
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
+      if (_selectedBodyType == null || _selectedComplexion == null) {
+        return;
+      }
+
       final notifier = ref.read(userPhysicalControllerProvider.notifier);
+
+      final disability = _physicallyChallenged
+          ? BilingualValue(
+              hi: _disabilityDetailsController.text,
+              en: _disabilityDetailsEnController.text,
+            )
+          : null;
 
       if (widget.mode == FormMode.create) {
         notifier.savePhysicals(
           height: double.parse(_heightController.text),
           weight: double.parse(_weightController.text),
-          bodyType: _bodyTypeController.text,
-          complexion: _complexionController.text,
+          bodyType: _selectedBodyType!,
+          complexion: _selectedComplexion!,
           physicallyChallenged: _physicallyChallenged,
-          disabilityDetails: _physicallyChallenged
-              ? _disabilityDetailsController.text
-              : null,
+          disabilityDetails: disability,
         );
       } else {
-        // Update logic (using savePhysicals as upsert)
         notifier.updatePhysicals(
           height: double.parse(_heightController.text),
           weight: double.parse(_weightController.text),
-          bodyType: _bodyTypeController.text,
-          complexion: _complexionController.text,
+          bodyType: _selectedBodyType!,
+          complexion: _selectedComplexion!,
           physicallyChallenged: _physicallyChallenged,
-          disabilityDetails: _physicallyChallenged
-              ? _disabilityDetailsController.text
-              : null,
+          disabilityDetails: disability,
         );
       }
     }
@@ -127,6 +135,7 @@ class _UserPhysicalFormScreenState
   @override
   Widget build(BuildContext context) {
     final physicalState = ref.watch(userPhysicalControllerProvider);
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
     ref.listen<PhysicalState>(userPhysicalControllerProvider, (
       previous,
@@ -138,7 +147,9 @@ class _UserPhysicalFormScreenState
         ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
       } else if (current.physical != null && !physicalState.isLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLabels.physicalProfileSavedSuccessfully(context))),
+          SnackBar(
+            content: Text(AppLabels.physicalProfileSavedSuccessfully(context)),
+          ),
         );
       }
     });
@@ -164,9 +175,10 @@ class _UserPhysicalFormScreenState
                 hint: AppLabels.heightHint(context),
                 obscureText: false,
                 keyboardType: TextInputType.number,
-                validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
+                validator: (v) => v == null || v.isEmpty
+                    ? AppLabels.isRequired(context)
+                    : null,
               ),
-
               const SizedBox(height: 16),
               AppTextField(
                 controller: _weightController,
@@ -176,64 +188,42 @@ class _UserPhysicalFormScreenState
                 hint: AppLabels.weightHint(context),
                 obscureText: false,
                 keyboardType: TextInputType.number,
-                validator: (v) => v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
+                validator: (v) => v == null || v.isEmpty
+                    ? AppLabels.isRequired(context)
+                    : null,
               ),
               const SizedBox(height: 16),
-
-              AppDropDown(
+              AppDropDown<BilingualValue>(
                 label: AppLabels.selectBodyType(context),
-                items: [
-                  AppLabels.slim(context),
-                  AppLabels.athletic(context),
-                  AppLabels.average(context),
-                  AppLabels.heavy(context),
-                  AppLabels.muscular(context),
-                  AppLabels.obese(context),
-                ],
-
-                value: _bodyTypeController.text.isEmpty
-                    ? null
-                    : _bodyTypeController.text,
+                items: _bodyTypeOptions.values.toList(),
+                value: _selectedBodyType,
+                itemLabel: (type) => isHindi ? type.hi : type.en,
                 onChanged: (value) {
-                  setState(() => _bodyTypeController.text = value!);
+                  setState(() => _selectedBodyType = value);
                 },
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null) {
                     return AppLabels.selectBodyType(context);
                   }
                   return null;
                 },
               ),
-
               const SizedBox(height: 16),
-              AppDropDown(
+              AppDropDown<BilingualValue>(
                 label: AppLabels.selectComplexion(context),
-
-                items: [
-                  AppLabels.veryFair(context),
-                  AppLabels.fair(context),
-                  AppLabels.wheatish(context),
-                  AppLabels.dark(context),
-                  AppLabels.brown(context),
-                  AppLabels.dusky(context),
-                  AppLabels.darkBrown(context),
-                  AppLabels.blackComplexion(context),
-                ],
-
-                value: _complexionController.text.isEmpty
-                    ? null
-                    : _complexionController.text,
+                items: _complexionOptions.values.toList(),
+                value: _selectedComplexion,
+                itemLabel: (comp) => isHindi ? comp.hi : comp.en,
                 onChanged: (value) {
-                  setState(() => _complexionController.text = value!);
+                  setState(() => _selectedComplexion = value);
                 },
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null) {
                     return AppLabels.selectComplexion(context);
                   }
                   return null;
                 },
               ),
-
               const SizedBox(height: 16),
               AppSwitch(
                 title: AppLabels.physicallyChallenged(context),
@@ -244,22 +234,19 @@ class _UserPhysicalFormScreenState
                   });
                 },
               ),
-
               if (_physicallyChallenged) ...[
                 const SizedBox(height: 16),
-                AppTextField(
+                BilingualTextField(
                   controller: _disabilityDetailsController,
+                  englishController: _disabilityDetailsEnController,
                   prefixIcon: Icons.accessible,
-                  iconColor: Theme.of(context).colorScheme.primary,
                   label: AppLabels.disabilityDetails(context),
                   hint: AppLabels.disabilityDetailsHint(context),
-                  obscureText: false,
-                  keyboardType: TextInputType.text,
-                  validator: (v) =>
-                      v == null || v.isEmpty ? AppLabels.pleaseEnter(context) : null,
+                  validator: (v) => v == null || v.isEmpty
+                      ? AppLabels.pleaseEnter(context)
+                      : null,
                 ),
               ],
-
               const SizedBox(height: 20),
               if (physicalState.isLoading)
                 const CircularProgressIndicator()

@@ -1,13 +1,13 @@
-import '../../../../core/constants/app_labels.dart';
-import '../../../../app/custom/custom_widgets/validators.dart';
-import '../providers/auth_providers.dart';
-
-import '../../../../app/router/app_router.dart';
-import '../../../../app/custom/custom_widgets/widgets.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../app/custom/custom_widgets/validators.dart';
+import '../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../app/router/app_router.dart';
+import '../../../../core/constants/app_labels.dart';
+import '../providers/auth_providers.dart';
 
 @RoutePage()
 class ChangePasswordScreen extends ConsumerStatefulWidget {
@@ -42,7 +42,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
     if (user == null) {
       if (!mounted) return;
-      context.router.replaceAll([ UserLoginRoute()]);
+      context.router.replaceAll([UserLoginRoute()]);
       return;
     }
 
@@ -82,7 +82,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
           message = AppLabels.noInternet(context);
           break;
         default:
-          message = "Failed to change password: ${e.message}";
+          message = AppLabels.failedToChangePassword(context, e.message ?? '');
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
@@ -103,7 +103,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppLabels.changePassword(context)), centerTitle: true),
+      appBar: AppBar(
+        title: Text(AppLabels.changePassword(context)),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Form(
@@ -152,7 +155,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       prefixIcon: Icons.lock,
                       iconColor: theme.colorScheme.primary,
                       label: AppLabels.currentPassword(context),
-                      hint: "••••••••",
+                      hint: AppLabels.passwordHint(context),
                       obscureText: true,
                       keyboardType: TextInputType.visiblePassword,
                       validator: (value) {
@@ -168,11 +171,12 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       prefixIcon: Icons.lock_outline,
                       iconColor: theme.colorScheme.primary,
                       label: AppLabels.newPassword(context),
-                      hint: "••••••••",
+                      hint: AppLabels.passwordHint(context),
                       obscureText: true,
 
                       keyboardType: TextInputType.visiblePassword,
-                      validator: (value) => Validators.validatePassword(context, value),
+                      validator: (value) =>
+                          Validators.validatePassword(context, value),
                     ),
                     const SizedBox(height: 16),
                     AppTextField(
@@ -180,7 +184,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       prefixIcon: Icons.lock_reset,
                       iconColor: theme.colorScheme.primary,
                       label: AppLabels.confirmNewPassword(context),
-                      hint: "••••••••",
+                      hint: AppLabels.passwordHint(context),
                       obscureText: true,
                       keyboardType: TextInputType.visiblePassword,
                       validator: (value) => Validators.validateConfirmPassword(
@@ -211,9 +215,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          AppLabels.mustBeLoggedInToReset(context),
-                        ),
+                        content: Text(AppLabels.mustBeLoggedInToReset(context)),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
@@ -242,7 +244,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                         message = AppLabels.userNotFound(context);
                         break;
                       default:
-                        message = "Failed to send reset email: ${e.message}";
+                        message = AppLabels.failedToSendResetEmail(
+                          context,
+                          e.message ?? '',
+                        );
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -254,7 +259,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text("${AppLabels.somethingWentWrong(context)}: $e"),
+                        content: Text(
+                          "${AppLabels.somethingWentWrong(context)}: $e",
+                        ),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );

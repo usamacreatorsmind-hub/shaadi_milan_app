@@ -1,7 +1,6 @@
 import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
-import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
-import 'package:shadi_milan/features/user/user_app/domain/repositories/user_recemmonded_repository.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_state.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
@@ -68,24 +67,57 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
 
     final homeState = ref.watch(homeControllerProvider);
     final filter = ref.watch(homeFilterProvider);
-    // COMMENTED OUT AS PER REQUEST
-    // final recommendedIdsAsync = ref.watch(currentUserRecommendedIdsProvider);
-    // final recommendedProfileIds =
-    //     recommendedIdsAsync.asData?.value ?? const <String>[];
-    // final recommendedProfileIdSet = recommendedProfileIds.toSet();
+    final locationAsync = ref.watch(locationJsonProvider);
+    final religionsAsync = ref.watch(religionsProvider);
 
     String filterText = '';
-    if ((filter.city ?? '').isNotEmpty) {
-      filterText = '${filter.city}, ${filter.state}';
-    } else if ((filter.state ?? '').isNotEmpty) {
-      filterText = filter.state;
+
+    // We need to resolve names from IDs for better UI display
+    final resolvedState = filter.state;
+    String resolvedCity = filter.city;
+    String resolvedReligion = filter.religion;
+    String resolvedCaste = filter.caste;
+
+    if (locationAsync.hasValue) {
+      final states = locationAsync.value!;
+      final stateObj = states.where((s) => s.name == filter.state).firstOrNull;
+      if (stateObj != null) {
+        final cityObj = stateObj.cities
+            .where((c) => c.id == filter.city || c.name == filter.city)
+            .firstOrNull;
+        if (cityObj != null) {
+          resolvedCity = cityObj.name;
+        }
+      }
     }
 
-    if ((filter.religion ?? '').isNotEmpty) {
+    if (religionsAsync.hasValue) {
+      final religions = religionsAsync.value!;
+      final religionObj = religions
+          .where((r) => r.id == filter.religion || r.name == filter.religion)
+          .firstOrNull;
+      if (religionObj != null) {
+        resolvedReligion = religionObj.name;
+        final casteObj = religionObj.castes
+            .where((c) => c.id == filter.caste || c.name == filter.caste)
+            .firstOrNull;
+        if (casteObj != null) {
+          resolvedCaste = casteObj.name;
+        }
+      }
+    }
+
+    if (resolvedCity.isNotEmpty) {
+      filterText = '$resolvedCity, $resolvedState';
+    } else if (resolvedState.isNotEmpty) {
+      filterText = resolvedState;
+    }
+
+    if (resolvedReligion.isNotEmpty) {
       if (filterText.isNotEmpty) filterText += ' | ';
-      filterText += filter.religion;
-      if ((filter.caste ?? '').isNotEmpty) {
-        filterText += ' (${filter.caste})';
+      filterText += resolvedReligion;
+      if (resolvedCaste.isNotEmpty) {
+        filterText += ' ($resolvedCaste)';
       }
     }
 
@@ -243,7 +275,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     child: _HomeSummaryCard(
-                      fullName: user.fullName,
+                      fullName: user.fullName.en,
                       hasFilter: filterText.isNotEmpty,
                       filterText: filterText.isEmpty
                           ? AppLabels.allProfiles(context)
@@ -336,45 +368,45 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
 
                       // If no state is selected, or if state matches
                       final stateMatch =
-                          (filter.state ?? '').isEmpty ||
-                          (profile.address.state.toLowerCase() ==
-                              filter.state!.toLowerCase());
+                          filter.state.isEmpty ||
+                          (profile.address.state.en.toLowerCase() ==
+                              filter.state.toLowerCase());
                       // If no city is selected, or if city matches
                       final cityMatch =
-                          (filter.city ?? '').isEmpty ||
-                          (profile.address.city.toLowerCase() ==
-                              filter.city!.toLowerCase());
+                          filter.city.isEmpty ||
+                          (profile.address.city.en.toLowerCase() ==
+                              filter.city.toLowerCase());
 
                       // If no religion is selected, or if religion matches
                       final religionMatch =
-                          (filter.religion ?? '').isEmpty ||
-                          (profile.cultural.religion.toLowerCase() ==
-                              filter.religion!.toLowerCase());
+                          filter.religion.isEmpty ||
+                          (profile.cultural.religion.en.toLowerCase() ==
+                              filter.religion.toLowerCase());
 
                       // If no caste is selected, or if caste matches
                       final casteMatch =
-                          (filter.caste ?? '').isEmpty ||
-                          (profile.cultural.caste.toLowerCase() ==
-                              filter.caste!.toLowerCase());
+                          filter.caste.isEmpty ||
+                          (profile.cultural.caste.en.toLowerCase() ==
+                              filter.caste.toLowerCase());
 
                       // Gender matching logic
                       bool genderMatch;
-                      final filterGender = (filter.gender ?? '');
+                      final filterGender = filter.gender;
                       if (filterGender.isEmpty) {
                         // Initial/Default state: show opposite gender
                         final currentUserGender =
-                            (user.gender ?? '').toLowerCase();
+                            user.gender.en.toLowerCase();
                         final opposite =
                             (currentUserGender == 'male') ? 'female' : 'male';
                         genderMatch =
-                            profile.identity.gender.toLowerCase() == opposite;
+                            profile.identity.gender.en.toLowerCase() == opposite;
                       } else if (filterGender == AppLabels.allProfiles(context)) {
                         // Explicitly show all
                         genderMatch = true;
                       } else {
                         // Filter by specific gender
                         genderMatch =
-                            profile.identity.gender.toLowerCase() ==
+                            profile.identity.gender.en.toLowerCase() ==
                             filterGender.toLowerCase();
                       }
 
@@ -445,7 +477,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                           final profile = viewModel.profile;
                           final user = viewModel.user;
                           final agent = viewModel.agent;
-                          final displayName = user?.fullName ?? 'N/A';
+                          final displayName = user?.fullName.en ?? 'N/A';
                           final designation = profile.employment.designation;
 
                           return Padding(
@@ -458,11 +490,11 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                               name: displayName.isEmpty ? 'N/A' : displayName,
                               age: profile.identity.age,
                               designation:
-                                  (designation == null || designation.isEmpty)
-                                      ? 'N/A'
-                                      : designation,
+                                  designation?.isNotEmpty == true
+                                      ? designation!
+                                      : 'N/A',
                               imageUrl: profile.images.primaryImageUrl,
-                              agentDesignation: agent != null ? agent.designation.label : null,
+                              agentDesignation: agent?.designation.label,
                             ),
                           );
                         }, childCount: visibleProfiles.length),
@@ -618,41 +650,41 @@ class FilterRightSheet extends ConsumerWidget {
                             const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('Error: $e'),
                         data: (states) {
-                          /// All state names from JSON
-                          final stateNames = states.map((e) => e.name).toList();
-
                           /// Selected state object
-                          final selectedState = states.firstWhere(
-                            (s) => s.name == filter.state,
-                            orElse: () => StateCityModel(name: '', cities: []),
-                          );
+                          final selectedState = states
+                              .where((s) => s.name == filter.state)
+                              .firstOrNull;
+
+                          final selectedCity = selectedState?.cities
+                              .where((c) => c.id == filter.city || c.name == filter.city)
+                              .firstOrNull;
 
                           return Column(
                             children: [
-                              _buildDropdown(
+                              _buildDropdown<StateCityModel>(
                                 title: AppLabels.state(context),
-                                value: filter.state.isEmpty
-                                    ? null
-                                    : filter.state,
-                                items: stateNames,
+                                value: selectedState,
+                                items: states,
+                                itemLabel: (s) => s.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
                                         .read(homeFilterProvider.notifier)
-                                        .updateState(val);
+                                        .updateState(val.name);
                                   }
                                 },
                               ),
                               const SizedBox(height: 12),
-                              _buildDropdown(
+                              _buildDropdown<CityModel>(
                                 title: AppLabels.city(context),
-                                value: filter.city.isEmpty ? null : filter.city,
-                                items: selectedState.cities,
+                                value: selectedCity,
+                                items: selectedState?.cities ?? [],
+                                itemLabel: (c) => c.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
                                         .read(homeFilterProvider.notifier)
-                                        .updateCity(val);
+                                        .updateCity(val.id);
                                   }
                                 },
                               ),
@@ -673,10 +705,11 @@ class FilterRightSheet extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      _buildDropdown(
+                      _buildDropdown<String>(
                         title: AppLabels.gender(context),
-                        value: (filter.gender ?? '').isEmpty ? null : filter.gender,
+                        value: filter.gender.isEmpty ? null : filter.gender,
                         items: [AppLabels.allProfiles(context), AppLabels.male(context), AppLabels.female(context)],
+                        itemLabel: (g) => g,
                         onChanged: (val) {
                           if (val != null) {
                             ref
@@ -703,44 +736,40 @@ class FilterRightSheet extends ConsumerWidget {
                             const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('Error: $e'),
                         data: (religions) {
-                          final religionNames = religions
-                              .map((r) => r.name)
-                              .toList();
+                          final selectedReligion = religions
+                              .where((r) => r.id == filter.religion || r.name == filter.religion)
+                              .firstOrNull;
 
-                          final selectedReligion = religions.firstWhere(
-                            (r) => r.name == filter.religion,
-                            orElse: () =>
-                                ReligionModel(id: '', name: '', castes: []),
-                          );
+                          final selectedCaste = selectedReligion?.castes
+                              .where((c) => c.id == filter.caste || c.name == filter.caste)
+                              .firstOrNull;
 
                           return Column(
                             children: [
-                              _buildDropdown(
+                              _buildDropdown<ReligionCasteModel>(
                                 title: AppLabels.religion(context),
-                                value: filter.religion.isEmpty
-                                    ? null
-                                    : filter.religion,
-                                items: religionNames,
+                                value: selectedReligion,
+                                items: religions,
+                                itemLabel: (r) => r.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
                                         .read(homeFilterProvider.notifier)
-                                        .updateReligion(val);
+                                        .updateReligion(val.id);
                                   }
                                 },
                               ),
                               const SizedBox(height: 12),
-                              _buildDropdown(
+                              _buildDropdown<CasteModel>(
                                 title: AppLabels.caste(context),
-                                value: filter.caste.isEmpty
-                                    ? null
-                                    : filter.caste,
-                                items: selectedReligion.castes,
+                                value: selectedCaste,
+                                items: selectedReligion?.castes ?? [],
+                                itemLabel: (c) => c.name,
                                 onChanged: (val) {
                                   if (val != null) {
                                     ref
                                         .read(homeFilterProvider.notifier)
-                                        .updateCaste(val);
+                                        .updateCaste(val.id);
                                   }
                                 },
                               ),
@@ -770,21 +799,23 @@ class FilterRightSheet extends ConsumerWidget {
   }
 
   /// ================= DROPDOWN BUILDER =================
-  static Widget _buildDropdown({
+  static Widget _buildDropdown<T>({
     required String title,
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
+    required T? value,
+    required List<T> items,
+    required String Function(T) itemLabel,
+    required ValueChanged<T?> onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
-        DropdownButtonFormField<String>(
-          value: value,
+        DropdownButtonFormField<T>(
+          isExpanded: true,
+          value: items.contains(value) ? value : null,
           items: items
-              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .map((e) => DropdownMenuItem<T>(value: e, child: Text(itemLabel(e))))
               .toList(),
           onChanged: onChanged,
           decoration: InputDecoration(
@@ -803,7 +834,7 @@ class ProfileCard extends StatelessWidget {
   final String uid;
   final String name;
   final int age;
-  final String designation;
+  final dynamic designation;
   final String imageUrl;
   final String? agentDesignation;
 
@@ -942,15 +973,25 @@ class ProfileCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 5),
                               Expanded(
-                                child: Text(
-                                  designation,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                child: designation is BilingualValue
+                                    ? BilingualParser(
+                                        value: designation,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      )
+                                    : Text(
+                                        designation.toString(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                               ),
                             ],
                           ),

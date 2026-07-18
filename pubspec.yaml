@@ -90,6 +90,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   auto_route: ^11.1.0
+  cloud_functions: ^6.3.5
 
 dev_dependencies:
   flutter_test:
@@ -118,6 +119,7 @@ dependency_overrides:
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -131,9 +133,10 @@ flutter:
     #   - images/a_dot_burr.jpeg
     - assets/images/
     - assets/logo.png
-
-    - assets/data/location.json
-    - assets/data/religion_caste.json
+    - assets/data/location_en.json
+    - assets/data/location_hi.json
+    - assets/data/religion_caste_en.json
+    - assets/data/religion_caste_hi.json
     - assets/data/
 
 flutter_launcher_icons:

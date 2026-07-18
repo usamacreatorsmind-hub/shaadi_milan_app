@@ -1,18 +1,17 @@
 import 'dart:io';
 
-import '../../../../auth/domain/states/user_state.dart';
-import '../../../../../../core/constants/app_labels.dart';
-import '../../widgets/pdf_viewer_bottomsheet.dart';
-
-import '../../../../../app/custom/image_picker/image_picker_controller.dart';
-import '../../../../../app/router/app_router.dart';
-import '../../domain/states/image_state.dart';
-import '../controllers/metrimony_profile_controller.dart';
-import '../../../../auth/presentation/providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../../../core/constants/app_labels.dart';
+import '../../../../../app/custom/image_picker/image_picker_controller.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
+import '../../domain/states/image_state.dart';
+import '../../widgets/pdf_viewer_bottomsheet.dart';
+import '../controllers/metrimony_profile_controller.dart';
 
 @RoutePage()
 class UserBiodataCheckScreen extends ConsumerStatefulWidget {
@@ -31,6 +30,8 @@ class _UserBiodataCheckScreenState
   Widget build(BuildContext context) {
     final state = ref.watch(metrimonyControllerProvider);
     final profile = state.metrimony;
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
+
     final authState = ref.watch(authStateProvider);
     final eitherUser = authState.value;
     final currentUser = eitherUser?.fold((l) => null, (r) => r);
@@ -70,36 +71,86 @@ class _UserBiodataCheckScreenState
               AppLabels.selectDateOfBirth(context),
               DateFormat('dd MMM yyyy').format(profile.identity.dob),
             ),
-            _infoRow(AppLabels.ageYrs(context), AppLabels.ageYears(context, profile.identity.age)),
+            _infoRow(
+              AppLabels.ageYrs(context),
+              AppLabels.ageYears(context, profile.identity.age),
+            ),
             _infoRow(AppLabels.aadharNumber(context), profile.identity.aadhar),
-            _infoRow(AppLabels.aboutMe(context), profile.identity.aboutMe),
+            _infoRow(
+              AppLabels.aboutMe(context),
+              isHindi
+                  ? profile.identity.aboutMe.hi
+                  : profile.identity.aboutMe.en,
+            ),
           ]),
 
-          _section(AppLabels.physicalProfile(context), Icons.accessibility_new, [
-            _infoRow(AppLabels.height(context), profile.physical.height),
-            _infoRow(AppLabels.weightKg(context), profile.physical.weight),
-            _infoRow(AppLabels.selectComplexion(context), profile.physical.complexion),
-            _infoRow(AppLabels.selectBodyType(context), profile.physical.bodyType),
-            if (profile.physical.physicallyChallenged)
-              _infoRow(AppLabels.physicallyChallenged(context), AppLabels.success(context)),
-            if (profile.physical.physicallyChallenged &&
-                profile.physical.disabilityDetails != null)
-              _infoRow(AppLabels.details(context), profile.physical.disabilityDetails),
-          ]),
+          _section(
+            AppLabels.physicalProfile(context),
+            Icons.accessibility_new,
+            [
+              _infoRow(AppLabels.height(context), profile.physical.height),
+              _infoRow(AppLabels.weightKg(context), profile.physical.weight),
+              _infoRow(
+                AppLabels.selectComplexion(context),
+                profile.physical.complexion,
+              ),
+              _infoRow(
+                AppLabels.selectBodyType(context),
+                profile.physical.bodyType,
+              ),
+              if (profile.physical.physicallyChallenged)
+                _infoRow(
+                  AppLabels.physicallyChallenged(context),
+                  AppLabels.success(context),
+                ),
+              if (profile.physical.physicallyChallenged &&
+                  profile.physical.disabilityDetails != null)
+                _infoRow(
+                  AppLabels.details(context),
+                  profile.physical.disabilityDetails,
+                ),
+            ],
+          ),
 
           _section(AppLabels.religionAndCaste(context), Icons.temple_hindu, [
             _infoRow(AppLabels.religion(context), profile.cultural.religion),
             _infoRow(AppLabels.caste(context), profile.cultural.caste),
-            _infoRow(AppLabels.subCasteLabel(context), profile.cultural.subCaste),
+            _infoRow(
+              AppLabels.subCasteLabel(context),
+              isHindi
+                  ? profile.cultural.subCaste.hi
+                  : profile.cultural.subCaste.en,
+            ),
             // _infoRow('Mother Tongue', profile.cultural.motherTongue),
-            _chipWrap(AppLabels.languagesKnown(context), profile.cultural.languages),
+            _chipWrap(
+              AppLabels.languagesKnown(context),
+              profile.cultural.languages
+                  .map((l) => isHindi ? l.hi : l.en)
+                  .toList(),
+            ),
           ]),
 
           _section(AppLabels.education(context), Icons.school, [
-            _infoRow(AppLabels.collegeUniversity(context), profile.education.education?.college),
-            _infoRow(AppLabels.degreeCourse(context), profile.education.education?.course),
-            _infoRow(AppLabels.percentageCGPA(context), profile.education.education?.percentage),
-            _infoRow(AppLabels.passingYear(context), profile.education.education?.passingYear),
+            _infoRow(
+              AppLabels.collegeUniversity(context),
+              isHindi
+                  ? profile.education.education?.college.hi
+                  : profile.education.education?.college.en,
+            ),
+            _infoRow(
+              AppLabels.degreeCourse(context),
+              isHindi
+                  ? profile.education.education?.course.hi
+                  : profile.education.education?.course.en,
+            ),
+            _infoRow(
+              AppLabels.percentageCGPA(context),
+              profile.education.education?.percentage,
+            ),
+            _infoRow(
+              AppLabels.passingYear(context),
+              profile.education.education?.passingYear,
+            ),
 
             // add additional courses
             // Languages
@@ -107,30 +158,67 @@ class _UserBiodataCheckScreenState
             // Additional Courses (Firebase)
             _chipWrap(
               AppLabels.additionalQualifications(context),
-              profile.education.extraQualification?.qualifications ?? [],
+              (profile.education.extraQualification?.qualifications ?? [])
+                  .map((q) => isHindi ? q.hi : q.en)
+                  .toList(),
             ),
           ]),
 
           _section(AppLabels.employmentDetails(context), Icons.work, [
-            _infoRow(AppLabels.organization(context), profile.employment.company),
-            _infoRow(AppLabels.role(context), profile.employment.designation),
-            _infoRow(AppLabels.annualIncome(context), profile.employment.annualIncome),
-            _infoRow(AppLabels.designation(context), profile.employment.designation),
+            _infoRow(
+              AppLabels.organization(context),
+              isHindi
+                  ? profile.employment.company?.hi
+                  : profile.employment.company?.en,
+            ),
+            _infoRow(
+              AppLabels.role(context),
+              isHindi
+                  ? profile.employment.designation?.hi
+                  : profile.employment.designation?.en,
+            ),
+            _infoRow(
+              AppLabels.annualIncome(context),
+              profile.employment.annualIncome,
+            ),
+            _infoRow(
+              AppLabels.designation(context),
+              isHindi
+                  ? profile.employment.designation?.hi
+                  : profile.employment.designation?.en,
+            ),
             _infoRow(AppLabels.jobType(context), profile.employment.jobType),
           ]),
 
           _section(AppLabels.familyDetails(context), Icons.family_restroom, [
             _infoRow(AppLabels.fatherName(context), profile.family.fatherName),
             _infoRow(AppLabels.motherName(context), profile.family.motherName),
-            _infoRow(AppLabels.numberOfBrothers(context), profile.family.numberOfBrothers),
-            _infoRow(AppLabels.numberOfSisters(context), profile.family.numberOfSisters),
+            _infoRow(
+              AppLabels.numberOfBrothers(context),
+              profile.family.numberOfBrothers,
+            ),
+            _infoRow(
+              AppLabels.numberOfSisters(context),
+              profile.family.numberOfSisters,
+            ),
             _infoRow(AppLabels.familyType(context), profile.family.familyType),
-            _infoRow(AppLabels.lifeStyleStatus(context), profile.family.familyStatus),
+            _infoRow(
+              AppLabels.lifeStyleStatus(context),
+              profile.family.familyStatus,
+            ),
           ]),
 
           _section(AppLabels.location(context), Icons.location_on, [
-            _infoRow(AppLabels.location(context), profile.address.addressLine1),
-            _infoRow(AppLabels.post(context), profile.address.post),
+            _infoRow(
+              AppLabels.location(context),
+              isHindi
+                  ? profile.address.addressLine1.hi
+                  : profile.address.addressLine1.en,
+            ),
+            _infoRow(
+              AppLabels.post(context),
+              isHindi ? profile.address.post.hi : profile.address.post.en,
+            ),
             _infoRow(AppLabels.city(context), profile.address.city),
             _infoRow(AppLabels.state(context), profile.address.state),
             _infoRow(AppLabels.pinCodeLabel(context), profile.address.pincode),
@@ -140,48 +228,52 @@ class _UserBiodataCheckScreenState
 
           if (imageState.aadharPdfPath != null &&
               imageState.aadharPdfPath!.isNotEmpty)
-            _section(AppLabels.aadharDocument(context), Icons.document_scanner, [
-              imageState.aadharPdfPath!.toLowerCase().endsWith('.pdf')
-                  ? GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) => PdfViewerBottomsheet(
-                            source: imageState.aadharPdfPath!,
-                            title: AppLabels.aadharDocument(context),
-                            isLocal: true,
-                          ),
-                        );
-                      },
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.picture_as_pdf,
-                            color: Colors.redAccent,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            AppLabels.document(context),
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Theme.of(context).primaryColor,
+            _section(
+              AppLabels.aadharDocument(context),
+              Icons.document_scanner,
+              [
+                imageState.aadharPdfPath!.toLowerCase().endsWith('.pdf')
+                    ? GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) => PdfViewerBottomsheet(
+                              source: imageState.aadharPdfPath!,
+                              title: AppLabels.aadharDocument(context),
+                              isLocal: true,
                             ),
-                          ),
-                        ],
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.picture_as_pdf,
+                              color: Colors.redAccent,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              AppLabels.document(context),
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.file(
+                          File(imageState.aadharPdfPath!),
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: Image.file(
-                        File(imageState.aadharPdfPath!),
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-            ]),
+              ],
+            ),
 
           Container(
             margin: const EdgeInsets.only(top: 20),
@@ -218,7 +310,10 @@ class _UserBiodataCheckScreenState
                   ),
                   child: Text(
                     AppLabels.finalSubmit(context),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -460,7 +555,9 @@ class _UserBiodataCheckScreenState
       );
 
       try {
-        await ref.read(imagePickerProvider.notifier).uploadImages(context, user.uid);
+        await ref
+            .read(imagePickerProvider.notifier)
+            .uploadImages(context, user.uid);
         if (context.mounted) Navigator.pop(context); // Close dialog
       } catch (e) {
         if (context.mounted) {

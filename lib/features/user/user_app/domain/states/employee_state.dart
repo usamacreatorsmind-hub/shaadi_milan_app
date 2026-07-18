@@ -1,9 +1,11 @@
+import '../../../../translitration/models/bilingual_value.dart';
+
 class EmploymentProfile {
-  final String jobType;
-  final String? company;
-  final String? designation;
+  final BilingualValue jobType;
+  final BilingualValue? company;
+  final BilingualValue? designation;
   final int? annualIncome;
-  final String? workLocation;
+  final BilingualValue? workLocation;
 
   EmploymentProfile({
     required this.jobType,
@@ -15,21 +17,33 @@ class EmploymentProfile {
 
   Map<String, dynamic> toMap() {
     return {
-      'jobType': jobType,
-      'company': company,
-      'designation': designation,
+      'jobType': jobType.toMap(),
+      'company': company?.toMap(),
+      'designation': designation?.toMap(),
       'annualIncome': annualIncome,
-      'workLocation': workLocation,
+      'workLocation': workLocation?.toMap(),
     };
   }
 
   factory EmploymentProfile.fromMap(Map<String, dynamic> map) {
+    BilingualValue parseBilingual(dynamic val) {
+      if (val is Map) {
+        return BilingualValue.fromMap(Map<String, dynamic>.from(val));
+      }
+      return BilingualValue(en: val?.toString() ?? '', hi: '');
+    }
+
+    BilingualValue? parseOptionalBilingual(dynamic val) {
+      if (val == null) return null;
+      return parseBilingual(val);
+    }
+
     return EmploymentProfile(
-      jobType: map['jobType'] as String? ?? '',
-      company: map['company'] as String?,
-      designation: map['designation'] as String?,
+      jobType: parseBilingual(map['jobType']),
+      company: parseOptionalBilingual(map['company']),
+      designation: parseOptionalBilingual(map['designation']),
       annualIncome: int.tryParse(map['annualIncome']?.toString() ?? ''),
-      workLocation: map['workLocation'] as String?,
+      workLocation: parseOptionalBilingual(map['workLocation']),
     );
   }
 
@@ -39,11 +53,11 @@ class EmploymentProfile {
   }
 
   EmploymentProfile copyWith({
-    String? jobType,
-    String? company,
-    String? designation,
+    BilingualValue? jobType,
+    BilingualValue? company,
+    BilingualValue? designation,
     int? annualIncome,
-    String? workLocation,
+    BilingualValue? workLocation,
   }) {
     return EmploymentProfile(
       jobType: jobType ?? this.jobType,
@@ -56,7 +70,7 @@ class EmploymentProfile {
 
   factory EmploymentProfile.empty() {
     return EmploymentProfile(
-      jobType: 'Not Working',
+      jobType: BilingualValue.empty(),
       company: null,
       designation: null,
       annualIncome: null,

@@ -146,7 +146,7 @@ class _UserPaymentScreenState
         error: (err, stack) => Center(child: Text("Error: $err")),
         data: (data) {
           final gender = data.user.gender;
-          final isMale = gender.toLowerCase() == 'male';
+          final isMale = gender.en.toLowerCase() == 'male';
           final amountState = isMale ? maleAmountState : femaleAmountState;
 
           return Container(
@@ -346,18 +346,18 @@ class _UserPaymentScreenState
                             debugPrint("Profile: $profile");
 
                             // Extract Address Data (Region/District/State)
-                            final region = profile.address.state.trim().isEmpty
+                            final region = profile.address.state.en.trim().isEmpty
                                 ? "Not Provided"
-                                : profile.address.state;
+                                : profile.address.state.en;
 
-                            final district = profile.address.city.trim().isEmpty
+                            final district = profile.address.city.en.trim().isEmpty
                                 ? "Not Provided"
-                                : profile.address.city;
+                                : profile.address.city.en;
 
                             // Extract Identity Data (Gender)
-                            final gender = user.gender.trim().isEmpty
+                            final gender = user.gender.en.trim().isEmpty
                                 ? "Not Provided"
-                                : user.gender;
+                                : user.gender.en;
 
                             // Extract Phone (user or address)
 
@@ -384,8 +384,8 @@ class _UserPaymentScreenState
                                 .startPayment(
                                   amount: amount,
                                   uid: user.uid,
-                                  email: user.email ?? "N/A",
-                                  fullName: user.fullName ?? "N/A",
+                                  email: user.email.isEmpty ? "N/A" : user.email,
+                                  fullName: user.fullName.en.isEmpty ? "N/A" : user.fullName.en,
                                   phone: user.phone,
                                   agentId: user.agentId,
                                   region: region,

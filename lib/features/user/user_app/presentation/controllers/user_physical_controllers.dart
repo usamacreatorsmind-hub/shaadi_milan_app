@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
@@ -17,10 +18,10 @@ class UserPhysicalController extends StateNotifier<PhysicalState> {
   Future<void> savePhysicals({
     required double height,
     required double weight,
-    required String bodyType,
-    required String complexion,
+    required BilingualValue bodyType,
+    required BilingualValue complexion,
     required bool physicallyChallenged,
-    String? disabilityDetails,
+    BilingualValue? disabilityDetails,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     final physicalProfile = PhysicalProfile(
@@ -45,10 +46,10 @@ class UserPhysicalController extends StateNotifier<PhysicalState> {
   Future<void> updatePhysicals({
     required double height,
     required double weight,
-    required String bodyType,
-    required String complexion,
+    required BilingualValue bodyType,
+    required BilingualValue complexion,
     required bool physicallyChallenged,
-    String? disabilityDetails,
+    BilingualValue? disabilityDetails,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     final physicalProfile = PhysicalProfile(

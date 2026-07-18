@@ -1,8 +1,6 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 
 enum CounterType { words, characters }
@@ -150,6 +148,7 @@ class AppTextField extends ConsumerStatefulWidget {
   final bool showWordCount;
   final int? maxLimit; // Unified max limit for words or characters
   final int maxLines;
+  final void Function(String)? onChanged;
 
   final List<TextInputFormatter>? inputFormatters;
 
@@ -169,7 +168,7 @@ class AppTextField extends ConsumerStatefulWidget {
     this.showWordCount = false,
     this.maxLimit, // Unified max limit
     this.maxLines = 1,
-
+    this.onChanged,
     this.autofillHints = const [],
   });
 
@@ -225,13 +224,15 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
     if (widget.showWordCount) {
       if (widget.counterType == CounterType.words) {
         if (widget.maxLimit != null) {
-          counterText = '$_currentCount / ${widget.maxLimit} ${AppLabels.words(context)}';
+          counterText =
+              '$_currentCount / ${widget.maxLimit} ${AppLabels.words(context)}';
         } else {
           counterText = '$_currentCount ${AppLabels.words(context)}';
         }
       } else {
         if (widget.maxLimit != null) {
-          counterText = '$_currentCount / ${widget.maxLimit} ${AppLabels.characters(context)}';
+          counterText =
+              '$_currentCount / ${widget.maxLimit} ${AppLabels.characters(context)}';
         } else {
           counterText = '$_currentCount ${AppLabels.characters(context)}';
         }
@@ -260,6 +261,7 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
             if (widget.showWordCount) {
               _updateCount();
             }
+            widget.onChanged?.call(value);
           },
           decoration: InputDecoration(
             labelText: widget.label,
@@ -363,30 +365,32 @@ class _SearchWidgetState extends ConsumerState<SearchWidget> {
   }
 }
 
-class AppDropDown extends ConsumerStatefulWidget {
+class AppDropDown<T> extends ConsumerStatefulWidget {
   final String label;
-  final List<String> items;
-  final String? value;
-  final void Function(String?) onChanged;
-  final String? Function(String?)? validator;
+  final List<T> items;
+  final T? value;
+  final String Function(T) itemLabel;
+  final void Function(T?) onChanged;
+  final String? Function(T?)? validator;
 
   const AppDropDown({
     super.key,
     required this.label,
     required this.items,
     required this.value,
+    required this.itemLabel,
     required this.onChanged,
     this.validator,
   });
 
   @override
-  ConsumerState<AppDropDown> createState() => _AppDropDownWidgetState();
+  ConsumerState<AppDropDown<T>> createState() => _AppDropDownWidgetState<T>();
 }
 
-class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
+class _AppDropDownWidgetState<T> extends ConsumerState<AppDropDown<T>> {
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
+    return DropdownButtonFormField<T>(
       isExpanded: true,
       value: widget.items.contains(widget.value) ? widget.value : null,
       decoration: InputDecoration(
@@ -436,9 +440,12 @@ class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
       ),
       items: widget.items
           .map(
-            (item) => DropdownMenuItem<String>(
+            (item) => DropdownMenuItem<T>(
               value: item,
-              child: Text(item, style: const TextStyle(fontSize: 14)),
+              child: Text(
+                widget.itemLabel(item),
+                style: const TextStyle(fontSize: 14),
+              ),
             ),
           )
           .toList(),
@@ -446,7 +453,7 @@ class _AppDropDownWidgetState extends ConsumerState<AppDropDown> {
       validator:
           widget.validator ??
           (value) {
-            if (value == null || value.isEmpty) {
+            if (value == null) {
               return '${AppLabels.pleaseSelect(context)} ${widget.label.toLowerCase()}';
             }
             return null;

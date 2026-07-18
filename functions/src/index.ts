@@ -787,6 +787,10 @@ export const notifyUserOnProfileSuggestion = onDocumentWritten(
 
 
 
+export { transliterate } from "./transliterate";
+
+
+
 // ============================================================
 // Additional triggers can be added here following the same pattern
 // ============================================================

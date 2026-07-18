@@ -59,7 +59,7 @@ class _CreateSupportTicketScreenState
           subject: _subjectController.text.trim(),
           description: _descriptionController.text.trim(),
           userId: userEntity.uid,
-          userName: userEntity.fullName,
+          userName: userEntity.fullName.en,
           userEmail: userEntity.email,
           category: _selectedCategory,
           priority: _selectedPriority,

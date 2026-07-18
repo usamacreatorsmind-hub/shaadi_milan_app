@@ -2,9 +2,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../core/constants/app_labels.dart';
 import '../../../../../core/enums/enum.dart';
+import '../../../../translitration/models/bilingual_value.dart';
+import '../../../../translitration/widgets/bilingual_text_field.dart';
 import '../../domain/states/cultural_state.dart';
 import '../../domain/states/religion_state.dart';
 import '../controllers/user_cultural_controllers.dart';
@@ -30,10 +32,16 @@ class UserCultureFormScreen extends ConsumerStatefulWidget {
 class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _subCasteController = TextEditingController();
-  final _manualCasteController = TextEditingController();
-  final _languagesController = TextEditingController();
+  final _subCasteEnController = TextEditingController();
 
-  final List<String> langauges = [];
+  final _manualCasteController = TextEditingController();
+  final _manualCasteEnController = TextEditingController();
+
+  final _languagesController = TextEditingController();
+  final _languagesEnController = TextEditingController();
+
+  final List<BilingualValue> languages = [];
+
   @override
   void initState() {
     super.initState();
@@ -43,63 +51,83 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
         widget.existingCulturalProfile != null) {
       final cult = widget.existingCulturalProfile!;
 
-      _subCasteController.text = cult.subCaste;
+      _subCasteController.text = cult.subCaste.hi;
+      _subCasteEnController.text = cult.subCaste.en;
 
-      // ✅ Load languages into chips
-      langauges.addAll(cult.languages);
+      languages.addAll(cult.languages);
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref
             .read(religionControllerProvider.notifier)
-            .setReligion(cult.religion);
+            .setReligion(cult.religion.en);
 
-        ref.read(religionControllerProvider.notifier).setCaste(cult.caste);
+        ref.read(religionControllerProvider.notifier).setCaste(cult.caste.en);
       });
     }
   }
 
-  // @override
-  // void dispose() {
-  //   _subCasteController.dispose();
-  //   _languagesController.dispose();
-  //   super.dispose();
-  // }
-  void _submitForm() {
+  void _submitForm() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    final religion = ref.read(religionControllerProvider).religion;
-    var caste = ref.read(religionControllerProvider).caste;
+    final religionId = ref.read(religionControllerProvider).religionId;
+    var casteId = ref.read(religionControllerProvider).casteId;
 
-    if (caste.toLowerCase().trim() == 'other') {
+    BilingualValue religionBilingual = BilingualValue.empty();
+    BilingualValue casteBilingual = BilingualValue.empty();
+
+    final bilingualData = await ref.read(bilingualReligionProvider.future);
+    final religionsMap = bilingualData['religions']!;
+    final castesMap = bilingualData['castes']!;
+
+    if (religionsMap.containsKey(religionId)) {
+      religionBilingual = religionsMap[religionId]!;
+    }
+
+    if (casteId.toLowerCase().trim().contains('other')) {
       final manual = _manualCasteController.text.trim();
+      final manualEn = _manualCasteEnController.text.trim();
       if (manual.isEmpty) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLabels.pleaseSelectCaste(context))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLabels.pleaseSelectCaste(context))),
+        );
         return;
       }
-      caste = manual;
+      casteBilingual = BilingualValue(hi: manual, en: manualEn);
+    } else if (castesMap.containsKey(casteId)) {
+      casteBilingual = castesMap[casteId]!;
     }
 
-    if (_languagesController.text.isNotEmpty) {
-      langauges.add(_languagesController.text.trim());
-    }
+    final notifier = ref.read(cultureControllerProvider.notifier);
 
-    ref
-        .read(cultureControllerProvider.notifier)
-        .saveCultural(
-          religion: religion,
-          caste: caste,
-          subCaste: _subCasteController.text.trim(),
-          languages: langauges, // ✅ FIXED
+    widget.mode == FormMode.create
+        ? notifier.saveCultural(
+          religion: religionBilingual,
+          caste: casteBilingual,
+          subCaste: BilingualValue(
+            hi: _subCasteController.text.trim(),
+            en: _subCasteEnController.text.trim(),
+          ),
+          languages: languages,
+        )
+        : notifier.updateCultural(
+          religion: religionBilingual,
+          caste: casteBilingual,
+          subCaste: BilingualValue(
+            hi: _subCasteController.text.trim(),
+            en: _subCasteEnController.text.trim(),
+          ),
+          languages: languages,
         );
   }
 
   @override
   void dispose() {
     _subCasteController.dispose();
+    _subCasteEnController.dispose();
     _manualCasteController.dispose();
+    _manualCasteEnController.dispose();
     _languagesController.dispose();
+    _languagesEnController.dispose();
     super.dispose();
   }
 
@@ -117,11 +145,13 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
           current.error == null &&
           previous?.isLoading == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLabels.culturalDetailsSavedSuccessfully(context))),
+          SnackBar(
+            content: Text(AppLabels.culturalDetailsSavedSuccessfully(context)),
+          ),
         );
       }
     });
- return  Scaffold(
+    return Scaffold(
       appBar: AppBar(
         title: Text(
           style: Theme.of(context).textTheme.headlineMedium,
@@ -136,72 +166,71 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
           key: _formKey,
           child: ListView(
             children: [
-              // create using dropdown
-
-              /// ================= Religion =================
               Consumer(
                 builder: (context, ref, child) {
                   final religionState = ref.watch(religionControllerProvider);
                   final religionsAsyncValue = ref.watch(religionsProvider);
 
                   return religionsAsyncValue.when(
-                    data: (religions) => AppDropDown(
-                      label: AppLabels.religion(context),
-                      items: religions.map((r) => r.name).toList(),
-                      value: religionState.religion.isEmpty
-                          ? null
-                          : religionState.religion,
-                      onChanged: (value) {
-                        if (value != null) {
-                          ref
-                              .read(religionControllerProvider.notifier)
-                              .setReligion(value);
-                          ref
-                              .read(religionControllerProvider.notifier)
-                              .setCaste('');
-                        }
-                      },
-                      validator: (value) => value == null || value.isEmpty
-                          ? AppLabels.pleaseSelectReligion(context)
-                          : null,
-                    ),
+                    data: (religions) {
+                      final selectedReligion = religions
+                          .where((r) => r.id == religionState.religionId)
+                          .firstOrNull;
+
+                      return AppDropDown<ReligionCasteModel>(
+                        label: AppLabels.religion(context),
+                        items: religions,
+                        value: selectedReligion,
+                        itemLabel: (r) => r.name,
+                        onChanged: (value) {
+                          if (value != null) {
+                            ref
+                                .read(religionControllerProvider.notifier)
+                                .setReligion(value.id);
+                          }
+                        },
+                        validator: (value) => value == null
+                            ? AppLabels.pleaseSelectReligion(context)
+                            : null,
+                      );
+                    },
                     loading: () => const CircularProgressIndicator(),
                     error: (err, _) => Text('Error: $err'),
                   );
                 },
               ),
-
               const SizedBox(height: 16),
-
-              /// ================= Caste =================
               Consumer(
                 builder: (context, ref, child) {
                   final religionState = ref.watch(religionControllerProvider);
 
-                  if (religionState.religion.isEmpty) {
+                  if (religionState.religionId.isEmpty) {
                     return const SizedBox.shrink();
                   }
 
                   final castesAsyncValue = ref.watch(
-                    castesByReligionProvider(religionState.religion),
+                    castesByReligionProvider(religionState.religionId),
                   );
 
                   return castesAsyncValue.when(
                     data: (castes) {
-                      return AppDropDown(
+                      final selectedCaste = castes
+                          .where((c) => c.id == religionState.casteId)
+                          .firstOrNull;
+
+                      return AppDropDown<CasteModel>(
                         label: AppLabels.caste(context),
                         items: castes,
-                        value: religionState.caste.isEmpty
-                            ? null
-                            : religionState.caste,
+                        value: selectedCaste,
+                        itemLabel: (c) => c.name,
                         onChanged: (value) {
                           if (value != null) {
                             ref
                                 .read(religionControllerProvider.notifier)
-                                .setCaste(value);
+                                .setCaste(value.id);
                           }
                         },
-                        validator: (value) => value == null || value.isEmpty
+                        validator: (value) => value == null
                             ? AppLabels.pleaseSelectCaste(context)
                             : null,
                       );
@@ -211,59 +240,55 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                   );
                 },
               ),
-
               const SizedBox(height: 16),
-
-              const SizedBox(height: 12),
-              // If caste is Other, show manual input
-              if (ref.watch(religionControllerProvider).caste.toLowerCase() ==
-                  'other')
+              if (ref
+                  .watch(religionControllerProvider)
+                  .casteId
+                  .toLowerCase()
+                  .contains('other'))
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12.0),
-                  child: AppTextField(
+                  child: BilingualTextField(
                     controller: _manualCasteController,
+                    englishController: _manualCasteEnController,
                     label: AppLabels.specifyCaste(context),
                     hint: AppLabels.specifyCasteHint(context),
                     prefixIcon: Icons.edit,
-                    iconColor: Theme.of(context).colorScheme.primary,
-                    obscureText: false,
-                    keyboardType: TextInputType.text,
-                    validator: (v) => v?.isEmpty == true ? AppLabels.isRequired(context) : null,
+                    validator: (v) => v?.isEmpty == true
+                        ? AppLabels.isRequired(context)
+                        : null,
                   ),
                 ),
-              AppTextField(
+              BilingualTextField(
                 controller: _subCasteController,
+                englishController: _subCasteEnController,
                 label: AppLabels.subCasteLabel(context),
                 hint: AppLabels.subCasteHint(context),
                 prefixIcon: Icons.group_add,
-                validator: (v) => v?.isEmpty == true ? AppLabels.isRequired(context) : null,
-                iconColor: Theme.of(context).colorScheme.primary,
-                obscureText: false,
-                keyboardType: TextInputType.text,
+                validator: (v) =>
+                    v?.isEmpty == true ? AppLabels.isRequired(context) : null,
               ),
               const SizedBox(height: 12),
-
               const SizedBox(height: 24),
+              _sectionHeader(AppLabels.addKnownLanguages(context)),
+              const SizedBox(height: 16),
+              _extraCourseInput(),
+              if (languages.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _extraCourseChips(),
+              ],
+              const SizedBox(height: 32),
               state.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : (widget.registerSubmit != null
                         ? const SizedBox.shrink()
-                        : AppButton(text: AppLabels.apply(context), onPressed: _submitForm)),
-
-              // ========== EXTRA QUALIFICATION SECTION ==========
-              _sectionHeader(AppLabels.additionalQualifications(context)),
-              const SizedBox(height: 16),
-
-              _extraCourseInput(),
-
-              if (langauges.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                _extraCourseChips(),
-              ],
+                        : AppButton(
+                            text: AppLabels.apply(context),
+                            onPressed: _submitForm,
+                          )),
             ],
           ),
         ),
-
       ),
     );
   }
@@ -286,40 +311,31 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
   }
 
   Widget _extraCourseInput() {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: AppTextField(
-            controller: _languagesController,
-            prefixIcon: Icons.language,
-            iconColor: Theme.of(context).colorScheme.primary,
-            label: AppLabels.addKnownLanguages(context),
-            hint: AppLabels.languagesHint(context),
-            obscureText: false,
-            keyboardType: TextInputType.text,
-            validator: (_) => null,
-          ),
+        BilingualTextField(
+          controller: _languagesController,
+          englishController: _languagesEnController,
+          prefixIcon: Icons.language,
+          label: AppLabels.addKnownLanguages(context),
+          hint: AppLabels.languagesHint(context),
         ),
-        const SizedBox(width: 8),
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-          ),
-          child: IconButton(
-            icon: Icon(
-              Icons.add_circle,
-              size: 28,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: AppButton(
+            width: 180,
             onPressed: () {
-              final value = _languagesController.text.trim();
-              if (value.isEmpty || langauges.contains(value)) return;
+              final hi = _languagesController.text.trim();
+              final en = _languagesEnController.text.trim();
+              if (hi.isEmpty && en.isEmpty) return;
               setState(() {
-                langauges.add(value);
+                languages.add(BilingualValue(hi: hi, en: en));
                 _languagesController.clear();
+                _languagesEnController.clear();
               });
             },
+            text: "Add Language",
           ),
         ),
       ],
@@ -330,11 +346,11 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: langauges.map((course) {
+      children: languages.map((lang) {
         return Chip(
-          label: Text(course),
+          label: Text(lang.hi),
           deleteIcon: const Icon(Icons.close, size: 18),
-          onDeleted: () => setState(() => langauges.remove(course)),
+          onDeleted: () => setState(() => languages.remove(lang)),
           backgroundColor: Theme.of(
             context,
           ).colorScheme.primary.withOpacity(0.1),

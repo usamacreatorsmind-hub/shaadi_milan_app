@@ -1,20 +1,19 @@
-import 'package:shadi_milan/core/constants/app_constants.dart';
-import 'package:shadi_milan/app/custom/custom_widgets/validators.dart';
-import 'package:shadi_milan/core/constants/app_labels.dart';
-import 'package:shadi_milan/core/notification/notification_service.dart';
-import 'package:shadi_milan/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:shadi_milan/app/custom/custom_widgets/validators.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
+import 'package:shadi_milan/core/notification/notification_service.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+import 'package:shadi_milan/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart';
 import 'package:sizer/sizer.dart';
-
-import '../providers/auth_providers.dart';
 
 import '../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../app/router/app_router.dart';
+import '../../../translitration/widgets/bilingual_text_field.dart';
+import '../providers/auth_providers.dart';
 
 enum Gender { male, female }
 
@@ -30,6 +29,7 @@ class UserRegisterScreen extends ConsumerStatefulWidget {
 
 class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
   final nameCtrl = TextEditingController();
+  final englishNameCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
   final pwCtrl = TextEditingController();
@@ -41,6 +41,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
   @override
   void dispose() {
     nameCtrl.dispose();
+    englishNameCtrl.dispose();
     emailCtrl.dispose();
     phoneCtrl.dispose();
     pwCtrl.dispose();
@@ -52,6 +53,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
   Future<void> _register(BuildContext context) async {
     String? agentUid;
     if (nameCtrl.text.isEmpty ||
+        englishNameCtrl.text.isEmpty ||
         emailCtrl.text.isEmpty ||
         phoneCtrl.text.isEmpty ||
         pwCtrl.text.isEmpty ||
@@ -93,7 +95,9 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error checking Staff Id: $e'),
+            content: Text(
+              AppLabels.errorCheckingStaffId(context, e.toString()),
+            ),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -107,9 +111,7 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Staff Id does not exist. Please check the ID or leave it blank.',
-          ),
+          content: Text(AppLabels.staffIdNotExists(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -129,8 +131,8 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     if (isEmailRegistered) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("This email is already registered."),
+        SnackBar(
+          content: Text(AppLabels.emailAlreadyRegistered(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -141,8 +143,8 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     if (isPhoneRegistered) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("This phone number is already registered."),
+        SnackBar(
+          content: Text(AppLabels.phoneAlreadyRegistered(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -151,21 +153,28 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
     }
 
     try {
+      final gender = ref.read(genderProvider);
+      final genderBilingual = gender == "male"
+          ? BilingualValue(en: "Male", hi: "पुरुष")
+          : BilingualValue(en: "Female", hi: "महिला");
+
       await authRepo.signUpUserWithEmail(
         email: emailCtrl.text.trim(),
         password: pwCtrl.text.trim(),
-        fullName: nameCtrl.text.trim(),
+        fullName: BilingualValue(
+          en: englishNameCtrl.text.trim(),
+          hi: nameCtrl.text.trim(),
+        ),
         phone: phoneCtrl.text.trim(),
-        gender: ref.read(genderProvider) ?? "",
-
+        gender: genderBilingual,
         agentId: agentUid ?? "",
       );
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Account created successfully!"),
+        SnackBar(
+          content: Text(AppLabels.accountCreatedSuccessfully(context)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -188,13 +197,13 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
 
       switch (e.code) {
         case 'email-already-in-use':
-          message = "An account with this email already exists.";
+          message = AppLabels.accountAlreadyExists(context);
           break;
         case 'invalid-email':
           message = AppLabels.invalidEmail(context);
           break;
         case 'weak-password':
-          message = "Password is too weak.";
+          message = AppLabels.passwordTooWeak(context);
           break;
         case 'network-request-failed':
           message = AppLabels.noInternet(context);
@@ -235,191 +244,199 @@ class _UserRegisterScreenState extends ConsumerState<UserRegisterScreen> {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => context.router.back(),
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        size: 20,
-                      ),
+          child: ListView(
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () => context.router.back(),
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      size: 20,
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
 
-                const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-                const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-                Text(
+              Center(
+                child: Text(
                   AppLabels.createAccount(context),
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
+              ),
+              const SizedBox(height: 4),
+              Center(
+                child: Text(
                   "${AppLabels.joinToday(context)}",
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 15),
                 ),
+              ),
 
-                const SizedBox(height: 30),
-
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        blurRadius: 24,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: AutofillGroup(
-                    child: Column(
-                      children: [
-                        AppTextField(
-                          autofillHints: const [AutofillHints.name],
-                          iconColor: theme.colorScheme.primary,
-                          obscureText: false,
-                          controller: nameCtrl,
-                          prefixIcon: Icons.person_outline_rounded,
-                          label: AppLabels.fullName(context),
-                          hint: "John Doe",
-                          keyboardType: TextInputType.name,
-                        ),
-                        const SizedBox(height: 16),
-                        AppTextField(
-                          autofillHints: const [AutofillHints.email],
-                          controller: emailCtrl,
-                          prefixIcon: Icons.alternate_email_rounded,
-                          label: AppLabels.email(context),
-                          hint: "example@mail.com",
-                          keyboardType: TextInputType.emailAddress,
-                          iconColor: theme.colorScheme.primary,
-                          obscureText: false,
-                        ),
-                        const SizedBox(height: 16),
-                        AppTextField(
-                          autofillHints: const [AutofillHints.telephoneNumber],
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          validator: (value) =>
-                              Validators.validatePhoneNumber(context, value),
-                          showWordCount: true,
-
-                          counterType: CounterType.characters,
-
-                          controller: phoneCtrl,
-                          maxLimit: 10,
-
-                          prefixIcon: Icons.phone_android_rounded,
-                          label: AppLabels.phone(context),
-                          hint: "1234 567 890",
-                          keyboardType: TextInputType.phone,
-                          obscureText: false,
-                          iconColor: theme.colorScheme.primary,
-                        ),
-                        const SizedBox(height: 16),
-                        AppTextField(
-                          autofillHints: const [AutofillHints.newPassword],
-                          obscureText: true,
-                          iconColor: theme.colorScheme.primary,
-                          validator: (value) =>
-                              Validators.validatePassword(context, value),
-
-                          controller: pwCtrl,
-                          prefixIcon: Icons.lock_outline_rounded,
-                          label: AppLabels.password(context),
-                          hint: AppLabels.passwordHint(context),
-                          keyboardType: TextInputType.visiblePassword,
-                        ),
-                        const SizedBox(height: 16),
-                        AppTextField(
-                          autofillHints: const [AutofillHints.newPassword],
-                          controller: confirmPwCtrl,
-
-                          obscureText: true,
-                          iconColor: theme.colorScheme.primary,
-                          validator: (value) =>
-                              Validators.validateConfirmPassword(
-                                context,
-                                value,
-                                pwCtrl.text,
-                              ),
-
-                          prefixIcon: Icons.verified_user_outlined,
-                          label: AppLabels.confirmPassword(context),
-                          hint: AppLabels.passwordHint(context),
-
-                          keyboardType: TextInputType.visiblePassword,
-                        ),
-
-                        const SizedBox(height: 16),
-                        AppTextField(
-                          autofillHints: const [AutofillHints.newPassword],
-                          controller: agentIdCtrl,
-                          prefixIcon: Icons.verified_user_outlined,
-                          label: AppLabels.staffId(context),
-                          hint: AppLabels.optional(context),
-                          obscureText: false,
-                          keyboardType: TextInputType.visiblePassword,
-                          iconColor: theme.colorScheme.primary,
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            genderCard(context, AppLabels.male(context), "male", ref),
-                            const Spacer(),
-                            genderCard(context, AppLabels.female(context), "female", ref),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: AppButton(
-                            text: isLoading ? AppLabels.registering(context) : AppLabels.register(context),
-                            onPressed: () => _register(context),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      AppLabels.alreadyAMember(context),
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
-                    TextButton(
-                      onPressed: () => context.router.back(),
-                      child: Text(
-                        AppLabels.loginNow(context),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
+              Container(
+                margin: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-              ],
-            ),
+                child: AutofillGroup(
+                  child: Column(
+                    children: [
+                      BilingualTextField(
+                        controller: nameCtrl,
+                        englishController: englishNameCtrl,
+                        prefixIcon: Icons.person_outline_rounded,
+                        label: AppLabels.fullName(context),
+                        hint: AppLabels.fullNameHint(context),
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        autofillHints: const [AutofillHints.email],
+                        controller: emailCtrl,
+                        prefixIcon: Icons.alternate_email_rounded,
+                        label: AppLabels.email(context),
+                        hint: AppLabels.emailHint(context),
+                        keyboardType: TextInputType.emailAddress,
+                        iconColor: theme.colorScheme.primary,
+                        obscureText: false,
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        autofillHints: const [AutofillHints.telephoneNumber],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        validator: (value) =>
+                            Validators.validatePhoneNumber(context, value),
+                        showWordCount: true,
+
+                        counterType: CounterType.characters,
+
+                        controller: phoneCtrl,
+                        maxLimit: 10,
+
+                        prefixIcon: Icons.phone_android_rounded,
+                        label: AppLabels.phone(context),
+                        hint: AppLabels.phoneHint(context),
+                        keyboardType: TextInputType.phone,
+                        obscureText: false,
+                        iconColor: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        autofillHints: const [AutofillHints.newPassword],
+                        obscureText: true,
+                        iconColor: theme.colorScheme.primary,
+                        validator: (value) =>
+                            Validators.validatePassword(context, value),
+
+                        controller: pwCtrl,
+                        prefixIcon: Icons.lock_outline_rounded,
+                        label: AppLabels.password(context),
+                        hint: AppLabels.passwordHint(context),
+                        keyboardType: TextInputType.visiblePassword,
+                      ),
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        autofillHints: const [AutofillHints.newPassword],
+                        controller: confirmPwCtrl,
+
+                        obscureText: true,
+                        iconColor: theme.colorScheme.primary,
+                        validator: (value) =>
+                            Validators.validateConfirmPassword(
+                              context,
+                              value,
+                              pwCtrl.text,
+                            ),
+
+                        prefixIcon: Icons.verified_user_outlined,
+                        label: AppLabels.confirmPassword(context),
+                        hint: AppLabels.passwordHint(context),
+
+                        keyboardType: TextInputType.visiblePassword,
+                      ),
+
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        autofillHints: const [AutofillHints.newPassword],
+                        controller: agentIdCtrl,
+                        prefixIcon: Icons.verified_user_outlined,
+                        label: AppLabels.staffId(context),
+                        hint: AppLabels.optional(context),
+                        obscureText: false,
+                        keyboardType: TextInputType.visiblePassword,
+                        iconColor: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          genderCard(
+                            context,
+                            AppLabels.male(context),
+                            "male",
+                            ref,
+                          ),
+                          const Spacer(),
+                          genderCard(
+                            context,
+                            AppLabels.female(context),
+                            "female",
+                            ref,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: AppButton(
+                          text: isLoading
+                              ? AppLabels.registering(context)
+                              : AppLabels.register(context),
+                          onPressed: () => _register(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    AppLabels.alreadyAMember(context),
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                  TextButton(
+                    onPressed: () => context.router.back(),
+                    child: Text(
+                      AppLabels.loginNow(context),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
           ),
         ),
       ),

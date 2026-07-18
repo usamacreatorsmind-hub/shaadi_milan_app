@@ -30,7 +30,7 @@ class _MyProfileCardState extends ConsumerState<MyProfileDetailScreen> {
                 children: [
                   const SizedBox(height: 16),
                   _buildInfoCard(context, 'Personal Information', [
-                    _buildInfoRow('Full Name', widget.user.fullName),
+                    _buildInfoRow('Full Name', widget.user.fullName.en),
                     _buildInfoRow('Email', widget.user.email),
 
                     _buildInfoRow('Phone', widget.user.phone),
