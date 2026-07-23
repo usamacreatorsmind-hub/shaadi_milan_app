@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../core/enums/enum.dart';
-import '../../../../translitration/widgets/bilingual_text_field.dart';
-import '../../domain/states/family_state.dart';
-import '../controllers/user_family_controllers.dart';
+import '../../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../../core/constants/app_labels.dart';
+import '../../../../../../core/enums/enum.dart';
+import '../../../../../translitration/widgets/bilingual_text_field.dart';
+import '../../../domain/states/family_state.dart';
+import '../../controllers/user_family_controllers.dart';
 
 @RoutePage()
 class UserFamilyFormScreen extends ConsumerStatefulWidget {
@@ -66,22 +66,40 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
 
       if (widget.mode == FormMode.create) {
         notifier.saveFamily(
-          fatherName: BilingualValue(hi: _fatherNameController.text, en: _fatherNameController.text),
-          motherName: BilingualValue(hi: _motherNameController.text, en: _motherNameController.text),
+          fatherName: BilingualValue(
+            hi: _fatherNameController.text,
+            en: _fatherNameController.text,
+          ),
+          motherName: BilingualValue(
+            hi: _motherNameController.text,
+            en: _motherNameController.text,
+          ),
           brothers: int.parse(_brothersController.text),
           sisters: int.parse(_sistersController.text),
           familyType: BilingualValue(hi: _familyType!, en: _familyType!),
-          familyStatus: BilingualValue(hi: _familyStatusController.text, en: _familyStatusController.text),
+          familyStatus: BilingualValue(
+            hi: _familyStatusController.text,
+            en: _familyStatusController.text,
+          ),
         );
       } else {
         // Update logic (using saveFamily as upsert)
         notifier.updateFamily(
-          fatherName: BilingualValue(hi: _fatherNameController.text, en: _fatherNameController.text),
-          motherName: BilingualValue(hi: _motherNameController.text, en: _motherNameController.text),
+          fatherName: BilingualValue(
+            hi: _fatherNameController.text,
+            en: _fatherNameController.text,
+          ),
+          motherName: BilingualValue(
+            hi: _motherNameController.text,
+            en: _motherNameController.text,
+          ),
           brothers: int.parse(_brothersController.text),
           sisters: int.parse(_sistersController.text),
           familyType: BilingualValue(hi: _familyType!, en: _familyType!),
-          familyStatus: BilingualValue(hi: _familyStatusController.text, en: _familyStatusController.text),
+          familyStatus: BilingualValue(
+            hi: _familyStatusController.text,
+            en: _familyStatusController.text,
+          ),
         );
       }
     }
@@ -95,7 +113,7 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
       if (current.error != null) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
+        ).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
       } else if (current.family != null && previous?.family == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

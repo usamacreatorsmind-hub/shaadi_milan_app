@@ -1,8 +1,10 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:auto_route/auto_route.dart';
-import '../../../../../app/router/app_router.dart';
+
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../../../../core/constants/app_labels.dart';
 import '../../domain/states/support_ticket.dart';
 import '../controllers/support_notifier.dart';
 
@@ -30,8 +32,8 @@ class SupportTicketsScreen extends ConsumerWidget {
                   ),
                 ),
 
-                title: 'Support Tickets',
-                subtitle: 'View and manage your tickets',
+                title: AppLabels.supportTickets(context),
+                subtitle: AppLabels.viewManageTickets(context),
               ),
 
               SliverPadding(
@@ -41,7 +43,9 @@ class SupportTicketsScreen extends ConsumerWidget {
                     child: Center(child: CircularProgressIndicator()),
                   ),
                   error: (error, stack) => SliverFillRemaining(
-                    child: Center(child: Text('Error: $error')),
+                    child: Center(
+                      child: Text(AppLabels.error(context, error.toString())),
+                    ),
                   ),
                   data: (tickets) {
                     if (tickets.isEmpty) {
@@ -80,7 +84,7 @@ class SupportTicketsScreen extends ConsumerWidget {
               backgroundColor: Theme.of(context).colorScheme.primary,
               onPressed: () => context.router.push(SupportTicketFormRoute()),
               icon: const Icon(Icons.add),
-              label: const Text('New Ticket'),
+              label: Text(AppLabels.newTicket(context)),
             ),
           ),
         ],
@@ -97,8 +101,6 @@ class _TicketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
@@ -141,7 +143,7 @@ class _TicketCard extends StatelessWidget {
                   const SizedBox(width: 8),
                 ],
                 Text(
-                  _formatDate(ticket.createdAt),
+                  _formatDate(context, ticket.createdAt),
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
@@ -153,13 +155,13 @@ class _TicketCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date);
 
-    if (diff.inDays == 0) return 'Today';
-    if (diff.inDays == 1) return 'Yesterday';
-    if (diff.inDays < 7) return '${diff.inDays} days ago';
+    if (diff.inDays == 0) return AppLabels.today(context);
+    if (diff.inDays == 1) return AppLabels.yesterday(context);
+    if (diff.inDays < 7) return AppLabels.daysAgo(context, diff.inDays);
     return '${date.day}/${date.month}/${date.year}';
   }
 }
@@ -216,19 +218,24 @@ class _PriorityBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color color;
+    String label;
 
     switch (priority) {
       case TicketPriority.low:
         color = Colors.green;
+        label = AppLabels.low(context);
         break;
       case TicketPriority.medium:
         color = Colors.blue;
+        label = AppLabels.medium(context);
         break;
       case TicketPriority.high:
         color = Colors.orange;
+        label = AppLabels.high(context);
         break;
       case TicketPriority.urgent:
         color = Colors.red;
+        label = AppLabels.urgent(context);
         break;
     }
 
@@ -240,7 +247,7 @@ class _PriorityBadge extends StatelessWidget {
         border: Border.all(color: color),
       ),
       child: Text(
-        priority.displayName,
+        label,
         style: TextStyle(
           fontSize: 12,
           color: color,
@@ -262,13 +269,13 @@ class _EmptyState extends StatelessWidget {
         children: [
           Icon(Icons.support_agent, size: 80, color: Colors.grey[300]),
           const SizedBox(height: 16),
-          const Text(
-            'No Support Tickets',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Text(
+            AppLabels.noSupportTickets(context),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            'Create a ticket to get help from our support team',
+            AppLabels.createTicketHelp(context),
             style: TextStyle(color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),

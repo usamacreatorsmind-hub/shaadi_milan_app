@@ -14,6 +14,7 @@ import 'package:shadi_milan/features/user/user_app/widgets/agent_bottom_sheet.da
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../../../translitration/models/bilingual_value.dart';
@@ -81,14 +82,12 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('No Photos Available'),
-        content: const Text(
-          'This profile does not have any photos uploaded yet.',
-        ),
+        title: Text(AppLabels.noPhotosAvailable(context)),
+        content: Text(AppLabels.noPhotosAvailable(context)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+            child: Text(AppLabels.ok(context)),
           ),
         ],
       ),
@@ -131,7 +130,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(matrimonyProfileProvider(widget.uid));
     final isHindi = Localizations.localeOf(context).languageCode == 'hi';
-    String _bText(BilingualValue val) {
+    String bText(BilingualValue val) {
       final text = isHindi ? val.hi : val.en;
       return text.isEmpty ? 'N/A' : text;
     }
@@ -206,7 +205,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               borderRadius: BorderRadius.circular(18),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.06),
+                                  color: Colors.black.withValues(alpha: 0.06),
                                   blurRadius: 12,
                                   offset: const Offset(0, 6),
                                 ),
@@ -217,27 +216,30 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               runSpacing: 10,
                               children: [
                                 _infoChip(
-                                  _bText(profile.employment.jobType),
+                                  bText(profile.employment.jobType),
                                   Icons.work_outline,
                                 ),
                                 _infoChip(
-                                  "${profile.identity.age ?? 'N/A'} yrs",
+                                  AppLabels.ageYears(
+                                    context,
+                                    profile.identity.age,
+                                  ),
                                   Icons.cake_outlined,
                                 ),
                                 _infoChip(
-                                  _bText(profile.identity.gender),
+                                  bText(profile.identity.gender),
                                   Icons.person_outline,
                                 ),
                                 _infoChip(
-                                  _bText(profile.address.city),
+                                  bText(profile.address.city),
                                   Icons.location_on_outlined,
                                 ),
                                 _infoChip(
-                                  _bText(profile.cultural.religion),
+                                  bText(profile.cultural.religion),
                                   Icons.temple_hindu,
                                 ),
                                 _infoChip(
-                                  "${profile.physical.height ?? 'N/A'} cm",
+                                  "${profile.physical.height.round()} cm",
                                   Icons.height_outlined,
                                 ),
                               ],
@@ -264,26 +266,22 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             ),
                             tabs: [
                               TabWidget(
-                                label: 'Basic Info',
+                                label: AppLabels.basicInfoTab(context),
                                 icon: Icons.person,
                               ),
 
                               TabWidget(
-                                label: 'Personal Details',
+                                label: AppLabels.personalDetailsTab(context),
                                 icon: Icons.accessibility_new,
                               ),
                               TabWidget(
-                                label: 'Education & Career',
+                                label: AppLabels.educationCareerTab(context),
                                 icon: Icons.school,
                               ),
                               TabWidget(
-                                label: 'Family & Culture',
+                                label: AppLabels.familyCultureTab(context),
                                 icon: Icons.family_restroom,
                               ),
-                              // TabWidget(
-                              //   label: 'Agent Details',
-                              //   icon: Icons.support_agent,
-                              // ),
                             ],
                           ),
                         ),
@@ -300,21 +298,24 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                           child: Column(
                             children: [
                               _InfoCard(
-                                title: 'Basic Information',
+                                title: AppLabels.basicInformation(context),
                                 icon: Icons.person,
                                 children: [
                                   _InfoTile(
-                                    label: 'Gender',
+                                    label: AppLabels.gender(context),
                                     icon: Icons.person_outline,
                                     bilingualValue: profile.identity.gender,
                                   ),
                                   _InfoTile(
-                                    label: 'Age',
+                                    label: AppLabels.age(context),
                                     icon: Icons.cake_outlined,
-                                  value: profile.identity.age.toString(),
+                                    value: AppLabels.ageYears(
+                                      context,
+                                      profile.identity.age,
+                                    ),
                                   ),
                                   _InfoTile(
-                                    label: 'Date of Birth',
+                                    label: AppLabels.dateOfBirth(context),
                                     icon: Icons.calendar_today_outlined,
                                     value: DateFormat(
                                       'dd-MM-yyyy',
@@ -323,20 +324,31 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 ],
                               ),
                               _InfoCard(
-                                title: 'About Me',
+                                title: AppLabels.aboutMe(context),
                                 icon: Icons.info_outline,
                                 children: [
-                                  (profile.identity.aboutMe.en.isNotEmpty || profile.identity.aboutMe.hi.isNotEmpty)
+                                  (profile.identity.aboutMe.en.isNotEmpty ||
+                                          profile
+                                              .identity
+                                              .aboutMe
+                                              .hi
+                                              .isNotEmpty)
                                       ? BilingualParser(
                                           value: profile.identity.aboutMe,
                                           textAlign: TextAlign.justify,
-                                          style: TextStyle(color: Colors.grey[700]),
+                                          style: TextStyle(
+                                            color: Colors.grey[700],
+                                          ),
                                         )
                                       // ignore: dead_code
                                       : Text(
-                                          "No description available.",
+                                          AppLabels.noDescriptionAvailable(
+                                            context,
+                                          ),
                                           textAlign: TextAlign.justify,
-                                          style: TextStyle(color: Colors.grey[700]),
+                                          style: TextStyle(
+                                            color: Colors.grey[700],
+                                          ),
                                         ),
                                 ],
                               ),
@@ -350,48 +362,52 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                           child: Column(
                             children: [
                               _InfoCard(
-                                title: 'Physical',
+                                title: AppLabels.physical(context),
                                 icon: Icons.accessibility,
                                 children: [
                                   _InfoTile(
-                                    label: 'Height',
+                                    label: AppLabels.height(context),
                                     icon: Icons.height,
-                                    value: "${profile.physical.height} cm",
+                                    value: _formatHeight(
+                                      profile.physical.height.round(),
+                                    ),
                                   ),
                                   _InfoTile(
-                                    label: 'Weight',
+                                    label: AppLabels.weightKg(context),
                                     icon: Icons.scale,
-                                    value: "${profile.physical.weight} kg",
+                                    value:
+                                        "${profile.physical.weight.round()} kg",
                                   ),
                                   _InfoTile(
-                                    label: 'Body Type',
+                                    label: AppLabels.selectBodyType(context),
                                     icon: Icons.accessibility_new,
                                     bilingualValue: profile.physical.bodyType,
                                   ),
                                   if (profile.physical.physicallyChallenged)
                                     _InfoTile(
-                                      label: 'Disability',
+                                      label: AppLabels.disability(context),
                                       icon: Icons.accessible,
-                                      value: "Yes",
-                                      bilingualValue: profile.physical.disabilityDetails,
+                                      value: AppLabels.yesLabel(context),
+                                      bilingualValue:
+                                          profile.physical.disabilityDetails,
                                     ),
                                 ],
                               ),
 
                               _InfoCard(
-                                title: 'Address',
+                                title: AppLabels.address(context),
                                 icon: Icons.location_on,
                                 children: [
                                   _InfoTile(
-                                    label: 'City',
+                                    label: AppLabels.city(context),
                                     icon: Icons.location_city_outlined,
                                     bilingualValue: profile.address.city,
                                   ),
 
                                   _InfoTile(
-                                    label: 'State',
+                                    label: AppLabels.state(context),
                                     icon: Icons.map_outlined,
-                                   bilingualValue: profile.address.state,
+                                    bilingualValue: profile.address.state,
                                   ),
                                 ],
                               ),
@@ -405,38 +421,40 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                           child: Column(
                             children: [
                               _InfoCard(
-                                title: 'Employment',
+                                title: AppLabels.employment(context),
                                 icon: Icons.work,
                                 children: [
                                   _InfoTile(
-                                    label: 'Job Type',
+                                    label: AppLabels.jobType(context),
                                     icon: Icons.work_outline,
                                     bilingualValue: profile.employment.jobType,
-                                   
                                   ),
-                                  if (profile.employment.jobType.en != "Not Working" && profile.employment.jobType.hi != "Not Working") ...[
+                                  if (profile.employment.jobType.en !=
+                                          "Not Working" &&
+                                      profile.employment.jobType.hi !=
+                                          "Not Working") ...[
                                     _InfoTile(
-                                      label: 'Company',
+                                      label: AppLabels.organization(context),
                                       icon: Icons.business,
                                       bilingualValue:
                                           profile.employment.company,
                                     ),
                                     _InfoTile(
-                                      label: 'Designation',
+                                      label: AppLabels.designation(context),
                                       icon: Icons.work_history,
                                       bilingualValue:
                                           profile.employment.designation,
                                     ),
                                     _InfoTile(
-                                      label: 'Income',
+                                      label: AppLabels.annualIncome(context),
                                       icon: Icons.attach_money,
                                       value:
                                           profile.employment.annualIncome
                                               ?.toString() ??
-                                          "N/A",
+                                          AppLabels.notAvailableShort(context),
                                     ),
                                     _InfoTile(
-                                      label: 'Work Location',
+                                      label: AppLabels.workLocation(context),
                                       icon: Icons.location_city_outlined,
                                       bilingualValue:
                                           profile.employment.workLocation,
@@ -448,13 +466,13 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               // ================= EDUCATION SECTION =================
                               if (profile.education.isIlletrate == true) ...[
                                 _InfoCard(
-                                  title: 'Education',
+                                  title: AppLabels.education(context),
                                   icon: Icons.school_outlined,
-                                  children: const [
+                                  children: [
                                     _InfoTile(
-                                      label: 'Education Status',
+                                      label: AppLabels.educationStatus(context),
                                       icon: Icons.info_outline,
-                                      value: 'Illiterate',
+                                      value: AppLabels.illiterate(context),
                                     ),
                                   ],
                                 ),
@@ -466,43 +484,29 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                           .isNotEmpty ??
                                       false)) ...[
                                 _InfoCard(
-                                  title: 'Education',
+                                  title: AppLabels.education(context),
                                   icon: Icons.school_outlined,
                                   children: [
                                     if (profile.education.education !=
                                         null) ...[
                                       _InfoTile(
-                                        label: 'College',
+                                        label: AppLabels.college(context),
                                         icon: Icons.account_balance,
-                                        value: isHindi
-                                            ? profile
-                                                  .education
-                                                  .education!
-                                                  .college
-                                                  .hi
-                                            : profile
-                                                  .education
-                                                  .education!
-                                                  .college
-                                                  .en,
+                                        bilingualValue: profile
+                                            .education
+                                            .education!
+                                            .college,
                                       ),
                                       _InfoTile(
-                                        label: 'Course',
+                                        label: AppLabels.course(context),
                                         icon: Icons.menu_book,
-                                        value: isHindi
-                                            ? profile
-                                                  .education
-                                                  .education!
-                                                  .course
-                                                  .hi
-                                            : profile
-                                                  .education
-                                                  .education!
-                                                  .course
-                                                  .en,
+                                        bilingualValue:
+                                            profile.education.education!.course,
                                       ),
                                       _InfoTile(
-                                        label: 'Percentage',
+                                        label: AppLabels.percentageCGPA(
+                                          context,
+                                        ),
                                         icon: Icons.percent,
                                         value: profile
                                             .education
@@ -511,7 +515,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                             .toString(),
                                       ),
                                       _InfoTile(
-                                        label: 'Passing Year',
+                                        label: AppLabels.passingYear(context),
                                         icon: Icons.calendar_today,
                                         value: profile
                                             .education
@@ -533,9 +537,11 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            const Text(
-                                              'Additional Courses',
-                                              style: TextStyle(
+                                            Text(
+                                              AppLabels.additionalCourses(
+                                                context,
+                                              ),
+                                              style: const TextStyle(
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w500,
                                                 color: Color.fromARGB(
@@ -556,10 +562,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                                   .qualifications
                                                   .map(
                                                     (course) => Chip(
-                                                      label: Text(
-                                                        isHindi
-                                                            ? course.hi
-                                                            : course.en,
+                                                      label: BilingualParser(
+                                                        value: course,
                                                       ),
                                                     ),
                                                   )
@@ -581,33 +585,33 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                           child: Column(
                             children: [
                               _InfoCard(
-                                title: 'Family',
+                                title: AppLabels.familyDetails(context),
                                 icon: Icons.family_restroom,
                                 children: [
                                   _InfoTile(
-                                    label: 'Father',
+                                    label: AppLabels.father(context),
                                     icon: Icons.person_outline,
                                     bilingualValue: profile.family.fatherName,
                                   ),
                                   _InfoTile(
-                                    label: 'Mother',
+                                    label: AppLabels.mother(context),
                                     icon: Icons.person_outline,
                                     bilingualValue: profile.family.motherName,
                                   ),
                                   _InfoTile(
-                                    label: 'Family Type',
+                                    label: AppLabels.familyType(context),
                                     icon: Icons.family_restroom,
                                     bilingualValue: profile.family.familyType,
                                   ),
                                   _InfoTile(
-                                    label: 'No. of Brother',
+                                    label: AppLabels.numberOfBrothers(context),
                                     icon: Icons.people_outline,
                                     value: profile.family.numberOfBrothers
                                         .toString(),
                                   ),
 
                                   _InfoTile(
-                                    label: 'No. of Sister',
+                                    label: AppLabels.numberOfSisters(context),
                                     icon: Icons.people_outline,
                                     value: profile.family.numberOfSisters
                                         .toString(),
@@ -616,30 +620,28 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               ),
 
                               _InfoCard(
-                                title: 'Cultural',
+                                title: AppLabels.cultural(context),
                                 icon: Icons.temple_hindu,
                                 children: [
                                   _InfoTile(
-                                    label: 'Religion',
+                                    label: AppLabels.religion(context),
                                     icon: Icons.temple_hindu,
                                     bilingualValue: profile.cultural.religion,
                                   ),
                                   _InfoTile(
-                                    label: 'Caste',
+                                    label: AppLabels.caste(context),
                                     icon: Icons.group,
                                     bilingualValue: profile.cultural.caste,
                                   ),
 
                                   _InfoTile(
-                                    label: 'Sub-Caste',
+                                    label: AppLabels.subCasteLabel(context),
                                     icon: Icons.group,
-                                    value: isHindi
-                                        ? profile.cultural.subCaste.hi
-                                        : profile.cultural.subCaste.en,
+                                    bilingualValue: profile.cultural.subCaste,
                                   ),
 
                                   _InfoTile(
-                                    label: 'Languages',
+                                    label: AppLabels.languagesKnown(context),
                                     icon: Icons.language,
                                     value: profile.cultural.languages
                                         .map((l) => isHindi ? l.hi : l.en)
@@ -650,51 +652,6 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             ],
                           ),
                         ),
-
-                        // 5️⃣ AGENT / VERIFICATION
-                        // SingleChildScrollView(
-                        //   padding: const EdgeInsets.only(bottom: 100),
-                        //   child: Column(
-                        //     children: [
-                        //       if (viewModel.agent != null)
-                        //         _InfoCard(
-                        //           title: 'Agent Details',
-                        //           icon: Icons.support_agent,
-                        //           children: [
-                        //             _InfoTile(
-                        //               label: 'Name',
-                        //               icon: Icons.person_outline,
-                        //               value: viewModel.agent!.agentName,
-                        //             ),
-                        //             _InfoTile(
-                        //               label: 'Mobile',
-                        //               icon: Icons.phone,
-                        //               value: viewModel.agent!.agentMobile,
-                        //             ),
-                        //             _InfoTile(
-                        //               label: 'Email',
-                        //               icon: Icons.email_outlined,
-                        //               value: viewModel.agent!.email,
-                        //             ),
-
-                        //             _InfoTile(
-                        //               label: 'Staff Id',
-                        //               icon: Icons.perm_identity,
-                        //               value: viewModel.agent!.agentId,
-                        //             ),
-
-                        //             _InfoTile(
-                        //               label: 'Registered Date',
-                        //               icon: Icons.calendar_today_outlined,
-                        //               value: DateFormat(
-                        //                 'dd-MM-yyyy',
-                        //               ).format(viewModel.agent!.registrationDate),
-                        //             ),
-                        //           ],
-                        //         ),
-                        //     ],
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
@@ -705,263 +662,250 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: Container(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            icon: const Icon(Icons.favorite_border),
-
-                            label: const Text('Add to Wishlist'),
-
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              backgroundColor: Theme.of(context).canvasColor,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.favorite_border),
+                          label: Text(AppLabels.addToWishlist(context)),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: Theme.of(context).primaryColor,
                             ),
-                            onPressed: () async {
-                              final currentUserId = ref
-                                  .read(authRepositoryProvider)
-                                  .currentUser
-                                  ?.uid;
+                            backgroundColor: Theme.of(context).canvasColor,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          onPressed: () async {
+                            final currentUserId = ref
+                                .read(authRepositoryProvider)
+                                .currentUser
+                                ?.uid;
 
-                              final profileId = viewModel.user?.uid;
-                              final agentId = viewModel.user?.agentId;
+                            final profileId = viewModel.user?.uid;
+                            final agentId = viewModel.user?.agentId;
 
-                              if (currentUserId == null ||
-                                  profileId == null ||
-                                  agentId == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'User ID or Profile ID or Staff Id is missing.',
-                                    ),
-                                  ),
-                                );
-                                return;
-                              }
-
-                              final wishlistRepo = ref.read(
-                                wishlistRepositoryProvider,
-                              );
-
-                              /// ✅ Proper existence check
-                              final existing = await wishlistRepo
-                                  .getExistingWishlist(
-                                    senderId: currentUserId,
-                                    receiverId: profileId,
-                                  );
-
-                              if (existing != null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Already added to wishlist!'),
-                                  ),
-                                );
-                                return;
-                              }
-
-                              /// ✅ Fetch current user agent
-                              final userRepo = ref.read(userRepositoryProvider);
-                              final currentUserData = await userRepo.fetchUser(
-                                currentUserId,
-                              );
-
-                              final senderAgent = currentUserData.agentId;
-
-                              final wishListItem = WishlistEntity(
-                                senderId: currentUserId,
-                                receiverId: profileId,
-                                receiverAgent: agentId,
-                                senderAgent: senderAgent,
-                                status: "pending",
-                                updatedAt: DateTime.now(),
-                              );
-
-                              await wishlistRepo.addWishlist(wishListItem);
-
+                            if (currentUserId == null ||
+                                profileId == null ||
+                                agentId == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Added to wishlist!'),
+                                  content: Text(
+                                    'User ID or Profile ID or Staff Id is missing.',
+                                  ),
                                 ),
                               );
-                            },
-                          ),
+                              return;
+                            }
+
+                            final wishlistRepo = ref.read(
+                              wishlistRepositoryProvider,
+                            );
+
+                            /// ✅ Proper existence check
+                            final existing = await wishlistRepo
+                                .getExistingWishlist(
+                                  senderId: currentUserId,
+                                  receiverId: profileId,
+                                );
+
+                            if (existing != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    AppLabels.alreadyAddedToWishlist(context),
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+
+                            /// ✅ Fetch current user agent
+                            final userRepo = ref.read(userRepositoryProvider);
+                            final currentUserData = await userRepo.fetchUser(
+                              currentUserId,
+                            );
+
+                            final senderAgent = currentUserData.agentId;
+
+                            final wishListItem = WishlistEntity(
+                              senderId: currentUserId,
+                              receiverId: profileId,
+                              receiverAgent: agentId,
+                              senderAgent: senderAgent,
+                              status: "pending",
+                              updatedAt: DateTime.now(),
+                            );
+
+                            await wishlistRepo.addWishlist(wishListItem);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  AppLabels.addedToWishlist(context),
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            icon: const Icon(Icons.chat_bubble_outline),
-                            label: const Text('Contact Agent'),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              backgroundColor: Theme.of(context).canvasColor,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.chat_bubble_outline),
+                          label: Text(AppLabels.contactAgent(context)),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: Theme.of(context).primaryColor,
                             ),
-                            onPressed: () {
-                              if (viewModel.user!.agentId.isEmpty) {
-                                // create a model bottom sheet  to take user id or  show contact details if he does not know
-                                print(" inside bottom sheet");
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(20),
-                                    ),
+                            backgroundColor: Theme.of(context).canvasColor,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (viewModel.user!.agentId.isEmpty) {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20),
                                   ),
-
-                                  constraints: BoxConstraints(
-                                    maxHeight:
-                                        MediaQuery.of(context).size.height *
-                                        0.9,
-                                  ),
-                                  // theme color
-                                  builder: (BuildContext context) {
-                                    // no agent is associated with this user
-                                    return Container(
-                                      height: 40.h,
-                                      width: double.infinity,
-
-                                      child: Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            const Icon(
-                                              Icons.sentiment_dissatisfied,
-                                              size: 50,
+                                ),
+                                builder: (BuildContext context) {
+                                  return SizedBox(
+                                    height: 40.h,
+                                    width: double.infinity,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.sentiment_dissatisfied,
+                                            size: 50,
+                                            color: Colors.grey,
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            AppLabels.noAgentAssociated(
+                                              context,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontSize: 18,
                                               color: Colors.grey,
                                             ),
-                                            const SizedBox(height: 10),
-                                            const Text(
-                                              "No agent associated with this user.",
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.grey,
-                                              ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          Text(
+                                            AppLabels.contactAdminDetails(
+                                              context,
                                             ),
-                                            const SizedBox(height: 20),
-                                            const Text(
-                                              "Please contact the administrator for more details.",
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.grey,
-                                              ),
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.grey,
                                             ),
-
-                                            // contact
-                                            Padding(
-                                              padding: const EdgeInsets.all(
-                                                16.0,
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: ElevatedButton.icon(
-                                                      onPressed: () {
-                                                        _makePhoneCall(
-                                                          "+919876543210",
-                                                        ); // Replace with actual admin number
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons.call,
-                                                      ),
-                                                      label: const Text("Call"),
-                                                      style: ElevatedButton.styleFrom(
-                                                        backgroundColor:
-                                                            Theme.of(
-                                                              context,
-                                                            ).primaryColor,
-                                                        foregroundColor:
-                                                            Colors.white,
-                                                        padding:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 24,
-                                                              vertical: 12,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: ElevatedButton.icon(
+                                                    onPressed: () {
+                                                      _makePhoneCall(
+                                                        "+919876543210",
+                                                      );
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.call,
+                                                    ),
+                                                    label: Text(
+                                                      AppLabels.phone(context),
+                                                    ),
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Theme.of(
+                                                        context,
+                                                      ).primaryColor,
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 24,
+                                                            vertical: 12,
+                                                          ),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              12,
                                                             ),
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                12,
-                                                              ),
-                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                  const SizedBox(width: 20),
-                                                  Expanded(
-                                                    child: ElevatedButton.icon(
-                                                      onPressed: () {
-                                                        _sendEmail(
-                                                          AppConstants
-                                                              .grievanceEmail,
-                                                        ); // Replace with actual admin email
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons.email,
-                                                      ),
-                                                      label: const Text(
-                                                        "Email",
-                                                      ),
-                                                      style: ElevatedButton.styleFrom(
-                                                        backgroundColor:
-                                                            Theme.of(
-                                                              context,
-                                                            ).primaryColor,
-                                                        foregroundColor:
-                                                            Colors.white,
-                                                        padding:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 24,
-                                                              vertical: 12,
+                                                ),
+                                                const SizedBox(width: 20),
+                                                Expanded(
+                                                  child: ElevatedButton.icon(
+                                                    onPressed: () {
+                                                      _sendEmail(
+                                                        AppConstants
+                                                            .grievanceEmail,
+                                                      );
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.email,
+                                                    ),
+                                                    label: Text(
+                                                      AppLabels.mail(context),
+                                                    ),
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Theme.of(
+                                                        context,
+                                                      ).primaryColor,
+                                                      foregroundColor:
+                                                          Colors.white,
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 24,
+                                                            vertical: 12,
+                                                          ),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              12,
                                                             ),
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                12,
-                                                              ),
-                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
-                                    );
-                                  },
-                                );
-
-                                return;
-                              } else {
-                                showAgentBottomSheet(
-                                  context,
-                                  viewModel.agent ?? AgentEntity.empty(),
-                                );
-                              }
-                            },
-                          ),
+                                    ),
+                                  );
+                                },
+                              );
+                              return;
+                            } else {
+                              showAgentBottomSheet(
+                                context,
+                                viewModel.agent ?? AgentEntity.empty(),
+                              );
+                            }
+                          },
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -988,15 +932,22 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
         text,
         style: TextStyle(color: Theme.of(context).primaryColor),
       ),
-      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+      backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: Theme.of(context).primaryColor.withOpacity(0.3),
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     );
+  }
+
+  String _formatHeight(int cm) {
+    final totalInches = (cm / 2.54).round();
+    final feet = totalInches ~/ 12;
+    final inches = totalInches % 12;
+    return '$cm cm ($feet\'$inches")';
   }
 }
 
@@ -1014,7 +965,7 @@ class TabWidget extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 6),
           decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(6),
           ),
           alignment: Alignment.center,
@@ -1085,7 +1036,7 @@ class _InfoCard extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -1101,7 +1052,7 @@ class _InfoCard extends StatelessWidget {
                 CircleAvatar(
                   backgroundColor: Theme.of(
                     context,
-                  ).primaryColor.withOpacity(0.1),
+                  ).primaryColor.withValues(alpha: 0.1),
                   child: Icon(icon, color: Theme.of(context).primaryColor),
                 ),
                 const SizedBox(width: 12),
@@ -1143,7 +1094,7 @@ class _InfoTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withOpacity(0.05),
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1154,7 +1105,7 @@ class _InfoTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.2),
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Icon(
@@ -1213,6 +1164,7 @@ class ProfileHeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final profile = viewModel.profile;
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -1245,11 +1197,12 @@ class ProfileHeaderCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /// NAME'
-                /// 
-                /// 
+                ///
+                ///
                 BilingualParser(
-                  value: viewModel.user?.fullName ??
-                        BilingualValue(en: 'N/A', hi: 'N/A'),
+                  value:
+                      viewModel.user?.fullName ??
+                      BilingualValue(en: 'N/A', hi: 'N/A'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -1262,11 +1215,31 @@ class ProfileHeaderCard extends StatelessWidget {
                 const SizedBox(height: 6),
 
                 /// AGE + DESIGNATION
-                Text(
-                  '${profile.identity.age ?? 'N/A'} yrs • ${profile.employment.designation ?? 'N/A'}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
+                Row(
+                  children: [
+                    Text(
+                      '${AppLabels.ageYearsOld(context, profile.identity.age)} • ',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    Expanded(
+                      child: BilingualParser(
+                        value:
+                            profile.employment.designation ??
+                            BilingualValue.empty(),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey.shade700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 8),
@@ -1282,8 +1255,9 @@ class ProfileHeaderCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Marquee(
-                        '${profile.address.city ?? 'N/A'}, ${profile.address.state ?? 'N/A'}',
-
+                        isHindi
+                            ? profile.address.city.hi
+                            : profile.address.city.en,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade600,

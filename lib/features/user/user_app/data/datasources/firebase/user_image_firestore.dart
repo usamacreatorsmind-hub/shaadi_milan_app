@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:firebase_storage/firebase_storage.dart';
 
 /// Custom exception for upload-related errors
@@ -183,6 +184,9 @@ class ImageUploadService {
     String primaryImageUrl = '';
     List<String> secondaryImageUrls = [];
     String aadharCardUrl = '';
+    String bioDataUrl = '';
+    String imageWithAgentUrl = '';
+    String profileImageUrl = '';
 
     for (final Reference ref in result.items) {
       final url = await ref.getDownloadURL();
@@ -190,14 +194,23 @@ class ImageUploadService {
         primaryImageUrl = url;
       } else if (ref.name.startsWith('gallery_')) {
         secondaryImageUrls.add(url);
-      } else if (ref.name == 'aadhar_card.pdf') {
+      } else if (ref.name.startsWith('aadhar_card.')) {
         aadharCardUrl = url;
+      } else if (ref.name.startsWith('biodata.')) {
+        bioDataUrl = url;
+      } else if (ref.name == 'image_with_agent.jpg') {
+        imageWithAgentUrl = url;
+      } else if (ref.name == 'profile_image.jpg') {
+        profileImageUrl = url;
       }
     }
     return {
       'primaryImageUrl': primaryImageUrl,
       'secondaryImageUrls': secondaryImageUrls,
       'aadharCardUrl': aadharCardUrl,
+      'bioDataUrl': bioDataUrl,
+      'imageWithAgentUrl': imageWithAgentUrl,
+      'profileImageUrl': profileImageUrl,
     };
   }
 
@@ -262,6 +275,51 @@ class ImageUploadService {
       );
     } catch (e) {
       throw UploadException('Unexpected error fetching Aadhar card: $e');
+    }
+  }
+
+  // 🔥 BIODATA UPLOAD
+  Future<String> uploadBioData({
+    required String uid,
+    required String filePath,
+    void Function(double)? onProgress,
+  }) async {
+    try {
+      _validateFile(filePath);
+
+      final ext = _getFileExtension(filePath);
+      if (!_isValidDocumentFormat(ext)) {
+        throw UploadException(
+          'Invalid file format: .$ext. Allowed: pdf, doc, docx, jpg, jpeg, png',
+          code: 'invalid-format',
+        );
+      }
+
+      _validateFileSize(filePath, maxMB: 50);
+
+      final file = File(filePath);
+      final ref = _storage.ref().child('profile_images/$uid/biodata.$ext');
+
+      final task = ref.putFile(file);
+
+      task.snapshotEvents.listen((event) {
+        if (onProgress != null && event.totalBytes > 0) {
+          onProgress(event.bytesTransferred / event.totalBytes);
+        }
+      });
+
+      await task;
+
+      return await ref.getDownloadURL();
+    } on FirebaseException catch (e) {
+      throw UploadException(
+        'Firebase biodata upload failed: ${e.message}',
+        code: e.code,
+      );
+    } on UploadException {
+      rethrow;
+    } catch (e) {
+      throw UploadException('Unexpected error uploading biodata: $e');
     }
   }
 

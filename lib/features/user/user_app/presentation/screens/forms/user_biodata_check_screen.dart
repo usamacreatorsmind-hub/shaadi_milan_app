@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../../../core/constants/app_labels.dart';
-import '../../../../../app/custom/image_picker/image_picker_controller.dart';
-import '../../../../../app/router/app_router.dart';
-import '../../../../auth/presentation/providers/auth_providers.dart';
-import '../../domain/states/image_state.dart';
-import '../../widgets/pdf_viewer_bottomsheet.dart';
-import '../controllers/metrimony_profile_controller.dart';
+import '../../../../../../../app/router/app_router.dart';
+import '../../../../../../../core/constants/app_labels.dart';
+import '../../../../../../app/custom/image_picker/image_picker_controller.dart';
+import '../../../../../auth/presentation/providers/auth_providers.dart';
+import '../../../../../translitration/models/bilingual_value.dart';
+import '../../../domain/states/image_state.dart';
+import '../../../widgets/pdf_viewer_bottomsheet.dart';
+import '../../controllers/metrimony_profile_controller.dart';
 
 @RoutePage()
 class UserBiodataCheckScreen extends ConsumerStatefulWidget {
@@ -76,12 +77,7 @@ class _UserBiodataCheckScreenState
               AppLabels.ageYears(context, profile.identity.age),
             ),
             _infoRow(AppLabels.aadharNumber(context), profile.identity.aadhar),
-            _infoRow(
-              AppLabels.aboutMe(context),
-              isHindi
-                  ? profile.identity.aboutMe.hi
-                  : profile.identity.aboutMe.en,
-            ),
+            _infoRow(AppLabels.aboutMe(context), profile.identity.aboutMe),
           ]),
 
           _section(
@@ -117,9 +113,7 @@ class _UserBiodataCheckScreenState
             _infoRow(AppLabels.caste(context), profile.cultural.caste),
             _infoRow(
               AppLabels.subCasteLabel(context),
-              isHindi
-                  ? profile.cultural.subCaste.hi
-                  : profile.cultural.subCaste.en,
+              profile.cultural.subCaste,
             ),
             // _infoRow('Mother Tongue', profile.cultural.motherTongue),
             _chipWrap(
@@ -133,15 +127,11 @@ class _UserBiodataCheckScreenState
           _section(AppLabels.education(context), Icons.school, [
             _infoRow(
               AppLabels.collegeUniversity(context),
-              isHindi
-                  ? profile.education.education?.college.hi
-                  : profile.education.education?.college.en,
+              profile.education.education?.college,
             ),
             _infoRow(
               AppLabels.degreeCourse(context),
-              isHindi
-                  ? profile.education.education?.course.hi
-                  : profile.education.education?.course.en,
+              profile.education.education?.course,
             ),
             _infoRow(
               AppLabels.percentageCGPA(context),
@@ -167,25 +157,16 @@ class _UserBiodataCheckScreenState
           _section(AppLabels.employmentDetails(context), Icons.work, [
             _infoRow(
               AppLabels.organization(context),
-              isHindi
-                  ? profile.employment.company?.hi
-                  : profile.employment.company?.en,
+              profile.employment.company,
             ),
-            _infoRow(
-              AppLabels.role(context),
-              isHindi
-                  ? profile.employment.designation?.hi
-                  : profile.employment.designation?.en,
-            ),
+            _infoRow(AppLabels.role(context), profile.employment.designation),
             _infoRow(
               AppLabels.annualIncome(context),
               profile.employment.annualIncome,
             ),
             _infoRow(
               AppLabels.designation(context),
-              isHindi
-                  ? profile.employment.designation?.hi
-                  : profile.employment.designation?.en,
+              profile.employment.designation,
             ),
             _infoRow(AppLabels.jobType(context), profile.employment.jobType),
           ]),
@@ -209,16 +190,8 @@ class _UserBiodataCheckScreenState
           ]),
 
           _section(AppLabels.location(context), Icons.location_on, [
-            _infoRow(
-              AppLabels.location(context),
-              isHindi
-                  ? profile.address.addressLine1.hi
-                  : profile.address.addressLine1.en,
-            ),
-            _infoRow(
-              AppLabels.post(context),
-              isHindi ? profile.address.post.hi : profile.address.post.en,
-            ),
+            _infoRow(AppLabels.location(context), profile.address.addressLine1),
+            _infoRow(AppLabels.post(context), profile.address.post),
             _infoRow(AppLabels.city(context), profile.address.city),
             _infoRow(AppLabels.state(context), profile.address.state),
             _infoRow(AppLabels.pinCodeLabel(context), profile.address.pincode),
@@ -267,6 +240,55 @@ class _UserBiodataCheckScreenState
                         borderRadius: BorderRadius.circular(14),
                         child: Image.file(
                           File(imageState.aadharPdfPath!),
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+              ],
+            ),
+
+          if (imageState.bioDataPath != null &&
+              imageState.bioDataPath!.isNotEmpty)
+            _section(
+              AppLabels.uploadBioData(context),
+              Icons.description,
+              [
+                imageState.bioDataPath!.toLowerCase().endsWith('.pdf')
+                    ? GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) => PdfViewerBottomsheet(
+                              source: imageState.bioDataPath!,
+                              title: AppLabels.uploadBioData(context),
+                              isLocal: true,
+                            ),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.picture_as_pdf,
+                              color: Colors.redAccent,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              AppLabels.document(context),
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.file(
+                          File(imageState.bioDataPath!),
                           height: 200,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -360,7 +382,18 @@ class _UserBiodataCheckScreenState
   }
 
   Widget _infoRow(String label, dynamic value) {
-    if (value == null || value.toString().trim().isEmpty) {
+    if (value == null) return const SizedBox();
+
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
+    String displayValue = '';
+
+    if (value is BilingualValue) {
+      displayValue = isHindi ? value.hi : value.en;
+    } else {
+      displayValue = value.toString().trim();
+    }
+
+    if (displayValue.isEmpty) {
       return const SizedBox();
     }
 
@@ -379,7 +412,7 @@ class _UserBiodataCheckScreenState
           Expanded(
             flex: 6,
             child: Text(
-              value.toString(),
+              displayValue,
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ),

@@ -1,5 +1,12 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/user/user_app/widgets/agent_bottom_sheet.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+
+import '../../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
-import '../../../../../app/custom/custom_widgets/contact_us_screen.dart';
 import '../../../../../app/custom/custom_widgets/user_drawer.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../app/router/app_router.dart';
@@ -9,12 +16,6 @@ import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
-import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
-import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
-import 'package:shadi_milan/features/user/user_app/widgets/agent_bottom_sheet.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final userProfileScreenProvider =
     StreamProvider.family<MetrimonyProfileViewModel, String>((ref, userId) {
@@ -69,14 +70,14 @@ class UserProfileScreen extends ConsumerWidget {
         error: (err, stackTrace) {
           debugPrint(stackTrace.toString());
 
-          return Center(child: Text('Error: $err'));
+          return Center(child: Text(AppLabels.error(context, err.toString())));
         },
         data: (profile) {
           return CustomScrollView(
             slivers: [
               ModernGradientAppBar(
-                title: "My Profile",
-                subtitle: "Manage your account",
+                title: AppLabels.myProfile(context),
+                subtitle: AppLabels.manageAccount(context),
                 leading: Builder(
                   builder: (context) => IconButton(
                     icon: const Icon(Icons.menu, color: Colors.white),
@@ -85,48 +86,6 @@ class UserProfileScreen extends ConsumerWidget {
                 ),
               ),
 
-              // SliverAppBar(
-              //   backgroundColor: Colors.grey[100],
-              //   expandedHeight: 120,
-              //   floating: false,
-              //   pinned: true,
-              //   flexibleSpace: FlexibleSpaceBar(
-              //     titlePadding: const EdgeInsets.symmetric(
-              //       horizontal: 16,
-              //       vertical: 10,
-              //     ),
-              //     centerTitle: false,
-              //     title: Text(
-              //       "My Profile",
-              //       style: TextStyle(
-              //         fontSize: 24,
-              //         fontWeight: FontWeight.bold,
-              //         color: theme.primaryColor,
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              // SliverAppBar(
-              //   backgroundColor: Colors.grey[100],
-              //   expandedHeight: 120,
-              //   floating: false,
-              //   pinned: true,
-              //   flexibleSpace: FlexibleSpaceBar(
-              //     titlePadding: const EdgeInsets.symmetric(
-              //       horizontal: 16,
-              //       vertical: 10,
-              //     ),
-              //     centerTitle: false,
-              //     title: Text(
-              //       "My Profile",
-              //       style: TextStyle(
-              //         fontSize: 24,
-              //         fontWeight: FontWeight.bold,
-              //         color: theme.primaryColor,
-              //       ),
-              //     ),
-              //   ),
-              // ),
               SliverToBoxAdapter(child: _ProfileHeaderCard(profile: profile)),
 
               SliverPadding(
@@ -138,8 +97,6 @@ class UserProfileScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 24),
-
-                        // 🔹 TITLE
 
                         // 🔹 PREMIUM CARD
 
@@ -157,8 +114,6 @@ class UserProfileScreen extends ConsumerWidget {
 
                             // change after publishing on playstore
                             if (paymentState.status == PayStatus.idle) {
-                              print(" this  is payment status");
-                              print(paymentState.status);
                               return GestureDetector(
                                 onTap: () => AutoRouter.of(context).push(
                                   UserPaymentSuccessRoute(user: profile.user),
@@ -205,7 +160,7 @@ class UserProfileScreen extends ConsumerWidget {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "Premium Active",
+                                              AppLabels.premiumActive(context),
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: Colors.green.shade800,
@@ -213,9 +168,11 @@ class UserProfileScreen extends ConsumerWidget {
                                                 letterSpacing: 1.1,
                                               ),
                                             ),
-                                            const Text(
-                                              "You are a Premium Member!",
-                                              style: TextStyle(
+                                            Text(
+                                              AppLabels.premiumMemberMessage(
+                                                context,
+                                              ),
+                                              style: const TextStyle(
                                                 fontSize: 17,
                                                 color: Colors.black87,
                                                 fontWeight: FontWeight.w600,
@@ -239,10 +196,10 @@ class UserProfileScreen extends ConsumerWidget {
                         ),
 
                         // 🔹 GENERAL SECTION
-                        _SectionTitle(title: "General"),
+                        _SectionTitle(title: AppLabels.generalSection(context)),
                         _SettingsTile(
                           icon: Icons.person_search_outlined,
-                          title: "My Profile",
+                          title: AppLabels.myProfile(context),
                           onTap: () {
                             AutoRouter.of(
                               context,
@@ -251,7 +208,7 @@ class UserProfileScreen extends ConsumerWidget {
                         ),
                         _SettingsTile(
                           icon: Icons.support_agent_outlined,
-                          title: "Agent Details",
+                          title: AppLabels.agentDetails(context),
                           onTap: () {
                             if (profile.agentEntity != null) {
                               showModalBottomSheet(
@@ -264,8 +221,10 @@ class UserProfileScreen extends ConsumerWidget {
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("No agent assigned yet."),
+                                SnackBar(
+                                  content: Text(
+                                    AppLabels.noAgentAssigned(context),
+                                  ),
                                 ),
                               );
                             }
@@ -275,39 +234,30 @@ class UserProfileScreen extends ConsumerWidget {
                         // user status
                         _SettingsTile(
                           icon: Icons.verified_user_outlined,
-                          title: "User Status",
+                          title: AppLabels.userStatus(context),
                           onTap: () {
                             // navigate to user status screen
                             AutoRouter.of(context).push(UserStatusRoute());
                           },
                         ),
 
-                        // // user Review
-                        // _SettingsTile(
-                        //   icon: Icons.verified_user_outlined,
-                        //   title: "My Review",
-                        //   onTap: () {
-                        //     // navigate to user status screen
-                        //     AutoRouter.of(context).push(const MyReviewRoute());
-                        //   },
-                        // ),
-
                         // Contact Support
-                        // stting tile
                         _SettingsTile(
                           icon: Icons.contact_support_outlined,
-                          title: "Contact Support",
+                          title: AppLabels.support(context),
                           onTap: () {
                             AutoRouter.of(context).push(const ContactUsRoute());
                           },
                         ),
 
                         // 🔹 ACCOUNT SETTINGS SECTION
-                        _SectionTitle(title: "Account Settings"),
+                        _SectionTitle(
+                          title: AppLabels.accountSettings(context),
+                        ),
 
                         _SettingsTile(
                           icon: Icons.lock_outline,
-                          title: "Change Password",
+                          title: AppLabels.changePassword(context),
                           onTap: () {
                             // navigate to change password screen
                             AutoRouter.of(context).push(ChangePasswordRoute());
@@ -317,7 +267,7 @@ class UserProfileScreen extends ConsumerWidget {
                         // payment route
                         _SettingsTile(
                           icon: Icons.payment_outlined,
-                          title: "Payment History",
+                          title: AppLabels.paymentHistory(context),
                           onTap: () {
                             AutoRouter.of(
                               context,
@@ -327,7 +277,7 @@ class UserProfileScreen extends ConsumerWidget {
 
                         _SettingsTile(
                           icon: Icons.family_restroom_outlined,
-                          title: "Post Marriage Payment",
+                          title: AppLabels.postMarriagePayment(context),
                           onTap: () {
                             AutoRouter.of(context).push(
                               UserAfterMarriagePaymentRoute(userId: userId),
@@ -364,13 +314,13 @@ class UserProfileScreen extends ConsumerWidget {
 
                               AutoRouter.of(context).replace(UserLoginRoute());
 
-                              print("Logout button pressed");
+                              debugPrint("Logout button pressed");
                             },
-                            child: const Text("Logout"),
+                            child: Text(AppLabels.logout(context)),
                           ),
                         ),
 
-                        SizedBox(height: 100),
+                        const SizedBox(height: 100),
                       ],
                     );
                   }, childCount: 1),
@@ -486,7 +436,9 @@ class _ProfileHeaderCard extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          profile.user.fullName.en.isEmpty ? 'N/A' : profile.user.fullName.en,
+                          profile.user.fullName.en.isEmpty
+                              ? AppLabels.notAvailableShort(context)
+                              : profile.user.fullName.en,
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w900,
@@ -505,7 +457,8 @@ class _ProfileHeaderCard extends StatelessWidget {
 
                   // --- Subtitle (Email/Role) ---
                   Text(
-                    profile.user.email?.toLowerCase() ?? 'N/A',
+                    profile.user.email?.toLowerCase() ??
+                        AppLabels.notAvailableShort(context),
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -521,11 +474,23 @@ class _ProfileHeaderCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildStatColumn("Profile", "85%"),
+                      _buildStatColumn(
+                        context,
+                        AppLabels.profile(context),
+                        "85%",
+                      ),
                       _buildVerticalDivider(),
-                      _buildStatColumn("Status", "Active"),
+                      _buildStatColumn(
+                        context,
+                        AppLabels.profileStatus(context),
+                        AppLabels.active(context),
+                      ),
                       _buildVerticalDivider(),
-                      _buildStatColumn("Trust Score", "4.8"),
+                      _buildStatColumn(
+                        context,
+                        AppLabels.trustScore(context),
+                        "4.8",
+                      ),
                     ],
                   ),
                 ],
@@ -537,7 +502,7 @@ class _ProfileHeaderCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatColumn(String label, String value) {
+  Widget _buildStatColumn(BuildContext context, String label, String value) {
     return Column(
       children: [
         Text(
@@ -572,7 +537,6 @@ class _PremiumCard extends StatelessWidget {
           // if Staff Id not present
           if (profile!.user.agentId.isEmpty) {
             // create a model bottom sheet  to take user id or  show contact details if he does not know
-            print(" inside bottom sheet");
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
@@ -587,7 +551,7 @@ class _PremiumCard extends StatelessWidget {
               // theme color
               backgroundColor: theme.canvasColor,
               builder: (BuildContext context) {
-                return AgentFormWidget();
+                return const AgentFormWidget();
               },
             );
 
@@ -619,7 +583,7 @@ class _PremiumCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Upgrade to Premium",
+                    AppLabels.upgradeToPremium(context),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -628,7 +592,7 @@ class _PremiumCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Get unlimited access to all features and connect with more matches.",
+                    AppLabels.premiumUpgradeBenefits(context),
                     style: TextStyle(
                       fontSize: 14,
                       color: theme.primaryColor.withOpacity(0.8),
@@ -697,7 +661,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = "Agent not found or invalid ID";
+          _errorMessage = AppLabels.agentNotFound(context);
           _isLoading = false;
         });
       }
@@ -707,7 +671,6 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
   @override
   Widget build(BuildContext context) {
     final selectedTab = ref.watch(agentSetupProvider);
-    final agentDetail = ref.watch(agentDetailProvider);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -715,7 +678,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _SectionTitle(title: "Agent Setup"),
+            _SectionTitle(title: AppLabels.agentSetup(context)),
             const SizedBox(height: 12),
 
             Row(
@@ -724,7 +687,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                 Expanded(
                   child: _ActionTab(
                     icon: Icons.person_add_alt_1_outlined,
-                    title: "Enter Staff Id",
+                    title: AppLabels.enterStaffId(context),
                     isSelected: selectedTab == 1,
                     onTap: () {
                       ref.read(agentSetupProvider.notifier).state = 1;
@@ -735,7 +698,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                 Expanded(
                   child: _ActionTab(
                     icon: Icons.contact_phone_outlined,
-                    title: "Contact Support",
+                    title: AppLabels.support(context),
                     isSelected: selectedTab == 2,
 
                     onTap: () {
@@ -761,9 +724,9 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
 
   void _assignAgent({required String agentId}) {
     if (agentId.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please enter Staff Id")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLabels.pleaseEnterStaffId(context))),
+      );
       return;
     }
 
@@ -782,7 +745,9 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Agent $agentId assigned successfully!")),
+      SnackBar(
+        content: Text(AppLabels.agentAssignedSuccessfully(context, agentId)),
+      ),
     );
 
     _agentIdController.clear();
@@ -796,7 +761,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Assign an agent to your profile to get personalized assistance and faster service.",
+            AppLabels.agentSetupDescription(context),
             style: TextStyle(
               fontSize: 16,
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -806,8 +771,8 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
           TextField(
             controller: _agentIdController,
             decoration: InputDecoration(
-              labelText: "Staff Id",
-              hintText: "Enter Staff Id (e.g., AGT-12345)",
+              labelText: AppLabels.staffId(context),
+              hintText: AppLabels.staffIdHint(context),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -852,16 +817,16 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Agent Details:",
-                        style: TextStyle(
+                      Text(
+                        AppLabels.agentDetailsHeader(context),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        "Name: ${_fetchedAgent!.agentName}",
+                        "${AppLabels.fullName(context)}: ${_fetchedAgent!.agentName}",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -869,25 +834,25 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
 
-                        "Mobile: ${_fetchedAgent!.agentMobile}",
+                        "${AppLabels.phone(context)}: ${_fetchedAgent!.agentMobile}",
                       ),
                       Text(
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
 
-                        "Email: ${_fetchedAgent!.agentEmail}",
+                        "${AppLabels.email(context)}: ${_fetchedAgent!.agentEmail}",
                       ),
                       Text(
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
 
-                        "Staff Id: ${_fetchedAgent!.agentId}",
+                        "${AppLabels.staffId(context)}: ${_fetchedAgent!.agentId}",
                       ),
                       Text(
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
 
-                        "Address: ${_fetchedAgent!.agentAddress}",
+                        "${AppLabels.address(context)}: ${_fetchedAgent!.agentAddress}",
                       ),
                       const SizedBox(height: 8),
                     ],
@@ -895,7 +860,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                 ],
               ),
             ),
-          SizedBox(height: 40),
+          const SizedBox(height: 40),
 
           SizedBox(
             width: double.infinity,
@@ -911,10 +876,13 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                 backgroundColor: Theme.of(context).primaryColor,
                 foregroundColor: Colors.white,
               ),
-              child: const Text("Assign Agent", style: TextStyle(fontSize: 16)),
+              child: Text(
+                AppLabels.assignAgent(context),
+                style: const TextStyle(fontSize: 16),
+              ),
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -926,7 +894,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
       child: Column(
         children: [
           Text(
-            "If you don't have an Staff Id, you can contact our support team for assistance.",
+            AppLabels.noStaffIdSupport(context),
             style: TextStyle(
               fontSize: 16,
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -940,8 +908,8 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                   prefixIcon: Icons.person,
 
                   iconColor: Theme.of(context).primaryColor,
-                  label: "Full Name",
-                  hint: "Enter your full name",
+                  label: AppLabels.fullName(context),
+                  hint: AppLabels.fullNameHint(context),
                   obscureText: false,
                   keyboardType: TextInputType.name,
                 ),
@@ -951,8 +919,8 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                   prefixIcon: Icons.email,
 
                   iconColor: Theme.of(context).primaryColor,
-                  label: "Email Address",
-                  hint: "Enter your email address",
+                  label: AppLabels.emailAddress(context),
+                  hint: AppLabels.emailHint(context),
                   obscureText: false,
                   keyboardType: TextInputType.emailAddress,
                 ),
@@ -961,8 +929,8 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                 AppTextField(
                   prefixIcon: Icons.phone,
                   iconColor: Theme.of(context).primaryColor,
-                  label: "Phone Number",
-                  hint: "Enter your phone number",
+                  label: AppLabels.phone(context),
+                  hint: AppLabels.phoneHint(context),
                   obscureText: false,
                   keyboardType: TextInputType.phone,
                 ),
@@ -971,8 +939,8 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                 AppTextField(
                   prefixIcon: Icons.message,
                   iconColor: Theme.of(context).primaryColor,
-                  label: "Message",
-                  hint: "Enter your message",
+                  label: AppLabels.message(context),
+                  hint: AppLabels.enterMessageHint(context),
                   obscureText: false,
                   keyboardType: TextInputType.multiline,
                   maxLines: 3,
@@ -983,9 +951,9 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                   child: ElevatedButton(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                        SnackBar(
                           content: Text(
-                            "Your request has been submitted. Our team will contact you shortly.",
+                            AppLabels.supportRequestSubmitted(context),
                           ),
                         ),
                       );
@@ -997,9 +965,9 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      "Submit Request",
-                      style: TextStyle(fontSize: 16),
+                    child: Text(
+                      AppLabels.submitRequest(context),
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
                 ),

@@ -1,10 +1,8 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import '../../../core/themes/app_theme.dart';
@@ -24,7 +22,11 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
   bool _isPicking = false;
 
-  Future<String?> _cropImage(BuildContext context, String path, {bool isPrimary = false}) async {
+  Future<String?> _cropImage(
+    BuildContext context,
+    String path, {
+    bool isPrimary = false,
+  }) async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
       uiSettings: [
@@ -62,7 +64,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
   }
 
   // pick images from gallary
-  Future<void> pickAadharImages() async {
+  Future<void> pickBioDataImages() async {
     if (_isPicking) return;
     _isPicking = true;
 
@@ -74,7 +76,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (result == null || result.files.single.path == null) return;
 
-      state = state.copyWith(aadharPdfPath: result.files.single.path);
+      state = state.copyWith(bioDataPath: result.files.single.path);
     } finally {
       _isPicking = false;
     }
@@ -92,7 +94,11 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (image == null) return;
 
-      final croppedPath = await _cropImage(context, image.path, isPrimary: true);
+      final croppedPath = await _cropImage(
+        context,
+        image.path,
+        isPrimary: true,
+      );
       if (croppedPath != null) {
         state = state.copyWith(primaryImage: croppedPath);
       }
@@ -166,6 +172,9 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     if (state.aadharPdfPath == null || state.aadharPdfPath!.isEmpty) {
       throw Exception(AppLabels.aadharDocumentRequired(context));
     }
+    if (state.bioDataPath == null || state.bioDataPath!.isEmpty) {
+      throw Exception("Bio-data is required");
+    }
 
     try {
       ref.read(uploadProgressProvider.notifier).state = 0.0;
@@ -174,7 +183,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       final service = ref.read(imageUploadServiceProvider);
 
       const steps =
-          5; // primary, secondary, aadhar, imageWithAgent, profileImage
+          6; // primary, secondary, aadhar, imageWithAgent, profileImage, bioData
       final stepWeight = 1.0 / steps;
 
       void updateStepProgress(int stepIndex, double p) {
@@ -216,6 +225,12 @@ class ImagePickerController extends StateNotifier<ImagesState> {
         onProgress: (p) => updateStepProgress(4, p),
       );
 
+      final bioDataUrl = await service.uploadBioData(
+        uid: uid,
+        filePath: state.bioDataPath!,
+        onProgress: (p) => updateStepProgress(5, p),
+      );
+
       ref
           .read(metrimonyControllerProvider.notifier)
           .saveImages(
@@ -225,6 +240,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
               imageWithAgentUrl: imagewithagenturl,
               aadharCardUrl: aadharCardUrl,
               secondaryImageUrls: secondaryImageUrls,
+              bioDataUrl: bioDataUrl,
             ),
           );
     } catch (e) {
@@ -242,7 +258,11 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (image == null) return;
 
-      final croppedPath = await _cropImage(context, image.path, isPrimary: false);
+      final croppedPath = await _cropImage(
+        context,
+        image.path,
+        isPrimary: false,
+      );
       if (croppedPath != null) {
         state = state.copyWith(imageWithAgentUrl: croppedPath);
       }
@@ -265,7 +285,11 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (image == null) return;
 
-      final croppedPath = await _cropImage(context, image.path, isPrimary: true);
+      final croppedPath = await _cropImage(
+        context,
+        image.path,
+        isPrimary: true,
+      );
 
       if (croppedPath != null) {
         state = state.copyWith(profileImage: croppedPath);

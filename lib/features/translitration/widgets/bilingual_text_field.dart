@@ -118,6 +118,7 @@ class _BilingualTextFieldState extends ConsumerState<BilingualTextField> {
           obscureText: false,
           keyboardType: widget.keyboardType,
           maxLines: widget.maxLines,
+          validator: (v) => null,
           onChanged: (v) => _onFieldChanged(v, true),
         ),
 

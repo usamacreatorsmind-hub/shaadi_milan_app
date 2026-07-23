@@ -1,8 +1,10 @@
-import '../../../../../app/custom/custom_widgets/appbar.dart';
-import '../controllers/user_status_controller.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../../app/custom/custom_widgets/appbar.dart';
+import '../../../../../core/constants/app_labels.dart';
+import '../controllers/user_status_controller.dart';
 
 @RoutePage()
 class UserStatusScreen extends ConsumerWidget {
@@ -16,11 +18,15 @@ class UserStatusScreen extends ConsumerWidget {
     final userStatus = userStatusState.userStatus;
 
     return Scaffold(
-      appBar: CustomAppBar(title: 'User Status'),
+      appBar: CustomAppBar(title: AppLabels.userStatus(context)),
       body: userStatusState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : userStatusState.error != null
-          ? Center(child: Text('Error: ${userStatusState.error}'))
+          ? Center(
+              child: Text(
+                AppLabels.error(context, userStatusState.error.toString()),
+              ),
+            )
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -31,17 +37,18 @@ class UserStatusScreen extends ConsumerWidget {
                   const SizedBox(height: 10),
                   _buildStatusRow(
                     context,
-                    'Payment ID:',
-                    userStatus.paymentId ?? 'N/A',
+                    '${AppLabels.paymentId(context)}:',
+                    userStatus.paymentId ??
+                        AppLabels.notAvailableShort(context),
                     Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   const SizedBox(height: 10),
                   _buildStatusRow(
                     context,
-                    'Payment Date:',
+                    '${AppLabels.paymentDate(context)}:',
                     userStatus.paymentAt != null
                         ? '${userStatus.paymentAt!.toLocal().day}/${userStatus.paymentAt!.toLocal().month}/${userStatus.paymentAt!.toLocal().year}'
-                        : 'N/A',
+                        : AppLabels.notAvailableShort(context),
                     Theme.of(context).textTheme.bodyMedium?.color,
                   ),
 
@@ -49,7 +56,7 @@ class UserStatusScreen extends ConsumerWidget {
                   if (userStatus.paymentId != null)
                     _buildStatusRow(
                       context,
-                      'Payment ID:',
+                      '${AppLabels.paymentId(context)}:',
                       userStatus.paymentId!,
                       Theme.of(context).textTheme.bodyMedium?.color,
                     ),
@@ -57,7 +64,7 @@ class UserStatusScreen extends ConsumerWidget {
                   if (userStatus.paymentAt != null)
                     _buildStatusRow(
                       context,
-                      'Payment Date:',
+                      '${AppLabels.paymentDate(context)}:',
                       '${userStatus.paymentAt!.toLocal().day}/${userStatus.paymentAt!.toLocal().month}/${userStatus.paymentAt!.toLocal().year}',
                       Theme.of(context).textTheme.bodyMedium?.color,
                     ),

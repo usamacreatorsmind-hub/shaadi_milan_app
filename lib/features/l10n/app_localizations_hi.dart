@@ -1890,7 +1890,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get matrimonyProfileTab => 'वैवाहिक प्रोफ़ाइल';
 
   @override
-  String get bioData => 'बायो डेटा';
+  String get bioData => 'बायोडाटा';
 
   @override
   String get matrimonyProfileNotFound => 'वैवाहिक प्रोफ़ाइल नहीं मिली';
@@ -2100,4 +2100,417 @@ class AppLocalizationsHi extends AppLocalizations {
   String yearsOld(int age) {
     return '$age साल';
   }
+
+  @override
+  String get photos => 'तस्वीरें';
+
+  @override
+  String get idCards => 'पहचान पत्र';
+
+  @override
+  String get basicInformation => 'बुनियादी जानकारी';
+
+  @override
+  String get noPhotosAvailable => 'कोई अतिरिक्त फ़ोटो उपलब्ध नहीं है।';
+
+  @override
+  String get aadharCardNotUploaded => 'आधार कार्ड अपलोड नहीं किया गया है।';
+
+  @override
+  String get noDescriptionAvailable => 'कोई परिचय उपलब्ध नहीं है।';
+
+  @override
+  String get myReviews => 'मेरी समीक्षाएं';
+
+  @override
+  String get noReviewsYet => 'अभी तक कोई समीक्षा नहीं है।';
+
+  @override
+  String error(String error) {
+    return 'त्रुटि: $error';
+  }
+
+  @override
+  String get religiousAndAstrological => 'धार्मिक और ज्योतिषीय';
+
+  @override
+  String get qualificationsBilingual => 'योग्यताएं (हिन्दी | अंग्रेजी)';
+
+  @override
+  String get languagesBilingual => 'भाषाएँ (हिन्दी | अंग्रेजी)';
+
+  @override
+  String get addQualification => 'योग्यता जोड़ें';
+
+  @override
+  String get addLanguage => 'भाषा जोड़ें';
+
+  @override
+  String get basicInfoTab => 'बुनियादी जानकारी';
+
+  @override
+  String get personalDetailsTab => 'व्यक्तिगत विवरण';
+
+  @override
+  String get educationCareerTab => 'शिक्षा और करियर';
+
+  @override
+  String get familyCultureTab => 'परिवार और संस्कृति';
+
+  @override
+  String get physical => 'शारीरिक';
+
+  @override
+  String get employment => 'रोजगार';
+
+  @override
+  String get educationStatus => 'शिक्षा की स्थिति';
+
+  @override
+  String get additionalCourses => 'अतिरिक्त पाठ्यक्रम';
+
+  @override
+  String get addToWishlist => 'विशलिस्ट में जोड़ें';
+
+  @override
+  String get disability => 'विकलांगता';
+
+  @override
+  String get college => 'कॉलेज';
+
+  @override
+  String get father => 'पिता';
+
+  @override
+  String get mother => 'माता';
+
+  @override
+  String get alreadyAddedToWishlist => 'पहले से ही विशलिस्ट में जोड़ा गया है!';
+
+  @override
+  String get addedToWishlist => 'विशलिस्ट में जोड़ा गया!';
+
+  @override
+  String get wishlistTitle => 'विशलिस्ट';
+
+  @override
+  String get manageInterests => 'अपनी रुचियों को प्रबंधित करें';
+
+  @override
+  String get myWishlist => 'मेरी विशलिस्ट';
+
+  @override
+  String get wishlistedMe => 'जिन्होंने मुझे विशलिस्ट किया';
+
+  @override
+  String get emptyWishlistTitle => 'आपकी विशलिस्ट खाली है!';
+
+  @override
+  String get emptyWishlistSubtitle =>
+      'यहाँ देखने के लिए अपनी विशलिस्ट में प्रोफाइल जोड़ना शुरू करें।';
+
+  @override
+  String get noOneWishlistedMeTitle =>
+      'अभी तक किसी ने आपको विशलिस्ट नहीं किया है!';
+
+  @override
+  String get noOneWishlistedMeSubtitle =>
+      'जब कोई आपको अपनी विशलिस्ट में जोड़ेगा, तो आप उन्हें यहाँ देखेंगे।';
+
+  @override
+  String get couldNotLoadProfile => 'प्रोफ़ाइल लोड नहीं की जा सकी';
+
+  @override
+  String get noAgentAssociated =>
+      'इस उपयोगकर्ता के साथ कोई एजेंट नहीं जुड़ा है।';
+
+  @override
+  String get userStatus => 'उपयोगकर्ता की स्थिति';
+
+  @override
+  String get paymentDate => 'भुगतान की तिथि';
+
+  @override
+  String get manageAccount => 'अपना खाता प्रबंधित करें';
+
+  @override
+  String get premiumActive => 'प्रीमियम सक्रिय';
+
+  @override
+  String get premiumMemberMessage => 'आप एक प्रीमियम सदस्य हैं!';
+
+  @override
+  String get generalSection => 'सामान्य';
+
+  @override
+  String get noAgentAssigned => 'अभी तक कोई एजेंट नियुक्त नहीं किया गया है।';
+
+  @override
+  String get accountSettings => 'खाता सेटिंग्स';
+
+  @override
+  String get paymentHistory => 'भुगतान इतिहास';
+
+  @override
+  String get postMarriagePayment => 'विवाह के बाद का भुगतान';
+
+  @override
+  String get trustScore => 'ट्रस्ट स्कोर';
+
+  @override
+  String get upgradeToPremium => 'प्रीमियम में अपग्रेड करें';
+
+  @override
+  String get premiumUpgradeBenefits =>
+      'सभी सुविधाओं तक असीमित पहुंच प्राप्त करें और अधिक मिलानों के साथ जुड़ें।';
+
+  @override
+  String get agentSetup => 'एजेंट सेटअप';
+
+  @override
+  String get enterStaffId => 'स्टाफ आईडी दर्ज करें';
+
+  @override
+  String get pleaseEnterStaffId => 'कृपया स्टाफ आईडी दर्ज करें';
+
+  @override
+  String agentAssignedSuccessfully(String id) {
+    return 'एजेंट $id सफलतापूर्वक नियुक्त किया गया!';
+  }
+
+  @override
+  String get agentSetupDescription =>
+      'व्यक्तिगत सहायता और तेज़ सेवा प्राप्त करने के लिए अपनी प्रोफ़ाइल में एक एजेंट नियुक्त करें।';
+
+  @override
+  String get staffIdHint => 'स्टाफ आईडी दर्ज करें (जैसे, AGT-12345)';
+
+  @override
+  String get agentDetailsHeader => 'एजेंट विवरण:';
+
+  @override
+  String get assignAgent => 'एजेंट नियुक्त करें';
+
+  @override
+  String get noStaffIdSupport =>
+      'यदि आपके पास स्टाफ आईडी नहीं है, तो आप सहायता के लिए हमारी सहायता टीम से संपर्क कर सकते हैं।';
+
+  @override
+  String get enterMessageHint => 'अपना संदेश दर्ज करें';
+
+  @override
+  String get supportRequestSubmitted =>
+      'आपका अनुरोध सबमिट कर दिया गया है। हमारी टीम जल्द ही आपसे संपर्क करेगी।';
+
+  @override
+  String get submitRequest => 'अनुरोध सबमिट करें';
+
+  @override
+  String get message => 'संदेश';
+
+  @override
+  String get viewManageTickets => 'अपने टिकट देखें और प्रबंधित करें';
+
+  @override
+  String get newTicket => 'नया टिकट';
+
+  @override
+  String get noSupportTickets => 'कोई सपोर्ट टिकट नहीं';
+
+  @override
+  String get createTicketHelp =>
+      'हमारी सपोर्ट टीम से सहायता प्राप्त करने के लिए टिकट बनाएं';
+
+  @override
+  String get today => 'आज';
+
+  @override
+  String get yesterday => 'कल';
+
+  @override
+  String daysAgo(int days) {
+    return '$days दिन पहले';
+  }
+
+  @override
+  String get resolved => 'समाधान किया गया';
+
+  @override
+  String get urgent => 'अत्यंत आवश्यक';
+
+  @override
+  String get low => 'कम';
+
+  @override
+  String get medium => 'मध्यम';
+
+  @override
+  String get high => 'उच्च';
+
+  @override
+  String get createSupportTicket => 'सपोर्ट टिकट बनाएं';
+
+  @override
+  String get wereHereToHelp => 'हम यहाँ आपकी मदद के लिए हैं!';
+
+  @override
+  String get supportFormSubtitle =>
+      'हमें अपनी समस्या के बारे में बताएं और हम जल्द ही आपसे संपर्क करेंगे।';
+
+  @override
+  String get category => 'श्रेणी';
+
+  @override
+  String get pleaseSelectCategory => 'कृपया एक श्रेणी चुनें';
+
+  @override
+  String get priority => 'प्राथमिकता';
+
+  @override
+  String get subject => 'विषय';
+
+  @override
+  String get pleaseEnterSubject => 'कृपया विषय दर्ज करें';
+
+  @override
+  String get pleaseEnterDescription => 'कृपया विवरण दर्ज करें';
+
+  @override
+  String get submitting => 'सबमिट किया जा रहा है...';
+
+  @override
+  String get ticketCreatedSuccess => 'टिकट सफलतापूर्वक बनाया गया!';
+
+  @override
+  String get catAccountIssues => 'खाता संबंधी समस्याएं';
+
+  @override
+  String get catPaymentProblems => 'भुगतान संबंधी समस्याएं';
+
+  @override
+  String get catProfileIssues => 'प्रोफ़ाइल संबंधी समस्याएं';
+
+  @override
+  String get catTechSupport => 'तकनीकी सहायता';
+
+  @override
+  String get catFeatureRequest => 'सुविधा का अनुरोध';
+
+  @override
+  String get catOther => 'अन्य';
+
+  @override
+  String get description => 'विवरण';
+
+  @override
+  String get ticketDetails => 'टिकट विवरण';
+
+  @override
+  String get ticketInformation => 'टिकट की जानकारी';
+
+  @override
+  String get adminResponse => 'एडमिन की प्रतिक्रिया';
+
+  @override
+  String get ticketHash => 'टिकट #';
+
+  @override
+  String get writeAReview => 'समीक्षा लिखें';
+
+  @override
+  String get pleaseSelectRating => 'कृपया रेटिंग चुनें';
+
+  @override
+  String get reviewSubmittedSuccess => 'समीक्षा सफलतापूर्वक सबमिट की गई!';
+
+  @override
+  String get reviewTitle => 'समीक्षा का शीर्षक';
+
+  @override
+  String get reviewTitleHint => 'अपनी समीक्षा के लिए एक शीर्षक दर्ज करें';
+
+  @override
+  String get reviewDescription => 'समीक्षा का विवरण';
+
+  @override
+  String get reviewDescriptionHint => 'अपनी विस्तृत समीक्षा यहाँ लिखें';
+
+  @override
+  String get titleCannotBeEmpty => 'शीर्षक खाली नहीं हो सकता';
+
+  @override
+  String get descriptionCannotBeEmpty => 'विवरण खाली नहीं हो सकता';
+
+  @override
+  String get submitReview => 'समीक्षा सबमिट करें';
+
+  @override
+  String get noAgentReviewError => 'आप बिना एजेंट के समीक्षा नहीं लिख सकते';
+
+  @override
+  String get whatUsersSay => 'हमारे उपयोगकर्ता हमारे बारे में क्या कहते हैं';
+
+  @override
+  String get happyCustomersMessage =>
+      'हमारे खुश ग्राहकों की वास्तविक समीक्षाएं पढ़ें।';
+
+  @override
+  String get beTheFirstReview => 'समीक्षा छोड़ने वाले पहले व्यक्ति बनें!';
+
+  @override
+  String get reviewDetails => 'समीक्षा विवरण';
+
+  @override
+  String reviewedOn(String date) {
+    return '$date को समीक्षा की गई';
+  }
+
+  @override
+  String get comment => 'टिप्पणी';
+
+  @override
+  String get title => 'शीर्षक';
+
+  @override
+  String get accountVerification => 'खाता सत्यापन';
+
+  @override
+  String get accountUnderReview =>
+      'आपका खाता वर्तमान में समीक्षाधीन है। कृपया सत्यापन की प्रतीक्षा करें।';
+
+  @override
+  String get profileUpdate => 'प्रोफ़ाइल अपडेट';
+
+  @override
+  String get profileUpdateSuccess =>
+      'आपकी प्रोफ़ाइल सफलतापूर्वक अपडेट कर दी गई है।';
+
+  @override
+  String get newMatchFoundTitle => 'नया मिलान मिला!';
+
+  @override
+  String get newMatchFoundSubtitle =>
+      'हमें आपके लिए एक नया मिलान मिला है। इसे अभी देखें!';
+
+  @override
+  String get newMessageTitle => 'नया संदेश';
+
+  @override
+  String newMessageFrom(String name) {
+    return 'आपको $name से एक नया संदेश मिला है।';
+  }
+
+  @override
+  String get paymentReminder => 'भुगतान अनुस्मारक';
+
+  @override
+  String get subscriptionRenewalDue =>
+      'आपकी सदस्यता का नवीनीकरण जल्द ही देय है।';
+
+  @override
+  String get contactAdminDetails =>
+      'अधिक जानकारी के लिए कृपया प्रशासक से संपर्क करें।';
+
+  @override
+  String get uploadBioData => 'बायोडाटा अपलोड करें (फोटो, PDF या दस्तावेज़)';
 }

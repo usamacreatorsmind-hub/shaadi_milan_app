@@ -1,6 +1,8 @@
-import '../../../../../app/custom/custom_widgets/widgets.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../core/constants/app_labels.dart';
 
 @RoutePage()
 class SearchScreen extends StatelessWidget {
@@ -9,7 +11,7 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Search')),
+      appBar: AppBar(title: Text(AppLabels.searchLabel(context))),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import 'image_picker_controller.dart';
@@ -55,8 +54,15 @@ class ExpandableImagePickerList extends ConsumerWidget {
         _ExpandableTile(
           title: AppLabels.aadharDocument(context),
           isSelected: state.aadharPdfPath != null,
-          onTapPick: controller.pickAadharImages,
+          onTapPick: controller.pickAadharPdf,
           child: _aadharPreview(state.aadharPdfPath),
+        ),
+
+        _ExpandableTile(
+          title: AppLabels.uploadBioData(context),
+          isSelected: state.bioDataPath != null,
+          onTapPick: controller.pickBioDataImages,
+          child: _aadharPreview(state.bioDataPath),
         ),
       ],
     );

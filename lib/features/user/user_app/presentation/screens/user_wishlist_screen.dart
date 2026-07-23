@@ -8,6 +8,7 @@ import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.da
 import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 
+import '../../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 import '../../../../../app/custom/custom_widgets/user_drawer.dart';
 import '../../../../../app/router/app_router.dart';
@@ -66,8 +67,8 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
           ? NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 ModernGradientAppBar(
-                  title: "Wishlist",
-                  subtitle: "Manage your interests",
+                  title: AppLabels.wishlistTitle(context),
+                  subtitle: AppLabels.manageInterests(context),
 
                   leading: Builder(
                     builder: (context) => IconButton(
@@ -91,9 +92,9 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
                           indicatorColor: theme.primaryColor,
                           labelColor: theme.primaryColor,
                           unselectedLabelColor: theme.primaryColor,
-                          tabs: const [
-                            Tab(text: "My Wishlist"),
-                            Tab(text: "Wishlisted Me"),
+                          tabs: [
+                            Tab(text: AppLabels.myWishlist(context)),
+                            Tab(text: AppLabels.wishlistedMe(context)),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -127,7 +128,7 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _buildFilterChip(null, "All", theme),
+          _buildFilterChip(null, AppLabels.all(context), theme),
           ...WishlistStatus.values.map(
             (status) =>
                 _buildFilterChip(status, _getStatusLabel(status), theme),
@@ -144,24 +145,22 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
   ) {
     final isSelected = _selectedStatus == status;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      padding: const EdgeInsets.only(right: 8),
       child: FilterChip(
         selected: isSelected,
-        label: Text(label),
-        labelStyle: TextStyle(
-          color: isSelected
-              ? Colors.white
-              : const Color.fromARGB(179, 31, 20, 20),
-          fontSize: 12,
+        label: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : theme.primaryColor,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
-        backgroundColor: Colors.white24,
-        selectedColor: _getStatusColor(status),
-        checkmarkColor: Colors.white,
+        backgroundColor: Colors.white,
+        selectedColor: theme.primaryColor,
         onSelected: (selected) {
           setState(() {
             _selectedStatus = selected ? status : null;
           });
-          // Update filters in notifiers
           ref
               .read(myWishlistNotifierProvider.notifier)
               .setStatusFilter(_selectedStatus);
@@ -169,6 +168,10 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
               .read(wishlistedMeNotifierProvider.notifier)
               .setStatusFilter(_selectedStatus);
         },
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: theme.primaryColor),
+        ),
       ),
     );
   }
@@ -176,38 +179,19 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
   String _getStatusLabel(WishlistStatus status) {
     switch (status) {
       case WishlistStatus.pending:
-        return "Pending";
+        return AppLabels.pending(context);
       case WishlistStatus.contacted:
-        return "Contacted";
+        return AppLabels.statusContacted(context);
       case WishlistStatus.interested:
-        return "Interested";
+        return AppLabels.statusInterested(context);
       case WishlistStatus.notInterested:
-        return "Not Interested";
+        return AppLabels.statusNotInterested(context);
       case WishlistStatus.closed:
-        return "Closed";
-    }
-  }
-
-  Color _getStatusColor(WishlistStatus? status) {
-    if (status == null) return Colors.blue;
-    switch (status) {
-      case WishlistStatus.pending:
-        return Colors.orange;
-      case WishlistStatus.contacted:
-        return Colors.blue;
-      case WishlistStatus.interested:
-        return Colors.green;
-      case WishlistStatus.notInterested:
-        return Colors.red;
-      case WishlistStatus.closed:
-        return Colors.grey;
+        return AppLabels.closed(context);
     }
   }
 }
 
-/// ==========================================
-/// My Wishlist Tab (User is sender)
-/// ==========================================
 class _MyWishlistTab extends ConsumerWidget {
   final String userId;
   final WishlistStatus? statusFilter;
@@ -230,7 +214,7 @@ class _MyWishlistTab extends ConsumerWidget {
             Icon(Icons.error_outline, size: 60, color: Colors.red[300]),
             const SizedBox(height: 16),
             Text(
-              'Error: ${wishlistState.error}',
+              AppLabels.error(context, wishlistState.error.toString()),
               style: const TextStyle(color: Colors.red),
               textAlign: TextAlign.center,
             ),
@@ -242,7 +226,7 @@ class _MyWishlistTab extends ConsumerWidget {
                     .loadWishlists(userId);
               },
               icon: const Icon(Icons.refresh),
-              label: const Text("Retry"),
+              label: Text(AppLabels.retry(context)),
             ),
           ],
         ),
@@ -254,39 +238,31 @@ class _MyWishlistTab extends ConsumerWidget {
     if (wishlists.isEmpty) {
       return _buildEmptyState(
         icon: Icons.favorite_border,
-        title: "Your wishlist is empty!",
-        subtitle: "Start adding profiles to your wishlist to see them here.",
+        title: AppLabels.emptyWishlistTitle(context),
+        subtitle: AppLabels.emptyWishlistSubtitle(context),
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        await ref
-            .read(myWishlistNotifierProvider.notifier)
-            .loadWishlists(userId);
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: wishlists.length,
+      itemBuilder: (context, index) {
+        final wishlist = wishlists[index];
+        return WishlistProfileCard(
+          wishlist: wishlist,
+          profileId: wishlist.receiverId,
+          isMyWishlist: true,
+          onStatusUpdate: (newStatus) async {
+            await ref
+                .read(myWishlistNotifierProvider.notifier)
+                .updateStatus(
+                  wishlistId: wishlist.id,
+                  status: newStatus,
+                  updatedBy: userId,
+                );
+          },
+        );
       },
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: wishlists.length,
-        itemBuilder: (context, index) {
-          final wishlist = wishlists[index];
-          return _WishlistItemCard(
-            wishlist: wishlist,
-            profileId: wishlist.receiverId, // Show receiver's profile
-            currentUserId: userId,
-            isMyWishlist: true,
-            onStatusUpdate: (newStatus) async {
-              await ref
-                  .read(myWishlistNotifierProvider.notifier)
-                  .updateStatus(
-                    wishlistId: wishlist.id,
-                    status: newStatus,
-                    updatedBy: userId,
-                  );
-            },
-          );
-        },
-      ),
     );
   }
 
@@ -301,22 +277,22 @@ class _MyWishlistTab extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 80, color: Colors.grey[400]),
+            Icon(icon, size: 80, color: Colors.grey[300]),
             const SizedBox(height: 16),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 20,
+              style: const TextStyle(
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
+                color: Colors.grey,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
+              style: TextStyle(color: Colors.grey[400]),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.grey[500]),
             ),
           ],
         ),
@@ -325,9 +301,6 @@ class _MyWishlistTab extends ConsumerWidget {
   }
 }
 
-/// ==========================================
-/// Wishlisted Me Tab (User is receiver)
-/// ==========================================
 class _WishlistedMeTab extends ConsumerWidget {
   final String userId;
   final WishlistStatus? statusFilter;
@@ -350,7 +323,7 @@ class _WishlistedMeTab extends ConsumerWidget {
             Icon(Icons.error_outline, size: 60, color: Colors.red[300]),
             const SizedBox(height: 16),
             Text(
-              'Error: ${wishlistState.error}',
+              AppLabels.error(context, wishlistState.error.toString()),
               style: const TextStyle(color: Colors.red),
               textAlign: TextAlign.center,
             ),
@@ -362,7 +335,7 @@ class _WishlistedMeTab extends ConsumerWidget {
                     .loadWishlists(userId);
               },
               icon: const Icon(Icons.refresh),
-              label: const Text("Retry"),
+              label: Text(AppLabels.retry(context)),
             ),
           ],
         ),
@@ -374,40 +347,31 @@ class _WishlistedMeTab extends ConsumerWidget {
     if (wishlists.isEmpty) {
       return _buildEmptyState(
         icon: Icons.people_outline,
-        title: "No one has wishlisted you yet!",
-        subtitle:
-            "When someone adds you to their wishlist, you'll see them here.",
+        title: AppLabels.noOneWishlistedMeTitle(context),
+        subtitle: AppLabels.noOneWishlistedMeSubtitle(context),
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        await ref
-            .read(wishlistedMeNotifierProvider.notifier)
-            .loadWishlists(userId);
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: wishlists.length,
+      itemBuilder: (context, index) {
+        final wishlist = wishlists[index];
+        return WishlistProfileCard(
+          wishlist: wishlist,
+          profileId: wishlist.senderId,
+          isMyWishlist: false,
+          onStatusUpdate: (newStatus) async {
+            await ref
+                .read(wishlistedMeNotifierProvider.notifier)
+                .updateStatus(
+                  wishlistId: wishlist.id,
+                  status: newStatus,
+                  updatedBy: userId,
+                );
+          },
+        );
       },
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: wishlists.length,
-        itemBuilder: (context, index) {
-          final wishlist = wishlists[index];
-          return _WishlistItemCard(
-            wishlist: wishlist,
-            profileId: wishlist.senderId, // Show sender's profile
-            currentUserId: userId,
-            isMyWishlist: false,
-            onStatusUpdate: (newStatus) async {
-              await ref
-                  .read(wishlistedMeNotifierProvider.notifier)
-                  .updateStatus(
-                    wishlistId: wishlist.id,
-                    status: newStatus,
-                    updatedBy: userId,
-                  );
-            },
-          );
-        },
-      ),
     );
   }
 
@@ -422,22 +386,22 @@ class _WishlistedMeTab extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 80, color: Colors.grey[400]),
+            Icon(icon, size: 80, color: Colors.grey[300]),
             const SizedBox(height: 16),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 20,
+              style: const TextStyle(
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
+                color: Colors.grey,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
+              style: TextStyle(color: Colors.grey[400]),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.grey[500]),
             ),
           ],
         ),
@@ -446,20 +410,16 @@ class _WishlistedMeTab extends ConsumerWidget {
   }
 }
 
-/// ==========================================
-/// Wishlist Item Card Widget
-/// ==========================================
-class _WishlistItemCard extends ConsumerWidget {
-  final WishlistEntity wishlist;
+class WishlistProfileCard extends ConsumerWidget {
+  final dynamic wishlist;
   final String profileId;
-  final String currentUserId;
   final bool isMyWishlist;
-  final Future<void> Function(String status) onStatusUpdate;
+  final Function(String) onStatusUpdate;
 
-  const _WishlistItemCard({
+  const WishlistProfileCard({
+    super.key,
     required this.wishlist,
     required this.profileId,
-    required this.currentUserId,
     required this.isMyWishlist,
     required this.onStatusUpdate,
   });
@@ -485,8 +445,8 @@ class _WishlistItemCard extends ConsumerWidget {
             backgroundColor: Colors.grey[300],
             child: const Icon(Icons.person_off),
           ),
-          title: const Text('Could not load profile'),
-          subtitle: Text('Profile ID: $profileId'),
+          title: Text(AppLabels.couldNotLoadProfile(context)),
+          subtitle: Text('${AppLabels.profileId(context)}: $profileId'),
         ),
         data: (profile) {
           final imageUrl = profile.images.primaryImageUrl;
@@ -562,12 +522,12 @@ class _WishlistItemCard extends ConsumerWidget {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                _buildStatusBadge(wishlist.status),
+                                _buildStatusBadge(context, wishlist.status),
                               ],
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${profile.identity.age} Yrs • ${profile.employment.jobType.isNotEmpty ? profile.employment.jobType : 'N/A'}',
+                              '${profile.identity.age} ${AppLabels.ageYrs(context)} • ${profile.employment.jobType.isNotEmpty ? profile.employment.jobType : AppLabels.notAvailableShort(context)}',
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Colors.grey[700],
@@ -612,7 +572,7 @@ class _WishlistItemCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusBadge(String status) {
+  Widget _buildStatusBadge(BuildContext context, String status) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -623,7 +583,7 @@ class _WishlistItemCard extends ConsumerWidget {
         ),
       ),
       child: Text(
-        _getStatusLabel(status),
+        _getStatusLabel(context, status),
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
@@ -638,14 +598,17 @@ class _WishlistItemCard extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Text(
-          'Updated: ${_formatDateTime(wishlist.updatedAt)}',
+          AppLabels.updatedAtWithParam(
+            context,
+            _formatDateTime(context, wishlist.updatedAt),
+          ),
           style: TextStyle(fontSize: 11, color: Colors.grey[500]),
         ),
         const Spacer(),
         TextButton.icon(
           onPressed: () => _showStatusUpdateDialog(context),
           icon: const Icon(Icons.edit, size: 16),
-          label: const Text('Update Status'),
+          label: Text(AppLabels.updateStatus(context)),
           style: TextButton.styleFrom(
             foregroundColor: Theme.of(context).primaryColor,
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -659,7 +622,7 @@ class _WishlistItemCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Update Status'),
+        title: Text(AppLabels.updateStatus(context)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: WishlistStatus.values.map((status) {
@@ -669,7 +632,7 @@ class _WishlistItemCard extends ConsumerWidget {
                 _getStatusIcon(status),
                 color: _getStatusColor(status.name),
               ),
-              title: Text(_getStatusLabel(status.name)),
+              title: Text(_getStatusLabel(context, status.name)),
               trailing: isSelected
                   ? const Icon(Icons.check_circle, color: Colors.green)
                   : null,
@@ -682,7 +645,10 @@ class _WishlistItemCard extends ConsumerWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Status updated to ${_getStatusLabel(status.name)}',
+                          AppLabels.statusUpdatedTo(
+                            context,
+                            _getStatusLabel(context, status.name),
+                          ),
                         ),
                         backgroundColor: Colors.green,
                       ),
@@ -692,7 +658,9 @@ class _WishlistItemCard extends ConsumerWidget {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Failed to update status: $e'),
+                        content: Text(
+                          AppLabels.failedToUpdateStatus(context, e.toString()),
+                        ),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -705,7 +673,7 @@ class _WishlistItemCard extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLabels.cancel(context)),
           ),
         ],
       ),
@@ -727,18 +695,18 @@ class _WishlistItemCard extends ConsumerWidget {
     }
   }
 
-  String _getStatusLabel(String status) {
+  String _getStatusLabel(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'Pending';
+        return AppLabels.pending(context);
       case 'contacted':
-        return 'Contacted';
+        return AppLabels.statusContacted(context);
       case 'interested':
-        return 'Interested';
+        return AppLabels.statusInterested(context);
       case 'notinterested':
-        return 'Not Interested';
+        return AppLabels.statusNotInterested(context);
       case 'closed':
-        return 'Closed';
+        return AppLabels.closed(context);
       default:
         return status;
     }
@@ -761,8 +729,10 @@ class _WishlistItemCard extends ConsumerWidget {
     }
   }
 
-  String _formatDateTime(DateTime dateTime) {
-    if (dateTime.millisecondsSinceEpoch == 0) return 'N/A';
+  String _formatDateTime(BuildContext context, DateTime dateTime) {
+    if (dateTime.millisecondsSinceEpoch == 0) {
+      return AppLabels.notAvailableShort(context);
+    }
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 }

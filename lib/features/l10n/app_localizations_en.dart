@@ -2095,4 +2095,414 @@ class AppLocalizationsEn extends AppLocalizations {
   String yearsOld(int age) {
     return '$age years old';
   }
+
+  @override
+  String get photos => 'Photos';
+
+  @override
+  String get idCards => 'ID Cards';
+
+  @override
+  String get basicInformation => 'Basic Information';
+
+  @override
+  String get noPhotosAvailable => 'No additional photos available.';
+
+  @override
+  String get aadharCardNotUploaded => 'Aadhar card not uploaded.';
+
+  @override
+  String get noDescriptionAvailable => 'No description available.';
+
+  @override
+  String get myReviews => 'My Reviews';
+
+  @override
+  String get noReviewsYet => 'No reviews yet.';
+
+  @override
+  String error(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get religiousAndAstrological => 'Religious & Astrological';
+
+  @override
+  String get qualificationsBilingual => 'Qualifications (Hindi | English)';
+
+  @override
+  String get languagesBilingual => 'Languages (Hindi | English)';
+
+  @override
+  String get addQualification => 'Add Qualification';
+
+  @override
+  String get addLanguage => 'Add Language';
+
+  @override
+  String get basicInfoTab => 'Basic Info';
+
+  @override
+  String get personalDetailsTab => 'Personal Details';
+
+  @override
+  String get educationCareerTab => 'Education & Career';
+
+  @override
+  String get familyCultureTab => 'Family & Culture';
+
+  @override
+  String get physical => 'Physical';
+
+  @override
+  String get employment => 'Employment';
+
+  @override
+  String get educationStatus => 'Education Status';
+
+  @override
+  String get additionalCourses => 'Additional Courses';
+
+  @override
+  String get addToWishlist => 'Add to Wishlist';
+
+  @override
+  String get disability => 'Disability';
+
+  @override
+  String get college => 'College';
+
+  @override
+  String get father => 'Father';
+
+  @override
+  String get mother => 'Mother';
+
+  @override
+  String get alreadyAddedToWishlist => 'Already added to wishlist!';
+
+  @override
+  String get addedToWishlist => 'Added to wishlist!';
+
+  @override
+  String get wishlistTitle => 'Wishlist';
+
+  @override
+  String get manageInterests => 'Manage your interests';
+
+  @override
+  String get myWishlist => 'My Wishlist';
+
+  @override
+  String get wishlistedMe => 'Wishlisted Me';
+
+  @override
+  String get emptyWishlistTitle => 'Your wishlist is empty!';
+
+  @override
+  String get emptyWishlistSubtitle =>
+      'Start adding profiles to your wishlist to see them here.';
+
+  @override
+  String get noOneWishlistedMeTitle => 'No one has wishlisted you yet!';
+
+  @override
+  String get noOneWishlistedMeSubtitle =>
+      'When someone adds you to their wishlist, you\'ll see them here.';
+
+  @override
+  String get couldNotLoadProfile => 'Could not load profile';
+
+  @override
+  String get noAgentAssociated => 'No agent associated with this user.';
+
+  @override
+  String get userStatus => 'User Status';
+
+  @override
+  String get paymentDate => 'Payment Date';
+
+  @override
+  String get manageAccount => 'Manage your account';
+
+  @override
+  String get premiumActive => 'Premium Active';
+
+  @override
+  String get premiumMemberMessage => 'You are a Premium Member!';
+
+  @override
+  String get generalSection => 'General';
+
+  @override
+  String get noAgentAssigned => 'No agent assigned yet.';
+
+  @override
+  String get accountSettings => 'Account Settings';
+
+  @override
+  String get paymentHistory => 'Payment History';
+
+  @override
+  String get postMarriagePayment => 'Post Marriage Payment';
+
+  @override
+  String get trustScore => 'Trust Score';
+
+  @override
+  String get upgradeToPremium => 'Upgrade to Premium';
+
+  @override
+  String get premiumUpgradeBenefits =>
+      'Get unlimited access to all features and connect with more matches.';
+
+  @override
+  String get agentSetup => 'Agent Setup';
+
+  @override
+  String get enterStaffId => 'Enter Staff Id';
+
+  @override
+  String get pleaseEnterStaffId => 'Please enter Staff Id';
+
+  @override
+  String agentAssignedSuccessfully(String id) {
+    return 'Agent $id assigned successfully!';
+  }
+
+  @override
+  String get agentSetupDescription =>
+      'Assign an agent to your profile to get personalized assistance and faster service.';
+
+  @override
+  String get staffIdHint => 'Enter Staff Id (e.g., AGT-12345)';
+
+  @override
+  String get agentDetailsHeader => 'Agent Details:';
+
+  @override
+  String get assignAgent => 'Assign Agent';
+
+  @override
+  String get noStaffIdSupport =>
+      'If you don\'t have an Staff Id, you can contact our support team for assistance.';
+
+  @override
+  String get enterMessageHint => 'Enter your message';
+
+  @override
+  String get supportRequestSubmitted =>
+      'Your request has been submitted. Our team will contact you shortly.';
+
+  @override
+  String get submitRequest => 'Submit Request';
+
+  @override
+  String get message => 'Message';
+
+  @override
+  String get viewManageTickets => 'View and manage your tickets';
+
+  @override
+  String get newTicket => 'New Ticket';
+
+  @override
+  String get noSupportTickets => 'No Support Tickets';
+
+  @override
+  String get createTicketHelp =>
+      'Create a ticket to get help from our support team';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String daysAgo(int days) {
+    return '$days days ago';
+  }
+
+  @override
+  String get resolved => 'Resolved';
+
+  @override
+  String get urgent => 'Urgent';
+
+  @override
+  String get low => 'Low';
+
+  @override
+  String get medium => 'Medium';
+
+  @override
+  String get high => 'High';
+
+  @override
+  String get createSupportTicket => 'Create Support Ticket';
+
+  @override
+  String get wereHereToHelp => 'We\'re here to help!';
+
+  @override
+  String get supportFormSubtitle =>
+      'Tell us about your issue and we\'ll get back to you soon.';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String get pleaseSelectCategory => 'Please select a category';
+
+  @override
+  String get priority => 'Priority';
+
+  @override
+  String get subject => 'Subject';
+
+  @override
+  String get pleaseEnterSubject => 'Please enter a subject';
+
+  @override
+  String get pleaseEnterDescription => 'Please enter a description';
+
+  @override
+  String get submitting => 'Submitting...';
+
+  @override
+  String get ticketCreatedSuccess => 'Ticket created successfully!';
+
+  @override
+  String get catAccountIssues => 'Account Issues';
+
+  @override
+  String get catPaymentProblems => 'Payment Problems';
+
+  @override
+  String get catProfileIssues => 'Profile Issues';
+
+  @override
+  String get catTechSupport => 'Technical Support';
+
+  @override
+  String get catFeatureRequest => 'Feature Request';
+
+  @override
+  String get catOther => 'Other';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get ticketDetails => 'Ticket Details';
+
+  @override
+  String get ticketInformation => 'Ticket Information';
+
+  @override
+  String get adminResponse => 'Admin Response';
+
+  @override
+  String get ticketHash => 'Ticket #';
+
+  @override
+  String get writeAReview => 'Write a Review';
+
+  @override
+  String get pleaseSelectRating => 'Please select a rating';
+
+  @override
+  String get reviewSubmittedSuccess => 'Review submitted successfully!';
+
+  @override
+  String get reviewTitle => 'Review Title';
+
+  @override
+  String get reviewTitleHint => 'Enter a title for your review';
+
+  @override
+  String get reviewDescription => 'Review Description';
+
+  @override
+  String get reviewDescriptionHint => 'Write your detailed review here';
+
+  @override
+  String get titleCannotBeEmpty => 'Title cannot be empty';
+
+  @override
+  String get descriptionCannotBeEmpty => 'Description cannot be empty';
+
+  @override
+  String get submitReview => 'Submit Review';
+
+  @override
+  String get noAgentReviewError => 'You can\'t write a review without an agent';
+
+  @override
+  String get whatUsersSay => 'What our users say about us';
+
+  @override
+  String get happyCustomersMessage =>
+      'Read genuine reviews from our happy customers.';
+
+  @override
+  String get beTheFirstReview => 'Be the first to leave a review!';
+
+  @override
+  String get reviewDetails => 'Review Details';
+
+  @override
+  String reviewedOn(String date) {
+    return 'Reviewed on $date';
+  }
+
+  @override
+  String get comment => 'Comment';
+
+  @override
+  String get title => 'Title';
+
+  @override
+  String get accountVerification => 'Account Verification';
+
+  @override
+  String get accountUnderReview =>
+      'Your account is currently under review. Please wait for verification.';
+
+  @override
+  String get profileUpdate => 'Profile Update';
+
+  @override
+  String get profileUpdateSuccess =>
+      'Your profile has been successfully updated.';
+
+  @override
+  String get newMatchFoundTitle => 'New Match Found!';
+
+  @override
+  String get newMatchFoundSubtitle =>
+      'We found a new match for you. Check it out!';
+
+  @override
+  String get newMessageTitle => 'New Message';
+
+  @override
+  String newMessageFrom(String name) {
+    return 'You have a new message from $name.';
+  }
+
+  @override
+  String get paymentReminder => 'Payment Reminder';
+
+  @override
+  String get subscriptionRenewalDue => 'Your subscription renewal is due soon.';
+
+  @override
+  String get contactAdminDetails =>
+      'Please contact the administrator for more details.';
+
+  @override
+  String get uploadBioData => 'Upload Biodata (Photo, PDF, or Document)';
 }

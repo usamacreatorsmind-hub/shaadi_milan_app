@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../../core/constants/app_labels.dart';
 import '../../domain/states/support_ticket.dart';
 import '../controllers/support_notifier.dart';
 
@@ -17,38 +18,45 @@ class SupportTicketDetailScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Ticket Details')),
+      appBar: AppBar(title: Text(AppLabels.ticketDetails(context))),
       body: ticketAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) =>
+            Center(child: Text(AppLabels.error(context, err.toString()))),
         data: (ticket) {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
               _buildHeader(context, ticket),
               const SizedBox(height: 24),
-              _buildInfoCard(context, 'Ticket Information', [
-                _buildInfoRow('Subject', ticket.subject),
-                _buildInfoRow('Category', ticket.category ?? 'N/A'),
+              _buildInfoCard(context, AppLabels.ticketInformation(context), [
+                _buildInfoRow(AppLabels.subject(context), ticket.subject),
                 _buildInfoRow(
-                  'Created At',
+                  AppLabels.category(context),
+                  ticket.category ?? AppLabels.notAvailableShort(context),
+                ),
+                _buildInfoRow(
+                  AppLabels.created(context),
                   DateFormat.yMMMd().add_jm().format(ticket.createdAt),
                 ),
                 if (ticket.updatedAt != null)
                   _buildInfoRow(
-                    'Last Updated',
+                    AppLabels.updatedAtWithParam(
+                      context,
+                      ticket.updatedAt.toString(),
+                    ),
                     DateFormat.yMMMd().add_jm().format(ticket.updatedAt!),
                   ),
               ]),
               const SizedBox(height: 16),
-              _buildInfoCard(context, 'Description', [
+              _buildInfoCard(context, AppLabels.description(context), [
                 Text(ticket.description, style: const TextStyle(height: 1.5)),
               ]),
               const SizedBox(height: 16),
               if (ticket.adminResponse != null)
                 _buildInfoCard(
                   context,
-                  'Admin Response',
+                  AppLabels.adminResponse(context),
                   [
                     Text(
                       ticket.adminResponse!,
@@ -76,7 +84,7 @@ class SupportTicketDetailScreen extends ConsumerWidget {
         child: Column(
           children: [
             Text(
-              'Ticket #${ticket.id.substring(0, 6)}',
+              '${AppLabels.ticketHash(context)}${ticket.id.substring(0, 6)}',
               style: theme.textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
@@ -84,13 +92,15 @@ class SupportTicketDetailScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildStatusChip(
-                  'Status',
-                  ticket.status.displayName,
+                  context,
+                  AppLabels.state(context),
+                  _getStatusLabel(context, ticket.status),
                   _getStatusColor(ticket.status),
                 ),
                 _buildStatusChip(
-                  'Priority',
-                  ticket.priority.displayName,
+                  context,
+                  AppLabels.priority(context),
+                  _getPriorityLabel(context, ticket.priority),
                   _getPriorityColor(ticket.priority),
                 ),
               ],
@@ -101,7 +111,38 @@ class SupportTicketDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusChip(String label, String value, Color color) {
+  String _getStatusLabel(BuildContext context, TicketStatus status) {
+    switch (status) {
+      case TicketStatus.pending:
+        return AppLabels.pending(context);
+      case TicketStatus.resolved:
+        return AppLabels.resolved(context);
+      case TicketStatus.closed:
+        return AppLabels.closed(context);
+      case TicketStatus.rejected:
+        return AppLabels.rejected(context);
+    }
+  }
+
+  String _getPriorityLabel(BuildContext context, TicketPriority priority) {
+    switch (priority) {
+      case TicketPriority.low:
+        return AppLabels.low(context);
+      case TicketPriority.medium:
+        return AppLabels.medium(context);
+      case TicketPriority.high:
+        return AppLabels.high(context);
+      case TicketPriority.urgent:
+        return AppLabels.urgent(context);
+    }
+  }
+
+  Widget _buildStatusChip(
+    BuildContext context,
+    String label,
+    String value,
+    Color color,
+  ) {
     return Column(
       children: [
         Text(label, style: const TextStyle(color: Colors.grey)),
@@ -160,7 +201,6 @@ class SupportTicketDetailScreen extends ConsumerWidget {
 
   Color _getStatusColor(TicketStatus status) {
     switch (status) {
-      // get updated
       case TicketStatus.pending:
         return Colors.green;
       case TicketStatus.resolved:

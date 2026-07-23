@@ -1,10 +1,11 @@
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../app/custom/image_picker/image_picker_widget.dart';
-import '../../../../../app/router/app_router.dart';
-import '../../../../../app/custom/image_picker/image_picker_controller.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../../../app/custom/image_picker/image_picker_controller.dart';
+import '../../../../../../app/custom/image_picker/image_picker_widget.dart';
+import '../../../../../../app/router/app_router.dart';
+import '../../../../../../core/constants/app_labels.dart';
 
 @RoutePage()
 class UserImageFormScreen extends ConsumerWidget {
@@ -55,8 +56,8 @@ class _FixedBottomButton extends ConsumerWidget {
 
             if (images.primaryImage == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Please select a primary profile image'),
+                SnackBar(
+                  content: Text(AppLabels.pleaseSelectPrimaryImage(context)),
                 ),
               );
               return;
@@ -64,7 +65,9 @@ class _FixedBottomButton extends ConsumerWidget {
 
             if (images.aadharPdfPath == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Please select Aadhar PDF')),
+                SnackBar(
+                  content: Text(AppLabels.pleaseSelectAadharPdf(context)),
+                ),
               );
               return;
             }
@@ -78,9 +81,9 @@ class _FixedBottomButton extends ConsumerWidget {
               borderRadius: BorderRadius.circular(30),
             ),
           ),
-          child: const Text(
-            'Continue',
-            style: TextStyle(
+          child: Text(
+            AppLabels.continueButton(context),
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,

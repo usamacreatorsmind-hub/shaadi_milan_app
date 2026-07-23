@@ -4,21 +4,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../app/custom/image_picker/image_picker_controller.dart';
 import '../../../../../app/router/app_router.dart';
+import '../../../../../core/constants/app_labels.dart';
 import '../../../../../core/enums/enum.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../l10n/app_translation_service.dart';
 import '../../domain/states/image_state.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../controllers/metrimony_profile_controller.dart';
-import 'user_address_form_screen.dart';
-import 'user_biodata_check_screen.dart';
-import 'user_culture_form_screen.dart';
-import 'user_education_form_screen.dart';
-import 'user_employement_form_screen.dart';
-import 'user_family_form_screen.dart';
-import 'user_identity_form_screen.dart';
-import 'user_image_form_screen.dart';
-import 'user_physical_form_screen.dart';
+import 'forms/user_address_form_screen.dart';
+import 'forms/user_biodata_check_screen.dart';
+import 'forms/user_culture_form_screen.dart';
+import 'forms/user_education_form_screen.dart';
+import 'forms/user_employement_form_screen.dart';
+import 'forms/user_family_form_screen.dart';
+import 'forms/user_identity_form_screen.dart';
+import 'forms/user_image_form_screen.dart';
+import 'forms/user_physical_form_screen.dart';
 
 @RoutePage()
 class MatrimonyFormFlowScreen extends ConsumerStatefulWidget {
@@ -53,6 +54,9 @@ class _MatrimonyFormFlowScreenState
     }
     if (imageState.aadharPdfPath == null || imageState.aadharPdfPath!.isEmpty) {
       return AppLocalizations.of(context)!.aadharDocumentRequired;
+    }
+    if (imageState.bioDataPath == null || imageState.bioDataPath!.isEmpty) {
+      return "${AppLabels.uploadBioData(context)} ${AppLocalizations.of(context)!.isRequired}";
     }
     return null;
   }

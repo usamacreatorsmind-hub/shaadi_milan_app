@@ -1,13 +1,13 @@
-import 'package:shadi_milan/features/user/user_app/data/repositories_impl/agent_repository_impl.dart';
-
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../data/repositories_impl/user_repo_impl.dart';
-import '../../domain/states/review_state.dart';
-import '../controllers/review_notifiers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_stars/easy_stars.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../../../../core/constants/app_labels.dart';
+import '../../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../data/repositories_impl/user_repo_impl.dart';
+import '../../../domain/states/review_state.dart';
+import '../../controllers/review_notifiers.dart';
 
 @RoutePage()
 class ReviewFormScreen extends ConsumerStatefulWidget {
@@ -36,27 +36,29 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_rating == 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a rating')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLabels.pleaseSelectRating(context))),
+      );
       return;
     }
 
     // send data to firestore
-    final currentUser = ref.watch(currentUserProvider);
+    final currentUser = ref.read(currentUserProvider).value;
+    if (currentUser == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppLabels.userNotFound(context))));
+      return;
+    }
 
     final reviewNotifier = ref.read(reviewNotifierProvider.notifier);
 
-    // fetch agetn entity  from repository
-    ref.read(agentRepositoryProvider).fetchAgent(currentUser.value!.agentId);
-
-    Review(
-      agentId: currentUser.value!.agentId,
-
+    final review = Review(
+      agentId: currentUser.agentId,
       id: '',
-      userId: currentUser.value!.uid,
-      userName: currentUser.value!.fullName.en,
-      userProfileImg: currentUser.value!.profileImageUrl,
+      userId: currentUser.uid,
+      userName: currentUser.fullName.en,
+      userProfileImg: currentUser.profileImageUrl,
       rating: _rating.toInt(),
       title: _titleController.text.trim(),
       comment: _descriptionController.text.trim(),
@@ -64,35 +66,42 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
       updatedAt: DateTime.now(),
     );
 
+    await reviewNotifier.addReview(review: review);
+
     final state = ref.read(reviewNotifierProvider);
     if (state.error != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${state.error}')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLabels.error(context, state.error.toString())),
+          ),
+        );
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Review submitted successfully!')),
-      );
-      context.router.maybePop();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLabels.reviewSubmittedSuccess(context))),
+        );
+        context.router.maybePop();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
+    final state = ref.watch(reviewNotifierProvider);
     final profileAsync = ref.watch(currentUserProfileProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Write a Review'),
+        title: Text(AppLabels.writeAReview(context)),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.router.maybePop(),
         ),
       ),
-
       body: profileAsync.when(
         data: (data) {
           return SafeArea(
@@ -108,19 +117,17 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
                     AppTextField(
                       obscureText: false,
                       keyboardType: TextInputType.text,
-
                       showWordCount: true,
-
                       inputFormatters: [],
                       controller: _titleController,
-                      label: 'Review Title',
-                      hint: 'Enter a title for your review',
+                      label: AppLabels.reviewTitle(context),
+                      hint: AppLabels.reviewTitleHint(context),
                       prefixIcon: Icons.title,
                       iconColor: theme.colorScheme.primary,
                       maxLines: 1,
                       counterType: CounterType.words,
                       validator: (v) => v == null || v.isEmpty
-                          ? 'Title cannot be empty'
+                          ? AppLabels.titleCannotBeEmpty(context)
                           : null,
                     ),
 
@@ -130,14 +137,14 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
                     AppTextField(
                       showWordCount: true,
                       controller: _descriptionController,
-                      label: 'Review Description',
-                      hint: 'Write your detailed review here',
+                      label: AppLabels.reviewDescription(context),
+                      hint: AppLabels.reviewDescriptionHint(context),
                       prefixIcon: Icons.description,
                       iconColor: theme.colorScheme.primary,
                       maxLines: 7,
                       counterType: CounterType.words,
                       validator: (v) => v == null || v.isEmpty
-                          ? 'Description cannot be empty'
+                          ? AppLabels.descriptionCannotBeEmpty(context)
                           : null,
                       obscureText: false,
                       keyboardType: TextInputType.text,
@@ -167,21 +174,21 @@ class _ReviewFormScreenState extends ConsumerState<ReviewFormScreen> {
                     /// SUBMIT
                     SizedBox(
                       width: double.infinity,
-                      child: AppButton(
-                        onPressed: _submitReview,
-
-                        text: 'Submit Review',
-                      ),
+                      child: state.isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : AppButton(
+                              onPressed: () => _submitReview(),
+                              text: AppLabels.submitReview(context),
+                            ),
                     ),
-
-                    // print data
                   ],
                 ),
               ),
             ),
           );
         },
-        error: (error, stackTrace) => Center(child: Text('Error: $error')),
+        error: (error, stackTrace) =>
+            Center(child: Text(AppLabels.error(context, error.toString()))),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );

@@ -2,14 +2,14 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../core/enums/enum.dart';
-import '../../../../translitration/models/bilingual_value.dart';
-import '../../../../translitration/widgets/bilingual_text_field.dart';
-import '../../domain/states/cultural_state.dart';
-import '../../domain/states/religion_state.dart';
-import '../controllers/user_cultural_controllers.dart';
+import '../../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../../core/constants/app_labels.dart';
+import '../../../../../../core/enums/enum.dart';
+import '../../../../../translitration/models/bilingual_value.dart';
+import '../../../../../translitration/widgets/bilingual_text_field.dart';
+import '../../../domain/states/cultural_state.dart';
+import '../../../domain/states/religion_state.dart';
+import '../../controllers/user_cultural_controllers.dart';
 
 @RoutePage()
 class UserCultureFormScreen extends ConsumerStatefulWidget {
@@ -97,27 +97,34 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
       casteBilingual = castesMap[casteId]!;
     }
 
+    List<BilingualValue> finalLanguages = List.from(languages);
+    final hiLang = _languagesController.text.trim();
+    final enLang = _languagesEnController.text.trim();
+    if (hiLang.isNotEmpty || enLang.isNotEmpty) {
+      finalLanguages.add(BilingualValue(hi: hiLang, en: enLang));
+    }
+
     final notifier = ref.read(cultureControllerProvider.notifier);
 
     widget.mode == FormMode.create
         ? notifier.saveCultural(
-          religion: religionBilingual,
-          caste: casteBilingual,
-          subCaste: BilingualValue(
-            hi: _subCasteController.text.trim(),
-            en: _subCasteEnController.text.trim(),
-          ),
-          languages: languages,
-        )
+            religion: religionBilingual,
+            caste: casteBilingual,
+            subCaste: BilingualValue(
+              hi: _subCasteController.text.trim(),
+              en: _subCasteEnController.text.trim(),
+            ),
+            languages: finalLanguages,
+          )
         : notifier.updateCultural(
-          religion: religionBilingual,
-          caste: casteBilingual,
-          subCaste: BilingualValue(
-            hi: _subCasteController.text.trim(),
-            en: _subCasteEnController.text.trim(),
-          ),
-          languages: languages,
-        );
+            religion: religionBilingual,
+            caste: casteBilingual,
+            subCaste: BilingualValue(
+              hi: _subCasteController.text.trim(),
+              en: _subCasteEnController.text.trim(),
+            ),
+            languages: finalLanguages,
+          );
   }
 
   @override
@@ -139,7 +146,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
       if (current.error != null) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
+        ).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
       }
       if (!current.isLoading &&
           current.error == null &&
@@ -195,7 +202,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                       );
                     },
                     loading: () => const CircularProgressIndicator(),
-                    error: (err, _) => Text('Error: $err'),
+                    error: (err, _) => Text(AppLabels.error(context, err.toString())),
                   );
                 },
               ),
@@ -236,7 +243,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                       );
                     },
                     loading: () => const CircularProgressIndicator(),
-                    error: (err, _) => Text('Error: $err'),
+                    error: (err, _) => Text(AppLabels.error(context, err.toString())),
                   );
                 },
               ),
@@ -319,6 +326,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
           prefixIcon: Icons.language,
           label: AppLabels.addKnownLanguages(context),
           hint: AppLabels.languagesHint(context),
+          validator: (v) => null,
         ),
         const SizedBox(height: 8),
         Align(
@@ -335,7 +343,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                 _languagesEnController.clear();
               });
             },
-            text: "Add Language",
+            text: AppLabels.addLanguage(context),
           ),
         ),
       ],
@@ -343,26 +351,38 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
   }
 
   Widget _extraCourseChips() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: languages.map((lang) {
-        return Chip(
-          label: Text(lang.hi),
-          deleteIcon: const Icon(Icons.close, size: 18),
-          onDeleted: () => setState(() => languages.remove(lang)),
-          backgroundColor: Theme.of(
-            context,
-          ).colorScheme.primary.withOpacity(0.1),
-          labelStyle: TextStyle(
-            color: Theme.of(context).colorScheme.primary,
-            fontWeight: FontWeight.w500,
-          ),
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-          ),
-        );
-      }).toList(),
+    if (languages.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLabels.languagesBilingual(context),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: languages.map((lang) {
+            return Chip(
+              label: Text("${lang.hi} | ${lang.en}"),
+              deleteIcon: const Icon(Icons.close, size: 18),
+              onDeleted: () => setState(() => languages.remove(lang)),
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.primary.withOpacity(0.1),
+              labelStyle: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w500,
+              ),
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }

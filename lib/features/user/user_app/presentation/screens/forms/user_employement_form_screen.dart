@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../core/enums/enum.dart';
-import '../../../../translitration/models/bilingual_value.dart';
-import '../../../../translitration/widgets/bilingual_text_field.dart';
-import '../../domain/states/employee_state.dart';
-import '../controllers/user_employment_controllers.dart';
+import '../../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../../core/constants/app_labels.dart';
+import '../../../../../../core/enums/enum.dart';
+import '../../../../../translitration/models/bilingual_value.dart';
+import '../../../../../translitration/widgets/bilingual_text_field.dart';
+import '../../../domain/states/employee_state.dart';
+import '../../controllers/user_employment_controllers.dart';
 
 class UserEmploymentFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
@@ -173,9 +173,11 @@ class _UserEmploymentFormScreenState
       current,
     ) {
       if (current.error != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLabels.error(context, current.error.toString())),
+          ),
+        );
       } else if (current.employment != null && previous?.employment == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

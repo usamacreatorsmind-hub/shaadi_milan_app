@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import '../../../../../../core/constants/app_labels.dart';
 
 @RoutePage()
 class UserNotificationScreen extends StatelessWidget {
@@ -8,62 +9,51 @@ class UserNotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Notifications')),
-      body: Container(
-        child: Card(
-          child: Column(
-            // implement  user if verified or not
-            children: [
-              NotificationTile(
-                title: 'Account Verification',
-
-                subtitle:
-                    'Your account is currently under review. Please wait for verification.',
-
-                icon: Icons.hourglass_empty,
-
-                iconColor: Colors.orange,
-              ),
-
-              NotificationTile(
-                title: 'Profile Update',
-                subtitle: 'Your profile has been successfully updated.',
-                icon: Icons.person_outline,
-                iconColor: Colors.blue,
-              ),
-              NotificationTile(
-                title: 'New Match Found!',
-                subtitle: 'We found a new match for you. Check it out!',
-                icon: Icons.favorite_border,
-                iconColor: Colors.red,
-                onTap: () {
-                  // Handle navigation to matches screen
-                },
-              ),
-
-              NotificationTile(
-                title: 'New Message',
-                subtitle: 'You have a new message from John Doe.',
-                icon: Icons.message_outlined,
-                iconColor: Colors.purple,
-                onTap: () {
-                  // Handle navigation to messages screen
-                },
-              ),
-
-              NotificationTile(
-                title: 'Payment Reminder',
-                subtitle: 'Your subscription renewal is due soon.',
-                icon: Icons.credit_card,
-                iconColor: Colors.green,
-                onTap: () {
-                  // Handle navigation to payment screen
-                },
-              ),
-
-              Divider(),
-            ],
-          ),
+      appBar: AppBar(title: Text(AppLabels.notifications(context))),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            NotificationTile(
+              title: AppLabels.accountVerification(context),
+              subtitle: AppLabels.accountUnderReview(context),
+              icon: Icons.hourglass_empty,
+              iconColor: Colors.orange,
+            ),
+            NotificationTile(
+              title: AppLabels.profileUpdate(context),
+              subtitle: AppLabels.profileUpdateSuccess(context),
+              icon: Icons.person_outline,
+              iconColor: Colors.blue,
+            ),
+            NotificationTile(
+              title: AppLabels.newMatchFoundTitle(context),
+              subtitle: AppLabels.newMatchFoundSubtitle(context),
+              icon: Icons.favorite_border,
+              iconColor: Colors.red,
+              onTap: () {
+                // Handle navigation to matches screen
+              },
+            ),
+            NotificationTile(
+              title: AppLabels.newMessageTitle(context),
+              subtitle: AppLabels.newMessageFrom(context, 'John Doe'),
+              icon: Icons.message_outlined,
+              iconColor: Colors.purple,
+              onTap: () {
+                // Handle navigation to messages screen
+              },
+            ),
+            NotificationTile(
+              title: AppLabels.paymentReminder(context),
+              subtitle: AppLabels.subscriptionRenewalDue(context),
+              icon: Icons.credit_card,
+              iconColor: Colors.green,
+              onTap: () {
+                // Handle navigation to payment screen
+              },
+            ),
+            const Divider(),
+          ],
         ),
       ),
     );

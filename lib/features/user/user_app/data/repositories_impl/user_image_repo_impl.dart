@@ -1,7 +1,8 @@
-import '../datasources/firebase/user_image_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../domain/repositories/user_image_repository.dart';
 import '../../domain/states/image_state.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../datasources/firebase/user_image_firestore.dart';
 
 class UserImageRepositoryImpl implements UserImageRepository {
   final ImageUploadService _imageUploadService;
@@ -34,6 +35,7 @@ class UserImageRepositoryImpl implements UserImageRepository {
       imageWithAgentUrl: imagesMap['imageWithAgentUrl'] as String,
       primaryImageUrl: imagesMap['primaryImageUrl'] as String,
       aadharCardUrl: imagesMap['aadharCardUrl'] as String,
+      bioDataUrl: imagesMap['bioDataUrl'] as String? ?? '',
 
       secondaryImageUrls: imagesMap['secondaryImageUrls'] as List<String>,
       profileImageUrl: imagesMap['profileImageUrl'] as String,

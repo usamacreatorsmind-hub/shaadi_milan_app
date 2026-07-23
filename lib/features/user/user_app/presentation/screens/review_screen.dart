@@ -1,16 +1,15 @@
-import 'package:shadi_milan/app/custom/custom_widgets/chip_and_action_chip.dart';
-
-import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
-import '../../../../../app/custom/custom_widgets/drawer.dart';
-import '../../../../../app/custom/custom_widgets/user_drawer.dart';
-import '../../../../../app/router/app_router.dart';
-import '../../data/repositories_impl/user_repo_impl.dart';
-import '../controllers/review_notifiers.dart';
-
-import '../../domain/states/review_state.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../../../core/constants/app_labels.dart';
+import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
+import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
+import '../../../../../app/custom/custom_widgets/user_drawer.dart';
+import '../../../../../app/router/app_router.dart';
+import '../../data/repositories_impl/user_repo_impl.dart';
+import '../../domain/states/review_state.dart';
+import '../controllers/review_notifiers.dart';
 
 @RoutePage()
 class ReviewScreen extends ConsumerStatefulWidget {
@@ -49,25 +48,29 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       body: allReviewsAsync.isLoading
           ? const Center(child: CircularProgressIndicator())
           : allReviewsAsync.error != null
-          ? Center(child: Text('Error: ${allReviewsAsync.error}'))
+          ? Center(
+              child: Text(
+                AppLabels.error(context, allReviewsAsync.error.toString()),
+              ),
+            )
           : CustomScrollView(
               slivers: [
                 MinimalAppBar(
-                  title: "Review",
+                  title: AppLabels.reviewTitle(context),
                   actions: [
                     AppActionChip(
-                      label: "Write a review",
+                      label: AppLabels.writeAReview(context),
                       onTap: () =>
                           // if agetn id is empty then no
                           currentUserAsync.value?.agentId == null
                           ? ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text(
-                                  "You can't write a review without an agent",
+                                  AppLabels.noAgentReviewError(context),
                                 ),
                               ),
                             )
-                          : context.pushRoute( ReviewFormRoute()),
+                          : context.pushRoute(const ReviewFormRoute()),
                     ),
 
                     const SizedBox(width: 20),
@@ -83,14 +86,14 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                       children: [
                         const SizedBox(height: 16),
                         Text(
-                          "What our users say about us",
+                          AppLabels.whatUsersSay(context),
                           style: theme.textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "Read genuine reviews from our happy customers.",
+                          AppLabels.happyCustomersMessage(context),
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: Colors.grey.shade600,
                           ),
@@ -118,7 +121,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            "No reviews yet!",
+                            AppLabels.noReviewsYet(context),
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -127,7 +130,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            "Be the first to leave a review!",
+                            AppLabels.beTheFirstReview(context),
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.grey[500],
@@ -266,7 +269,7 @@ class ReviewDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Review Details"),
+        title: Text(AppLabels.reviewDetails(context)),
         backgroundColor: theme.primaryColor,
         foregroundColor: theme.colorScheme.onPrimary,
       ),
@@ -304,7 +307,10 @@ class ReviewDetailsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Reviewed on ${review.createdAt.day}/${review.createdAt.month}/${review.createdAt.year}',
+                          AppLabels.reviewedOn(
+                            context,
+                            '${review.createdAt.day}/${review.createdAt.month}/${review.createdAt.year}',
+                          ),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: Colors.grey.shade600,
                           ),
@@ -321,7 +327,7 @@ class ReviewDetailsScreen extends StatelessWidget {
               const SizedBox(height: 24),
               if (review.title.isNotEmpty) ...[
                 Text(
-                  "Title",
+                  AppLabels.title(context),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -336,7 +342,7 @@ class ReviewDetailsScreen extends StatelessWidget {
                 const SizedBox(height: 24),
               ],
               Text(
-                "Comment",
+                AppLabels.comment(context),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

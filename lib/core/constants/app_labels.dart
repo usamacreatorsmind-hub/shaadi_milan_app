@@ -45,6 +45,16 @@ class AppLabels {
   static String settings(BuildContext context) => _loc(context).settings;
   static String myProfile(BuildContext context) => _loc(context).myProfile;
   static String document(BuildContext context) => _loc(context).document;
+  static String aadharCard(BuildContext context) => _loc(context).aadharCard;
+  static String viewDocument(BuildContext context) =>
+      _loc(context).viewDocument;
+  static String age(BuildContext context) => _loc(context).age;
+  static String dateOfBirth(BuildContext context) => _loc(context).dateOfBirth;
+  static String course(BuildContext context) => _loc(context).course;
+  static String yesLabel(BuildContext context) => _loc(context).yesLabel;
+  static String noLabel(BuildContext context) => _loc(context).noLabel;
+  static String notAvailableShort(BuildContext context) =>
+      _loc(context).notAvailableShort;
   static String agentIdLabel(BuildContext context) =>
       _loc(context).agentIdLabel;
 
@@ -145,6 +155,7 @@ class AppLabels {
   static String closed(BuildContext context) => _loc(context).closed;
   static String matrimonyProfile(BuildContext context) =>
       _loc(context).matrimonyProfile;
+  static String profileId(BuildContext context) => _loc(context).profileId;
   static String notCreated(BuildContext context) => _loc(context).notCreated;
   static String apply(BuildContext context) => _loc(context).apply;
   static String filterRevenue(BuildContext context) =>
@@ -186,6 +197,8 @@ class AppLabels {
   static String resetFilters(BuildContext context) =>
       _loc(context).resetFilters;
   static String ageYrs(BuildContext context) => _loc(context).ageYrs;
+  static String ageYearsOld(BuildContext context, int age) =>
+      _loc(context).yearsOld(age);
   static String userNotFound(BuildContext context) =>
       _loc(context).userNotFound;
   static String location(BuildContext context) => _loc(context).location;
@@ -809,6 +822,8 @@ class AppLabels {
       _loc(context).somethingWentWrong;
   static String errorOccurred(BuildContext context) =>
       _loc(context).errorOccurred;
+  static String error(BuildContext context, String error) =>
+      _loc(context).error(error);
 
   static String designation(BuildContext context) => _loc(context).designation;
 
@@ -841,6 +856,261 @@ class AppLabels {
   static String fullNameHint(BuildContext context) =>
       _loc(context).fullNameHint;
   static String phoneHint(BuildContext context) => _loc(context).phoneHint;
-  static String agentDetails(BuildContext context) => _loc(context).agentDetails;
+  static String agentDetails(BuildContext context) =>
+      _loc(context).agentDetails;
   static String address(BuildContext context) => _loc(context).address;
+
+  static String photos(BuildContext context) => _loc(context).photos;
+  static String idCards(BuildContext context) => _loc(context).idCards;
+  static String basicInformation(BuildContext context) =>
+      _loc(context).basicInformation;
+  static String noPhotosAvailable(BuildContext context) =>
+      _loc(context).noPhotosAvailable;
+  static String aadharCardNotUploaded(BuildContext context) =>
+      _loc(context).aadharCardNotUploaded;
+  static String noDescriptionAvailable(BuildContext context) =>
+      _loc(context).noDescriptionAvailable;
+  static String myReviews(BuildContext context) => _loc(context).myReviews;
+  static String noReviewsYet(BuildContext context) =>
+      _loc(context).noReviewsYet;
+
+  static String religiousAndAstrological(BuildContext context) =>
+      _loc(context).religiousAndAstrological;
+  static String qualificationsBilingual(BuildContext context) =>
+      _loc(context).qualificationsBilingual;
+  static String languagesBilingual(BuildContext context) =>
+      _loc(context).languagesBilingual;
+  static String addQualification(BuildContext context) =>
+      _loc(context).addQualification;
+  static String addLanguage(BuildContext context) => _loc(context).addLanguage;
+
+  static String basicInfoTab(BuildContext context) =>
+      _loc(context).basicInfoTab;
+  static String personalDetailsTab(BuildContext context) =>
+      _loc(context).personalDetailsTab;
+  static String educationCareerTab(BuildContext context) =>
+      _loc(context).educationCareerTab;
+  static String familyCultureTab(BuildContext context) =>
+      _loc(context).familyCultureTab;
+  static String physical(BuildContext context) => _loc(context).physical;
+  static String employment(BuildContext context) => _loc(context).employment;
+  static String educationStatus(BuildContext context) =>
+      _loc(context).educationStatus;
+  static String additionalCourses(BuildContext context) =>
+      _loc(context).additionalCourses;
+  static String addToWishlist(BuildContext context) =>
+      _loc(context).addToWishlist;
+  static String contactAgent(BuildContext context) =>
+      _loc(context).contactAgent;
+  static String disability(BuildContext context) => _loc(context).disability;
+  static String college(BuildContext context) => _loc(context).college;
+  static String father(BuildContext context) => _loc(context).father;
+  static String mother(BuildContext context) => _loc(context).mother;
+  static String alreadyAddedToWishlist(BuildContext context) =>
+      _loc(context).alreadyAddedToWishlist;
+  static String addedToWishlist(BuildContext context) =>
+      _loc(context).addedToWishlist;
+  static String userStatus(BuildContext context) => _loc(context).userStatus;
+  static String paymentId(BuildContext context) => _loc(context).paymentId;
+  static String paymentDate(BuildContext context) => _loc(context).paymentDate;
+  static String wishlistTitle(BuildContext context) =>
+      _loc(context).wishlistTitle;
+  static String manageInterests(BuildContext context) =>
+      _loc(context).manageInterests;
+  static String myWishlist(BuildContext context) => _loc(context).myWishlist;
+  static String wishlistedMe(BuildContext context) =>
+      _loc(context).wishlistedMe;
+  static String emptyWishlistTitle(BuildContext context) =>
+      _loc(context).emptyWishlistTitle;
+  static String emptyWishlistSubtitle(BuildContext context) =>
+      _loc(context).emptyWishlistSubtitle;
+  static String noOneWishlistedMeTitle(BuildContext context) =>
+      _loc(context).noOneWishlistedMeTitle;
+  static String noOneWishlistedMeSubtitle(BuildContext context) =>
+      _loc(context).noOneWishlistedMeSubtitle;
+  static String couldNotLoadProfile(BuildContext context) =>
+      _loc(context).couldNotLoadProfile;
+  static String statusContacted(BuildContext context) =>
+      _loc(context).statusContacted;
+  static String statusInterested(BuildContext context) =>
+      _loc(context).statusInterested;
+  static String statusNotInterested(BuildContext context) =>
+      _loc(context).statusNotInterested;
+  static String retry(BuildContext context) => _loc(context).retry;
+  static String updateStatus(BuildContext context) =>
+      _loc(context).updateStatus;
+
+  static String updatedAtWithParam(BuildContext context, String date) =>
+      _loc(context).updatedAtWithParam(date);
+  static String statusUpdatedTo(BuildContext context, String status) =>
+      _loc(context).statusUpdatedTo(status);
+  static String failedToUpdateStatus(BuildContext context, String error) =>
+      _loc(context).failedToUpdateStatus(error);
+
+  static String noAgentAssociated(BuildContext context) =>
+      _loc(context).noAgentAssociated;
+  static String manageAccount(BuildContext context) =>
+      _loc(context).manageAccount;
+  static String premiumActive(BuildContext context) =>
+      _loc(context).premiumActive;
+  static String premiumMemberMessage(BuildContext context) =>
+      _loc(context).premiumMemberMessage;
+  static String generalSection(BuildContext context) =>
+      _loc(context).generalSection;
+  static String noAgentAssigned(BuildContext context) =>
+      _loc(context).noAgentAssigned;
+  static String accountSettings(BuildContext context) =>
+      _loc(context).accountSettings;
+  static String paymentHistory(BuildContext context) =>
+      _loc(context).paymentHistory;
+  static String postMarriagePayment(BuildContext context) =>
+      _loc(context).postMarriagePayment;
+  static String trustScore(BuildContext context) => _loc(context).trustScore;
+  static String upgradeToPremium(BuildContext context) =>
+      _loc(context).upgradeToPremium;
+  static String premiumUpgradeBenefits(BuildContext context) =>
+      _loc(context).premiumUpgradeBenefits;
+  static String agentSetup(BuildContext context) => _loc(context).agentSetup;
+  static String enterStaffId(BuildContext context) =>
+      _loc(context).enterStaffId;
+  static String pleaseEnterStaffId(BuildContext context) =>
+      _loc(context).pleaseEnterStaffId;
+  static String agentAssignedSuccessfully(BuildContext context, String id) =>
+      _loc(context).agentAssignedSuccessfully(id);
+  static String agentSetupDescription(BuildContext context) =>
+      _loc(context).agentSetupDescription;
+  static String staffIdHint(BuildContext context) => _loc(context).staffIdHint;
+  static String agentDetailsHeader(BuildContext context) =>
+      _loc(context).agentDetailsHeader;
+  static String assignAgent(BuildContext context) => _loc(context).assignAgent;
+  static String noStaffIdSupport(BuildContext context) =>
+      _loc(context).noStaffIdSupport;
+  static String enterMessageHint(BuildContext context) =>
+      _loc(context).enterMessageHint;
+  static String supportRequestSubmitted(BuildContext context) =>
+      _loc(context).supportRequestSubmitted;
+  static String submitRequest(BuildContext context) =>
+      _loc(context).submitRequest;
+  static String message(BuildContext context) => _loc(context).message;
+  static String viewManageTickets(BuildContext context) =>
+      _loc(context).viewManageTickets;
+  static String newTicket(BuildContext context) => _loc(context).newTicket;
+  static String noSupportTickets(BuildContext context) =>
+      _loc(context).noSupportTickets;
+  static String createTicketHelp(BuildContext context) =>
+      _loc(context).createTicketHelp;
+  static String today(BuildContext context) => _loc(context).today;
+  static String yesterday(BuildContext context) => _loc(context).yesterday;
+  static String daysAgo(BuildContext context, int days) =>
+      _loc(context).daysAgo(days);
+  static String resolved(BuildContext context) => _loc(context).resolved;
+  static String urgent(BuildContext context) => _loc(context).urgent;
+  static String low(BuildContext context) => _loc(context).low;
+  static String medium(BuildContext context) => _loc(context).medium;
+  static String high(BuildContext context) => _loc(context).high;
+  static String createSupportTicket(BuildContext context) =>
+      _loc(context).createSupportTicket;
+  static String wereHereToHelp(BuildContext context) =>
+      _loc(context).wereHereToHelp;
+  static String supportFormSubtitle(BuildContext context) =>
+      _loc(context).supportFormSubtitle;
+  static String category(BuildContext context) => _loc(context).category;
+  static String pleaseSelectCategory(BuildContext context) =>
+      _loc(context).pleaseSelectCategory;
+  static String priority(BuildContext context) => _loc(context).priority;
+  static String subject(BuildContext context) => _loc(context).subject;
+  static String pleaseEnterSubject(BuildContext context) =>
+      _loc(context).pleaseEnterSubject;
+  static String pleaseEnterDescription(BuildContext context) =>
+      _loc(context).pleaseEnterDescription;
+  static String submitting(BuildContext context) => _loc(context).submitting;
+  static String submitTicket(BuildContext context) =>
+      _loc(context).submitRequest;
+  static String ticketCreatedSuccess(BuildContext context) =>
+      _loc(context).ticketCreatedSuccess;
+  static String catAccountIssues(BuildContext context) =>
+      _loc(context).catAccountIssues;
+  static String catPaymentProblems(BuildContext context) =>
+      _loc(context).catPaymentProblems;
+  static String catProfileIssues(BuildContext context) =>
+      _loc(context).catProfileIssues;
+  static String catTechSupport(BuildContext context) =>
+      _loc(context).catTechSupport;
+  static String catFeatureRequest(BuildContext context) =>
+      _loc(context).catFeatureRequest;
+  static String catOther(BuildContext context) => _loc(context).catOther;
+  static String description(BuildContext context) => _loc(context).description;
+  static String ticketDetails(BuildContext context) =>
+      _loc(context).ticketDetails;
+  static String ticketInformation(BuildContext context) =>
+      _loc(context).ticketInformation;
+  static String adminResponse(BuildContext context) =>
+      _loc(context).adminResponse;
+  static String ticketHash(BuildContext context) => _loc(context).ticketHash;
+  static String writeAReview(BuildContext context) =>
+      _loc(context).writeAReview;
+  static String pleaseSelectRating(BuildContext context) =>
+      _loc(context).pleaseSelectRating;
+  static String reviewSubmittedSuccess(BuildContext context) =>
+      _loc(context).reviewSubmittedSuccess;
+  static String reviewTitle(BuildContext context) => _loc(context).reviewTitle;
+  static String reviewTitleHint(BuildContext context) =>
+      _loc(context).reviewTitleHint;
+  static String reviewDescription(BuildContext context) =>
+      _loc(context).reviewDescription;
+  static String reviewDescriptionHint(BuildContext context) =>
+      _loc(context).reviewDescriptionHint;
+  static String titleCannotBeEmpty(BuildContext context) =>
+      _loc(context).titleCannotBeEmpty;
+  static String descriptionCannotBeEmpty(BuildContext context) =>
+      _loc(context).descriptionCannotBeEmpty;
+  static String submitReview(BuildContext context) =>
+      _loc(context).submitReview;
+  static String noAgentReviewError(BuildContext context) =>
+      _loc(context).noAgentReviewError;
+  static String whatUsersSay(BuildContext context) =>
+      _loc(context).whatUsersSay;
+  static String happyCustomersMessage(BuildContext context) =>
+      _loc(context).happyCustomersMessage;
+  static String beTheFirstReview(BuildContext context) =>
+      _loc(context).beTheFirstReview;
+  static String reviewDetails(BuildContext context) =>
+      _loc(context).reviewDetails;
+  static String reviewedOn(BuildContext context, String date) =>
+      _loc(context).reviewedOn(date);
+  static String comment(BuildContext context) => _loc(context).comment;
+  static String title(BuildContext context) => _loc(context).title;
+
+  static String accountVerification(BuildContext context) =>
+      _loc(context).accountVerification;
+  static String accountUnderReview(BuildContext context) =>
+      _loc(context).accountUnderReview;
+  static String profileUpdate(BuildContext context) =>
+      _loc(context).profileUpdate;
+  static String profileUpdateSuccess(BuildContext context) =>
+      _loc(context).profileUpdateSuccess;
+  static String newMatchFoundTitle(BuildContext context) =>
+      _loc(context).newMatchFoundTitle;
+  static String newMatchFoundSubtitle(BuildContext context) =>
+      _loc(context).newMatchFoundSubtitle;
+  static String newMessageTitle(BuildContext context) =>
+      _loc(context).newMessageTitle;
+  static String newMessageFrom(BuildContext context, String name) =>
+      _loc(context).newMessageFrom(name);
+  static String paymentReminder(BuildContext context) =>
+      _loc(context).paymentReminder;
+  static String subscriptionRenewalDue(BuildContext context) =>
+      _loc(context).subscriptionRenewalDue;
+
+  static String contactAdminDetails(BuildContext context) =>
+      _loc(context).contactAdminDetails;
+  static String ok(BuildContext context) => _loc(context).ok;
+  static String mail(BuildContext context) => _loc(context).mail;
+
+  static String rejected(BuildContext context) => _loc(context).rejected;
+
+  static String bioData(BuildContext context) => _loc(context).bioData;
+
+  static String uploadBioData(BuildContext context) =>
+      _loc(context).uploadBioData;
 }

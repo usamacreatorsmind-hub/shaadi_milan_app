@@ -7,13 +7,13 @@ import 'package:intl/intl.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 
-import '../../../../../app/custom/custom_widgets/validators.dart';
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../core/enums/enum.dart';
-import '../../../../translitration/widgets/bilingual_text_field.dart';
-import '../../domain/states/identity_state.dart';
-import '../controllers/user_identity_controllers.dart';
+import '../../../../../../app/custom/custom_widgets/validators.dart';
+import '../../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../../core/constants/app_labels.dart';
+import '../../../../../../core/enums/enum.dart';
+import '../../../../../translitration/widgets/bilingual_text_field.dart';
+import '../../../domain/states/identity_state.dart';
+import '../../controllers/user_identity_controllers.dart';
 
 @RoutePage()
 class UserIdentityFormScreen extends ConsumerStatefulWidget {
@@ -177,7 +177,7 @@ class _UserIdentityFormScreenState
         print(current.error);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
+        ).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
       }
 
       if (current.identity != null && previous?.identity == null) {

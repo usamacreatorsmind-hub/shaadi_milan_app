@@ -1,11 +1,12 @@
-import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
-import 'package:shadi_milan/features/user/user_app/domain/states/support_ticket.dart'
-    show TicketPriority;
-import 'package:shadi_milan/features/user/user_app/presentation/controllers/support_notifier.dart';
-import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../../../../core/constants/app_labels.dart';
+import '../../../../../../app/custom/custom_widgets/animated_app_bar.dart';
+import '../../../data/repositories_impl/user_repo_impl.dart';
+import '../../../domain/states/support_ticket.dart' show TicketPriority;
+import '../../controllers/support_notifier.dart';
 
 @RoutePage()
 class SupportTicketFormScreen extends ConsumerStatefulWidget {
@@ -25,20 +26,22 @@ class _CreateSupportTicketScreenState
   String? _selectedCategory;
   TicketPriority _selectedPriority = TicketPriority.medium;
 
-  final List<String> _categories = [
-    'Account Issues',
-    'Payment Problems',
-    'Profile Issues',
-    'Technical Support',
-    'Feature Request',
-    'Other',
-  ];
-
   @override
   void dispose() {
     _subjectController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  List<String> _getCategories(BuildContext context) {
+    return [
+      AppLabels.catAccountIssues(context),
+      AppLabels.catPaymentProblems(context),
+      AppLabels.catProfileIssues(context),
+      AppLabels.catTechSupport(context),
+      AppLabels.catFeatureRequest(context),
+      AppLabels.catOther(context),
+    ];
   }
 
   Future<void> _submitTicket() async {
@@ -47,9 +50,9 @@ class _CreateSupportTicketScreenState
     final userEntity = ref.read(currentUserProvider).value;
 
     if (userEntity == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not found. Please log in again.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppLabels.userNotFound(context))));
       return;
     }
 
@@ -69,12 +72,14 @@ class _CreateSupportTicketScreenState
     final state = ref.read(supportNotifierProvider);
 
     if (state.error != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${state.error}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLabels.error(context, state.error.toString())),
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ticket created successfully!')),
+        SnackBar(content: Text(AppLabels.ticketCreatedSuccess(context))),
       );
       context.router.maybePop();
     }
@@ -83,11 +88,12 @@ class _CreateSupportTicketScreenState
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(supportNotifierProvider);
+    final categories = _getCategories(context);
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          const MinimalAppBar(title: 'Create Support Ticket'),
+          MinimalAppBar(title: AppLabels.createSupportTicket(context)),
 
           SliverPadding(
             padding: const EdgeInsets.all(16),
@@ -98,16 +104,16 @@ class _CreateSupportTicketScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'We\'re here to help!',
-                        style: TextStyle(
+                      Text(
+                        AppLabels.wereHereToHelp(context),
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Tell us about your issue and we\'ll get back to you soon.',
+                        AppLabels.supportFormSubtitle(context),
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                       const SizedBox(height: 32),
@@ -115,12 +121,12 @@ class _CreateSupportTicketScreenState
                       // Category dropdown
                       DropdownButtonFormField<String>(
                         value: _selectedCategory,
-                        decoration: const InputDecoration(
-                          labelText: 'Category',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.category_outlined),
+                        decoration: InputDecoration(
+                          labelText: AppLabels.category(context),
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.category_outlined),
                         ),
-                        items: _categories.map((category) {
+                        items: categories.map((category) {
                           return DropdownMenuItem(
                             value: category,
                             child: Text(category),
@@ -130,23 +136,39 @@ class _CreateSupportTicketScreenState
                           setState(() => _selectedCategory = value);
                         },
                         validator: (value) {
-                          if (value == null) return 'Please select a category';
+                          if (value == null)
+                            return AppLabels.pleaseSelectCategory(context);
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
 
                       // Priority selection
-                      const Text(
-                        'Priority',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      Text(
+                        AppLabels.priority(context),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
                         children: TicketPriority.values.map((priority) {
+                          String label;
+                          switch (priority) {
+                            case TicketPriority.low:
+                              label = AppLabels.low(context);
+                              break;
+                            case TicketPriority.medium:
+                              label = AppLabels.medium(context);
+                              break;
+                            case TicketPriority.high:
+                              label = AppLabels.high(context);
+                              break;
+                            case TicketPriority.urgent:
+                              label = AppLabels.urgent(context);
+                              break;
+                          }
                           return ChoiceChip(
-                            label: Text(priority.displayName),
+                            label: Text(label),
                             selected: _selectedPriority == priority,
                             onSelected: (selected) {
                               if (selected) {
@@ -161,14 +183,14 @@ class _CreateSupportTicketScreenState
                       // Subject field
                       TextFormField(
                         controller: _subjectController,
-                        decoration: const InputDecoration(
-                          labelText: 'Subject',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.subject),
+                        decoration: InputDecoration(
+                          labelText: AppLabels.subject(context),
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.subject),
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Please enter a subject';
+                            return AppLabels.pleaseEnterSubject(context);
                           }
                           return null;
                         },
@@ -179,15 +201,15 @@ class _CreateSupportTicketScreenState
                       TextFormField(
                         controller: _descriptionController,
                         maxLines: 5,
-                        decoration: const InputDecoration(
-                          labelText: 'Description',
+                        decoration: InputDecoration(
+                          labelText: AppLabels.description(context),
                           alignLabelWithHint: true,
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.description_outlined),
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.description_outlined),
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Please enter a description';
+                            return AppLabels.pleaseEnterDescription(context);
                           }
                           return null;
                         },
@@ -209,7 +231,9 @@ class _CreateSupportTicketScreenState
                                 )
                               : const Icon(Icons.send),
                           label: Text(
-                            state.isLoading ? 'Submitting...' : 'Submit Ticket',
+                            state.isLoading
+                                ? AppLabels.submitting(context)
+                                : AppLabels.submitTicket(context),
                           ),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),

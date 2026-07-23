@@ -4057,6 +4057,780 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{age} years old'**
   String yearsOld(int age);
+
+  /// No description provided for @photos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photos;
+
+  /// No description provided for @idCards.
+  ///
+  /// In en, this message translates to:
+  /// **'ID Cards'**
+  String get idCards;
+
+  /// No description provided for @basicInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Information'**
+  String get basicInformation;
+
+  /// No description provided for @noPhotosAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No additional photos available.'**
+  String get noPhotosAvailable;
+
+  /// No description provided for @aadharCardNotUploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Aadhar card not uploaded.'**
+  String get aadharCardNotUploaded;
+
+  /// No description provided for @noDescriptionAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No description available.'**
+  String get noDescriptionAvailable;
+
+  /// No description provided for @myReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'My Reviews'**
+  String get myReviews;
+
+  /// No description provided for @noReviewsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No reviews yet.'**
+  String get noReviewsYet;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String error(String error);
+
+  /// No description provided for @religiousAndAstrological.
+  ///
+  /// In en, this message translates to:
+  /// **'Religious & Astrological'**
+  String get religiousAndAstrological;
+
+  /// No description provided for @qualificationsBilingual.
+  ///
+  /// In en, this message translates to:
+  /// **'Qualifications (Hindi | English)'**
+  String get qualificationsBilingual;
+
+  /// No description provided for @languagesBilingual.
+  ///
+  /// In en, this message translates to:
+  /// **'Languages (Hindi | English)'**
+  String get languagesBilingual;
+
+  /// No description provided for @addQualification.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Qualification'**
+  String get addQualification;
+
+  /// No description provided for @addLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Language'**
+  String get addLanguage;
+
+  /// No description provided for @basicInfoTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Info'**
+  String get basicInfoTab;
+
+  /// No description provided for @personalDetailsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Details'**
+  String get personalDetailsTab;
+
+  /// No description provided for @educationCareerTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Education & Career'**
+  String get educationCareerTab;
+
+  /// No description provided for @familyCultureTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Family & Culture'**
+  String get familyCultureTab;
+
+  /// No description provided for @physical.
+  ///
+  /// In en, this message translates to:
+  /// **'Physical'**
+  String get physical;
+
+  /// No description provided for @employment.
+  ///
+  /// In en, this message translates to:
+  /// **'Employment'**
+  String get employment;
+
+  /// No description provided for @educationStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Education Status'**
+  String get educationStatus;
+
+  /// No description provided for @additionalCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Courses'**
+  String get additionalCourses;
+
+  /// No description provided for @addToWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Wishlist'**
+  String get addToWishlist;
+
+  /// No description provided for @disability.
+  ///
+  /// In en, this message translates to:
+  /// **'Disability'**
+  String get disability;
+
+  /// No description provided for @college.
+  ///
+  /// In en, this message translates to:
+  /// **'College'**
+  String get college;
+
+  /// No description provided for @father.
+  ///
+  /// In en, this message translates to:
+  /// **'Father'**
+  String get father;
+
+  /// No description provided for @mother.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother'**
+  String get mother;
+
+  /// No description provided for @alreadyAddedToWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Already added to wishlist!'**
+  String get alreadyAddedToWishlist;
+
+  /// No description provided for @addedToWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to wishlist!'**
+  String get addedToWishlist;
+
+  /// No description provided for @wishlistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wishlist'**
+  String get wishlistTitle;
+
+  /// No description provided for @manageInterests.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your interests'**
+  String get manageInterests;
+
+  /// No description provided for @myWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'My Wishlist'**
+  String get myWishlist;
+
+  /// No description provided for @wishlistedMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Wishlisted Me'**
+  String get wishlistedMe;
+
+  /// No description provided for @emptyWishlistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wishlist is empty!'**
+  String get emptyWishlistTitle;
+
+  /// No description provided for @emptyWishlistSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start adding profiles to your wishlist to see them here.'**
+  String get emptyWishlistSubtitle;
+
+  /// No description provided for @noOneWishlistedMeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No one has wishlisted you yet!'**
+  String get noOneWishlistedMeTitle;
+
+  /// No description provided for @noOneWishlistedMeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When someone adds you to their wishlist, you\'ll see them here.'**
+  String get noOneWishlistedMeSubtitle;
+
+  /// No description provided for @couldNotLoadProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load profile'**
+  String get couldNotLoadProfile;
+
+  /// No description provided for @noAgentAssociated.
+  ///
+  /// In en, this message translates to:
+  /// **'No agent associated with this user.'**
+  String get noAgentAssociated;
+
+  /// No description provided for @userStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'User Status'**
+  String get userStatus;
+
+  /// No description provided for @paymentDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Date'**
+  String get paymentDate;
+
+  /// No description provided for @manageAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your account'**
+  String get manageAccount;
+
+  /// No description provided for @premiumActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Active'**
+  String get premiumActive;
+
+  /// No description provided for @premiumMemberMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You are a Premium Member!'**
+  String get premiumMemberMessage;
+
+  /// No description provided for @generalSection.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get generalSection;
+
+  /// No description provided for @noAgentAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'No agent assigned yet.'**
+  String get noAgentAssigned;
+
+  /// No description provided for @accountSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Settings'**
+  String get accountSettings;
+
+  /// No description provided for @paymentHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment History'**
+  String get paymentHistory;
+
+  /// No description provided for @postMarriagePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Post Marriage Payment'**
+  String get postMarriagePayment;
+
+  /// No description provided for @trustScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Trust Score'**
+  String get trustScore;
+
+  /// No description provided for @upgradeToPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get upgradeToPremium;
+
+  /// No description provided for @premiumUpgradeBenefits.
+  ///
+  /// In en, this message translates to:
+  /// **'Get unlimited access to all features and connect with more matches.'**
+  String get premiumUpgradeBenefits;
+
+  /// No description provided for @agentSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Agent Setup'**
+  String get agentSetup;
+
+  /// No description provided for @enterStaffId.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Staff Id'**
+  String get enterStaffId;
+
+  /// No description provided for @pleaseEnterStaffId.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter Staff Id'**
+  String get pleaseEnterStaffId;
+
+  /// No description provided for @agentAssignedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Agent {id} assigned successfully!'**
+  String agentAssignedSuccessfully(String id);
+
+  /// No description provided for @agentSetupDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign an agent to your profile to get personalized assistance and faster service.'**
+  String get agentSetupDescription;
+
+  /// No description provided for @staffIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Staff Id (e.g., AGT-12345)'**
+  String get staffIdHint;
+
+  /// No description provided for @agentDetailsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Agent Details:'**
+  String get agentDetailsHeader;
+
+  /// No description provided for @assignAgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign Agent'**
+  String get assignAgent;
+
+  /// No description provided for @noStaffIdSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'If you don\'t have an Staff Id, you can contact our support team for assistance.'**
+  String get noStaffIdSupport;
+
+  /// No description provided for @enterMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your message'**
+  String get enterMessageHint;
+
+  /// No description provided for @supportRequestSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your request has been submitted. Our team will contact you shortly.'**
+  String get supportRequestSubmitted;
+
+  /// No description provided for @submitRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Request'**
+  String get submitRequest;
+
+  /// No description provided for @message.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get message;
+
+  /// No description provided for @viewManageTickets.
+  ///
+  /// In en, this message translates to:
+  /// **'View and manage your tickets'**
+  String get viewManageTickets;
+
+  /// No description provided for @newTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'New Ticket'**
+  String get newTicket;
+
+  /// No description provided for @noSupportTickets.
+  ///
+  /// In en, this message translates to:
+  /// **'No Support Tickets'**
+  String get noSupportTickets;
+
+  /// No description provided for @createTicketHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a ticket to get help from our support team'**
+  String get createTicketHelp;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days ago'**
+  String daysAgo(int days);
+
+  /// No description provided for @resolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved'**
+  String get resolved;
+
+  /// No description provided for @urgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent'**
+  String get urgent;
+
+  /// No description provided for @low.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get low;
+
+  /// No description provided for @medium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get medium;
+
+  /// No description provided for @high.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get high;
+
+  /// No description provided for @createSupportTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Support Ticket'**
+  String get createSupportTicket;
+
+  /// No description provided for @wereHereToHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re here to help!'**
+  String get wereHereToHelp;
+
+  /// No description provided for @supportFormSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us about your issue and we\'ll get back to you soon.'**
+  String get supportFormSubtitle;
+
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @pleaseSelectCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a category'**
+  String get pleaseSelectCategory;
+
+  /// No description provided for @priority.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get priority;
+
+  /// No description provided for @subject.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get subject;
+
+  /// No description provided for @pleaseEnterSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a subject'**
+  String get pleaseEnterSubject;
+
+  /// No description provided for @pleaseEnterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a description'**
+  String get pleaseEnterDescription;
+
+  /// No description provided for @submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting...'**
+  String get submitting;
+
+  /// No description provided for @ticketCreatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket created successfully!'**
+  String get ticketCreatedSuccess;
+
+  /// No description provided for @catAccountIssues.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Issues'**
+  String get catAccountIssues;
+
+  /// No description provided for @catPaymentProblems.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Problems'**
+  String get catPaymentProblems;
+
+  /// No description provided for @catProfileIssues.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Issues'**
+  String get catProfileIssues;
+
+  /// No description provided for @catTechSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical Support'**
+  String get catTechSupport;
+
+  /// No description provided for @catFeatureRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Feature Request'**
+  String get catFeatureRequest;
+
+  /// No description provided for @catOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get catOther;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// No description provided for @ticketDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket Details'**
+  String get ticketDetails;
+
+  /// No description provided for @ticketInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket Information'**
+  String get ticketInformation;
+
+  /// No description provided for @adminResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin Response'**
+  String get adminResponse;
+
+  /// No description provided for @ticketHash.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket #'**
+  String get ticketHash;
+
+  /// No description provided for @writeAReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a Review'**
+  String get writeAReview;
+
+  /// No description provided for @pleaseSelectRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a rating'**
+  String get pleaseSelectRating;
+
+  /// No description provided for @reviewSubmittedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Review submitted successfully!'**
+  String get reviewSubmittedSuccess;
+
+  /// No description provided for @reviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Title'**
+  String get reviewTitle;
+
+  /// No description provided for @reviewTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a title for your review'**
+  String get reviewTitleHint;
+
+  /// No description provided for @reviewDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Description'**
+  String get reviewDescription;
+
+  /// No description provided for @reviewDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your detailed review here'**
+  String get reviewDescriptionHint;
+
+  /// No description provided for @titleCannotBeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Title cannot be empty'**
+  String get titleCannotBeEmpty;
+
+  /// No description provided for @descriptionCannotBeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Description cannot be empty'**
+  String get descriptionCannotBeEmpty;
+
+  /// No description provided for @submitReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Review'**
+  String get submitReview;
+
+  /// No description provided for @noAgentReviewError.
+  ///
+  /// In en, this message translates to:
+  /// **'You can\'t write a review without an agent'**
+  String get noAgentReviewError;
+
+  /// No description provided for @whatUsersSay.
+  ///
+  /// In en, this message translates to:
+  /// **'What our users say about us'**
+  String get whatUsersSay;
+
+  /// No description provided for @happyCustomersMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Read genuine reviews from our happy customers.'**
+  String get happyCustomersMessage;
+
+  /// No description provided for @beTheFirstReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to leave a review!'**
+  String get beTheFirstReview;
+
+  /// No description provided for @reviewDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Details'**
+  String get reviewDetails;
+
+  /// No description provided for @reviewedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewed on {date}'**
+  String reviewedOn(String date);
+
+  /// No description provided for @comment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get comment;
+
+  /// No description provided for @title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get title;
+
+  /// No description provided for @accountVerification.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Verification'**
+  String get accountVerification;
+
+  /// No description provided for @accountUnderReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is currently under review. Please wait for verification.'**
+  String get accountUnderReview;
+
+  /// No description provided for @profileUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Update'**
+  String get profileUpdate;
+
+  /// No description provided for @profileUpdateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile has been successfully updated.'**
+  String get profileUpdateSuccess;
+
+  /// No description provided for @newMatchFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Match Found!'**
+  String get newMatchFoundTitle;
+
+  /// No description provided for @newMatchFoundSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We found a new match for you. Check it out!'**
+  String get newMatchFoundSubtitle;
+
+  /// No description provided for @newMessageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Message'**
+  String get newMessageTitle;
+
+  /// No description provided for @newMessageFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a new message from {name}.'**
+  String newMessageFrom(String name);
+
+  /// No description provided for @paymentReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Reminder'**
+  String get paymentReminder;
+
+  /// No description provided for @subscriptionRenewalDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription renewal is due soon.'**
+  String get subscriptionRenewalDue;
+
+  /// No description provided for @contactAdminDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Please contact the administrator for more details.'**
+  String get contactAdminDetails;
+
+  /// No description provided for @uploadBioData.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Biodata (Photo, PDF, or Document)'**
+  String get uploadBioData;
 }
 
 class _AppLocalizationsDelegate

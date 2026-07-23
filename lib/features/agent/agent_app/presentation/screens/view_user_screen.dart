@@ -154,11 +154,10 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
         title: userAsync.maybeWhen(
           data: (user) => BilingualParser(
             value: user?.fullName ?? BilingualValue.empty(),
-            
+
             style: TextStyle(color: theme.colorScheme.onPrimary),
           ),
 
-          
           orElse: () => Text(
             context.l10n.userDetails,
             style: TextStyle(color: theme.colorScheme.onPrimary),
@@ -609,10 +608,7 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                   _InfoRow(context.l10n.aadharCard, profile.identity.aadhar),
                   if (profile.identity.aboutMe.hi.isNotEmpty ||
                       profile.identity.aboutMe.en.isNotEmpty)
-                    _InfoRow(
-                      context.l10n.aboutMe,
-                      profile.identity.aboutMe,
-                    ),
+                    _InfoRow(context.l10n.aboutMe, profile.identity.aboutMe),
                 ],
               ),
               const SizedBox(height: 16),
@@ -787,7 +783,7 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                     profile.address.policeStation,
                   ),
                   _InfoRow(context.l10n.city, resolvedCity),
-                  _InfoRow(context.l10n.state, resolvedState),  
+                  _InfoRow(context.l10n.state, resolvedState),
                   _InfoRow(context.l10n.pincode, profile.address.pincode),
                 ],
               ),
@@ -913,16 +909,14 @@ class _MatrimonyHeaderCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 
-               BilingualParser(
+                  BilingualParser(
                     value: profile.user.fullName,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                 
-                
+
                   const SizedBox(height: 4),
                   Text(
                     '${profile.identity.gender} • ${profile.identity.age} years',
@@ -1032,7 +1026,10 @@ class _InfoRow extends StatelessWidget {
                     (value == null || value.toString().isEmpty)
                         ? context.l10n.notProvided
                         : value.toString(),
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
           ),
         ],
@@ -1705,17 +1702,14 @@ class _WishlistUserTile extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          BilingualParser(
+                            value: user.fullName,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
 
-  BilingualParser(
-                    value:  user.fullName,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-
-                      
                           const SizedBox(height: 2),
                           Row(
                             children: [

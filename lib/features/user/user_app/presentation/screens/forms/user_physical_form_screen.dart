@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../core/enums/enum.dart';
-import '../../../../translitration/widgets/bilingual_text_field.dart';
-import '../../domain/states/physical_state.dart';
-import '../controllers/user_physical_controllers.dart';
+import '../../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../../core/constants/app_labels.dart';
+import '../../../../../../core/enums/enum.dart';
+import '../../../../../translitration/widgets/bilingual_text_field.dart';
+import '../../../domain/states/physical_state.dart';
+import '../../controllers/user_physical_controllers.dart';
 
 @RoutePage()
 class UserPhysicalFormScreen extends ConsumerStatefulWidget {
@@ -30,15 +30,18 @@ class UserPhysicalFormScreen extends ConsumerStatefulWidget {
 class _UserPhysicalFormScreenState
     extends ConsumerState<UserPhysicalFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _heightController = TextEditingController();
-  final _weightController = TextEditingController();
   final _disabilityDetailsController = TextEditingController();
   final _disabilityDetailsEnController = TextEditingController();
 
+  int? _selectedHeight;
+  int? _selectedWeight;
   BilingualValue? _selectedBodyType;
   BilingualValue? _selectedComplexion;
 
   bool _physicallyChallenged = false;
+
+  final List<int> _heightOptions = List.generate(151, (index) => index + 100);
+  final List<int> _weightOptions = List.generate(121, (index) => index + 30);
 
   final Map<String, BilingualValue> _bodyTypeOptions = {
     'Slim': BilingualValue(hi: 'दुबला', en: 'Slim'),
@@ -67,8 +70,8 @@ class _UserPhysicalFormScreenState
     if (widget.mode == FormMode.edit &&
         widget.existingPhysicalProfile != null) {
       final profile = widget.existingPhysicalProfile!;
-      _heightController.text = profile.height.toString();
-      _weightController.text = profile.weight.toString();
+      _selectedHeight = profile.height.round();
+      _selectedWeight = profile.weight.round();
 
       _selectedBodyType = _bodyTypeOptions.values.firstWhere(
         (e) => e.en == profile.bodyType.en,
@@ -88,8 +91,6 @@ class _UserPhysicalFormScreenState
 
   @override
   void dispose() {
-    _heightController.dispose();
-    _weightController.dispose();
     _disabilityDetailsController.dispose();
     _disabilityDetailsEnController.dispose();
     super.dispose();
@@ -97,7 +98,10 @@ class _UserPhysicalFormScreenState
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      if (_selectedBodyType == null || _selectedComplexion == null) {
+      if (_selectedBodyType == null ||
+          _selectedComplexion == null ||
+          _selectedHeight == null ||
+          _selectedWeight == null) {
         return;
       }
 
@@ -112,8 +116,8 @@ class _UserPhysicalFormScreenState
 
       if (widget.mode == FormMode.create) {
         notifier.savePhysicals(
-          height: double.parse(_heightController.text),
-          weight: double.parse(_weightController.text),
+          height: _selectedHeight!.toDouble(),
+          weight: _selectedWeight!.toDouble(),
           bodyType: _selectedBodyType!,
           complexion: _selectedComplexion!,
           physicallyChallenged: _physicallyChallenged,
@@ -121,8 +125,8 @@ class _UserPhysicalFormScreenState
         );
       } else {
         notifier.updatePhysicals(
-          height: double.parse(_heightController.text),
-          weight: double.parse(_weightController.text),
+          height: _selectedHeight!.toDouble(),
+          weight: _selectedWeight!.toDouble(),
           bodyType: _selectedBodyType!,
           complexion: _selectedComplexion!,
           physicallyChallenged: _physicallyChallenged,
@@ -130,6 +134,13 @@ class _UserPhysicalFormScreenState
         );
       }
     }
+  }
+
+  String _formatHeight(int cm) {
+    final totalInches = (cm / 2.54).round();
+    final feet = totalInches ~/ 12;
+    final inches = totalInches % 12;
+    return '$cm cm ($feet\'$inches")';
   }
 
   @override
@@ -144,7 +155,7 @@ class _UserPhysicalFormScreenState
       if (current.error != null) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${current.error}')));
+        ).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
       } else if (current.physical != null && !physicalState.isLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -167,30 +178,36 @@ class _UserPhysicalFormScreenState
           key: _formKey,
           child: ListView(
             children: [
-              AppTextField(
-                controller: _heightController,
-                prefixIcon: Icons.height,
-                iconColor: Theme.of(context).colorScheme.primary,
+              AppDropDown<int>(
                 label: AppLabels.heightCm(context),
-                hint: AppLabels.heightHint(context),
-                obscureText: false,
-                keyboardType: TextInputType.number,
-                validator: (v) => v == null || v.isEmpty
-                    ? AppLabels.isRequired(context)
-                    : null,
+                items: _heightOptions,
+                value: _selectedHeight,
+                itemLabel: (cm) => _formatHeight(cm),
+                onChanged: (value) {
+                  setState(() => _selectedHeight = value);
+                },
+                validator: (value) {
+                  if (value == null) {
+                    return AppLabels.isRequired(context);
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
-              AppTextField(
-                controller: _weightController,
-                prefixIcon: Icons.monitor_weight,
-                iconColor: Theme.of(context).colorScheme.primary,
+              AppDropDown<int>(
                 label: AppLabels.weightKg(context),
-                hint: AppLabels.weightHint(context),
-                obscureText: false,
-                keyboardType: TextInputType.number,
-                validator: (v) => v == null || v.isEmpty
-                    ? AppLabels.isRequired(context)
-                    : null,
+                items: _weightOptions,
+                value: _selectedWeight,
+                itemLabel: (kg) => '$kg kg',
+                onChanged: (value) {
+                  setState(() => _selectedWeight = value);
+                },
+                validator: (value) {
+                  if (value == null) {
+                    return AppLabels.isRequired(context);
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               AppDropDown<BilingualValue>(
@@ -262,5 +279,9 @@ class _UserPhysicalFormScreenState
         ),
       ),
     );
+  }
+
+  int totalInchesToFeet(int inches) {
+    return inches ~/ 12;
   }
 }

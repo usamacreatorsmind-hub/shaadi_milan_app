@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/app/custom/custom_widgets/shimmer.dart';
+import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import '../../../../../app/router/app_router.dart';
 import '../../../../auth/domain/states/agent_state.dart';
@@ -10,7 +11,6 @@ import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
-import '../../domain/states/religion_state.dart';
 import '../../domain/states/state_city.dart';
 import '../../widgets/pdf_viewer_bottomsheet.dart';
 
@@ -28,10 +28,6 @@ final matrimonyProfileProvider =
         final AgentEntity agent;
 
         if (user.agentId.isNotEmpty) {
-          // print agetn id
-          print("This is Staff Id");
-          print(user.agentId);
-
           agent = await agentRepo.fetchAgent(user.agentId);
         } else {
           agent = AgentEntity.empty();
@@ -53,13 +49,11 @@ class MyProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locationAsync = ref.watch(locationJsonProvider);
-    final religionsAsync = ref.watch(religionsProvider);
     final profileAsync = ref.watch(matrimonyProfileProvider(uid));
-    print("inside my profile view");
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Profile"),
+        title: Text(AppLabels.myProfile(context)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -68,17 +62,16 @@ class MyProfileScreen extends ConsumerWidget {
           onPressed: () => AutoRouter.of(context).maybePop(),
         ),
       ),
-
       backgroundColor: Colors.grey[100],
-
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text("Error: $e")),
+        error: (e, _) =>
+            Center(child: Text(AppLabels.error(context, e.toString()))),
         data: (profile) {
-          String resolvedState = profile.address.state.en;
-          String resolvedCity = profile.address.city.en;
-          String resolvedReligion = profile.cultural.religion.en;
-          String resolvedCaste = profile.cultural.caste.en;
+          BilingualValue resolvedState = profile.address.state;
+          BilingualValue resolvedCity = profile.address.city;
+          BilingualValue resolvedReligion = profile.cultural.religion;
+          BilingualValue resolvedCaste = profile.cultural.caste;
 
           if (locationAsync.hasValue) {
             final states = locationAsync.value!;
@@ -86,7 +79,10 @@ class MyProfileScreen extends ConsumerWidget {
                 .where((s) => s.name == profile.address.state.en)
                 .firstOrNull;
             if (stateObj != null) {
-              resolvedState = stateObj.name;
+              resolvedState = BilingualValue(
+                en: stateObj.name,
+                hi: stateObj.name,
+              );
               final cityObj = stateObj.cities
                   .where(
                     (c) =>
@@ -95,40 +91,13 @@ class MyProfileScreen extends ConsumerWidget {
                   )
                   .firstOrNull;
               if (cityObj != null) {
-                resolvedCity = cityObj.name;
+                resolvedCity = BilingualValue(
+                  en: cityObj.name,
+                  hi: cityObj.name,
+                );
               }
             }
           }
-
-          if (religionsAsync.hasValue) {
-            final religions = religionsAsync.value!;
-            final religionObj = religions
-                .where(
-                  (r) =>
-                      r.id == profile.cultural.religion ||
-                      r.name == profile.cultural.religion,
-                )
-                .firstOrNull;
-            if (religionObj != null) {
-              resolvedReligion = religionObj.name;
-              final casteObj = religionObj.castes
-                  .where(
-                    (c) =>
-                        c.id == profile.cultural.caste ||
-                        c.name == profile.cultural.caste,
-                  )
-                  .firstOrNull;
-              if (casteObj != null) {
-                resolvedCaste = casteObj.name;
-              }
-            }
-          }
-
-          print((" these all are details"));
-          print(profile.toString());
-          print(profile.user.toString());
-          print("this is agent ");
-          print(profile.agentEntity);
 
           final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
@@ -145,7 +114,7 @@ class MyProfileScreen extends ConsumerWidget {
 
                 // build Image card that display all images of user
                 _DetailSection(
-                  title: "Photos",
+                  title: AppLabels.photos(context),
                   children: [
                     profile.images.secondaryImageUrls.isNotEmpty
                         ? SizedBox(
@@ -206,7 +175,7 @@ class MyProfileScreen extends ConsumerWidget {
                               },
                             ),
                           )
-                        : const Text("No additional photos available."),
+                        : Text(AppLabels.noPhotosAvailable(context)),
                   ],
                 ),
 
@@ -214,7 +183,7 @@ class MyProfileScreen extends ConsumerWidget {
 
                 // show aadhar widget with file name and a download url and a button to view the pdf
                 _DetailSection(
-                  title: "ID Cards",
+                  title: AppLabels.idCards(context),
                   children: [
                     if (profile
                         .metrimonyProfile
@@ -222,8 +191,8 @@ class MyProfileScreen extends ConsumerWidget {
                         .aadharCardUrl
                         .isNotEmpty)
                       DetailRowWithAction(
-                        label: "Aadhar Card",
-                        value: "View PDF",
+                        label: AppLabels.aadharCard(context),
+                        value: AppLabels.viewDocument(context),
                         onTap: () {
                           showModalBottomSheet(
                             context: context,
@@ -232,18 +201,49 @@ class MyProfileScreen extends ConsumerWidget {
                             builder: (context) => PdfViewerBottomsheet(
                               source:
                                   profile.metrimonyProfile.images.aadharCardUrl,
-                              title: 'Aadhar PDF',
+                              title: AppLabels.aadharCard(context),
                               isLocal: false,
                             ),
                           );
                         },
-                      )
-                    else
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                      ),
+                    if (profile
+                        .metrimonyProfile
+                        .images
+                        .bioDataUrl
+                        .isNotEmpty)
+                      DetailRowWithAction(
+                        label: AppLabels.bioData(context),
+                        value: AppLabels.viewDocument(context),
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => PdfViewerBottomsheet(
+                              source:
+                                  profile.metrimonyProfile.images.bioDataUrl,
+                              title: AppLabels.bioData(context),
+                              isLocal: false,
+                            ),
+                          );
+                        },
+                      ),
+                    if (profile
+                            .metrimonyProfile
+                            .images
+                            .aadharCardUrl
+                            .isEmpty &&
+                        profile
+                            .metrimonyProfile
+                            .images
+                            .bioDataUrl
+                            .isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Text(
-                          "Aadhar card not uploaded.",
-                          style: TextStyle(color: Colors.grey),
+                          AppLabels.aadharCardNotUploaded(context),
+                          style: const TextStyle(color: Colors.grey),
                         ),
                       ),
                   ],
@@ -251,7 +251,7 @@ class MyProfileScreen extends ConsumerWidget {
 
                 // 📝 ABOUT ME
                 _DetailSection(
-                  title: "About Me",
+                  title: AppLabels.aboutMe(context),
                   children: [
                     if (profile.identity.aboutMe.isNotEmpty)
                       BilingualParser(
@@ -261,23 +261,31 @@ class MyProfileScreen extends ConsumerWidget {
                       )
                     else
                       Text(
-                        "No description available.",
+                        AppLabels.noDescriptionAvailable(context),
                         textAlign: TextAlign.justify,
                         style: TextStyle(color: Colors.grey[700]),
                       ),
- 
                   ],
                 ),
 
                 // 📋 BASIC INFO
                 _DetailSection(
-                  title: "Basic Information",
+                  title: AppLabels.basicInformation(context),
                   children: [
-                    _DetailRow("Aadhar", profile.identity.aadhar ?? 'N/A'),
-                    _DetailRow("Age", "${profile.identity.age ?? 'N/A'} years"),
-                    _DetailRow("Gender", profile.identity.gender ?? 'N/A'),
                     _DetailRow(
-                      "Date of Birth",
+                      AppLabels.aadharNumber(context),
+                      profile.identity.aadhar,
+                    ),
+                    _DetailRow(
+                      AppLabels.age(context),
+                      AppLabels.ageYearsOld(context, profile.identity.age),
+                    ),
+                    _DetailRow(
+                      AppLabels.gender(context),
+                      profile.identity.gender,
+                    ),
+                    _DetailRow(
+                      AppLabels.dateOfBirth(context),
                       profile.identity.dob.toString().split(" ").first,
                     ),
                   ],
@@ -285,29 +293,23 @@ class MyProfileScreen extends ConsumerWidget {
 
                 // 🎓 EDUCATION
                 _DetailSection(
-                  title: "Education",
+                  title: AppLabels.education(context),
                   children: [
                     _DetailRow(
-                      "Course",
-                      isHindi
-                          ? profile.education.education?.course.hi ?? "N/A"
-                          : profile.education.education?.course.en ?? "N/A",
+                      AppLabels.course(context),
+                      profile.education.education?.course,
                     ),
                     _DetailRow(
-                      "College",
-                      isHindi
-                          ? profile.education.education?.college.hi ?? "N/A"
-                          : profile.education.education?.college.en ?? "N/A",
+                      AppLabels.collegeUniversity(context),
+                      profile.education.education?.college,
                     ),
                     _DetailRow(
-                      "Passing Year",
-                      profile.education.education?.passingYear.toString() ??
-                          "N/A",
+                      AppLabels.passingYear(context),
+                      profile.education.education?.passingYear.toString(),
                     ),
                     _DetailRow(
-                      "Percentage",
-                      profile.education.education?.percentage.toString() ??
-                          "N/A",
+                      AppLabels.percentageCGPA(context),
+                      profile.education.education?.percentage.toString(),
                     ),
                   ],
                 ),
@@ -320,7 +322,7 @@ class MyProfileScreen extends ConsumerWidget {
                         .isNotEmpty ??
                     false)
                   _DetailSection(
-                    title: "Additional Qualifications",
+                    title: AppLabels.additionalQualifications(context),
                     children: [
                       Wrap(
                         spacing: 10.0,
@@ -332,7 +334,7 @@ class MyProfileScreen extends ConsumerWidget {
                             .map(
                               (course) => Chip(
                                 backgroundColor: Theme.of(context).canvasColor,
-                                label: Text(isHindi ? course.hi : course.en),
+                                label: BilingualParser(value: course),
                               ),
                             )
                             .toList(),
@@ -342,153 +344,108 @@ class MyProfileScreen extends ConsumerWidget {
 
                 // employement
                 _DetailSection(
-                  title: "Employment",
-                  // actionChip: AppChip(
-                  //   label: "Edit",
-                  //   icon: Icons.edit,
-                  //   onTap: () => AutoRouter.of(context).push(
-                  //     UserEmploymentFormRoute(
-                  //       mode: FormMode.edit,
-                  //       existingEmploymentProfile: profile.employment,
-                  //     ),
-                  //   ),
-                  // ),
+                  title: AppLabels.employmentDetails(context),
                   children: [
-                    _DetailRow("Company", profile.employment.company ?? "N/A"),
                     _DetailRow(
-                      "Income",
-                      profile.employment.annualIncome.toString() ?? "N/A",
+                      AppLabels.organization(context),
+                      profile.employment.company,
                     ),
-                    _DetailRow("Job Type", profile.employment.jobType ?? "N/A"),
                     _DetailRow(
-                      "Designation",
-                      profile.employment.designation ?? "N/A",
+                      AppLabels.annualIncome(context),
+                      profile.employment.annualIncome?.toString(),
+                    ),
+                    _DetailRow(
+                      AppLabels.jobType(context),
+                      profile.employment.jobType,
+                    ),
+                    _DetailRow(
+                      AppLabels.designation(context),
+                      profile.employment.designation,
                     ),
                   ],
                 ),
 
                 // 🏠 ADDRESS
                 _DetailSection(
-                  title: "Address",
-
-                  // actionChip: AppChip(
-                  //   label: "Edit",
-                  //   onTap: () => AutoRouter.of(context).push(
-                  //     UserAddressFormRoute(
-                  //       mode: FormMode.edit,
-                  //       existingAddressProfile: profile.address,
-                  //     ),
-                  //   ),
-                  //   icon: Icons.edit,
-                  // ),
+                  title: AppLabels.address(context),
                   children: [
-                    _DetailRow("City", resolvedCity),
-                    _DetailRow("State", resolvedState),
+                    _DetailRow(AppLabels.city(context), resolvedCity),
+                    _DetailRow(AppLabels.state(context), resolvedState),
                   ],
                 ),
 
                 // 👪 FAMILY
                 _DetailSection(
-                  title: "Family Details",
-
-                  // actionChip: AppChip(
-                  //   label: "Edit",
-                  //   onTap: () => AutoRouter.of(context).push(
-                  //     UserFamilyFormRoute(
-                  //       mode: FormMode.edit,
-                  //       existingFamilyProfile: profile.family,
-                  //     ),
-                  //   ),
-
-                  //   icon: Icons.edit,
-                  // ),
+                  title: AppLabels.familyDetails(context),
                   children: [
-                    _DetailRow("Father", profile.family.fatherName ?? "N/A"),
-                    _DetailRow("Mother", profile.family.motherName ?? "N/A"),
                     _DetailRow(
-                      "Family Type",
-                      profile.family.familyType ?? "N/A",
+                      AppLabels.fatherName(context),
+                      profile.family.fatherName,
+                    ),
+                    _DetailRow(
+                      AppLabels.motherName(context),
+                      profile.family.motherName,
+                    ),
+                    _DetailRow(
+                      AppLabels.familyType(context),
+                      profile.family.familyType,
                     ),
                   ],
                 ),
 
                 //  physical details
                 _DetailSection(
-                  title: "Physical Details",
-                  // actionChip: AppChip(
-                  //   label: "Edit",
-                  //   onTap: () => AutoRouter.of(context).push(
-                  //     UserPhysicalFormRoute(
-                  //       mode: FormMode.edit,
-                  //       existingPhysicalProfile: profile.physical,
-                  //     ),
-                  //   ),
-                  //   icon: Icons.edit,
-                  // ),
+                  title: AppLabels.physicalDetails(context),
                   children: [
-                    _DetailRow("Height", "${profile.physical.height} cm"),
-                    _DetailRow("Weight", "${profile.physical.weight} kg"),
-                    _DetailRow("Body Type", profile.physical.bodyType ?? "N/A"),
-
                     _DetailRow(
-                      "Complexion",
-                      profile.physical.complexion ?? "N/A",
+                      AppLabels.height(context),
+                      _formatHeight(profile.physical.height.round()),
                     ),
-
                     _DetailRow(
-                      "Disability",
-                      profile.physical.physicallyChallenged ? "Yes" : "No ",
+                      AppLabels.weightKg(context),
+                      "${profile.physical.weight.round()} kg",
+                    ),
+                    _DetailRow(
+                      AppLabels.selectBodyType(context),
+                      profile.physical.bodyType,
+                    ),
+                    _DetailRow(
+                      AppLabels.selectComplexion(context),
+                      profile.physical.complexion,
+                    ),
+                    _DetailRow(
+                      AppLabels.physicallyChallenged(context),
+                      profile.physical.physicallyChallenged
+                          ? AppLabels.yesLabel(context)
+                          : AppLabels.noLabel(context),
                     ),
                     if (profile.physical.physicallyChallenged)
                       _DetailRow(
-                        "Details",
-                        profile.physical.disabilityDetails ?? "N/A",
+                        AppLabels.disabilityDetails(context),
+                        profile.physical.disabilityDetails,
                       ),
                   ],
                 ),
 
                 //  RELIGIOUS & ASTROLOGICAL
                 _DetailSection(
-                  title: "Religious & Astrological",
+                  title: AppLabels.religiousAndAstrological(context),
                   children: [
-                    _DetailRow("Religion", resolvedReligion),
-                    _DetailRow("Caste", resolvedCaste),
+                    _DetailRow(AppLabels.religion(context), resolvedReligion),
+                    _DetailRow(AppLabels.caste(context), resolvedCaste),
                     _DetailRow(
-                      "Sub-caste",
-                      isHindi
-                          ? profile.cultural.subCaste.hi
-                          : profile.cultural.subCaste.en,
+                      AppLabels.subCasteLabel(context),
+                      profile.cultural.subCaste,
                     ),
                     _DetailRow(
-                      "Languages",
+                      AppLabels.addKnownLanguages(context),
                       profile.cultural.languages
-                              .map((l) => isHindi ? l.hi : l.en)
-                              .join(", ") ??
-                          "N/A",
+                          .map((l) => isHindi ? l.hi : l.en)
+                          .join(", "),
                     ),
                   ],
                 ),
 
-                // //  AGENT DETAILS
-                // if (profile.agent != null) ...[
-                //   const SizedBox(height: 24),
-                //   _DetailSection(
-                //     title: "Agent Details",
-                //     actionChip: AppChip(
-                //       label: "Contact",
-                //       icon: Icons.call,
-                //       onTap: () {},
-                //     ),
-                //     children: [
-                //       _DetailRow("Name", profile.agent!.agentName),
-                //       _DetailRow("Mobile", profile.agent!.agentMobile),
-                //       _DetailRow("Email", profile.agent!.email),
-                //       _DetailRow("Staff Id", profile.agent!.agentId),
-                //     ],
-                //   ),
-                // ],
-
-                // � PARTNER PREFERENCES
                 const SizedBox(height: 24),
               ],
             ),
@@ -507,6 +464,13 @@ class MyProfileScreen extends ConsumerWidget {
       barrierDismissible: true,
       builder: (_) => PhotoPreviewDialog(photoUrl: photoUrl),
     );
+  }
+
+  String _formatHeight(int cm) {
+    final totalInches = (cm / 2.54).round();
+    final feet = totalInches ~/ 12;
+    final inches = totalInches % 12;
+    return '$cm cm ($feet\'$inches")';
   }
 }
 
@@ -581,6 +545,7 @@ class DetailRowWithAction extends StatelessWidget {
   final VoidCallback onTap;
 
   const DetailRowWithAction({
+    super.key,
     required this.label,
     required this.value,
     required this.onTap,
@@ -715,12 +680,14 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
                                         widget
                                                 .profile
                                                 .userProfile
-                                                .fullName.en
+                                                .fullName
+                                                .en
                                                 .isNotEmpty
                                             ? widget
                                                   .profile
                                                   .userProfile
-                                                  .fullName.en[0]
+                                                  .fullName
+                                                  .en[0]
                                                   .toUpperCase()
                                             : '?',
                                         style: TextStyle(
@@ -761,8 +728,8 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
                               Row(
                                 children: [
                                   Expanded(
-                                    child: Text(
-                                      widget.profile.user.fullName.en.isEmpty ? "N/A" : widget.profile.user.fullName.en,
+                                    child: BilingualParser(
+                                      value: widget.profile.user.fullName,
                                       style: Theme.of(context)
                                           .textTheme
                                           .headlineSmall
@@ -780,8 +747,12 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
                               const SizedBox(height: 6),
                               // Contact Info - Compact
                               _buildCompactContactInfo(
-                                phone: widget.profile.user.phone ?? "N/A",
-                                email: widget.profile.user.email ?? "N/A",
+                                phone: widget.profile.user.phone.isEmpty
+                                    ? AppLabels.notAvailableShort(context)
+                                    : widget.profile.user.phone,
+                                email: widget.profile.user.email.isEmpty
+                                    ? AppLabels.notAvailableShort(context)
+                                    : widget.profile.user.email,
                                 theme: theme,
                               ),
                             ],
@@ -796,17 +767,20 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
                       spacing: 10,
                       children: [
                         _buildAttributeChip(
-                          label: widget.profile.identity.gender ?? "N/A",
+                          label: widget.profile.identity.gender,
                           icon: Icons.person_outline,
                           theme: theme,
                         ),
                         _buildAttributeChip(
-                          label: "${widget.profile.identity.age ?? 'N/A'} yrs",
+                          label: AppLabels.ageYearsOld(
+                            context,
+                            widget.profile.identity.age,
+                          ),
                           icon: Icons.cake_outlined,
                           theme: theme,
                         ),
                         _buildAttributeChip(
-                          label: widget.profile.employment.designation ?? "N/A",
+                          label: widget.profile.employment.designation,
                           icon: Icons.work_outline,
                           theme: theme,
                         ),
@@ -890,13 +864,13 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            theme.primaryColor.withOpacity(0.08),
-            theme.primaryColor.withOpacity(0.04),
+            theme.primaryColor.withValues(alpha: 0.08),
+            theme.primaryColor.withValues(alpha: 0.04),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: theme.primaryColor.withOpacity(0.15),
+          color: theme.primaryColor.withValues(alpha: 0.15),
           width: 1,
         ),
       ),
@@ -927,27 +901,6 @@ class _ProfileHeroCardState extends State<_ProfileHeroCard>
     );
   }
 
-  Container _buildContactTile({
-    required String label,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.grey[100],
-      ),
-
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Container(child: Icon(icon, color: color)),
-          Text(label),
-        ],
-      ),
-    );
-  }
-
   void showPhotoDialogBox({
     required String photoUrl,
     required BuildContext context,
@@ -964,13 +917,7 @@ class _DetailSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
 
-  // final AppChip actionChip;
-
-  const _DetailSection({
-    required this.title,
-    required this.children,
-    // required this.actionChip,
-  });
+  const _DetailSection({required this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -1000,11 +947,7 @@ class _DetailSection extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
-              //   adding chip or action chip
               const Spacer(),
-
-              // actionChip,
               const SizedBox(width: 8),
             ],
           ),
@@ -1035,7 +978,7 @@ class _DetailRow extends StatelessWidget {
               ? BilingualParser(value: value as BilingualValue)
               : Text(
                   (value == null || value.toString().isEmpty)
-                      ? 'N/A'
+                      ? AppLabels.notAvailableShort(context)
                       : value.toString(),
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),

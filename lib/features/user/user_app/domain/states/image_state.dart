@@ -4,6 +4,7 @@ class ProfileImages {
   final String aadharCardUrl;
   final String imageWithAgentUrl;
   final String profileImageUrl;
+  final String bioDataUrl;
 
   const ProfileImages({
     required this.primaryImageUrl,
@@ -11,6 +12,7 @@ class ProfileImages {
     required this.aadharCardUrl,
     required this.imageWithAgentUrl,
     required this.profileImageUrl,
+    required this.bioDataUrl,
   });
 
   factory ProfileImages.empty() {
@@ -21,6 +23,7 @@ class ProfileImages {
       profileImageUrl: '',
 
       aadharCardUrl: '',
+      bioDataUrl: '',
 
       secondaryImageUrls: [],
     );
@@ -32,6 +35,7 @@ class ProfileImages {
     String? imageWithAgentUrl,
     String? aadharCardUrl,
     String? profileImageUrl,
+    String? bioDataUrl,
   }) {
     return ProfileImages(
       imageWithAgentUrl: imageWithAgentUrl ?? this.imageWithAgentUrl,
@@ -39,6 +43,7 @@ class ProfileImages {
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       primaryImageUrl: primaryImageUrl ?? this.primaryImageUrl,
       secondaryImageUrls: secondaryImageUrls ?? this.secondaryImageUrls,
+      bioDataUrl: bioDataUrl ?? this.bioDataUrl,
     );
   }
 
@@ -49,6 +54,7 @@ class ProfileImages {
       'imageWithAgentUrl': imageWithAgentUrl,
       'secondaryImageUrls': secondaryImageUrls,
       'profileImageUrl': profileImageUrl,
+      'bioDataUrl': bioDataUrl,
     };
   }
 
@@ -57,6 +63,7 @@ class ProfileImages {
       profileImageUrl: map['profileImageUrl'] ?? '',
       aadharCardUrl: map['aadharCardUrl'] ?? '',
       imageWithAgentUrl: map['imageWithAgentUrl'] ?? '',
+      bioDataUrl: map['bioDataUrl'] ?? '',
 
       primaryImageUrl: map['primaryImageUrl'] ?? '',
       secondaryImageUrls: List<String>.from(map['secondaryImageUrls'] ?? []),
@@ -65,7 +72,7 @@ class ProfileImages {
 
   @override
   String toString() =>
-      'ProfileImages(primary: $primaryImageUrl, profile: $profileImageUrl,    gallery: $secondaryImageUrls , imageWithAgent: $imageWithAgentUrl, aadharCard: $aadharCardUrl)';
+      'ProfileImages(primary: $primaryImageUrl, profile: $profileImageUrl,    gallery: $secondaryImageUrls , imageWithAgent: $imageWithAgentUrl, aadharCard: $aadharCardUrl, bioData: $bioDataUrl)';
 }
 
 class ImagesState {
@@ -73,6 +80,7 @@ class ImagesState {
   final List<String> secondaryImages;
   final String? aadharPdfPath;
   final String? imageWithAgentUrl;
+  final String? bioDataPath;
 
   final String? profileImage;
 
@@ -81,6 +89,7 @@ class ImagesState {
     this.primaryImage,
     this.aadharPdfPath,
     this.imageWithAgentUrl,
+    this.bioDataPath,
 
     this.secondaryImages = const [],
   });
@@ -93,6 +102,7 @@ class ImagesState {
     List<String>? secondaryImages,
     String? imageWithAgentUrl,
     String? aadharPdfPath,
+    String? bioDataPath,
   }) {
     return ImagesState(
       profileImage: profileImage ?? this.profileImage,
@@ -101,6 +111,7 @@ class ImagesState {
       primaryImage: primaryImage ?? this.primaryImage,
       aadharPdfPath: aadharPdfPath ?? this.aadharPdfPath,
       secondaryImages: secondaryImages ?? this.secondaryImages,
+      bioDataPath: bioDataPath ?? this.bioDataPath,
     );
   }
 }

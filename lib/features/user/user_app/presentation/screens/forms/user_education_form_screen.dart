@@ -2,13 +2,13 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../app/custom/custom_widgets/widgets.dart';
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../core/enums/enum.dart';
-import '../../../../translitration/models/bilingual_value.dart';
-import '../../../../translitration/widgets/bilingual_text_field.dart';
-import '../../domain/states/education_state.dart';
-import '../controllers/user_education_controllers.dart';
+import '../../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../../core/constants/app_labels.dart';
+import '../../../../../../core/enums/enum.dart';
+import '../../../../../translitration/models/bilingual_value.dart';
+import '../../../../../translitration/widgets/bilingual_text_field.dart';
+import '../../../domain/states/education_state.dart';
+import '../../controllers/user_education_controllers.dart';
 
 @RoutePage()
 class UserEducationFormScreen extends ConsumerStatefulWidget {
@@ -152,9 +152,9 @@ class _UserEducationFormScreenState
 
     ref.listen<EducationState>(userEducationControllerProvider, (prev, next) {
       if (next.error != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.error!)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLabels.error(context, next.error!))),
+        );
       }
 
       if (next.education != null && prev?.education == null) {
@@ -340,7 +340,7 @@ class _UserEducationFormScreenState
                 _extraCourseEnCtrl.clear();
               });
             },
-            text: "Add Qualification",
+            text: AppLabels.addQualification(context),
           ),
         ),
       ],
@@ -348,27 +348,38 @@ class _UserEducationFormScreenState
   }
 
   Widget _extraCourseChips() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: extraCourses.map((course) {
-        final label = course.hi.isNotEmpty ? course.hi : course.en;
-        return Chip(
-          label: Text(label),
-          deleteIcon: const Icon(Icons.close, size: 18),
-          onDeleted: () => setState(() => extraCourses.remove(course)),
-          backgroundColor: Theme.of(
-            context,
-          ).colorScheme.primary.withOpacity(0.1),
-          labelStyle: TextStyle(
-            color: Theme.of(context).colorScheme.primary,
-            fontWeight: FontWeight.w500,
-          ),
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-          ),
-        );
-      }).toList(),
+    if (extraCourses.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLabels.qualificationsBilingual(context),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: extraCourses.map((course) {
+            return Chip(
+              label: Text("${course.hi} | ${course.en}"),
+              deleteIcon: const Icon(Icons.close, size: 18),
+              onDeleted: () => setState(() => extraCourses.remove(course)),
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.primary.withOpacity(0.1),
+              labelStyle: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w500,
+              ),
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }

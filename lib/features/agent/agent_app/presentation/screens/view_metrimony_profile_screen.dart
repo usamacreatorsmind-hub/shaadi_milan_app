@@ -188,10 +188,7 @@ class _ViewMetrimonyProfileScreenState
                   title: context.l10n.identityInformation,
                   icon: Icons.person,
                   children: [
-                    _InfoRow(
-                      context.l10n.fullName,
-                      profile.user.fullName,
-                    ),
+                    _InfoRow(context.l10n.fullName, profile.user.fullName),
                     _InfoRow(
                       context.l10n.dateOfBirth,
                       profile.identity.dob.toLocal().toString().split(' ')[0],
@@ -276,7 +273,7 @@ class _ViewMetrimonyProfileScreenState
                         profile.education.education != null) ...[
                       _InfoRow(
                         context.l10n.course,
-                        profile.education.education!.course  ,
+                        profile.education.education!.course,
                       ),
                       _InfoRow(
                         context.l10n.collegeUniversity,
@@ -618,12 +615,13 @@ class _ImagesTabSection extends StatelessWidget {
     }
 
     final hasAadhar = images.aadharCardUrl.isNotEmpty;
+    final hasBioData = images.bioDataUrl.isNotEmpty;
 
-    if (allImages.isEmpty && !hasAadhar) {
+    if (allImages.isEmpty && !hasAadhar && !hasBioData) {
       return const SizedBox.shrink();
     }
 
-    final tabCount = allImages.length + (hasAadhar ? 1 : 0);
+    final tabCount = allImages.length + (hasAadhar ? 1 : 0) + (hasBioData ? 1 : 0);
 
     return DefaultTabController(
       length: tabCount,
@@ -667,6 +665,8 @@ class _ImagesTabSection extends StatelessWidget {
                   ...allImages.map((entry) => Tab(text: entry.key)),
                   if (images.aadharCardUrl.isNotEmpty)
                     Tab(text: context.l10n.aadharCard),
+                  if (images.bioDataUrl.isNotEmpty)
+                    Tab(text: context.l10n.bioData),
                 ],
               ),
 
@@ -681,12 +681,16 @@ class _ImagesTabSection extends StatelessWidget {
                           _ImageViewer(imageUrl: entry.value, label: entry.key),
                     ),
 
-                    // // Aadhar card tab
-                    // if (images.aadharCardUrl.isNotEmpty)
-                    _DocumentViewer(
-                      documentUrl: images.aadharCardUrl,
-                      label: context.l10n.aadharCard,
-                    ),
+                    if (images.aadharCardUrl.isNotEmpty)
+                      _DocumentViewer(
+                        documentUrl: images.aadharCardUrl,
+                        label: context.l10n.aadharCard,
+                      ),
+                    if (images.bioDataUrl.isNotEmpty)
+                      _DocumentViewer(
+                        documentUrl: images.bioDataUrl,
+                        label: context.l10n.bioData,
+                      ),
                   ],
                 ),
               ),
