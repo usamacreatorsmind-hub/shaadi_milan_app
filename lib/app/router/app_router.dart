@@ -9,6 +9,7 @@ import 'package:shadi_milan/features/agent/agent_app/presentation/screens/view_w
 import 'package:shadi_milan/features/auth/presentation/screens/view_agent_profile.dart';
 import 'package:shadi_milan/features/user/user_app/presentation/screens/my_review_screen.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_after_marriage_payment_screen.dart';
+import '../../features/agent/agent_app/presentation/screens/agent_add_client_screen.dart';
 
 import '../../core/enums/enum.dart';
 import '../../features/agent/agent_app/presentation/screens/agen_home_screen.dart';

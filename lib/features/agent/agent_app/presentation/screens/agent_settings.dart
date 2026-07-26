@@ -3,8 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/app/router/app_router.dart';
-
+import '../../../../../core/constants/app_labels.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../l10n/app_translation_service.dart';
 
 @RoutePage()
 class AgentSettingsScreen extends ConsumerStatefulWidget {
@@ -69,6 +70,13 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () => context.pushRoute(ChangePasswordRoute()),
                 ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: Icon(Icons.language, color: theme.primaryColor),
+                  title: Text(AppLabels.language(context)),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: () => _showLanguageDialog(context, ref),
+                ),
               ],
             ),
           ),
@@ -132,4 +140,32 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
       ),
     );
   }
+}
+
+void _showLanguageDialog(BuildContext context, WidgetRef ref) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(AppLabels.selectLanguage(context)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: AppTranslation.supportedTranslations.map((translation) {
+            return ListTile(
+              title: Text(translation.nativeName),
+              subtitle: Text(translation.name),
+              onTap: () {
+                ref
+                    .read(appTranslationServiceProvider)
+                    .setLanguageCode(translation.languageCode);
+                ref.read(localeProvider.notifier).state =
+                    Locale(translation.languageCode);
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        ),
+      );
+    },
+  );
 }

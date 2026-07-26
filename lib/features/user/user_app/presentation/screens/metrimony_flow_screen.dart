@@ -26,12 +26,10 @@ class MatrimonyFormFlowScreen extends ConsumerStatefulWidget {
   const MatrimonyFormFlowScreen({super.key});
 
   @override
-  ConsumerState<MatrimonyFormFlowScreen> createState() =>
-      _MatrimonyFormFlowScreenState();
+  ConsumerState<MatrimonyFormFlowScreen> createState() => _MatrimonyFormFlowScreenState();
 }
 
-class _MatrimonyFormFlowScreenState
-    extends ConsumerState<MatrimonyFormFlowScreen> {
+class _MatrimonyFormFlowScreenState extends ConsumerState<MatrimonyFormFlowScreen> {
   final Map<MatrimonyStep, VoidCallback> _submitCallbacks = {};
 
   void _registerSubmit(MatrimonyStep step, VoidCallback callback) {
@@ -45,8 +43,7 @@ class _MatrimonyFormFlowScreenState
     if (imageState.primaryImage == null || imageState.primaryImage!.isEmpty) {
       return AppLocalizations.of(context)!.primaryImageRequired;
     }
-    if (imageState.imageWithAgentUrl == null ||
-        imageState.imageWithAgentUrl!.isEmpty) {
+    if (imageState.imageWithAgentUrl == null || imageState.imageWithAgentUrl!.isEmpty) {
       return AppLocalizations.of(context)!.imageWithAgentRequired;
     }
     if (imageState.secondaryImages.isEmpty) {
@@ -81,22 +78,46 @@ class _MatrimonyFormFlowScreenState
         ),
 
         actions: [
-          // 🌐 Language Toggle
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.translate),
-            onSelected: (String code) {
-              ref.read(appTranslationServiceProvider).setLanguageCode(code);
-              ref.read(localeProvider.notifier).state = Locale(code);
-            },
-            itemBuilder: (BuildContext context) => AppTranslation
-                .supportedTranslations
-                .map(
-                  (lang) => PopupMenuItem<String>(
-                    value: lang.languageCode,
-                    child: Text(lang.nativeName),
+          // 🌐 Language Toggle Switch
+          Consumer(
+            builder: (context, ref, _) {
+              final locale = ref.watch(localeProvider);
+              final isHindi = locale.languageCode == 'hi';
+
+              return Row(
+                children: [
+                  Text(
+                    "EN",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: isHindi ? FontWeight.normal : FontWeight.bold,
+                      color: isHindi ? Colors.grey : Theme.of(context).primaryColor,
+                    ),
                   ),
-                )
-                .toList(),
+                  Transform.scale(
+                    scale: 0.7,
+                    child: Switch(
+                      value: isHindi,
+                      activeColor: Theme.of(context).primaryColor,
+                      onChanged: (val) {
+                        final code = val ? 'hi' : 'en';
+                        ref.read(appTranslationServiceProvider).setLanguageCode(code);
+                        ref.read(localeProvider.notifier).state = Locale(code);
+                      },
+                    ),
+                  ),
+                  Text(
+                    "हि",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: isHindi ? FontWeight.bold : FontWeight.normal,
+                      color: isHindi ? Theme.of(context).primaryColor : Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -104,10 +125,7 @@ class _MatrimonyFormFlowScreenState
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 80.0),
-            child: IndexedStack(
-              index: MatrimonyStep.values.indexOf(state.step),
-              children: _buildSteps(state),
-            ),
+            child: IndexedStack(index: MatrimonyStep.values.indexOf(state.step), children: _buildSteps(state)),
           ),
           Positioned(
             bottom: 30,
@@ -123,14 +141,34 @@ class _MatrimonyFormFlowScreenState
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          ref
-                              .read(metrimonyControllerProvider.notifier)
-                              .previousStep();
+                          ref.read(metrimonyControllerProvider.notifier).previousStep();
                         },
                         child: Text(AppLocalizations.of(context)!.back),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
+                  ],
+
+                  // ⏭ SKIP (Always enabled to make data filling non-mandatory)
+                  if (state.step != MatrimonyStep.user) ...[
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          ref.read(metrimonyControllerProvider.notifier).nextStep();
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.orange.shade800,
+                          side: BorderSide(color: Colors.orange.shade300),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        icon: const Icon(Icons.skip_next_rounded, size: 20),
+                        label: const Text(
+                          "Skip",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                   ],
 
                   // ➡ NEXT
@@ -141,36 +179,13 @@ class _MatrimonyFormFlowScreenState
                           // If a form has registered a submit callback, call it.
                           if (_submitCallbacks.containsKey(state.step)) {
                             _submitCallbacks[state.step]!.call();
-                          } else if (state.step == MatrimonyStep.image) {
-                            final validationError = _validateImageStep(
-                              imageState,
-                              context,
-                            );
-                            if (validationError != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(validationError)),
-                              );
-                              return;
-                            }
-                            ref
-                                .read(metrimonyControllerProvider.notifier)
-                                .nextStep();
                           } else {
-                            // Fallback for screens without forms (e.g. Image upload if it handles itself or just next)
-                            ref
-                                .read(metrimonyControllerProvider.notifier)
-                                .nextStep();
+                            // Fallback for screens without forms (e.g. Image upload handled by controller or just next)
+                            ref.read(metrimonyControllerProvider.notifier).nextStep();
                           }
                         },
                         child: state.isLoading
-                            ? const SizedBox(
-                                height: 40,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
+                            ? const SizedBox(height: 40, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                             : Text(AppLocalizations.of(context)!.next),
                       ),
                     ),
@@ -228,14 +243,4 @@ class _MatrimonyFormFlowScreenState
   }
 }
 
-enum MatrimonyStep {
-  identity,
-  address,
-  education,
-  employment,
-  family,
-  cultural,
-  physical,
-  image,
-  user,
-}
+enum MatrimonyStep { identity, address, education, employment, family, cultural, physical, image, user }

@@ -245,10 +245,9 @@ class _PdfViewerBottomsheetState
         throw Exception('File not found');
       }
 
-      final bytes = await file.readAsBytes();
+      // No need to read as bytes for SfPdfViewer.file
       if (mounted) {
         setState(() {
-          _pdfBytes = bytes;
           _status = 'Loaded';
         });
       }
@@ -262,7 +261,7 @@ class _PdfViewerBottomsheetState
     }
   }
 
-  // ================= NETWORK PDF =================
+  // ... (keep _downloadPdf as is)
   Future<void> _downloadPdf() async {
     final client = HttpClient();
 
@@ -271,7 +270,7 @@ class _PdfViewerBottomsheetState
       final response = await request.close();
 
       if (response.statusCode != 200) {
-        throw HttpException('Failed to load PDF');
+        throw const HttpException('Failed to load PDF');
       }
 
       final totalBytes = response.contentLength;
@@ -329,6 +328,7 @@ class _PdfViewerBottomsheetState
     }
   }
 
+
   // ================= UI =================
   @override
   Widget build(BuildContext context) {
@@ -367,13 +367,19 @@ class _PdfViewerBottomsheetState
 
           // 🔹 BODY
           Expanded(
-            child: _pdfBytes != null
-                ? SfPdfViewer.memory(
-                    _pdfBytes!,
+            child: widget.isLocal
+                ? SfPdfViewer.file(
+                    File(widget.source),
                     canShowScrollHead: true,
                     canShowScrollStatus: true,
                   )
-                : _buildLoadingState(),
+                : (_pdfBytes != null
+                    ? SfPdfViewer.memory(
+                        _pdfBytes!,
+                        canShowScrollHead: true,
+                        canShowScrollStatus: true,
+                      )
+                    : _buildLoadingState()),
           ),
         ],
       ),

@@ -14,6 +14,7 @@ import 'package:shadi_milan/features/user/user_app/domain/states/state_city.dart
 import 'package:shadi_milan/features/user/user_app/widgets/pdf_viewer_bottomsheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../l10n/app_translation_service.dart';
 import '../../../../l10n/l10n_helper.dart';
 import '../notifier/user_nofier.dart';
 
@@ -22,18 +23,13 @@ class ViewUserScreen extends ConsumerStatefulWidget {
   final String userId;
   final bool showMatchButton;
 
-  const ViewUserScreen({
-    super.key,
-    required this.userId,
-    this.showMatchButton = true,
-  });
+  const ViewUserScreen({super.key, required this.userId, this.showMatchButton = true});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ViewUserScreenState();
 }
 
-class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
-    with SingleTickerProviderStateMixin {
+class _ViewUserScreenState extends ConsumerState<ViewUserScreen> with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
   @override
@@ -55,61 +51,35 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
     try {
       final registrationPayment = await ref
           .read(userPaymentDsProvider)
-          .getUserPayment(
-            userId: userId,
-            agentId: FirebaseAuth.instance.currentUser!.uid,
-          );
+          .getUserPayment(userId: userId, agentId: FirebaseAuth.instance.currentUser!.uid);
 
-      if (registrationPayment == null ||
-          registrationPayment.status != 'SUCCESS') {
+      if (registrationPayment == null || registrationPayment.status != 'SUCCESS') {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                context.l10n.cannotCloseProfileNoRegistrationPayment,
-              ),
-            ),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.cannotCloseProfileNoRegistrationPayment)));
         }
         return;
       }
 
-      final payments = await ref
-          .read(userPaymentDsProvider)
-          .getAfterMarriagePaymentForUser(userId: userId);
+      final payments = await ref.read(userPaymentDsProvider).getAfterMarriagePaymentForUser(userId: userId);
 
       if (payments == null || payments.status != 'SUCCESS') {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                context.l10n.cannotCloseProfileNoAfterMarriagePayment,
-              ),
-            ),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.cannotCloseProfileNoAfterMarriagePayment)));
         }
         return;
       }
 
-      await ref
-          .read(agentUserNotifierProvider.notifier)
-          .closeMatrimonyProfile(userId);
+      await ref.read(agentUserNotifierProvider.notifier).closeMatrimonyProfile(userId);
 
       ref.invalidate(agentUserNotifierProvider);
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.profileClosedSuccessfully)),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.profileClosedSuccessfully)));
         context.router.maybePop();
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.failedToCloseProfile(e.toString())),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.failedToCloseProfile(e.toString()))));
       }
     }
   }
@@ -121,10 +91,7 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
         title: Text(context.l10n.closeMatrimonyProfile),
         content: Text(context.l10n.closeProfileConfirmMessage),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.cancel),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(context.l10n.cancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
@@ -158,21 +125,14 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
             style: TextStyle(color: theme.colorScheme.onPrimary),
           ),
 
-          orElse: () => Text(
-            context.l10n.userDetails,
-            style: TextStyle(color: theme.colorScheme.onPrimary),
-          ),
+          orElse: () => Text(context.l10n.userDetails, style: TextStyle(color: theme.colorScheme.onPrimary)),
         ),
         actions: [
           userAsync.maybeWhen(
             data: (user) {
-              if (widget.showMatchButton &&
-                  user != null &&
-                  user.profileStatus == 'active') {
+              if (widget.showMatchButton && user != null && user.profileStatus == 'active') {
                 return OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 235, 227, 227),
-                  ),
+                  style: OutlinedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 235, 227, 227)),
                   onPressed: () => _showCloseProfileDialog(context, user.uid),
                   child: Text(context.l10n.closeProfileButton),
                 );
@@ -186,19 +146,11 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
         bottom: TabBar(
           controller: _tabController,
           labelColor: theme.colorScheme.onPrimary,
-          unselectedLabelColor: theme.colorScheme.onPrimary.withValues(
-            alpha: 0.6,
-          ),
+          unselectedLabelColor: theme.colorScheme.onPrimary.withValues(alpha: 0.6),
           indicatorColor: theme.colorScheme.onPrimary,
           tabs: [
-            Tab(
-              icon: const Icon(Icons.person_outline),
-              text: context.l10n.profileTab,
-            ),
-            Tab(
-              icon: const Icon(Icons.favorite_border),
-              text: context.l10n.matrimonyProfileTab,
-            ),
+            Tab(icon: const Icon(Icons.person_outline), text: context.l10n.profileTab),
+            Tab(icon: const Icon(Icons.favorite_border), text: context.l10n.matrimonyProfileTab),
           ],
         ),
       ),
@@ -210,24 +162,15 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
             children: [
               Icon(Icons.error_outline, size: 80, color: Colors.red[400]),
               const SizedBox(height: 16),
-              Text(
-                context.l10n.errorLoadingUser,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
+              Text(context.l10n.errorLoadingUser, style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Text(
-                  error.toString(),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+                child: Text(error.toString(), textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
-                onPressed: () => ref
-                    .read(agentUserNotifierProvider.notifier)
-                    .fetchUserById(widget.userId),
+                onPressed: () => ref.read(agentUserNotifierProvider.notifier).fetchUserById(widget.userId),
                 icon: const Icon(Icons.refresh),
                 label: Text(context.l10n.retry),
               ),
@@ -240,11 +183,7 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.person_off_outlined,
-                    size: 80,
-                    color: Colors.grey,
-                  ),
+                  const Icon(Icons.person_off_outlined, size: 80, color: Colors.grey),
                   const SizedBox(height: 16),
                   Text(context.l10n.userNotFound),
                 ],
@@ -261,9 +200,7 @@ class _ViewUserScreenState extends ConsumerState<ViewUserScreen>
           );
         },
       ),
-      bottomNavigationBar: widget.showMatchButton
-          ? _MatchProfilesBottomBar(userId: widget.userId)
-          : null,
+      bottomNavigationBar: widget.showMatchButton ? _MatchProfilesBottomBar(userId: widget.userId) : null,
     );
   }
 }
@@ -296,10 +233,7 @@ class _UserProfileTab extends StatelessWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               color: theme.primaryColor,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
-              ),
+              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
             ),
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 36),
             child: Column(
@@ -314,36 +248,29 @@ class _UserProfileTab extends StatelessWidget {
                       color: Colors.white,
                       border: Border.all(color: Colors.white, width: 3),
                       image: user.profileImageUrl.isNotEmpty
-                          ? DecorationImage(
-                              image: NetworkImage(user.profileImageUrl),
-                              fit: BoxFit.cover,
-                            )
+                          ? DecorationImage(image: NetworkImage(user.profileImageUrl), fit: BoxFit.cover)
                           : null,
                     ),
                     child: user.profileImageUrl.isEmpty
                         ? Center(
                             child: Text(
                               user.fullName.isNotEmpty
-                                  ? user.fullName[0].toUpperCase()
+                                  ? user.fullName.en.isNotEmpty
+                                        ? user.fullName.en[0].toUpperCase()
+                                        : user.fullName.hi.isNotEmpty
+                                        ? user.fullName.hi[0].toUpperCase()
+                                        : '?'
                                   : '?',
-                              style: TextStyle(
-                                fontSize: 34,
-                                fontWeight: FontWeight.bold,
-                                color: theme.primaryColor,
-                              ),
+                              style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: theme.primaryColor),
                             ),
                           )
                         : null,
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  user.fullName,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                BilingualParser(
+                  value: user.fullName,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 4),
@@ -362,33 +289,23 @@ class _UserProfileTab extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Card(
               elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _StatusItem(
-                      icon: user.isProfileCreated
-                          ? Icons.check_circle
-                          : Icons.error,
+                      icon: user.isProfileCreated ? Icons.check_circle : Icons.error,
                       label: context.l10n.bioData,
-                      value: user.isProfileCreated
-                          ? context.l10n.created
-                          : context.l10n.pending,
-                      color: user.isProfileCreated
-                          ? Colors.green
-                          : Colors.orange,
+                      value: user.isProfileCreated ? context.l10n.created : context.l10n.pending,
+                      color: user.isProfileCreated ? Colors.green : Colors.orange,
                     ),
                     _StatusItem(
                       icon: Icons.verified_user,
                       label: context.l10n.profileStatus,
                       value: user.profileStatus,
-                      color: user.profileStatus == 'active'
-                          ? Colors.green
-                          : Colors.red,
+                      color: user.profileStatus == 'active' ? Colors.green : Colors.red,
                     ),
                   ],
                 ),
@@ -402,10 +319,7 @@ class _UserProfileTab extends StatelessWidget {
             title: context.l10n.contactInformation,
             icon: Icons.contact_mail,
             children: [
-              _InfoRow(
-                context.l10n.phone,
-                user.phone.isNotEmpty ? user.phone : context.l10n.notProvided,
-              ),
+              _InfoRow(context.l10n.phone, user.phone.isNotEmpty ? user.phone : context.l10n.notProvided),
               const Divider(height: 16),
               _InfoRow(context.l10n.email, user.email),
             ],
@@ -416,17 +330,9 @@ class _UserProfileTab extends StatelessWidget {
             title: context.l10n.accountInformation,
             icon: Icons.account_box,
             children: [
-              _InfoRow(
-                context.l10n.role,
-                user.role.isNotEmpty ? user.role : context.l10n.userRole,
-              ),
+              _InfoRow(context.l10n.role, user.role.isNotEmpty ? user.role : context.l10n.userRole),
               const Divider(height: 16),
-              _InfoRow(
-                context.l10n.gender,
-                user.gender.isNotEmpty
-                    ? user.gender
-                    : context.l10n.notSpecified,
-              ),
+              _InfoRow(context.l10n.gender, user.gender.isNotEmpty ? user.gender : context.l10n.notSpecified),
             ],
           ),
 
@@ -435,15 +341,9 @@ class _UserProfileTab extends StatelessWidget {
             title: context.l10n.activity,
             icon: Icons.history,
             children: [
-              _InfoRow(
-                context.l10n.createdAt,
-                _formatDate(user.createdAt, context),
-              ),
+              _InfoRow(context.l10n.createdAt, _formatDate(user.createdAt, context)),
               const Divider(height: 16),
-              _InfoRow(
-                context.l10n.lastSeen,
-                _formatDate(user.lastSeen, context),
-              ),
+              _InfoRow(context.l10n.lastSeen, _formatDate(user.lastSeen, context)),
             ],
           ),
 
@@ -469,21 +369,10 @@ class _MatrimonyProfileTab extends ConsumerWidget {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         icon: const Icon(Icons.favorite_border, size: 56, color: Colors.grey),
-        title: Text(
-          context.l10n.matrimonyProfileNotFound,
-          textAlign: TextAlign.center,
-        ),
-        content: Text(
-          context.l10n.matrimonyProfileNotFoundContent,
-          textAlign: TextAlign.center,
-        ),
+        title: Text(context.l10n.matrimonyProfileNotFound, textAlign: TextAlign.center),
+        content: Text(context.l10n.matrimonyProfileNotFoundContent, textAlign: TextAlign.center),
         actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.ok),
-          ),
-        ],
+        actions: [ElevatedButton(onPressed: () => Navigator.pop(context), child: Text(context.l10n.ok))],
       ),
     );
   }
@@ -495,9 +384,7 @@ class _MatrimonyProfileTab extends ConsumerWidget {
 
     ref.listen(matrimonyProfileViewModelProvider(userId), (prev, next) {
       // Show dialog on first transition to null data (profile doesn't exist yet)
-      if (next.hasValue &&
-          next.value == null &&
-          (prev == null || prev.isLoading)) {
+      if (next.hasValue && next.value == null && (prev == null || prev.isLoading)) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) _showNoProfileDialog(context);
         });
@@ -532,6 +419,9 @@ class _MatrimonyProfileTab extends ConsumerWidget {
           );
         }
 
+        final locale = ref.watch(localeProvider);
+        final langCode = locale.languageCode;
+
         String resolvedState = profile.address.state.en;
         String resolvedCity = profile.address.city.en;
         String resolvedReligion = profile.cultural.religion.en;
@@ -539,16 +429,16 @@ class _MatrimonyProfileTab extends ConsumerWidget {
 
         if (locationAsync.hasValue) {
           final states = locationAsync.value!;
-          final stateObj = states
-              .where((s) => s.name == profile.address.state)
-              .firstOrNull;
+          final stateObj = states.where((s) => s.name == profile.address.state.en || s.name == profile.address.state.hi).firstOrNull;
           if (stateObj != null) {
             resolvedState = stateObj.name;
             final cityObj = stateObj.cities
                 .where(
                   (c) =>
-                      c.id == profile.address.city ||
-                      c.name == profile.address.city,
+                      c.id == profile.address.city.en ||
+                      c.id == profile.address.city.hi ||
+                      c.name == profile.address.city.en ||
+                      c.name == profile.address.city.hi,
                 )
                 .firstOrNull;
             if (cityObj != null) {
@@ -562,8 +452,10 @@ class _MatrimonyProfileTab extends ConsumerWidget {
           final religionObj = religions
               .where(
                 (r) =>
-                    r.id == profile.cultural.religion ||
-                    r.name == profile.cultural.religion,
+                    r.id == profile.cultural.religion.en ||
+                    r.id == profile.cultural.religion.hi ||
+                    r.name == profile.cultural.religion.en ||
+                    r.name == profile.cultural.religion.hi,
               )
               .firstOrNull;
           if (religionObj != null) {
@@ -571,8 +463,10 @@ class _MatrimonyProfileTab extends ConsumerWidget {
             final casteObj = religionObj.castes
                 .where(
                   (c) =>
-                      c.id == profile.cultural.caste ||
-                      c.name == profile.cultural.caste,
+                      c.id == profile.cultural.caste.en ||
+                      c.id == profile.cultural.caste.hi ||
+                      c.name == profile.cultural.caste.en ||
+                      c.name == profile.cultural.caste.hi,
                 )
                 .firstOrNull;
             if (casteObj != null) {
@@ -596,18 +490,11 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                 icon: Icons.person,
                 children: [
                   _InfoRow(context.l10n.fullName, profile.user.fullName),
-                  _InfoRow(
-                    context.l10n.dateOfBirth,
-                    profile.identity.dob.toLocal().toString().split(' ')[0],
-                  ),
-                  _InfoRow(
-                    context.l10n.male,
-                    '${profile.identity.age} ${context.l10n.ageYrs}',
-                  ),
+                  _InfoRow(context.l10n.dateOfBirth, profile.identity.dob.toLocal().toString().split(' ')[0]),
+                  _InfoRow(context.l10n.male, '${profile.identity.age} ${context.l10n.ageYrs}'),
                   _InfoRow(context.l10n.gender, profile.identity.gender),
                   _InfoRow(context.l10n.aadharCard, profile.identity.aadhar),
-                  if (profile.identity.aboutMe.hi.isNotEmpty ||
-                      profile.identity.aboutMe.en.isNotEmpty)
+                  if (profile.identity.aboutMe.hi.isNotEmpty || profile.identity.aboutMe.en.isNotEmpty)
                     _InfoRow(context.l10n.aboutMe, profile.identity.aboutMe),
                 ],
               ),
@@ -618,30 +505,16 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                 title: context.l10n.physicalInformation,
                 icon: Icons.accessibility,
                 children: [
-                  _InfoRow(
-                    context.l10n.height,
-                    '${profile.physical.height} cm',
-                  ),
-                  _InfoRow(
-                    context.l10n.weightKg,
-                    '${profile.physical.weight} kg',
-                  ),
+                  _InfoRow(context.l10n.height, '${profile.physical.height} cm'),
+                  _InfoRow(context.l10n.weightKg, '${profile.physical.weight} kg'),
                   _InfoRow(context.l10n.bodyType, profile.physical.bodyType),
-                  _InfoRow(
-                    context.l10n.complexion,
-                    profile.physical.complexion,
-                  ),
+                  _InfoRow(context.l10n.complexion, profile.physical.complexion),
                   _InfoRow(
                     context.l10n.physicallyChallenged,
-                    profile.physical.physicallyChallenged
-                        ? context.l10n.yesLabel
-                        : context.l10n.noLabel,
+                    profile.physical.physicallyChallenged ? context.l10n.yesLabel : context.l10n.noLabel,
                   ),
                   if (profile.physical.disabilityDetails != null)
-                    _InfoRow(
-                      context.l10n.disabilityDetails,
-                      profile.physical.disabilityDetails!,
-                    ),
+                    _InfoRow(context.l10n.disabilityDetails, profile.physical.disabilityDetails!),
                 ],
               ),
               const SizedBox(height: 16),
@@ -653,14 +526,8 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                 children: [
                   _InfoRow(context.l10n.religion, resolvedReligion),
                   _InfoRow(context.l10n.caste, resolvedCaste),
-                  _InfoRow(
-                    context.l10n.subCaste,
-                    profile.cultural.subCaste as String,
-                  ),
-                  _InfoRow(
-                    context.l10n.languages,
-                    profile.cultural.languages.join(', '),
-                  ),
+                  _InfoRow(context.l10n.subCaste, profile.cultural.subCaste),
+                  _InfoRow(context.l10n.languages, profile.cultural.languages.map((l) => langCode == 'hi' ? l.hi : l.en).join(', ')),
                 ],
               ),
               const SizedBox(height: 16),
@@ -670,42 +537,17 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                 title: context.l10n.education,
                 icon: Icons.school,
                 children: [
-                  _InfoRow(
-                    context.l10n.isIlliterate,
-                    profile.education.isIlletrate
-                        ? context.l10n.yesLabel
-                        : context.l10n.noLabel,
-                  ),
-                  if (!profile.education.isIlletrate &&
-                      profile.education.education != null) ...[
-                    _InfoRow(
-                      context.l10n.course,
-                      profile.education.education!.course as String,
-                    ),
-                    _InfoRow(
-                      context.l10n.collegeUniversity,
-                      profile.education.education!.college as String,
-                    ),
-                    _InfoRow(
-                      context.l10n.passingYear,
-                      '${profile.education.education!.passingYear}',
-                    ),
-                    _InfoRow(
-                      context.l10n.percentage,
-                      '${profile.education.education!.percentage}%',
-                    ),
+                  _InfoRow(context.l10n.isIlliterate, profile.education.isIlletrate ? context.l10n.yesLabel : context.l10n.noLabel),
+                  if (!profile.education.isIlletrate && profile.education.education != null) ...[
+                    _InfoRow(context.l10n.course, profile.education.education!.course),
+                    _InfoRow(context.l10n.collegeUniversity, profile.education.education!.college),
+                    _InfoRow(context.l10n.passingYear, '${profile.education.education!.passingYear}'),
+                    _InfoRow(context.l10n.percentage, '${profile.education.education!.percentage}%'),
                   ],
-                  if (profile
-                          .education
-                          .extraQualification
-                          ?.qualifications
-                          .isNotEmpty ==
-                      true)
+                  if (profile.education.extraQualification?.qualifications.isNotEmpty == true)
                     _InfoRow(
                       context.l10n.extraQualifications,
-                      profile.education.extraQualification!.qualifications.join(
-                        ', ',
-                      ),
+                      profile.education.extraQualification!.qualifications.map((q) => langCode == 'hi' ? q.hi : q.en).join(', '),
                     ),
                 ],
               ),
@@ -717,26 +559,10 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                 icon: Icons.work,
                 children: [
                   _InfoRow(context.l10n.jobType, profile.employment.jobType),
-                  if (profile.employment.company != null)
-                    _InfoRow(
-                      context.l10n.organization,
-                      profile.employment.company!,
-                    ),
-                  if (profile.employment.designation != null)
-                    _InfoRow(
-                      context.l10n.designation,
-                      profile.employment.designation!,
-                    ),
-                  if (profile.employment.annualIncome != null)
-                    _InfoRow(
-                      context.l10n.annualIncome,
-                      '₹${profile.employment.annualIncome}',
-                    ),
-                  if (profile.employment.workLocation != null)
-                    _InfoRow(
-                      context.l10n.workLocation,
-                      profile.employment.workLocation!,
-                    ),
+                  if (profile.employment.company != null) _InfoRow(context.l10n.organization, profile.employment.company!),
+                  if (profile.employment.designation != null) _InfoRow(context.l10n.designation, profile.employment.designation!),
+                  if (profile.employment.annualIncome != null) _InfoRow(context.l10n.annualIncome, '₹${profile.employment.annualIncome}'),
+                  if (profile.employment.workLocation != null) _InfoRow(context.l10n.workLocation, profile.employment.workLocation!),
                 ],
               ),
               const SizedBox(height: 16),
@@ -746,27 +572,12 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                 title: context.l10n.familyInformation,
                 icon: Icons.family_restroom,
                 children: [
-                  _InfoRow(
-                    context.l10n.fatherName,
-                    profile.family.fatherName ?? '',
-                  ),
-                  _InfoRow(
-                    context.l10n.motherName,
-                    profile.family.motherName ?? '',
-                  ),
-                  _InfoRow(
-                    context.l10n.brothers,
-                    '${profile.family.numberOfBrothers}',
-                  ),
-                  _InfoRow(
-                    context.l10n.sisters,
-                    '${profile.family.numberOfSisters}',
-                  ),
+                  _InfoRow(context.l10n.fatherName, profile.family.fatherName ?? ''),
+                  _InfoRow(context.l10n.motherName, profile.family.motherName ?? ''),
+                  _InfoRow(context.l10n.brothers, '${profile.family.numberOfBrothers}'),
+                  _InfoRow(context.l10n.sisters, '${profile.family.numberOfSisters}'),
                   _InfoRow(context.l10n.familyType, profile.family.familyType),
-                  _InfoRow(
-                    context.l10n.familyStatus,
-                    profile.family.familyStatus,
-                  ),
+                  _InfoRow(context.l10n.familyStatus, profile.family.familyStatus),
                 ],
               ),
               const SizedBox(height: 16),
@@ -778,10 +589,7 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                 children: [
                   _InfoRow(context.l10n.address, profile.address.addressLine1),
                   _InfoRow(context.l10n.post, profile.address.post),
-                  _InfoRow(
-                    context.l10n.policeStation,
-                    profile.address.policeStation,
-                  ),
+                  _InfoRow(context.l10n.policeStation, profile.address.policeStation),
                   _InfoRow(context.l10n.city, resolvedCity),
                   _InfoRow(context.l10n.state, resolvedState),
                   _InfoRow(context.l10n.pincode, profile.address.pincode),
@@ -795,22 +603,10 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                   title: context.l10n.agentInformation,
                   icon: Icons.support_agent,
                   children: [
-                    _InfoRow(
-                      context.l10n.agentName,
-                      profile.agentEntity!.agentName,
-                    ),
-                    _InfoRow(
-                      context.l10n.phone,
-                      profile.agentEntity!.agentMobile,
-                    ),
-                    _InfoRow(
-                      context.l10n.email,
-                      profile.agentEntity!.agentEmail,
-                    ),
-                    _InfoRow(
-                      context.l10n.license,
-                      profile.agentEntity!.agentLicenseNumber,
-                    ),
+                    _InfoRow(context.l10n.agentName, profile.agentEntity!.agentName),
+                    _InfoRow(context.l10n.phone, profile.agentEntity!.agentMobile),
+                    _InfoRow(context.l10n.email, profile.agentEntity!.agentEmail),
+                    _InfoRow(context.l10n.license, profile.agentEntity!.agentLicenseNumber),
                     _InfoRow(context.l10n.city, profile.agentEntity!.agentCity),
                   ],
                 ),
@@ -849,26 +645,17 @@ class _MatchProfilesBottomBar extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 8, offset: const Offset(0, -2))],
           ),
           child: ElevatedButton.icon(
-            onPressed: () =>
-                context.router.push(ProfileMatchRoute(profile: profile)),
+            onPressed: () => context.router.push(ProfileMatchRoute(profile: profile)),
             icon: const Icon(Icons.favorite),
             label: Text(context.l10n.matchProfiles),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.primaryColor,
               foregroundColor: theme.colorScheme.onPrimary,
               minimumSize: const Size.fromHeight(50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
         );
@@ -911,10 +698,7 @@ class _MatrimonyHeaderCard extends StatelessWidget {
                 children: [
                   BilingualParser(
                     value: profile.user.fullName,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 4),
@@ -923,16 +707,8 @@ class _MatrimonyHeaderCard extends StatelessWidget {
                     style: TextStyle(color: Colors.grey[600], fontSize: 13),
                   ),
                   const SizedBox(height: 2),
-                  if (profile.user.phone.isNotEmpty)
-                    Text(
-                      profile.user.phone,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
-                  if (profile.user.email.isNotEmpty)
-                    Text(
-                      profile.user.email,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
+                  if (profile.user.phone.isNotEmpty) Text(profile.user.phone, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                  if (profile.user.email.isNotEmpty) Text(profile.user.email, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                 ],
               ),
             ),
@@ -952,11 +728,7 @@ class _SectionCard extends StatelessWidget {
   final IconData icon;
   final List<Widget> children;
 
-  const _SectionCard({
-    required this.title,
-    required this.icon,
-    required this.children,
-  });
+  const _SectionCard({required this.title, required this.icon, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -977,11 +749,7 @@ class _SectionCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.primaryColor),
                   ),
                 ],
               ),
@@ -1014,22 +782,14 @@ class _InfoRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 130,
-            child: Text(
-              label,
-              style: TextStyle(color: Colors.grey[600], fontSize: 13),
-            ),
+            child: Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
           ),
           Expanded(
             child: value is BilingualValue
                 ? BilingualParser(value: value as BilingualValue)
                 : Text(
-                    (value == null || value.toString().isEmpty)
-                        ? context.l10n.notProvided
-                        : value.toString(),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    (value == null || value.toString().isEmpty) ? context.l10n.notProvided : value.toString(),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                   ),
           ),
         ],
@@ -1048,12 +808,7 @@ class _StatusItem extends StatelessWidget {
   final String value;
   final Color color;
 
-  const _StatusItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+  const _StatusItem({required this.icon, required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -1069,11 +824,7 @@ class _StatusItem extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color),
         ),
       ],
     );
@@ -1094,27 +845,16 @@ class _ImagesTabSection extends StatelessWidget {
     final List<MapEntry<String, String>> allImages = [];
 
     if (images.primaryImageUrl.isNotEmpty) {
-      allImages.add(
-        MapEntry(context.l10n.primaryPhoto, images.primaryImageUrl),
-      );
+      allImages.add(MapEntry(context.l10n.primaryPhoto, images.primaryImageUrl));
     }
     if (images.profileImageUrl.isNotEmpty) {
-      allImages.add(
-        MapEntry(context.l10n.profilePhoto, images.profileImageUrl),
-      );
+      allImages.add(MapEntry(context.l10n.profilePhoto, images.profileImageUrl));
     }
     if (images.imageWithAgentUrl.isNotEmpty) {
-      allImages.add(
-        MapEntry(context.l10n.photoWithAgent, images.imageWithAgentUrl),
-      );
+      allImages.add(MapEntry(context.l10n.photoWithAgent, images.imageWithAgentUrl));
     }
     for (int i = 0; i < images.secondaryImageUrls.length; i++) {
-      allImages.add(
-        MapEntry(
-          '${context.l10n.gallery} ${i + 1}',
-          images.secondaryImageUrls[i],
-        ),
-      );
+      allImages.add(MapEntry('${context.l10n.gallery} ${i + 1}', images.secondaryImageUrls[i]));
     }
 
     final hasAadhar = images.aadharCardUrl.isNotEmpty;
@@ -1137,19 +877,9 @@ class _ImagesTabSection extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.photo_library,
-                      size: 20,
-                      color: Theme.of(context).primaryColor,
-                    ),
+                    Icon(Icons.photo_library, size: 20, color: Theme.of(context).primaryColor),
                     const SizedBox(width: 8),
-                    Text(
-                      context.l10n.photosAndDocuments,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text(context.l10n.photosAndDocuments, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -1168,14 +898,8 @@ class _ImagesTabSection extends StatelessWidget {
                 height: 400,
                 child: TabBarView(
                   children: [
-                    ...allImages.map(
-                      (e) => _ImageViewer(imageUrl: e.value, label: e.key),
-                    ),
-                    if (hasAadhar)
-                      _DocumentViewer(
-                        documentUrl: images.aadharCardUrl,
-                        label: context.l10n.aadharCard,
-                      ),
+                    ...allImages.map((e) => _ImageViewer(imageUrl: e.value, label: e.key)),
+                    if (hasAadhar) _DocumentViewer(documentUrl: images.aadharCardUrl, label: context.l10n.aadharCard),
                   ],
                 ),
               ),
@@ -1200,16 +924,9 @@ class _ImageError extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.broken_image_outlined,
-              size: 56,
-              color: Colors.grey[500],
-            ),
+            Icon(Icons.broken_image_outlined, size: 56, color: Colors.grey[500]),
             const SizedBox(height: 8),
-            Text(
-              '$label not available',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            Text('$label not available', style: TextStyle(color: Colors.grey[600])),
           ],
         ),
       ),
@@ -1250,10 +967,7 @@ class _ImageViewer extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            context.l10n.tapToViewFullscreen,
-            style: TextStyle(color: Colors.grey[600], fontSize: 12),
-          ),
+          Text(context.l10n.tapToViewFullscreen, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
         ],
       ),
     );
@@ -1277,15 +991,9 @@ class _ImageViewer extends StatelessWidget {
                   fit: BoxFit.contain,
                   loadingBuilder: (_, child, progress) {
                     if (progress == null) return child;
-                    return const Center(
-                      child: CircularProgressIndicator(color: Colors.white),
-                    );
+                    return const Center(child: CircularProgressIndicator(color: Colors.white));
                   },
-                  errorBuilder: (_, _, _) => const Icon(
-                    Icons.broken_image,
-                    color: Colors.white,
-                    size: 64,
-                  ),
+                  errorBuilder: (_, _, _) => const Icon(Icons.broken_image, color: Colors.white, size: 64),
                 ),
               ),
             ),
@@ -1321,23 +1029,14 @@ class _DocumentViewer extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            isPdf ? Icons.picture_as_pdf : Icons.image,
-            size: 80,
-            color: Theme.of(context).primaryColor,
-          ),
+          Icon(isPdf ? Icons.picture_as_pdf : Icons.image, size: 80, color: Theme.of(context).primaryColor),
           const SizedBox(height: 16),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          Text(label, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => _openDocument(context, isPdf),
             icon: const Icon(Icons.open_in_new),
-            label: Text(
-              isPdf ? context.l10n.openPdf : context.l10n.viewDocument,
-            ),
+            label: Text(isPdf ? context.l10n.openPdf : context.l10n.viewDocument),
           ),
           const SizedBox(height: 12),
           Text(
@@ -1356,20 +1055,13 @@ class _DocumentViewer extends StatelessWidget {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => PdfViewerBottomsheet(
-          source: documentUrl,
-          title: label,
-          isLocal: false,
-        ),
+        builder: (context) => PdfViewerBottomsheet(source: documentUrl, title: label, isLocal: false),
       );
     } else {
       showDialog(
         context: context,
         builder: (_) => Dialog(
-          child: Image.network(
-            documentUrl,
-            errorBuilder: (_, _, _) => _ImageError(label: label),
-          ),
+          child: Image.network(documentUrl, errorBuilder: (_, _, _) => _ImageError(label: label)),
         ),
       );
     }
@@ -1405,10 +1097,7 @@ class MatchingOptionsSheet extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            context.l10n.matchingOptions,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text(context.l10n.matchingOptions, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
         ],
       ),
@@ -1436,24 +1125,11 @@ class MatchingFilterRightSheet extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    context.l10n.filterProfiles,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text(context.l10n.filterProfiles, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   Row(
                     children: [
-                      TextButton(
-                        onPressed: () =>
-                            ref.read(matchFilterProvider.notifier).reset(),
-                        child: Text(context.l10n.reset),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
-                      ),
+                      TextButton(onPressed: () => ref.read(matchFilterProvider.notifier).reset(), child: Text(context.l10n.reset)),
+                      IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
                     ],
                   ),
                 ],
@@ -1466,30 +1142,17 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                     children: [
                       Text(
                         context.l10n.location,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                        ),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey),
                       ),
                       const SizedBox(height: 8),
                       locationAsync.when(
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
+                        loading: () => const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('Error: $e'),
                         data: (states) {
                           /// Selected state object
-                          final selectedState = states
-                              .where((s) => s.name == filter.state)
-                              .firstOrNull;
+                          final selectedState = states.where((s) => s.name == filter.state).firstOrNull;
 
-                          final selectedCity = selectedState?.cities
-                              .where(
-                                (c) =>
-                                    c.id == filter.city ||
-                                    c.name == filter.city,
-                              )
-                              .firstOrNull;
+                          final selectedCity = selectedState?.cities.where((c) => c.id == filter.city || c.name == filter.city).firstOrNull;
 
                           return Column(
                             children: [
@@ -1500,9 +1163,7 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                                 itemLabel: (s) => s.name,
                                 onChanged: (val) {
                                   if (val != null) {
-                                    ref
-                                        .read(matchFilterProvider.notifier)
-                                        .updateState(val.name);
+                                    ref.read(matchFilterProvider.notifier).updateState(val.name);
                                   }
                                 },
                               ),
@@ -1514,9 +1175,7 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                                 itemLabel: (c) => c.name,
                                 onChanged: (val) {
                                   if (val != null) {
-                                    ref
-                                        .read(matchFilterProvider.notifier)
-                                        .updateCity(val.id);
+                                    ref.read(matchFilterProvider.notifier).updateCity(val.id);
                                   }
                                 },
                               ),
@@ -1527,32 +1186,17 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                       const SizedBox(height: 24),
                       Text(
                         context.l10n.cultural,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                        ),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey),
                       ),
                       const SizedBox(height: 8),
                       religionsAsync.when(
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
+                        loading: () => const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('Error: $e'),
                         data: (religions) {
-                          final selectedReligion = religions
-                              .where(
-                                (r) =>
-                                    r.id == filter.religion ||
-                                    r.name == filter.religion,
-                              )
-                              .firstOrNull;
+                          final selectedReligion = religions.where((r) => r.id == filter.religion || r.name == filter.religion).firstOrNull;
 
                           final selectedCaste = selectedReligion?.castes
-                              .where(
-                                (c) =>
-                                    c.id == filter.caste ||
-                                    c.name == filter.caste,
-                              )
+                              .where((c) => c.id == filter.caste || c.name == filter.caste)
                               .firstOrNull;
 
                           return Column(
@@ -1564,9 +1208,7 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                                 itemLabel: (r) => r.name,
                                 onChanged: (val) {
                                   if (val != null) {
-                                    ref
-                                        .read(matchFilterProvider.notifier)
-                                        .updateReligion(val.id);
+                                    ref.read(matchFilterProvider.notifier).updateReligion(val.id);
                                   }
                                 },
                               ),
@@ -1578,9 +1220,7 @@ class MatchingFilterRightSheet extends ConsumerWidget {
                                 itemLabel: (c) => c.name,
                                 onChanged: (val) {
                                   if (val != null) {
-                                    ref
-                                        .read(matchFilterProvider.notifier)
-                                        .updateCaste(val.id);
+                                    ref.read(matchFilterProvider.notifier).updateCaste(val.id);
                                   }
                                 },
                               ),
@@ -1595,10 +1235,7 @@ class MatchingFilterRightSheet extends ConsumerWidget {
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(context.l10n.applyFilters),
-                ),
+                child: ElevatedButton(onPressed: () => Navigator.pop(context), child: Text(context.l10n.applyFilters)),
               ),
             ],
           ),
@@ -1622,15 +1259,9 @@ class MatchingFilterRightSheet extends ConsumerWidget {
         DropdownButtonFormField<T>(
           isExpanded: true,
           value: items.contains(value) ? value : null,
-          items: items
-              .map(
-                (e) => DropdownMenuItem<T>(value: e, child: Text(itemLabel(e))),
-              )
-              .toList(),
+          items: items.map((e) => DropdownMenuItem<T>(value: e, child: Text(itemLabel(e)))).toList(),
           onChanged: onChanged,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
+          decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
         ),
       ],
     );
@@ -1672,14 +1303,7 @@ class _WishlistUserTile extends ConsumerWidget {
             decoration: BoxDecoration(
               color: const Color.fromARGB(255, 245, 236, 236),
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), spreadRadius: 1, blurRadius: 5, offset: const Offset(0, 2))],
             ),
             padding: const EdgeInsets.all(12),
             child: Column(
@@ -1690,12 +1314,8 @@ class _WishlistUserTile extends ConsumerWidget {
                     CircleAvatar(
                       radius: 24,
                       backgroundColor: Colors.grey[300],
-                      backgroundImage: user.profileImageUrl.isNotEmpty
-                          ? NetworkImage(user.profileImageUrl)
-                          : null,
-                      child: user.profileImageUrl.isEmpty
-                          ? Icon(Icons.person, color: Colors.grey[600])
-                          : null,
+                      backgroundImage: user.profileImageUrl.isNotEmpty ? NetworkImage(user.profileImageUrl) : null,
+                      child: user.profileImageUrl.isEmpty ? Icon(Icons.person, color: Colors.grey[600]) : null,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -1704,29 +1324,17 @@ class _WishlistUserTile extends ConsumerWidget {
                         children: [
                           BilingualParser(
                             value: user.fullName,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           ),
 
                           const SizedBox(height: 2),
                           Row(
                             children: [
-                              Icon(
-                                Icons.phone,
-                                size: 14,
-                                color: Colors.grey[600],
-                              ),
+                              Icon(Icons.phone, size: 14, color: Colors.grey[600]),
                               const SizedBox(width: 4),
                               Text(
-                                user.phone.isNotEmpty
-                                    ? user.phone
-                                    : context.l10n.noPhone,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[700],
-                                ),
+                                user.phone.isNotEmpty ? user.phone : context.l10n.noPhone,
+                                style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                               ),
                             ],
                           ),
@@ -1734,33 +1342,18 @@ class _WishlistUserTile extends ConsumerWidget {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: _getStatusColor(
-                                    status,
-                                  ).withValues(alpha: 0.1),
+                                  color: _getStatusColor(status).withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
                                   status,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: _getStatusColor(status),
-                                  ),
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: _getStatusColor(status)),
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              Text(
-                                formatDateTime(updatedAt),
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey[500],
-                                ),
-                              ),
+                              Text(formatDateTime(updatedAt), style: TextStyle(fontSize: 11, color: Colors.grey[500])),
                             ],
                           ),
                         ],
@@ -1782,23 +1375,11 @@ class _WishlistUserTile extends ConsumerWidget {
                             showAgentDialog(context, ref, user.agentId);
                           }
                         },
-                        icon: Icon(
-                          isSameAgent
-                              ? Icons.check_circle_outline
-                              : Icons.person,
-                        ),
-                        label: Text(
-                          isSameAgent
-                              ? context.l10n.sameAgent
-                              : context.l10n.contactAgent,
-                        ),
+                        icon: Icon(isSameAgent ? Icons.check_circle_outline : Icons.person),
+                        label: Text(isSameAgent ? context.l10n.sameAgent : context.l10n.contactAgent),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: isSameAgent
-                              ? Colors.green
-                              : Colors.blue,
-                          side: BorderSide(
-                            color: isSameAgent ? Colors.green : Colors.blue,
-                          ),
+                          foregroundColor: isSameAgent ? Colors.green : Colors.blue,
+                          side: BorderSide(color: isSameAgent ? Colors.green : Colors.blue),
                           padding: const EdgeInsets.symmetric(vertical: 8),
                         ),
                       ),
@@ -1829,11 +1410,7 @@ class _WishlistUserTile extends ConsumerWidget {
             CircleAvatar(
               radius: 24,
               backgroundColor: Colors.grey[200],
-              child: const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
+              child: const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -1843,19 +1420,13 @@ class _WishlistUserTile extends ConsumerWidget {
                   Container(
                     height: 16,
                     width: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
+                    decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(4)),
                   ),
                   const SizedBox(height: 8),
                   Container(
                     height: 12,
                     width: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
+                    decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(4)),
                   ),
                 ],
               ),
@@ -1929,32 +1500,18 @@ class _WishlistUserTile extends ConsumerWidget {
     );
   }
 
-  Future<void> _updateStatus(
-    WidgetRef ref,
-    String newStatus,
-    BuildContext context,
-  ) async {
+  Future<void> _updateStatus(WidgetRef ref, String newStatus, BuildContext context) async {
     try {
       await ref
           .read(agentUserNotifierProvider.notifier)
-          .updateUserWishlistStatus(
-            userId: parentUserId,
-            profileId: profileId,
-            status: newStatus,
-          );
+          .updateUserWishlistStatus(userId: parentUserId, profileId: profileId, status: newStatus);
       ref.invalidate(agentUserNotifierProvider);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.statusUpdatedTo(newStatus))),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.statusUpdatedTo(newStatus))));
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.failedToUpdateStatus(e.toString())),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.failedToUpdateStatus(e.toString()))));
       }
     }
   }
@@ -1966,12 +1523,7 @@ class _WishlistUserTile extends ConsumerWidget {
         icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
         title: Text(context.l10n.sameAgent),
         content: Text(context.l10n.sameAgentMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.ok),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(context.l10n.ok))],
       ),
     );
   }
@@ -2004,18 +1556,9 @@ class _AgentDialog extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
-              ),
+              Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
               const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
             ],
           ),
         ),
@@ -2025,21 +1568,12 @@ class _AgentDialog extends ConsumerWidget {
 
   Widget _buildStatusChip(dynamic agent, BuildContext context) {
     if (agent.isApproved) {
-      return Chip(
-        label: Text(context.l10n.approved),
-        backgroundColor: Colors.greenAccent,
-      );
+      return Chip(label: Text(context.l10n.approved), backgroundColor: Colors.greenAccent);
     }
     if (agent.isRejected) {
-      return Chip(
-        label: Text(context.l10n.rejected),
-        backgroundColor: Colors.redAccent,
-      );
+      return Chip(label: Text(context.l10n.rejected), backgroundColor: Colors.redAccent);
     }
-    return Chip(
-      label: Text(context.l10n.pending),
-      backgroundColor: Colors.orangeAccent,
-    );
+    return Chip(label: Text(context.l10n.pending), backgroundColor: Colors.orangeAccent);
   }
 
   @override
@@ -2056,22 +1590,12 @@ class _AgentDialog extends ConsumerWidget {
             CircleAvatar(
               radius: 22,
               backgroundColor: Colors.blue.withValues(alpha: 0.1),
-              backgroundImage: agent.profileImageUrl.isNotEmpty
-                  ? NetworkImage(agent.profileImageUrl)
-                  : null,
-              child: agent.profileImageUrl.isEmpty
-                  ? const Icon(Icons.support_agent, color: Colors.blue)
-                  : null,
+              backgroundImage: agent.profileImageUrl.isNotEmpty ? NetworkImage(agent.profileImageUrl) : null,
+              child: agent.profileImageUrl.isEmpty ? const Icon(Icons.support_agent, color: Colors.blue) : null,
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                agent.agentName,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: Text(agent.agentName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -2079,14 +1603,8 @@ class _AgentDialog extends ConsumerWidget {
         error: (_, _) => Text(context.l10n.agentDetails),
       ),
       content: agentAsync.when(
-        loading: () => const SizedBox(
-          height: 120,
-          child: Center(child: CircularProgressIndicator()),
-        ),
-        error: (_, _) => SizedBox(
-          height: 120,
-          child: Center(child: Text(context.l10n.failedToLoadAgentInfo)),
-        ),
+        loading: () => const SizedBox(height: 120, child: Center(child: CircularProgressIndicator())),
+        error: (_, _) => SizedBox(height: 120, child: Center(child: Text(context.l10n.failedToLoadAgentInfo))),
         data: (agent) => SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2095,11 +1613,7 @@ class _AgentDialog extends ConsumerWidget {
               const Divider(),
               _buildInfoRow(Icons.email, context.l10n.email, agent.agentEmail),
               const Divider(),
-              _buildInfoRow(
-                Icons.location_on,
-                context.l10n.location,
-                '${agent.agentCity}, ${agent.agentState}',
-              ),
+              _buildInfoRow(Icons.location_on, context.l10n.location, '${agent.agentCity}, ${agent.agentState}'),
               const Divider(),
               _buildStatusChip(agent, context),
             ],
@@ -2108,19 +1622,12 @@ class _AgentDialog extends ConsumerWidget {
       ),
       actions: agentAsync.when(
         data: (agent) => [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.closeLabel),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(context.l10n.closeLabel)),
           if (agent.agentMobile.isNotEmpty) ...[
             TextButton.icon(
               onPressed: () {
-                final number = agent.agentMobile.replaceAll(
-                  RegExp(r'[^0-9]'),
-                  '',
-                );
-                final url =
-                    'https://wa.me/$number?text=${Uri.encodeComponent(context.l10n.whatsappContactMessage)}';
+                final number = agent.agentMobile.replaceAll(RegExp(r'[^0-9]'), '');
+                final url = 'https://wa.me/$number?text=${Uri.encodeComponent(context.l10n.whatsappContactMessage)}';
                 launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
               },
               icon: const Icon(Icons.message, size: 18),
@@ -2128,10 +1635,7 @@ class _AgentDialog extends ConsumerWidget {
             ),
             ElevatedButton.icon(
               onPressed: () {
-                launchUrl(
-                  Uri.parse('tel:${agent.agentMobile}'),
-                  mode: LaunchMode.externalApplication,
-                );
+                launchUrl(Uri.parse('tel:${agent.agentMobile}'), mode: LaunchMode.externalApplication);
               },
               icon: const Icon(Icons.phone, size: 18),
               label: Text(context.l10n.call),
@@ -2139,12 +1643,7 @@ class _AgentDialog extends ConsumerWidget {
           ],
         ],
         loading: () => [],
-        error: (_, _) => [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.closeLabel),
-          ),
-        ],
+        error: (_, _) => [TextButton(onPressed: () => Navigator.pop(context), child: Text(context.l10n.closeLabel))],
       ),
     );
   }

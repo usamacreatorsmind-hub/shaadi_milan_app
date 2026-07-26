@@ -62,6 +62,11 @@ class AgentRouter {
       guards: [AuthGuard(ref), AgentGuard(ref)],
     ),
 
+    AutoRoute(
+      page: AgentAddClientRoute.page,
+      guards: [AuthGuard(ref), AgentGuard(ref)],
+    ),
+
     AutoRoute(page: AgentSupportRoute.page),
   ];
 }

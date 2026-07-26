@@ -9,6 +9,7 @@ import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_r
 
 import '../../../../../../app/custom/custom_widgets/validators.dart';
 import '../../../../../../app/custom/custom_widgets/widgets.dart';
+import '../../../../../../app/providers/global_providers.dart';
 import '../../../../../../core/constants/app_labels.dart';
 import '../../../../../../core/enums/enum.dart';
 import '../../../../../translitration/widgets/bilingual_text_field.dart';
@@ -96,14 +97,14 @@ class _UserIdentityFormScreenState
   }
 
   Future<void> _submitForm() async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) return;
+    final targetUid = ref.read(targetUserIdProvider);
+    if (targetUid == null) return;
 
     BilingualValue gender = BilingualValue.empty();
     try {
       final user = await ref
           .read(userRepositoryProvider)
-          .fetchUser(currentUser.uid);
+          .fetchUser(targetUid);
 
       if (!mounted) return;
       gender = user.gender;
@@ -129,39 +130,28 @@ class _UserIdentityFormScreenState
     }
     if (!_formKey.currentState!.validate()) return;
 
-    if (_selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLabels.pleaseSelectDob(context))),
-      );
-      return;
-    }
-
-    if (_age! < 18) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppLabels.mustBe18(context))));
-      return;
-    }
-
     final notifier = ref.read(identityControllerProvider.notifier);
     final aboutMe = BilingualValue(
       hi: _aboutMeController.text.trim(),
       en: _aboutMeEnController.text.trim(),
     );
 
+    final dob = _selectedDate ?? DateTime(1900);
+    final ageValue = _age ?? 0;
+
     if (widget.mode == FormMode.create) {
       notifier.saveIdentity(
         gender: gender,
-        dob: _selectedDate!,
-        age: _age!,
+        dob: dob,
+        age: ageValue,
         aadhar: _aadharController.text.trim(),
         aboutMe: aboutMe,
       );
     } else {
       notifier.updateIdentity(
         gender: gender,
-        dob: _selectedDate!,
-        age: _age!,
+        dob: dob,
+        age: ageValue,
         aadhar: _aadharController.text.trim(),
         aboutMe: aboutMe,
       );
@@ -213,9 +203,6 @@ class _UserIdentityFormScreenState
                 hint: AppLabels.tellUsAboutYourself(context),
                 keyboardType: TextInputType.multiline,
                 maxLines: 3,
-                validator: (v) => v == null || v.isEmpty
-                    ? AppLabels.isRequired(context)
-                    : null,
               ),
               const SizedBox(height: 16),
               AppTextField(
@@ -233,7 +220,12 @@ class _UserIdentityFormScreenState
                 hint: AppLabels.enterAadharNumber(context),
                 obscureText: false,
                 keyboardType: TextInputType.number,
-                validator: (value) => Validators.validateAadhar(context, value),
+                validator: (value) {
+                  if (value != null && value.isNotEmpty) {
+                    return Validators.validateAadhar(context, value);
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 20),
               ListTile(
@@ -258,7 +250,7 @@ class _UserIdentityFormScreenState
                 subtitle: _age == null
                     ? null
                     : Text(AppLabels.ageYears(context, _age!)),
-                onTap: () => _selectDate(context),
+                onTap: widget.mode == FormMode.edit ? null : () => _selectDate(context),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                   side: BorderSide(
@@ -269,25 +261,16 @@ class _UserIdentityFormScreenState
                 ),
               ),
               const SizedBox(height: 20),
-              if (_age == null)
-                const SizedBox.shrink()
-              else if (_age! >= 18)
-                identityState.isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : (widget.registerSubmit != null
-                          ? const SizedBox.shrink()
-                          : AppButton(
-                              onPressed: _submitForm,
-                              text: widget.mode == FormMode.create
-                                  ? AppLabels.saveIdentity(context)
-                                  : AppLabels.updateIdentity(context),
-                            ))
-              else
-                Text(
-                  AppLabels.notEligibleUnder18(context),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.red),
-                ),
+              identityState.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : (widget.registerSubmit != null
+                      ? const SizedBox.shrink()
+                      : AppButton(
+                          onPressed: _submitForm,
+                          text: widget.mode == FormMode.create
+                              ? AppLabels.saveIdentity(context)
+                              : AppLabels.updateIdentity(context),
+                        )),
               const SizedBox(height: 16),
             ],
           ),

@@ -74,6 +74,22 @@ class AgentActivitiesRouteArgs {
 }
 
 /// generated route for
+/// [AgentAddClientScreen]
+class AgentAddClientRoute extends PageRouteInfo<void> {
+  const AgentAddClientRoute({List<PageRouteInfo>? children})
+    : super(AgentAddClientRoute.name, initialChildren: children);
+
+  static const String name = 'AgentAddClientRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AgentAddClientScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [AgentContactScreen]
 class AgentContactRoute extends PageRouteInfo<AgentContactRouteArgs> {
   AgentContactRoute({

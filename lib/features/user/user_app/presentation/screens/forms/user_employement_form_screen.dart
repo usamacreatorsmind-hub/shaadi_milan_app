@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,24 +10,18 @@ import '../../../../../translitration/widgets/bilingual_text_field.dart';
 import '../../../domain/states/employee_state.dart';
 import '../../controllers/user_employment_controllers.dart';
 
+@RoutePage()
 class UserEmploymentFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final EmploymentProfile? existingEmploymentProfile;
   final void Function(VoidCallback)? registerSubmit;
-  const UserEmploymentFormScreen({
-    super.key,
-    required this.mode,
-    required this.existingEmploymentProfile,
-    this.registerSubmit,
-  });
+  const UserEmploymentFormScreen({super.key, required this.mode, required this.existingEmploymentProfile, this.registerSubmit});
 
   @override
-  ConsumerState<UserEmploymentFormScreen> createState() =>
-      _UserEmploymentFormScreenState();
+  ConsumerState<UserEmploymentFormScreen> createState() => _UserEmploymentFormScreenState();
 }
 
-class _UserEmploymentFormScreenState
-    extends ConsumerState<UserEmploymentFormScreen> {
+class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _companyController = TextEditingController();
   final _companyEnController = TextEditingController();
@@ -54,8 +49,7 @@ class _UserEmploymentFormScreenState
   void initState() {
     super.initState();
     widget.registerSubmit?.call(_submitForm);
-    if (widget.mode == FormMode.edit &&
-        widget.existingEmploymentProfile != null) {
+    if (widget.mode == FormMode.edit && widget.existingEmploymentProfile != null) {
       final profile = widget.existingEmploymentProfile!;
       _companyController.text = profile.company?.hi ?? "";
       _companyEnController.text = profile.company?.en ?? "";
@@ -68,10 +62,7 @@ class _UserEmploymentFormScreenState
       _workLocationController.text = profile.workLocation?.hi ?? "";
       _workLocationEnController.text = profile.workLocation?.en ?? "";
 
-      _selectedJobType = _jobTypeOptions.values.firstWhere(
-        (e) => e.en == profile.jobType.en,
-        orElse: () => profile.jobType,
-      );
+      _selectedJobType = _jobTypeOptions.values.firstWhere((e) => e.en == profile.jobType.en, orElse: () => profile.jobType);
     }
   }
 
@@ -88,78 +79,45 @@ class _UserEmploymentFormScreenState
   }
 
   void _submitForm() {
-    if (_selectedJobType == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppLabels.selectJobType(context))));
-      return;
-    }
+    final notifier = ref.read(userEmploymentControllerProvider.notifier);
+    final jobType = _selectedJobType ?? _jobTypeOptions['Not Working']!;
 
-    // If "Not Working", skip validation and submit with null values
-    if (_selectedJobType!.en == 'Not Working') {
-      final notifier = ref.read(userEmploymentControllerProvider.notifier);
-
+    // If "Not Working" or null, submit with null values
+    if (jobType.en == 'Not Working') {
       if (widget.mode == FormMode.create) {
-        notifier.saveEmployment(
-          jobType: _selectedJobType!,
-          company: null,
-          designation: null,
-          annualIncome: null,
-          workLocation: null,
-        );
+        notifier.saveEmployment(jobType: jobType, company: null, designation: null, annualIncome: null, workLocation: null);
       } else {
-        notifier.updateEmployment(
-          jobType: _selectedJobType!,
-          company: null,
-          designation: null,
-          annualIncome: null,
-          workLocation: null,
-        );
+        notifier.updateEmployment(jobType: jobType, company: null, designation: null, annualIncome: null, workLocation: null);
       }
 
       return;
     }
 
-    // For other job types, validate form
-    if (_formKey.currentState!.validate()) {
-      final notifier = ref.read(userEmploymentControllerProvider.notifier);
+    // For other job types, save whatever is filled
+    final company = _companyController.text.isEmpty ? null : BilingualValue(hi: _companyController.text, en: _companyEnController.text);
+    final designation = _designationController.text.isEmpty
+        ? null
+        : BilingualValue(hi: _designationController.text, en: _designationEnController.text);
+    final workLocation = _workLocationController.text.isEmpty
+        ? null
+        : BilingualValue(hi: _workLocationController.text, en: _workLocationEnController.text);
 
-      final company = _companyController.text.isEmpty
-          ? null
-          : BilingualValue(
-              hi: _companyController.text,
-              en: _companyEnController.text,
-            );
-      final designation = _designationController.text.isEmpty
-          ? null
-          : BilingualValue(
-              hi: _designationController.text,
-              en: _designationEnController.text,
-            );
-      final workLocation = _workLocationController.text.isEmpty
-          ? null
-          : BilingualValue(
-              hi: _workLocationController.text,
-              en: _workLocationEnController.text,
-            );
-
-      if (widget.mode == FormMode.create) {
-        notifier.saveEmployment(
-          jobType: _selectedJobType!,
-          company: company,
-          designation: designation,
-          annualIncome: int.tryParse(_annualIncomeController.text),
-          workLocation: workLocation,
-        );
-      } else {
-        notifier.updateEmployment(
-          jobType: _selectedJobType!,
-          company: company,
-          designation: designation,
-          annualIncome: int.tryParse(_annualIncomeController.text),
-          workLocation: workLocation,
-        );
-      }
+    if (widget.mode == FormMode.create) {
+      notifier.saveEmployment(
+        jobType: jobType,
+        company: company,
+        designation: designation,
+        annualIncome: int.tryParse(_annualIncomeController.text),
+        workLocation: workLocation,
+      );
+    } else {
+      notifier.updateEmployment(
+        jobType: jobType,
+        company: company,
+        designation: designation,
+        annualIncome: int.tryParse(_annualIncomeController.text),
+        workLocation: workLocation,
+      );
     }
   }
 
@@ -168,22 +126,11 @@ class _UserEmploymentFormScreenState
     final employmentState = ref.watch(userEmploymentControllerProvider);
     final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
-    ref.listen<EmploymentState>(userEmploymentControllerProvider, (
-      previous,
-      current,
-    ) {
+    ref.listen<EmploymentState>(userEmploymentControllerProvider, (previous, current) {
       if (current.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLabels.error(context, current.error.toString())),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
       } else if (current.employment != null && previous?.employment == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLabels.employmentSavedSuccessfully(context)),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.employmentSavedSuccessfully(context))));
       }
     });
 
@@ -196,8 +143,6 @@ class _UserEmploymentFormScreenState
             prefixIcon: Icons.business,
             label: AppLabels.organization(context),
             hint: AppLabels.organizationHint(context),
-            validator: (v) =>
-                v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
           ),
           const SizedBox(height: 16),
 
@@ -207,8 +152,6 @@ class _UserEmploymentFormScreenState
             prefixIcon: Icons.work,
             label: AppLabels.designation(context),
             hint: AppLabels.designationHint(context),
-            validator: (v) =>
-                v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
           ),
           const SizedBox(height: 16),
 
@@ -218,8 +161,6 @@ class _UserEmploymentFormScreenState
             prefixIcon: Icons.location_on,
             label: AppLabels.workLocation(context),
             hint: AppLabels.workLocationHint(context),
-            validator: (v) =>
-                v == null || v.isEmpty ? AppLabels.isRequired(context) : null,
           ),
           const SizedBox(height: 16),
 
@@ -237,12 +178,7 @@ class _UserEmploymentFormScreenState
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          AppLabels.employmentDetails(context),
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
+      appBar: AppBar(title: Text(AppLabels.employmentDetails(context), style: Theme.of(context).textTheme.headlineMedium)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -259,9 +195,7 @@ class _UserEmploymentFormScreenState
                 },
               ),
               const SizedBox(height: 16),
-              _selectedJobType?.en == 'Not Working'
-                  ? const SizedBox()
-                  : buildEmploymentForm(),
+              _selectedJobType?.en == 'Not Working' ? const SizedBox() : buildEmploymentForm(),
 
               const SizedBox(height: 25),
 
@@ -273,10 +207,7 @@ class _UserEmploymentFormScreenState
                     ? const SizedBox.shrink()
                     : SizedBox(
                         width: double.infinity,
-                        child: AppButton(
-                          onPressed: _submitForm,
-                          text: AppLabels.saveEmployment(context),
-                        ),
+                        child: AppButton(onPressed: _submitForm, text: AppLabels.saveEmployment(context)),
                       )),
             ],
           ),

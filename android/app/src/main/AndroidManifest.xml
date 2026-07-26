@@ -7,9 +7,12 @@
     <!-- Notifications -->
     <uses-permission
         android:name="android.permission.POST_NOTIFICATIONS"/>
-    <!-- Media / Camera (only if used) -->
-    <uses-permission
-        android:name="android.permission.CAMERA"/>
+    <!-- Media / Camera -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+
     <!-- System -->
     <uses-permission
         android:name="android.permission.VIBRATE"/>

@@ -5,6 +5,7 @@ import 'package:shadi_milan/features/l10n/l10n_helper.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../app/custom/custom_widgets/drawer.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../../../auth/domain/states/user_state.dart';
 import '../notifier/user_nofier.dart';
@@ -18,12 +19,10 @@ class AgentWishlistScreen extends ConsumerStatefulWidget {
   const AgentWishlistScreen({super.key, required this.agentId});
 
   @override
-  ConsumerState<AgentWishlistScreen> createState() =>
-      _AgentWishlistScreenState();
+  ConsumerState<AgentWishlistScreen> createState() => _AgentWishlistScreenState();
 }
 
-class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
-    with SingleTickerProviderStateMixin {
+class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   WishlistStatus? _selectedStatus;
 
@@ -34,9 +33,7 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
 
     // Load wishlists for agent
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(agentWishlistNotifierProvider.notifier)
-          .loadWishlists(widget.agentId);
+      ref.read(agentWishlistNotifierProvider.notifier).loadWishlists(widget.agentId);
     });
   }
 
@@ -50,10 +47,15 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final wishlistState = ref.watch(agentWishlistNotifierProvider);
+    final agentAsync = ref.watch(agentProvider(widget.agentId));
 
     return Scaffold(
+      drawer: AppDrawer(agentAsync: agentAsync),
       appBar: AppBar(
         title: Text(context.l10n.wishlistManagement),
+        leading: Builder(
+          builder: (context) => IconButton(icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer()),
+        ),
         backgroundColor: theme.primaryColor,
         foregroundColor: theme.colorScheme.onPrimary,
         bottom: PreferredSize(
@@ -69,14 +71,8 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white70,
                 tabs: [
-                  Tab(
-                    icon: const Icon(Icons.arrow_upward),
-                    text: context.l10n.myUsersWishlists,
-                  ),
-                  Tab(
-                    icon: const Icon(Icons.arrow_downward),
-                    text: context.l10n.leadsForMyUsers,
-                  ),
+                  Tab(icon: const Icon(Icons.arrow_upward), text: context.l10n.myUsersWishlists),
+                  Tab(icon: const Icon(Icons.arrow_downward), text: context.l10n.leadsForMyUsers),
                 ],
               ),
             ],
@@ -91,15 +87,9 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
               controller: _tabController,
               children: [
                 // Tab 1: Wishlists where user is sender
-                _buildWishlistList(
-                  wishlists: _filterBySender(wishlistState.filteredWishlists),
-                  isMyUsersSender: true,
-                ),
+                _buildWishlistList(wishlists: _filterBySender(wishlistState.filteredWishlists), isMyUsersSender: true),
                 // Tab 2: Wishlists where user is receiver (leads)
-                _buildWishlistList(
-                  wishlists: _filterByReceiver(wishlistState.filteredWishlists),
-                  isMyUsersSender: false,
-                ),
+                _buildWishlistList(wishlists: _filterByReceiver(wishlistState.filteredWishlists), isMyUsersSender: false),
               ],
             ),
     );
@@ -121,37 +111,20 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
         scrollDirection: Axis.horizontal,
         children: [
           _buildFilterChip(null, context.l10n.all, theme, context),
-          ...WishlistStatus.values.map(
-            (status) => _buildFilterChip(
-              status,
-              _getStatusLabel(status.name, context),
-              theme,
-              context,
-            ),
-          ),
+          ...WishlistStatus.values.map((status) => _buildFilterChip(status, _getStatusLabel(status.name, context), theme, context)),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChip(
-    WishlistStatus? status,
-    String label,
-    ThemeData theme,
-    BuildContext context,
-  ) {
+  Widget _buildFilterChip(WishlistStatus? status, String label, ThemeData theme, BuildContext context) {
     final isSelected = _selectedStatus == status;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: FilterChip(
         selected: isSelected,
         label: Text(label),
-        labelStyle: TextStyle(
-          color: isSelected
-              ? Colors.white
-              : const Color.fromARGB(179, 15, 3, 3),
-          fontSize: 12,
-        ),
+        labelStyle: TextStyle(color: isSelected ? Colors.white : const Color.fromARGB(179, 15, 3, 3), fontSize: 12),
         backgroundColor: Colors.white24,
         selectedColor: _getStatusColor(status),
         checkmarkColor: Colors.white,
@@ -159,9 +132,7 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
           setState(() {
             _selectedStatus = selected ? status : null;
           });
-          ref
-              .read(agentWishlistNotifierProvider.notifier)
-              .setStatusFilter(_selectedStatus);
+          ref.read(agentWishlistNotifierProvider.notifier).setStatusFilter(_selectedStatus);
         },
       ),
     );
@@ -174,16 +145,11 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
         children: [
           Icon(Icons.error_outline, size: 60, color: Colors.red[300]),
           const SizedBox(height: 16),
-          Text(
-            '${context.l10n.errorOccurred}: $error',
-            style: const TextStyle(color: Colors.red),
-          ),
+          Text('${context.l10n.errorOccurred}: $error', style: const TextStyle(color: Colors.red)),
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () {
-              ref
-                  .read(agentWishlistNotifierProvider.notifier)
-                  .loadWishlists(widget.agentId);
+              ref.read(agentWishlistNotifierProvider.notifier).loadWishlists(widget.agentId);
             },
             icon: const Icon(Icons.refresh),
             label: Text(context.l10n.retry),
@@ -193,30 +159,17 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
     );
   }
 
-  Widget _buildWishlistList({
-    required List<WishlistEntity> wishlists,
-    required bool isMyUsersSender,
-  }) {
+  Widget _buildWishlistList({required List<WishlistEntity> wishlists, required bool isMyUsersSender}) {
     if (wishlists.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              isMyUsersSender ? Icons.favorite_border : Icons.people_outline,
-              size: 80,
-              color: Colors.grey[400],
-            ),
+            Icon(isMyUsersSender ? Icons.favorite_border : Icons.people_outline, size: 80, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
-              isMyUsersSender
-                  ? context.l10n.noWishlistsFromClient
-                  : context.l10n.noLeadsForClient,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
-              ),
+              isMyUsersSender ? context.l10n.noWishlistsFromClient : context.l10n.noLeadsForClient,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -225,9 +178,7 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref
-            .read(agentWishlistNotifierProvider.notifier)
-            .loadWishlists(widget.agentId);
+        await ref.read(agentWishlistNotifierProvider.notifier).loadWishlists(widget.agentId);
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -241,11 +192,7 @@ class _AgentWishlistScreenState extends ConsumerState<AgentWishlistScreen>
             onStatusUpdate: (newStatus) async {
               await ref
                   .read(agentWishlistNotifierProvider.notifier)
-                  .updateStatus(
-                    wishlistId: wishlist.id,
-                    status: newStatus,
-                    updatedBy: widget.agentId,
-                  );
+                  .updateStatus(wishlistId: wishlist.id, status: newStatus, updatedBy: widget.agentId);
             },
           );
         },
@@ -296,23 +243,14 @@ class _AgentWishlistCard extends ConsumerWidget {
   final bool isMyUsersSender;
   final Future<void> Function(String status) onStatusUpdate;
 
-  const _AgentWishlistCard({
-    required this.wishlist,
-    required this.agentId,
-    required this.isMyUsersSender,
-    required this.onStatusUpdate,
-  });
+  const _AgentWishlistCard({required this.wishlist, required this.agentId, required this.isMyUsersSender, required this.onStatusUpdate});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Determine which user to show based on perspective
     final myUserId = isMyUsersSender ? wishlist.senderId : wishlist.receiverId;
-    final otherUserId = isMyUsersSender
-        ? wishlist.receiverId
-        : wishlist.senderId;
-    final otherAgentId = isMyUsersSender
-        ? wishlist.receiverAgent
-        : wishlist.senderAgent;
+    final otherUserId = isMyUsersSender ? wishlist.receiverId : wishlist.senderId;
+    final otherAgentId = isMyUsersSender ? wishlist.receiverAgent : wishlist.senderAgent;
 
     final myUserAsync = ref.watch(wishlistUserProvider(myUserId));
     final otherUserAsync = ref.watch(wishlistUserProvider(otherUserId));
@@ -336,13 +274,8 @@ class _AgentWishlistCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  isMyUsersSender
-                      ? context.l10n.outgoingInterest
-                      : context.l10n.incomingLead,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isMyUsersSender ? Colors.blue : Colors.green,
-                  ),
+                  isMyUsersSender ? context.l10n.outgoingInterest : context.l10n.incomingLead,
+                  style: TextStyle(fontWeight: FontWeight.bold, color: isMyUsersSender ? Colors.blue : Colors.green),
                 ),
                 const Spacer(),
                 _buildStatusBadge(wishlist.status, context),
@@ -351,32 +284,17 @@ class _AgentWishlistCard extends ConsumerWidget {
             const Divider(height: 16),
 
             // My User Section
-            _buildUserSection(
-              context,
-              ref,
-              label: context.l10n.yourUser,
-              userAsync: myUserAsync,
-              userId: myUserId,
-              showActions: true,
-            ),
+            _buildUserSection(context, ref, label: context.l10n.yourUser, userAsync: myUserAsync, userId: myUserId, showActions: true),
 
             const SizedBox(height: 8),
-            Center(
-              child: Icon(
-                isMyUsersSender ? Icons.favorite : Icons.arrow_downward,
-                color: Colors.pink,
-                size: 24,
-              ),
-            ),
+            Center(child: Icon(isMyUsersSender ? Icons.favorite : Icons.arrow_downward, color: Colors.pink, size: 24)),
             const SizedBox(height: 8),
 
             // Other User Section
             _buildUserSection(
               context,
               ref,
-              label: isMyUsersSender
-                  ? context.l10n.interestedIn
-                  : context.l10n.interestedBy,
+              label: isMyUsersSender ? context.l10n.interestedIn : context.l10n.interestedBy,
               userAsync: otherUserAsync,
               userId: otherUserId,
               showActions: false,
@@ -389,9 +307,7 @@ class _AgentWishlistCard extends ConsumerWidget {
             Row(
               children: [
                 Text(
-                  context.l10n.updatedAtWithParam(
-                    _formatDateTime(wishlist.updatedAt, context),
-                  ),
+                  context.l10n.updatedAtWithParam(_formatDateTime(wishlist.updatedAt, context)),
                   style: TextStyle(fontSize: 11, color: Colors.grey[500]),
                 ),
                 const Spacer(),
@@ -422,17 +338,12 @@ class _AgentWishlistCard extends ConsumerWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         const SizedBox(height: 8),
         userAsync.when(
           loading: () => const LinearProgressIndicator(),
-          error: (error, stackTrace) =>
-              Text(context.l10n.errorLoadingUserWithId(userId)),
+          error: (error, stackTrace) => Text(context.l10n.errorLoadingUserWithId(userId)),
           data: (user) {
             if (user == null) {
               return Text(context.l10n.userNotFoundWithId(userId));
@@ -442,27 +353,21 @@ class _AgentWishlistCard extends ConsumerWidget {
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: Colors.grey[300],
-                  backgroundImage: user.profileImageUrl.isNotEmpty
-                      ? NetworkImage(user.profileImageUrl)
-                      : null,
-                  child: user.profileImageUrl.isEmpty
-                      ? Icon(Icons.person, color: Colors.grey[600])
-                      : null,
+                  backgroundImage: user.profileImageUrl.isNotEmpty ? NetworkImage(user.profileImageUrl) : null,
+                  child: user.profileImageUrl.isEmpty ? Icon(Icons.person, color: Colors.grey[600]) : null,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      BilingualParser(value: user.fullName,style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        )),
-                      
+                      BilingualParser(
+                        value: user.fullName,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+
                       Text(
-                        user.phone.isNotEmpty
-                            ? user.phone
-                            : context.l10n.noPhone,
+                        user.phone.isNotEmpty ? user.phone : context.l10n.noPhone,
                         style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                       ),
                     ],
@@ -483,13 +388,10 @@ class _AgentWishlistCard extends ConsumerWidget {
                   ),
                 ] else if (otherAgentId != null && otherAgentId.isNotEmpty) ...[
                   OutlinedButton.icon(
-                    onPressed: () =>
-                        _showAgentDialog(context, ref, otherAgentId),
+                    onPressed: () => _showAgentDialog(context, ref, otherAgentId),
                     icon: const Icon(Icons.support_agent, size: 16),
                     label: Text(context.l10n.contactAgent),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                    ),
+                    style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
                   ),
                 ],
               ],
@@ -506,17 +408,11 @@ class _AgentWishlistCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: _getStatusColor(status).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _getStatusColor(status).withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: _getStatusColor(status).withValues(alpha: 0.5)),
       ),
       child: Text(
         _getStatusLabel(status, context),
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: _getStatusColor(status),
-        ),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _getStatusColor(status)),
       ),
     );
   }
@@ -531,14 +427,9 @@ class _AgentWishlistCard extends ConsumerWidget {
           children: WishlistStatus.values.map((status) {
             final isSelected = wishlist.status == status.name;
             return ListTile(
-              leading: Icon(
-                _getStatusIcon(status),
-                color: _getStatusColor(status.name),
-              ),
+              leading: Icon(_getStatusIcon(status), color: _getStatusColor(status.name)),
               title: Text(_getStatusLabel(status.name, context)),
-              trailing: isSelected
-                  ? const Icon(Icons.check_circle, color: Colors.green)
-                  : null,
+              trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.green) : null,
               selected: isSelected,
               onTap: () async {
                 Navigator.pop(context);
@@ -547,46 +438,28 @@ class _AgentWishlistCard extends ConsumerWidget {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          context.l10n.statusUpdatedTo(
-                            _getStatusLabel(status.name, context),
-                          ),
-                        ),
+                        content: Text(context.l10n.statusUpdatedTo(_getStatusLabel(status.name, context))),
                         backgroundColor: Colors.green,
                       ),
                     );
                   }
                 } catch (e) {
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          context.l10n.failedToUpdateStatus(e.toString()),
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(context.l10n.failedToUpdateStatus(e.toString())), backgroundColor: Colors.red));
                   }
                 }
               },
             );
           }).toList(),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.cancel),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(context.l10n.cancel))],
       ),
     );
   }
 
-  void _showAgentDialog(
-    BuildContext context,
-    WidgetRef ref,
-    String otherAgentId,
-  ) {
+  void _showAgentDialog(BuildContext context, WidgetRef ref, String otherAgentId) {
     showDialog(
       context: context,
       builder: (_) => _AgentContactDialog(agentId: otherAgentId),
@@ -664,10 +537,7 @@ class _AgentContactDialog extends ConsumerWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(context.l10n.contactAgent),
       content: agentAsync.when(
-        loading: () => const SizedBox(
-          height: 100,
-          child: Center(child: CircularProgressIndicator()),
-        ),
+        loading: () => const SizedBox(height: 100, child: Center(child: CircularProgressIndicator())),
         error: (error, stackTrace) => Text(context.l10n.failedToLoadAgentInfo),
         data: (agent) => Column(
           mainAxisSize: MainAxisSize.min,
@@ -675,55 +545,28 @@ class _AgentContactDialog extends ConsumerWidget {
             CircleAvatar(
               radius: 40,
               backgroundColor: Colors.blue.withValues(alpha: 0.1),
-              backgroundImage: agent.profileImageUrl.isNotEmpty
-                  ? NetworkImage(agent.profileImageUrl)
-                  : null,
-              child: agent.profileImageUrl.isEmpty
-                  ? const Icon(
-                      Icons.support_agent,
-                      size: 40,
-                      color: Colors.blue,
-                    )
-                  : null,
+              backgroundImage: agent.profileImageUrl.isNotEmpty ? NetworkImage(agent.profileImageUrl) : null,
+              child: agent.profileImageUrl.isEmpty ? const Icon(Icons.support_agent, size: 40, color: Colors.blue) : null,
             ),
             const SizedBox(height: 16),
-            Text(
-              agent.agentName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            Text(agent.agentName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             _buildInfoRow(Icons.phone, agent.agentMobile, context),
             _buildInfoRow(Icons.email, agent.agentEmail, context),
-            _buildInfoRow(
-              Icons.location_on,
-              '${agent.agentCity}, ${agent.agentState}',
-              context,
-            ),
+            _buildInfoRow(Icons.location_on, '${agent.agentCity}, ${agent.agentState}', context),
           ],
         ),
       ),
       actions: agentAsync.when(
         loading: () => [],
-        error: (error, stackTrace) => [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.closeLabel),
-          ),
-        ],
+        error: (error, stackTrace) => [TextButton(onPressed: () => Navigator.pop(context), child: Text(context.l10n.closeLabel))],
         data: (agent) => [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.closeLabel),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(context.l10n.closeLabel)),
           if (agent.agentMobile.isNotEmpty) ...[
             TextButton.icon(
               onPressed: () {
-                final number = agent.agentMobile.replaceAll(
-                  RegExp(r'[^0-9]'),
-                  '',
-                );
-                final url =
-                    'https://wa.me/$number?text=${Uri.encodeComponent(context.l10n.whatsappContactMessage)}';
+                final number = agent.agentMobile.replaceAll(RegExp(r'[^0-9]'), '');
+                final url = 'https://wa.me/$number?text=${Uri.encodeComponent(context.l10n.whatsappContactMessage)}';
                 launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
               },
               icon: const Icon(Icons.message, size: 18),
@@ -749,12 +592,7 @@ class _AgentContactDialog extends ConsumerWidget {
         children: [
           Icon(icon, size: 16, color: Colors.grey),
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              value.isNotEmpty ? value : context.l10n.notAvailable,
-              style: const TextStyle(fontSize: 14),
-            ),
-          ),
+          Expanded(child: Text(value.isNotEmpty ? value : context.l10n.notAvailable, style: const TextStyle(fontSize: 14))),
         ],
       ),
     );

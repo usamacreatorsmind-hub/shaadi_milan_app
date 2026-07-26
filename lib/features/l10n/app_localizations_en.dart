@@ -2505,4 +2505,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get uploadBioData => 'Upload Biodata (Photo, PDF, or Document)';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get selectLanguage => 'Select Language';
 }

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../router/app_router.dart';
 import '../../../features/auth/domain/states/user_state.dart';
+import '../../../core/notification/notification_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:riverpod/src/framework.dart';
@@ -26,18 +27,10 @@ class AppDrawer extends ConsumerWidget {
               // ===== HEADER =====
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.only(
-                  top: 48,
-                  left: 16,
-                  right: 16,
-                  bottom: 20,
-                ),
+                padding: const EdgeInsets.only(top: 48, left: 16, right: 16, bottom: 20),
                 decoration: BoxDecoration(
                   color: theme.primaryColor,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  ),
+                  borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,54 +39,25 @@ class AppDrawer extends ConsumerWidget {
                       radius: 34,
                       backgroundColor: Colors.white,
 
-                      backgroundImage: data.profileImageUrl.isNotEmpty
-                          ? NetworkImage(data.profileImageUrl)
-                          : null,
+                      backgroundImage: data.profileImageUrl.isNotEmpty ? NetworkImage(data.profileImageUrl) : null,
                       child: data.profileImageUrl.isEmpty
-                          ? Text(
-                              data.agentName[0].toUpperCase(),
-                              style: TextStyle(
-                                fontSize: 28,
-                                color: theme.primaryColor,
-                              ),
-                            )
+                          ? Text(data.agentName[0].toUpperCase(), style: TextStyle(fontSize: 28, color: theme.primaryColor))
                           : null,
                     ),
                     const SizedBox(height: 12),
                     Text(
                       data.agentName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      data.agentEmail,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                      ),
-                    ),
+                    Text(data.agentEmail, style: const TextStyle(color: Colors.white70, fontSize: 13)),
                     const SizedBox(height: 4),
                     Text(
                       data.designation.label,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.1,
-                      ),
+                      style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 1.1),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      "${AppLabels.agentIdLabel(context)}${data.agentId}",
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                      ),
-                    ),
+                    Text("${AppLabels.agentIdLabel(context)}${data.agentId}", style: const TextStyle(color: Colors.white70, fontSize: 13)),
                   ],
                 ),
               ),
@@ -110,6 +74,7 @@ class AppDrawer extends ConsumerWidget {
                       title: AppLabels.dashboard(context),
                       onTap: () {
                         context.maybePop();
+                        AutoTabsRouter.of(context).setActiveIndex(0);
                       },
                     ),
                     DrawerItem(
@@ -117,50 +82,72 @@ class AppDrawer extends ConsumerWidget {
                       title: AppLabels.myClients(context),
                       onTap: () {
                         context.maybePop();
+                        AutoTabsRouter.of(context).setActiveIndex(1);
                       },
                     ),
 
                     DrawerItem(
-                      icon: Icons.bar_chart_outlined,
-                      title: AppLabels.analytics(context),
+                      icon: Icons.payments_outlined,
+                      title: AppLabels.navRevenue(context),
                       onTap: () {
                         context.maybePop();
+                        AutoTabsRouter.of(context).setActiveIndex(2);
                       },
                     ),
 
-                    // DrawerItem(
-                    //   icon: Icons.reviews_outlined,
-                    //   title: "Reviews",
-                    //   onTap: () {
-                    //     context.maybePop();
-                    //     context.pushRoute(  ReviewRoute());
-                    //   },
-                    // ),
+                    DrawerItem(
+                      icon: Icons.favorite_border,
+                      title: AppLabels.navWishlist(context),
+                      onTap: () {
+                        context.maybePop();
+                        AutoTabsRouter.of(context).setActiveIndex(3);
+                      },
+                    ),
+
+                    DrawerItem(
+                      icon: Icons.notifications_outlined,
+                      title: AppLabels.notifications(context),
+                      trailing: Consumer(
+                        builder: (context, ref, _) {
+                          final count = ref.watch(unreadNotificationsCountProvider);
+                          return count > 0
+                              ? Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                                  child: Text('$count', style: const TextStyle(color: Colors.white, fontSize: 10)),
+                                )
+                              : const SizedBox.shrink();
+                        },
+                      ),
+                      onTap: () {
+                        context.maybePop();
+                        context.pushRoute(const AgentnotificationRoute());
+                      },
+                    ),
+                    DrawerItem(
+                      icon: Icons.person_add_alt_1_outlined,
+                      title: "Add New Client",
+                      onTap: () {
+                        context.maybePop();
+                        context.pushRoute(const AgentAddClientRoute());
+                      },
+                    ),
                     DrawerItem(
                       icon: Icons.support_agent,
                       title: AppLabels.supportTickets(context),
                       onTap: () {
                         context.maybePop();
-                        context.pushRoute(
-                          AgentSupportRoute(agentId: data.agentId),
-                        );
+                        context.pushRoute(AgentSupportRoute(agentId: data.agentId));
                       },
                     ),
 
-                    DrawerItem(
-                      icon: Icons.description_outlined,
-                      title: AppLabels.documents(context),
-                      onTap: () {
-                        context.maybePop();
-                      },
-                    ),
                     const Divider(),
                     DrawerItem(
                       icon: Icons.settings_outlined,
                       title: AppLabels.settings(context),
                       onTap: () {
                         context.maybePop();
-                        context.pushRoute(AgentSettingsRoute());
+                        context.pushRoute(const AgentSettingsRoute());
                       },
                     ),
 
@@ -169,17 +156,9 @@ class AppDrawer extends ConsumerWidget {
                       title: AppLabels.myProfile(context),
                       onTap: () {
                         context.maybePop();
-                        context.pushRoute(AgentEntityRoute(uid: data.agentId));
+                        AutoTabsRouter.of(context).setActiveIndex(4);
                       },
                     ),
-                    // DrawerItem(
-                    //   icon: Icons.reviews_outlined,
-                    //   title: "My Reviews",
-                    //   onTap: () {
-                    //     context.maybePop();
-                    //     context.pushRoute(MyReviewRoute());
-                    //   },
-                    // ),
                     const Divider(),
                     DrawerItem(
                       icon: Icons.logout_rounded,
@@ -191,16 +170,10 @@ class AppDrawer extends ConsumerWidget {
                             title: Text(AppLabels.logout(context)),
                             content: Text(AppLabels.logoutConfirm(context)),
                             actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: Text(AppLabels.cancel(context)),
-                              ),
+                              TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppLabels.cancel(context))),
                               TextButton(
                                 onPressed: () => Navigator.pop(context, true),
-                                child: Text(
-                                  AppLabels.logout(context),
-                                  style: const TextStyle(color: Colors.red),
-                                ),
+                                child: Text(AppLabels.logout(context), style: const TextStyle(color: Colors.red)),
                               ),
                             ],
                           ),
@@ -235,13 +208,9 @@ class DrawerItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
+  final Widget? trailing;
 
-  const DrawerItem({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.onTap,
-  });
+  const DrawerItem({super.key, required this.icon, required this.title, required this.onTap, this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -250,6 +219,7 @@ class DrawerItem extends StatelessWidget {
     return ListTile(
       leading: Icon(icon, color: theme.primaryColor),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+      trailing: trailing,
       onTap: onTap,
       horizontalTitleGap: 12,
     );

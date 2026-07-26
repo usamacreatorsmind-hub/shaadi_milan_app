@@ -1,4 +1,3 @@
- 
 import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 import '../../../features/translitration/models/bilingual_value.dart';
@@ -12,6 +11,8 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../router/app_router.dart';
 import '../../../features/auth/domain/states/user_state.dart';
+import '../../../features/l10n/app_translation_service.dart';
+import '../../../core/notification/notification_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 
@@ -39,12 +40,9 @@ class UserDrawer extends ConsumerWidget {
 
           void requirePayment() {
             context.maybePop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(AppLabels.pleaseSubscribe(context)),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(AppLabels.pleaseSubscribe(context)), backgroundColor: Colors.red));
             context.pushRoute(UserPaymentRoute(userId: user.uid));
           }
 
@@ -96,7 +94,12 @@ class UserDrawer extends ConsumerWidget {
                     DrawerItem(
                       icon: Icons.notifications_outlined,
                       title: AppLabels.notifications(context),
-                      trailing: const _NotificationBadge(count: 3),
+                      trailing: Consumer(
+                        builder: (context, ref, _) {
+                          final count = ref.watch(unreadNotificationsCountProvider);
+                          return _NotificationBadge(count: count);
+                        },
+                      ),
                       onTap: () => guardedTap(() {
                         context.maybePop();
                         context.pushRoute(const UserNotificationRoute());
@@ -109,6 +112,15 @@ class UserDrawer extends ConsumerWidget {
                       onTap: () => guardedTap(() {
                         context.maybePop();
                       }),
+                    ),
+
+                    DrawerItem(
+                      icon: Icons.language,
+                      title: AppLabels.language(context),
+                      onTap: () {
+                        context.maybePop();
+                        _showLanguageDialog(context, ref);
+                      },
                     ),
 
                     _SectionTitle(title: AppLabels.legalAndInfo(context)),
@@ -147,9 +159,7 @@ class UserDrawer extends ConsumerWidget {
                       title: AppLabels.supportTickets(context),
                       onTap: () => guardedTap(() {
                         context.maybePop();
-                        context.router.push(
-                          SupportTicketsRoute(userId: user.uid),
-                        );
+                        context.router.push(SupportTicketsRoute(userId: user.uid));
                       }),
                     ),
 
@@ -170,16 +180,13 @@ class UserDrawer extends ConsumerWidget {
                         context.maybePop();
 
                         // 2. Define your app's Play Store link
-                        const String packageName =
-                            "com.shaadimilan.app"; // Replace with your package name
-                        const String playStoreLink =
-                            "https://play.google.com/store/apps/details?id=$packageName";
+                        const String packageName = "com.shaadimilan.app"; // Replace with your package name
+                        const String playStoreLink = "https://play.google.com/store/apps/details?id=$packageName";
 
                         // 3. Trigger the native share sheet
                         await Share.share(
                           'Check out ${AppConstants.appName}! Find your perfect match here: $playStoreLink',
-                          subject:
-                              'Download ${AppConstants.appNameRaw} App', // Subject is used for Email sharing
+                          subject: 'Download ${AppConstants.appNameRaw} App', // Subject is used for Email sharing
                         );
                       },
                     ),
@@ -193,9 +200,7 @@ class UserDrawer extends ConsumerWidget {
                         if (await inAppReview.isAvailable()) {
                           // openStoreListing opens the specific app page.
                           // appStoreId is ONLY required for iOS (found in App Store Connect).
-                          inAppReview.openStoreListing(
-                            appStoreId: 'YOUR_IOS_APP_ID_HERE',
-                          );
+                          inAppReview.openStoreListing(appStoreId: 'YOUR_IOS_APP_ID_HERE');
                         }
 
                         // ignore: use_build_context_synchronously
@@ -223,26 +228,42 @@ class DrawerItem extends StatelessWidget {
   final VoidCallback onTap;
   final Widget? trailing;
 
-  const DrawerItem({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.onTap,
-    this.trailing,
-  });
+  const DrawerItem({super.key, required this.icon, required this.title, required this.onTap, this.trailing});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return ListTile(
-      leading: Icon(icon, color: theme.primaryColor),
+      leading: Icon(icon, color: Theme.of(context).primaryColor),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
       trailing: trailing,
       onTap: onTap,
-      horizontalTitleGap: 12,
     );
   }
+}
+
+void _showLanguageDialog(BuildContext context, WidgetRef ref) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(AppLabels.selectLanguage(context)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: AppTranslation.supportedTranslations.map((translation) {
+            return ListTile(
+              title: Text(translation.nativeName),
+              subtitle: Text(translation.name),
+              onTap: () {
+                ref.read(appTranslationServiceProvider).setLanguageCode(translation.languageCode);
+                ref.read(localeProvider.notifier).state = Locale(translation.languageCode);
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        ),
+      );
+    },
+  );
 }
 
 class _SectionTitle extends StatelessWidget {
@@ -253,10 +274,7 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      ),
+      child: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
     );
   }
 }
@@ -272,18 +290,11 @@ class _NotificationBadge extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.red,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(12)),
       constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
       child: Text(
         count > 99 ? '99+' : count.toString(),
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-        ),
+        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
         textAlign: TextAlign.center,
       ),
     );
@@ -305,10 +316,7 @@ class DrawerHeader1 extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 48, 16, 20),
       decoration: BoxDecoration(
         color: theme.primaryColor,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-        ),
+        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -316,9 +324,7 @@ class DrawerHeader1 extends StatelessWidget {
           CircleAvatar(
             radius: 34,
             backgroundColor: Colors.white,
-            backgroundImage: hasImage
-                ? NetworkImage(user.profileImageUrl)
-                : null,
+            backgroundImage: hasImage ? NetworkImage(user.profileImageUrl) : null,
             child: !hasImage
                 ? Text(
                     user.fullName.en.isNotEmpty ? user.fullName.en[0].toUpperCase() : '?',
@@ -329,17 +335,10 @@ class DrawerHeader1 extends StatelessWidget {
           const SizedBox(height: 12),
           BilingualParser(
             value: user.fullName,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
-          Text(
-            user.email,
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
-          ),
+          Text(user.email, style: const TextStyle(color: Colors.white70, fontSize: 13)),
         ],
       ),
     );
@@ -364,9 +363,7 @@ class _LogoutButton extends StatelessWidget {
             foregroundColor: Theme.of(context).colorScheme.error,
             side: BorderSide(color: Theme.of(context).colorScheme.error),
             padding: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
           onPressed: () {
             ref.read(authControllerProvider.notifier).signOut();

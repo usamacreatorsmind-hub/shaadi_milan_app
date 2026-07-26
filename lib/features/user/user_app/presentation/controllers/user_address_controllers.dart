@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../app/providers/global_providers.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../../../translitration/models/bilingual_value.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
@@ -13,8 +14,7 @@ class UserAddressController extends StateNotifier<AddressState> {
   final String _uid;
   final Ref _ref;
 
-  UserAddressController(this._matrimonyRepository, this._uid, this._ref)
-    : super(AddressState.initial);
+  UserAddressController(this._matrimonyRepository, this._uid, this._ref) : super(AddressState.initial);
 
   Future<void> saveAddress({
     required BilingualValue at,
@@ -35,9 +35,7 @@ class UserAddressController extends StateNotifier<AddressState> {
     );
 
     try {
-      _ref
-          .read(metrimonyControllerProvider.notifier)
-          .saveAddress(addressProfile);
+      _ref.read(metrimonyControllerProvider.notifier).saveAddress(addressProfile);
 
       state = state.copyWith(address: addressProfile, isLoading: false);
     } catch (e) {
@@ -49,7 +47,7 @@ class UserAddressController extends StateNotifier<AddressState> {
     required BilingualValue at,
     required BilingualValue post,
     required BilingualValue policeStation,
-    required  BilingualValue district,
+    required BilingualValue district,
     required BilingualValue stateName,
     required String pin,
   }) {
@@ -64,29 +62,19 @@ class UserAddressController extends StateNotifier<AddressState> {
     );
 
     try {
-      _ref
-          .read(matrimonyRepositoryProvider)
-          .updateAddressProfile(_uid, addressProfile);
+      _ref.read(matrimonyRepositoryProvider).updateAddressProfile(_uid, addressProfile);
 
       state = state.copyWith(address: addressProfile, isLoading: false);
-      _ref
-          .read(metrimonyControllerProvider.notifier)
-          .saveAddress(addressProfile);
+      _ref.read(metrimonyControllerProvider.notifier).saveAddress(addressProfile);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 }
 
-final addressControllerProvider =
-    StateNotifierProvider<UserAddressController, AddressState>((ref) {
-      final repo = ref.read(matrimonyRepositoryProvider);
-      final authState = ref.read(authStateProvider);
+final addressControllerProvider = StateNotifierProvider<UserAddressController, AddressState>((ref) {
+  final repo = ref.read(matrimonyRepositoryProvider);
+  final uid = ref.watch(targetUserIdProvider);
 
-      final uid = authState.value?.fold((agent) => null, (user) => user.uid);
-      if (uid == null) {
-        throw Exception('User not authenticated');
-      }
-
-      return UserAddressController(repo, uid, ref);
-    });
+  return UserAddressController(repo, uid ?? '', ref);
+});

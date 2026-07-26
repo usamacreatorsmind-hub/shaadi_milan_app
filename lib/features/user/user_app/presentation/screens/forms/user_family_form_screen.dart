@@ -15,16 +15,10 @@ class UserFamilyFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final FamilyProfile? existingFamilyProfile;
   final void Function(VoidCallback)? registerSubmit;
-  const UserFamilyFormScreen({
-    super.key,
-    required this.mode,
-    required this.existingFamilyProfile,
-    this.registerSubmit,
-  });
+  const UserFamilyFormScreen({super.key, required this.mode, required this.existingFamilyProfile, this.registerSubmit});
 
   @override
-  ConsumerState<UserFamilyFormScreen> createState() =>
-      _UserFamilyFormScreenState();
+  ConsumerState<UserFamilyFormScreen> createState() => _UserFamilyFormScreenState();
 }
 
 class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
@@ -54,54 +48,28 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      if (_familyType == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLabels.selectFamilyType(context))),
-        );
-        return;
-      }
+    final notifier = ref.read(userFamilyControllerProvider.notifier);
+    final familyType = _familyType ?? AppLabels.preferNotToSay(context);
+    final familyStatus = _familyStatusController.text.isEmpty ? AppLabels.preferNotToSay(context) : _familyStatusController.text;
 
-      final notifier = ref.read(userFamilyControllerProvider.notifier);
-
-      if (widget.mode == FormMode.create) {
-        notifier.saveFamily(
-          fatherName: BilingualValue(
-            hi: _fatherNameController.text,
-            en: _fatherNameController.text,
-          ),
-          motherName: BilingualValue(
-            hi: _motherNameController.text,
-            en: _motherNameController.text,
-          ),
-          brothers: int.parse(_brothersController.text),
-          sisters: int.parse(_sistersController.text),
-          familyType: BilingualValue(hi: _familyType!, en: _familyType!),
-          familyStatus: BilingualValue(
-            hi: _familyStatusController.text,
-            en: _familyStatusController.text,
-          ),
-        );
-      } else {
-        // Update logic (using saveFamily as upsert)
-        notifier.updateFamily(
-          fatherName: BilingualValue(
-            hi: _fatherNameController.text,
-            en: _fatherNameController.text,
-          ),
-          motherName: BilingualValue(
-            hi: _motherNameController.text,
-            en: _motherNameController.text,
-          ),
-          brothers: int.parse(_brothersController.text),
-          sisters: int.parse(_sistersController.text),
-          familyType: BilingualValue(hi: _familyType!, en: _familyType!),
-          familyStatus: BilingualValue(
-            hi: _familyStatusController.text,
-            en: _familyStatusController.text,
-          ),
-        );
-      }
+    if (widget.mode == FormMode.create) {
+      notifier.saveFamily(
+        fatherName: BilingualValue(hi: _fatherNameController.text, en: _fatherNameController.text),
+        motherName: BilingualValue(hi: _motherNameController.text, en: _motherNameController.text),
+        brothers: int.tryParse(_brothersController.text) ?? 0,
+        sisters: int.tryParse(_sistersController.text) ?? 0,
+        familyType: BilingualValue(hi: familyType, en: familyType),
+        familyStatus: BilingualValue(hi: familyStatus, en: familyStatus),
+      );
+    } else {
+      notifier.updateFamily(
+        fatherName: BilingualValue(hi: _fatherNameController.text, en: _fatherNameController.text),
+        motherName: BilingualValue(hi: _motherNameController.text, en: _motherNameController.text),
+        brothers: int.tryParse(_brothersController.text) ?? 0,
+        sisters: int.tryParse(_sistersController.text) ?? 0,
+        familyType: BilingualValue(hi: familyType, en: familyType),
+        familyStatus: BilingualValue(hi: familyStatus, en: familyStatus),
+      );
     }
   }
 
@@ -111,25 +79,14 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
 
     ref.listen<FamilyState>(userFamilyControllerProvider, (previous, current) {
       if (current.error != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
       } else if (current.family != null && previous?.family == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLabels.familyProfileSavedSuccessfully(context)),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.familyProfileSavedSuccessfully(context))));
       }
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          AppLabels.familyDetails(context),
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
+      appBar: AppBar(title: Text(AppLabels.familyDetails(context), style: Theme.of(context).textTheme.headlineMedium)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -141,9 +98,6 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
                 prefixIcon: Icons.person,
                 label: AppLabels.fatherName(context),
                 hint: AppLabels.fatherNameHint(context),
-                validator: (v) => v == null || v.isEmpty
-                    ? AppLabels.isRequired(context)
-                    : null,
               ),
               const SizedBox(height: 16),
               BilingualTextField(
@@ -151,9 +105,6 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
                 prefixIcon: Icons.person,
                 label: AppLabels.motherName(context),
                 hint: AppLabels.motherNameHint(context),
-                validator: (v) => v == null || v.isEmpty
-                    ? AppLabels.isRequired(context)
-                    : null,
               ),
               const SizedBox(height: 16),
               AppTextField(
@@ -180,20 +131,11 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
 
               AppDropDown<String>(
                 label: AppLabels.familyType(context),
-                items: [
-                  AppLabels.jointFamily(context),
-                  AppLabels.nuclearFamily(context),
-                ],
+                items: [AppLabels.jointFamily(context), AppLabels.nuclearFamily(context), AppLabels.preferNotToSay(context)],
                 value: _familyType,
                 itemLabel: (type) => type,
                 onChanged: (value) {
                   setState(() => _familyType = value);
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return AppLabels.selectFamilyType(context);
-                  }
-                  return null;
                 },
               ),
               const SizedBox(height: 16),
@@ -208,18 +150,10 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
                   AppLabels.comfortableLifestyle(context),
                   AppLabels.wellEstablishedLifestyle(context),
                 ],
-                value: _familyStatusController.text.isEmpty
-                    ? null
-                    : _familyStatusController.text,
+                value: _familyStatusController.text.isEmpty ? null : _familyStatusController.text,
                 itemLabel: (status) => status,
                 onChanged: (value) {
                   setState(() => _familyStatusController.text = value!);
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return AppLabels.selectLifeStyleStatus(context);
-                  }
-                  return null;
                 },
               ),
 
@@ -229,10 +163,7 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
               else
                 (widget.registerSubmit != null
                     ? const SizedBox.shrink()
-                    : AppButton(
-                        onPressed: _submitForm,
-                        text: AppLabels.saveFamily(context),
-                      )),
+                    : AppButton(onPressed: _submitForm, text: AppLabels.saveFamily(context))),
             ],
           ),
         ),

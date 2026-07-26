@@ -22,11 +22,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
   bool _isPicking = false;
 
-  Future<String?> _cropImage(
-    BuildContext context,
-    String path, {
-    bool isPrimary = false,
-  }) async {
+  Future<String?> _cropImage(BuildContext context, String path, {bool isPrimary = false}) async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
       uiSettings: [
@@ -50,14 +46,13 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      FilePickerResult? result = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-      );
+      FilePickerResult? result = await FilePicker.pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
 
       if (result == null || result.files.single.path == null) return;
 
       state = state.copyWith(aadharPdfPath: result.files.single.path);
+    } catch (e) {
+      debugPrint("Error picking Aadhaar PDF: $e");
     } finally {
       _isPicking = false;
     }
@@ -69,14 +64,13 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      FilePickerResult? result = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-      );
+      FilePickerResult? result = await FilePicker.pickFiles(type: FileType.custom, allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png']);
 
       if (result == null || result.files.single.path == null) return;
 
       state = state.copyWith(bioDataPath: result.files.single.path);
+    } catch (e) {
+      debugPrint("Error picking BioData: $e");
     } finally {
       _isPicking = false;
     }
@@ -94,11 +88,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (image == null) return;
 
-      final croppedPath = await _cropImage(
-        context,
-        image.path,
-        isPrimary: true,
-      );
+      final croppedPath = await _cropImage(context, image.path, isPrimary: true);
       if (croppedPath != null) {
         state = state.copyWith(primaryImage: croppedPath);
       }
@@ -126,9 +116,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
       }
       final updated = {...state.secondaryImages, ...croppedPaths}.toList();
 
-      state = state.copyWith(
-        secondaryImages: updated.take(maxSecondaryImages).toList(),
-      );
+      state = state.copyWith(secondaryImages: updated.take(maxSecondaryImages).toList());
     } finally {
       _isPicking = false;
     }
@@ -136,9 +124,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
   // ❌ Remove one gallery image
   void removeSecondaryImage(String path) {
-    state = state.copyWith(
-      secondaryImages: state.secondaryImages.where((e) => e != path).toList(),
-    );
+    state = state.copyWith(secondaryImages: state.secondaryImages.where((e) => e != path).toList());
   }
 
   // ❌ Clear primary
@@ -157,79 +143,82 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
   // ☁️ Upload images
   Future<void> uploadImages(BuildContext context, String uid) async {
-    if (state.profileImage == null || state.profileImage!.isEmpty) {
-      throw Exception(AppLabels.profileImageRequired(context));
-    }
-    if (state.primaryImage == null || state.primaryImage!.isEmpty) {
-      throw Exception(AppLabels.primaryImageRequired(context));
-    }
-    if (state.imageWithAgentUrl == null || state.imageWithAgentUrl!.isEmpty) {
-      throw Exception(AppLabels.imageWithAgentRequired(context));
-    }
-    if (state.secondaryImages.isEmpty) {
-      throw Exception(AppLabels.atLeastOneGalleryImageRequired(context));
-    }
-    if (state.aadharPdfPath == null || state.aadharPdfPath!.isEmpty) {
-      throw Exception(AppLabels.aadharDocumentRequired(context));
-    }
-    if (state.bioDataPath == null || state.bioDataPath!.isEmpty) {
-      throw Exception("Bio-data is required");
-    }
-
     try {
       ref.read(uploadProgressProvider.notifier).state = 0.0;
 
       // Use service directly to access progress callbacks
       final service = ref.read(imageUploadServiceProvider);
 
-      const steps =
-          6; // primary, secondary, aadhar, imageWithAgent, profileImage, bioData
-      final stepWeight = 1.0 / steps;
+      // Count how many items we actually need to upload to distribute progress
+      int stepsToRun = 0;
+      if (state.primaryImage != null) stepsToRun++;
+      if (state.secondaryImages.isNotEmpty) stepsToRun++;
+      if (state.aadharPdfPath != null) stepsToRun++;
+      if (state.imageWithAgentUrl != null) stepsToRun++;
+      if (state.profileImage != null) stepsToRun++;
+      if (state.bioDataPath != null) stepsToRun++;
 
-      void updateStepProgress(int stepIndex, double p) {
-        final base = stepIndex * stepWeight;
+      if (stepsToRun == 0) return;
+
+      final stepWeight = 1.0 / stepsToRun;
+      int currentStep = 0;
+
+      void updateStepProgress(double p) {
+        final base = currentStep * stepWeight;
         final current = p * stepWeight;
         ref.read(uploadProgressProvider.notifier).state = base + current;
       }
 
+      String primaryImageUrl = "";
+      List<String> secondaryImageUrls = [];
+      String aadharCardUrl = "";
+      String imageWithAgentUrl = "";
+      String profileImageUrl = "";
+      String bioDataUrl = "";
+
       // 1. Primary
-      final primaryImageUrl = await service.uploadPrimaryImage(
-        uid: uid,
-        filePath: state.primaryImage!,
-        onProgress: (p) => updateStepProgress(0, p),
-      );
+      if (state.primaryImage != null) {
+        primaryImageUrl = await service.uploadPrimaryImage(uid: uid, filePath: state.primaryImage!, onProgress: updateStepProgress);
+        currentStep++;
+      }
 
       // 2. Secondary
-      final secondaryImageUrls = await service.uploadSecondaryImages(
-        uid: uid,
-        filePaths: state.secondaryImages,
-        onProgress: (p) => updateStepProgress(1, p),
-      );
+      if (state.secondaryImages.isNotEmpty) {
+        secondaryImageUrls = await service.uploadSecondaryImages(
+          uid: uid,
+          filePaths: state.secondaryImages,
+          onProgress: updateStepProgress,
+        );
+        currentStep++;
+      }
 
       // 3. Aadhar
-      final aadharCardUrl = await service.uploadAadharCard(
-        uid: uid,
-        filePath: state.aadharPdfPath!,
-        onProgress: (p) => updateStepProgress(2, p),
-      );
+      if (state.aadharPdfPath != null) {
+        aadharCardUrl = await service.uploadAadharCard(uid: uid, filePath: state.aadharPdfPath!, onProgress: updateStepProgress);
+        currentStep++;
+      }
 
-      final imagewithagenturl = await service.uploadImageWithAgent(
-        uid: uid,
-        filePath: state.imageWithAgentUrl!,
-        onProgress: (p) => updateStepProgress(3, p),
-      );
+      // 4. Image with Agent
+      if (state.imageWithAgentUrl != null) {
+        imageWithAgentUrl = await service.uploadImageWithAgent(
+          uid: uid,
+          filePath: state.imageWithAgentUrl!,
+          onProgress: updateStepProgress,
+        );
+        currentStep++;
+      }
 
-      final profileImageUrl = await service.uploadProfileImage(
-        uid: uid,
-        filePath: state.profileImage!,
-        onProgress: (p) => updateStepProgress(4, p),
-      );
+      // 5. Profile Image
+      if (state.profileImage != null) {
+        profileImageUrl = await service.uploadProfileImage(uid: uid, filePath: state.profileImage!, onProgress: updateStepProgress);
+        currentStep++;
+      }
 
-      final bioDataUrl = await service.uploadBioData(
-        uid: uid,
-        filePath: state.bioDataPath!,
-        onProgress: (p) => updateStepProgress(5, p),
-      );
+      // 6. BioData
+      if (state.bioDataPath != null) {
+        bioDataUrl = await service.uploadBioData(uid: uid, filePath: state.bioDataPath!, onProgress: updateStepProgress);
+        currentStep++;
+      }
 
       ref
           .read(metrimonyControllerProvider.notifier)
@@ -237,14 +226,14 @@ class ImagePickerController extends StateNotifier<ImagesState> {
             ProfileImages(
               profileImageUrl: profileImageUrl,
               primaryImageUrl: primaryImageUrl,
-              imageWithAgentUrl: imagewithagenturl,
+              imageWithAgentUrl: imageWithAgentUrl,
               aadharCardUrl: aadharCardUrl,
               secondaryImageUrls: secondaryImageUrls,
               bioDataUrl: bioDataUrl,
             ),
           );
     } catch (e) {
-      rethrow; // UI will handle snackbar
+      rethrow;
     }
   }
 
@@ -258,11 +247,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (image == null) return;
 
-      final croppedPath = await _cropImage(
-        context,
-        image.path,
-        isPrimary: false,
-      );
+      final croppedPath = await _cropImage(context, image.path, isPrimary: false);
       if (croppedPath != null) {
         state = state.copyWith(imageWithAgentUrl: croppedPath);
       }
@@ -285,11 +270,7 @@ class ImagePickerController extends StateNotifier<ImagesState> {
 
       if (image == null) return;
 
-      final croppedPath = await _cropImage(
-        context,
-        image.path,
-        isPrimary: true,
-      );
+      final croppedPath = await _cropImage(context, image.path, isPrimary: true);
 
       if (croppedPath != null) {
         state = state.copyWith(profileImage: croppedPath);
@@ -330,7 +311,4 @@ class ImagePickerController extends StateNotifier<ImagesState> {
   }
 }
 
-final imagePickerProvider =
-    StateNotifierProvider<ImagePickerController, ImagesState>(
-      (ref) => ImagePickerController(ref),
-    );
+final imagePickerProvider = StateNotifierProvider<ImagePickerController, ImagesState>((ref) => ImagePickerController(ref));

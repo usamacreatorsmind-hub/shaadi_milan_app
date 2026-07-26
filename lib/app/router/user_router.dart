@@ -44,39 +44,39 @@ class UserRouter {
     // ================= USER FLOW =================
     AutoRoute(
       page: MatrimonyFormFlowRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
+      guards: [AuthGuard(ref)], // Allow Agent or User
     ),
     AutoRoute(
       page: UserIdentityFormRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
+      guards: [AuthGuard(ref)],
     ),
     AutoRoute(
       page: UserPhysicalFormRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
+      guards: [AuthGuard(ref)],
     ),
     AutoRoute(
       page: UserCultureFormRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
+      guards: [AuthGuard(ref)],
     ),
     AutoRoute(
       page: UserEducationFormRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
+      guards: [AuthGuard(ref)],
     ),
     AutoRoute(
       page: UserEmploymentFormRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
+      guards: [AuthGuard(ref)],
     ),
     AutoRoute(
       page: UserFamilyFormRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
+      guards: [AuthGuard(ref)],
     ),
     AutoRoute(
       page: UserAddressFormRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
+      guards: [AuthGuard(ref)],
     ),
     AutoRoute(
       page: UserBiodataCheckRoute.page,
-      guards: [AuthGuard(ref), UserGuard(ref)],
+      guards: [AuthGuard(ref)], // Allow Agent or User
     ),
     AutoRoute(
       page: UserDetailRoute.page,

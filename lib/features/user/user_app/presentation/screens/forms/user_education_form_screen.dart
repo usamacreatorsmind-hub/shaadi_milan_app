@@ -219,9 +219,6 @@ class _UserEducationFormScreenState
                     prefixIcon: Icons.school,
                     label: AppLabels.collegeUniversity(context),
                     hint: AppLabels.collegeHint(context),
-                    validator: (v) => v == null || v.isEmpty
-                        ? AppLabels.isRequired(context)
-                        : null,
                   ),
                   const SizedBox(height: 12),
                   BilingualTextField(
@@ -230,9 +227,6 @@ class _UserEducationFormScreenState
                     prefixIcon: Icons.book,
                     label: AppLabels.degreeCourse(context),
                     hint: AppLabels.degreeHint(context),
-                    validator: (v) => v == null || v.isEmpty
-                        ? AppLabels.isRequired(context)
-                        : null,
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -246,9 +240,6 @@ class _UserEducationFormScreenState
                           hint: AppLabels.percentageHint(context),
                           obscureText: false,
                           keyboardType: TextInputType.number,
-                          validator: (v) => double.tryParse(v ?? '') == null
-                              ? AppLabels.mustBeNumber(context)
-                              : null,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -261,9 +252,6 @@ class _UserEducationFormScreenState
                           hint: AppLabels.yearHint(context),
                           obscureText: false,
                           keyboardType: TextInputType.number,
-                          validator: (v) => int.tryParse(v ?? '') == null
-                              ? AppLabels.mustBeNumber(context)
-                              : null,
                         ),
                       ),
                     ],

@@ -205,11 +205,22 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     await ref
         .read(matrimonyRepositoryProvider)
         .updateMatrimonyProfile(uid, profile);
+
+    // If this was an agent-led registration, we might want to do something specific
+    // like clearing the targetUserId after successful submission.
+    
     // Update profileImageUrl in users collection with profileImageUrl
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
       'profileImageUrl': profile.images.profileImageUrl,
       'isProfileCreated': true,
       'userStatus': {'isProfileCreated': true},
     });
+  }
+
+  /// Sets the initial state for an agent-led registration
+  void startAgentLedRegistration(String clientUid) {
+    state = MetrimonyState.initial().copyWith(
+      metrimony: MatrimonyProfile.empty().copyWith(userId: clientUid),
+    );
   }
 }

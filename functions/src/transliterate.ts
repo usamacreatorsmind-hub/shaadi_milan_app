@@ -33,29 +33,39 @@ export const transliterate = onCall(async (request) => {
     let result: string | undefined;
 
     if (target === "hi") {
-      // Strategy 1: English -> Hindi (Phonetic Transliteration)
-      const url = "https://inputtools.google.com/request";
-      const response = await axios.get(url, {
-        params: {
-          itc: "hi-t-i0-und",
-          num: 1,
-          cp: 0,
-          cs: 1,
-          ie: "utf-8",
-          oe: "utf-8",
-          app: "demopage",
-          text: text,
-        },
-      });
+      // Strategy 1: English -> Hindi (Word-by-Word for better accuracy)
+      const words = text.split(/\s+/);
+      const transliteratedWords: string[] = [];
 
-      if (
-        response.data[0] === "SUCCESS" &&
-        response.data[1] &&
-        response.data[1][0] &&
-        response.data[1][0][1]
-      ) {
-        result = response.data[1][0][1][0];
+      for (const word of words) {
+        if (!word) continue;
+
+        const url = "https://inputtools.google.com/request";
+        const response = await axios.get(url, {
+          params: {
+            itc: "hi-t-i0-und",
+            num: 1,
+            cp: 0,
+            cs: 1,
+            ie: "utf-8",
+            oe: "utf-8",
+            app: "shaadimilan",
+            text: word,
+          },
+        });
+
+        if (
+          response.data[0] === "SUCCESS" &&
+          response.data[1] &&
+          response.data[1][0] &&
+          response.data[1][0][1]
+        ) {
+          transliteratedWords.push(response.data[1][0][1][0]);
+        } else {
+          transliteratedWords.push(word); // Fallback to original word
+        }
       }
+      result = transliteratedWords.join(" ");
     } else {
       // Strategy 2: Hindi -> English (Romanization)
       const url = "https://translate.googleapis.com/translate_a/single";

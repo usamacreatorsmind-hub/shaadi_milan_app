@@ -36,39 +36,58 @@ class RoleSelectionScreen extends ConsumerWidget {
         child: SafeArea(
           child: Column(
             children: [
-              // 🌐 Language Toggle
+              // 🌐 Language Toggle Switch
               Align(
                 alignment: Alignment.topRight,
                 child: Padding(
                   padding: const EdgeInsets.only(right: 16, top: 8),
-                  child: PopupMenuButton<String>(
-                    initialValue: currentLocale.languageCode,
-                    icon: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.8),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.pink.withOpacity(0.1)),
-                      ),
-                      child: const Icon(Icons.language, color: Colors.pink, size: 20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.pink.withOpacity(0.1)),
                     ),
-                    onSelected: (String code) {
-                      ref.read(appTranslationServiceProvider).setLanguageCode(code);
-                      ref.read(localeProvider.notifier).state = Locale(code);
-                    },
-                    itemBuilder: (BuildContext context) => AppTranslation.supportedTranslations
-                        .map((lang) => PopupMenuItem<String>(
-                              value: lang.languageCode,
-                              child: Row(
-                                children: [
-                                  Text(lang.nativeName),
-                                  const SizedBox(width: 8),
-                                  if (currentLocale.languageCode == lang.languageCode)
-                                    const Icon(Icons.check, color: Colors.green, size: 16),
-                                ],
+                    child: Consumer(
+                      builder: (context, ref, _) {
+                        final locale = ref.watch(localeProvider);
+                        final isHindi = locale.languageCode == 'hi';
+
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "EN",
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: isHindi ? FontWeight.normal : FontWeight.bold,
+                                color: isHindi ? Colors.grey : Colors.pink,
                               ),
-                            ))
-                        .toList(),
+                            ),
+                            Transform.scale(
+                              scale: 0.7,
+                              child: Switch(
+                                value: isHindi,
+                                activeColor: Colors.pink,
+                                onChanged: (val) {
+                                  final code = val ? 'hi' : 'en';
+                                  ref.read(appTranslationServiceProvider).setLanguageCode(code);
+                                  ref.read(localeProvider.notifier).state = Locale(code);
+                                },
+                              ),
+                            ),
+                            Text(
+                              "हि",
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: isHindi ? FontWeight.bold : FontWeight.normal,
+                                color: isHindi ? Colors.pink : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),

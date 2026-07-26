@@ -1,5 +1,6 @@
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 
+import '../../../../../app/providers/global_providers.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
@@ -13,8 +14,7 @@ class UserFamilyController extends StateNotifier<FamilyState> {
   final String _uid;
   final Ref _ref;
 
-  UserFamilyController(this._matrimonyRepository, this._uid, this._ref)
-    : super(FamilyState.initial);
+  UserFamilyController(this._matrimonyRepository, this._uid, this._ref) : super(FamilyState.initial);
 
   Future<void> saveFamily({
     required BilingualValue fatherName,
@@ -69,9 +69,7 @@ class UserFamilyController extends StateNotifier<FamilyState> {
     );
 
     try {
-      _ref
-          .read(matrimonyRepositoryProvider)
-          .updateFamilyProfile(_uid, familyProfile);
+      _ref.read(matrimonyRepositoryProvider).updateFamilyProfile(_uid, familyProfile);
 
       state = state.copyWith(family: familyProfile, isLoading: false);
       debugPrint('✅ Family Updated Successfully');
@@ -84,13 +82,8 @@ class UserFamilyController extends StateNotifier<FamilyState> {
   }
 }
 
-final userFamilyControllerProvider =
-    StateNotifierProvider.autoDispose<UserFamilyController, FamilyState>((ref) {
-      final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
-      final uid = ref
-          .read(authStateProvider)
-          .value
-          ?.fold((agent) => agent.uid, (user) => user.uid);
-      if (uid == null) throw Exception('User not authenticated');
-      return UserFamilyController(matrimonyRepo, uid, ref);
-    });
+final userFamilyControllerProvider = StateNotifierProvider.autoDispose<UserFamilyController, FamilyState>((ref) {
+  final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
+  final uid = ref.watch(targetUserIdProvider);
+  return UserFamilyController(matrimonyRepo, uid ?? '', ref);
+});

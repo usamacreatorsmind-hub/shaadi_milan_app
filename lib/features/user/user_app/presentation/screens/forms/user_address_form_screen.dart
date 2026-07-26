@@ -18,16 +18,10 @@ class UserAddressFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final AddressProfile? existingAddressProfile;
   final void Function(VoidCallback)? registerSubmit;
-  const UserAddressFormScreen({
-    super.key,
-    required this.mode,
-    required this.existingAddressProfile,
-    this.registerSubmit,
-  });
+  const UserAddressFormScreen({super.key, required this.mode, required this.existingAddressProfile, this.registerSubmit});
 
   @override
-  ConsumerState<UserAddressFormScreen> createState() =>
-      _UserAddressFormScreenState();
+  ConsumerState<UserAddressFormScreen> createState() => _UserAddressFormScreenState();
 }
 
 class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
@@ -92,29 +86,16 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     final notifier = ref.read(addressControllerProvider.notifier);
     final location = ref.read(homeFilterProvider);
 
-    final at = BilingualValue(
-      hi: _atController.text.trim(),
-      en: _atEnController.text.trim(),
-    );
-    final post = BilingualValue(
-      hi: _postController.text.trim(),
-      en: _postEnController.text.trim(),
-    );
-    final policeStation = BilingualValue(
-      hi: _policeStationController.text.trim(),
-      en: _policeStationEnController.text.trim(),
-    );
+    final at = BilingualValue(hi: _atController.text.trim(), en: _atEnController.text.trim());
+    final post = BilingualValue(hi: _postController.text.trim(), en: _postEnController.text.trim());
+    final policeStation = BilingualValue(hi: _policeStationController.text.trim(), en: _policeStationEnController.text.trim());
 
     final bilingualData = await ref.read(bilingualLocationProvider.future);
     final statesMap = bilingualData['states']!;
     final citiesMap = bilingualData['cities']!;
 
-    final stateBilingual =
-        statesMap[location.state] ??
-        BilingualValue(hi: location.state, en: location.state);
-    final cityBilingual =
-        citiesMap[location.city] ??
-        BilingualValue(hi: location.city, en: location.city);
+    final stateBilingual = statesMap[location.state] ?? BilingualValue(hi: location.state, en: location.state);
+    final cityBilingual = citiesMap[location.city] ?? BilingualValue(hi: location.city, en: location.city);
 
     if (widget.mode == FormMode.create) {
       notifier.saveAddress(
@@ -146,25 +127,16 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
 
     ref.listen<AddressState>(addressControllerProvider, (previous, current) {
       if (current.error != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error!))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error!))));
       }
 
       if (current.address != null && previous?.address == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLabels.addressSavedSuccessfully(context))),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.addressSavedSuccessfully(context))));
       }
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          AppLabels.addressDetails(context),
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
+      appBar: AppBar(title: Text(AppLabels.addressDetails(context), style: Theme.of(context).textTheme.headlineMedium)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -178,9 +150,6 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   prefixIcon: Icons.location_on,
                   label: AppLabels.place(context),
                   hint: AppLabels.placeHint(context),
-                  validator: (v) => v == null || v.isEmpty
-                      ? AppLabels.isRequired(context)
-                      : null,
                 ),
                 const SizedBox(height: 16),
                 BilingualTextField(
@@ -189,9 +158,6 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   prefixIcon: Icons.local_post_office,
                   label: AppLabels.post(context),
                   hint: AppLabels.postHint(context),
-                  validator: (v) => v == null || v.isEmpty
-                      ? AppLabels.isRequired(context)
-                      : null,
                 ),
                 const SizedBox(height: 16),
                 BilingualTextField(
@@ -200,26 +166,15 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   prefixIcon: Icons.local_police,
                   label: AppLabels.policeStation(context),
                   hint: AppLabels.policeStationHint(context),
-                  validator: (v) => v == null || v.isEmpty
-                      ? AppLabels.isRequired(context)
-                      : null,
                 ),
                 const SizedBox(height: 16),
                 locationAsync.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
+                  loading: () => const Center(child: CircularProgressIndicator()),
                   error: (e, _) => Text(e.toString()),
                   data: (states) {
-                    final selectedState = states
-                        .where((s) => s.name == location.state)
-                        .firstOrNull;
+                    final selectedState = states.where((s) => s.name == location.state).firstOrNull;
 
-                    final selectedCity = selectedState?.cities
-                        .where(
-                          (c) =>
-                              c.id == location.city || c.name == location.city,
-                        )
-                        .firstOrNull;
+                    final selectedCity = selectedState?.cities.where((c) => c.id == location.city || c.name == location.city).firstOrNull;
 
                     return Column(
                       children: [
@@ -230,9 +185,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                           itemLabel: (s) => s.name,
                           onChanged: (val) {
                             if (val != null) {
-                              ref
-                                  .read(homeFilterProvider.notifier)
-                                  .updateState(val.name);
+                              ref.read(homeFilterProvider.notifier).updateState(val.name);
                               _stateController.text = val.name;
                               _districtController.clear();
                             }
@@ -247,9 +200,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                           itemLabel: (c) => c.name,
                           onChanged: (val) {
                             if (val != null) {
-                              ref
-                                  .read(homeFilterProvider.notifier)
-                                  .updateCity(val.id);
+                              ref.read(homeFilterProvider.notifier).updateCity(val.id);
                               _districtController.text = val.id;
                             }
                           },
@@ -263,10 +214,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   showWordCount: true,
                   maxLines: 1,
                   counterType: CounterType.characters,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    MaxLengthFormatter(max: 6),
-                  ],
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly, MaxLengthFormatter(max: 6)],
                   controller: _pinController,
                   prefixIcon: Icons.numbers,
                   iconColor: Theme.of(context).colorScheme.primary,
@@ -275,10 +223,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   obscureText: false,
                   keyboardType: TextInputType.number,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return AppLabels.pinCodeRequired(context);
-                    }
-                    if (value.length != 6) {
+                    if (value != null && value.isNotEmpty && value.length != 6) {
                       return AppLabels.invalidPinCode(context);
                     }
                     return null;
@@ -289,10 +234,7 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                     ? const Center(child: CircularProgressIndicator())
                     : (widget.registerSubmit != null
                           ? const SizedBox.shrink()
-                          : AppButton(
-                              onPressed: _submitForm,
-                              text: AppLabels.saveAddress(context),
-                            )),
+                          : AppButton(onPressed: _submitForm, text: AppLabels.saveAddress(context))),
                 const SizedBox(height: 16),
               ],
             ),

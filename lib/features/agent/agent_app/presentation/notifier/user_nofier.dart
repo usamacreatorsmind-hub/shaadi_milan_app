@@ -32,7 +32,7 @@ final agentUserRepositoryProvider = Provider<UserRepository>((ref) {
 class UsersNotifier extends StateNotifier<AsyncValue<List<UserEntity>>> {
   final UserRepository _userRepository;
 
-  UsersNotifier(this._userRepository) : super(const AsyncValue.data([]));
+  UsersNotifier(this._userRepository) : super(const AsyncValue.loading());
 
   Future<void> getUsersForAgent() async {
     try {
@@ -51,11 +51,10 @@ class UsersNotifier extends StateNotifier<AsyncValue<List<UserEntity>>> {
 }
 
 /// Provider for UsersNotifier
-final agentUsersNotifierProvider =
-    StateNotifierProvider<UsersNotifier, AsyncValue<List<UserEntity>>>((ref) {
-      final userRepository = ref.watch(agentUserRepositoryProvider);
-      return UsersNotifier(userRepository);
-    });
+final agentUsersNotifierProvider = StateNotifierProvider<UsersNotifier, AsyncValue<List<UserEntity>>>((ref) {
+  final userRepository = ref.watch(agentUserRepositoryProvider);
+  return UsersNotifier(userRepository);
+});
 
 /// ==========================================
 /// Notifier for Single User
@@ -86,11 +85,7 @@ class UserNotifier extends StateNotifier<AsyncValue<UserEntity?>> {
     state = const AsyncValue.data(null);
   }
 
-  Future<void> updateUserWishlistStatus({
-    required String userId,
-    required String profileId,
-    required String status,
-  }) async {
+  Future<void> updateUserWishlistStatus({required String userId, required String profileId, required String status}) async {
     state = const AsyncValue.loading();
     if (state.value == null) {
       await fetchUserById(userId);
@@ -123,26 +118,19 @@ class UserNotifier extends StateNotifier<AsyncValue<UserEntity?>> {
 }
 
 /// Provider for UserNotifier
-final agentUserNotifierProvider =
-    StateNotifierProvider<UserNotifier, AsyncValue<UserEntity?>>((ref) {
-      final userRepository = ref.watch(agentUserRepositoryProvider);
-      return UserNotifier(userRepository);
-    });
+final agentUserNotifierProvider = StateNotifierProvider<UserNotifier, AsyncValue<UserEntity?>>((ref) {
+  final userRepository = ref.watch(agentUserRepositoryProvider);
+  return UserNotifier(userRepository);
+});
 
 /// Family provider to fetch user by ID (for wishlist items)
-final wishlistUserProvider = FutureProvider.family<UserEntity?, String>((
-  ref,
-  userId,
-) async {
+final wishlistUserProvider = FutureProvider.family<UserEntity?, String>((ref, userId) async {
   final userRepository = ref.watch(agentUserRepositoryProvider);
   return userRepository.getUserById(userId);
 });
 
 /// Family provider to fetch agent by agentId (for wishlist items)
-final wishlistAgentProvider = FutureProvider.family<AgentEntity?, String>((
-  ref,
-  agentId,
-) async {
+final wishlistAgentProvider = FutureProvider.family<AgentEntity?, String>((ref, agentId) async {
   if (agentId.isEmpty) return null;
   try {
     final agentDs = ref.watch(agentFirestoreDsProvider);
@@ -155,19 +143,12 @@ final wishlistAgentProvider = FutureProvider.family<AgentEntity?, String>((
 class UserPaymentNotifier extends StateNotifier<AsyncValue<Payment?>> {
   final UserPaymentsRepository _userPaymentsRepository;
 
-  UserPaymentNotifier(this._userPaymentsRepository)
-    : super(const AsyncValue.data(null));
+  UserPaymentNotifier(this._userPaymentsRepository) : super(const AsyncValue.data(null));
 
-  Future<void> getUserPayment({
-    required String userId,
-    required String agentId,
-  }) async {
+  Future<void> getUserPayment({required String userId, required String agentId}) async {
     try {
       state = const AsyncValue.loading();
-      final payment = await _userPaymentsRepository.getUserPayment(
-        userId: userId,
-        agentId: agentId,
-      );
+      final payment = await _userPaymentsRepository.getUserPayment(userId: userId, agentId: agentId);
       state = AsyncValue.data(payment);
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
@@ -181,24 +162,20 @@ final userPaymentsRepositoryProvider = Provider<UserPaymentsRepository>((ref) {
   return UserPaymentRepositoryImpl(ref.read(userPaymentDsProvider));
 });
 
-final userPaymentNotifierProvider =
-    StateNotifierProvider<UserPaymentNotifier, AsyncValue<Payment?>>((ref) {
-      return UserPaymentNotifier(ref.read(userPaymentsRepositoryProvider));
-    });
+final userPaymentNotifierProvider = StateNotifierProvider<UserPaymentNotifier, AsyncValue<Payment?>>((ref) {
+  return UserPaymentNotifier(ref.read(userPaymentsRepositoryProvider));
+});
 
 class UsersPaymentsNotifier extends StateNotifier<AsyncValue<List<Payment?>>> {
   final UserPaymentsRepository _userPaymentsRepository;
 
-  UsersPaymentsNotifier(this._userPaymentsRepository)
-    : super(const AsyncValue.data([]));
+  UsersPaymentsNotifier(this._userPaymentsRepository) : super(const AsyncValue.loading());
 
   /// Fetch all payments for an agent
   Future<void> getUsersPayment({required String agentId}) async {
     try {
       state = const AsyncValue.loading();
-      final payments = await _userPaymentsRepository.getUsersPayment(
-        agentId: agentId,
-      );
+      final payments = await _userPaymentsRepository.getUsersPayment(agentId: agentId);
       // Filter out null values and keep valid payments
       final validPayments = payments.where((p) => p != null).toList();
       state = AsyncValue.data(validPayments);
@@ -209,27 +186,20 @@ class UsersPaymentsNotifier extends StateNotifier<AsyncValue<List<Payment?>>> {
   }
 }
 
-final usersPaymentsNotifierProvider =
-    StateNotifierProvider<UsersPaymentsNotifier, AsyncValue<List<Payment?>>>((
-      ref,
-    ) {
-      return UsersPaymentsNotifier(ref.read(userPaymentsRepositoryProvider));
-    });
+final usersPaymentsNotifierProvider = StateNotifierProvider<UsersPaymentsNotifier, AsyncValue<List<Payment?>>>((ref) {
+  return UsersPaymentsNotifier(ref.read(userPaymentsRepositoryProvider));
+});
 
-class AfterMarriagePaymentsNotifier
-    extends StateNotifier<AsyncValue<List<Payment?>>> {
+class AfterMarriagePaymentsNotifier extends StateNotifier<AsyncValue<List<Payment?>>> {
   final UserPaymentsRepository _userPaymentsRepository;
 
-  AfterMarriagePaymentsNotifier(this._userPaymentsRepository)
-    : super(const AsyncValue.data([]));
+  AfterMarriagePaymentsNotifier(this._userPaymentsRepository) : super(const AsyncValue.data([]));
 
   /// Fetch all after marriage payments for an agent
   Future<void> getAfterMarriagePayments({required String agentId}) async {
     try {
       state = const AsyncValue.loading();
-      final payments = await _userPaymentsRepository.getAfterMarriagePayments(
-        agentId: agentId,
-      );
+      final payments = await _userPaymentsRepository.getAfterMarriagePayments(agentId: agentId);
       // Filter out null values and keep valid payments
       final validPayments = payments.where((p) => p != null).toList();
       state = AsyncValue.data(validPayments);
@@ -240,29 +210,20 @@ class AfterMarriagePaymentsNotifier
   }
 }
 
-final afterMarriagePaymentsNotifierProvider =
-    StateNotifierProvider<
-      AfterMarriagePaymentsNotifier,
-      AsyncValue<List<Payment?>>
-    >((ref) {
-      return AfterMarriagePaymentsNotifier(
-        ref.read(userPaymentsRepositoryProvider),
-      );
-    });
+final afterMarriagePaymentsNotifierProvider = StateNotifierProvider<AfterMarriagePaymentsNotifier, AsyncValue<List<Payment?>>>((ref) {
+  return AfterMarriagePaymentsNotifier(ref.read(userPaymentsRepositoryProvider));
+});
 
-class AfterMarriagePaymentsForUserNotifier
-    extends StateNotifier<AsyncValue<Payment?>> {
+class AfterMarriagePaymentsForUserNotifier extends StateNotifier<AsyncValue<Payment?>> {
   final UserPaymentsRepository _userPaymentsRepository;
 
-  AfterMarriagePaymentsForUserNotifier(this._userPaymentsRepository)
-    : super(const AsyncValue.data(null));
+  AfterMarriagePaymentsForUserNotifier(this._userPaymentsRepository) : super(const AsyncValue.data(null));
 
   /// Fetch all after marriage payments for a specific user
   Future<void> getAfterMarriagePaymentForUser({required String userId}) async {
     try {
       state = const AsyncValue.loading();
-      final payment = await _userPaymentsRepository
-          .getAfterMarriagePaymentForUser(userId: userId);
+      final payment = await _userPaymentsRepository.getAfterMarriagePaymentForUser(userId: userId);
       state = AsyncValue.data(payment);
     } catch (error, stackTrace) {
       print('Error fetching after marriage payments for user: $error');
@@ -271,12 +232,8 @@ class AfterMarriagePaymentsForUserNotifier
   }
 }
 
-final afterMarriagePaymentsForUserNotifierProvider =
-    StateNotifierProvider<
-      AfterMarriagePaymentsForUserNotifier,
-      AsyncValue<Payment?>
-    >((ref) {
-      return AfterMarriagePaymentsForUserNotifier(
-        ref.read(userPaymentsRepositoryProvider),
-      );
-    });
+final afterMarriagePaymentsForUserNotifierProvider = StateNotifierProvider<AfterMarriagePaymentsForUserNotifier, AsyncValue<Payment?>>((
+  ref,
+) {
+  return AfterMarriagePaymentsForUserNotifier(ref.read(userPaymentsRepositoryProvider));
+});

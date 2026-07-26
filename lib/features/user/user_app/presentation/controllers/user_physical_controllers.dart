@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 
+import '../../../../../app/providers/global_providers.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
@@ -80,8 +81,6 @@ final userPhysicalControllerProvider =
       ref,
     ) {
       final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
-      final authState = ref.read(authStateProvider);
-      final uid = authState.value?.fold((agent) => null, (user) => user.uid);
-      if (uid == null) throw Exception('User not authenticated');
-      return UserPhysicalController(matrimonyRepo, uid, ref);
+      final uid = ref.watch(targetUserIdProvider);
+      return UserPhysicalController(matrimonyRepo, uid ?? '', ref);
     });

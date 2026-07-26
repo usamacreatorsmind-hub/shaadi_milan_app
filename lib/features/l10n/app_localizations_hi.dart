@@ -2513,4 +2513,10 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get uploadBioData => 'बायोडाटा अपलोड करें (फोटो, PDF या दस्तावेज़)';
+
+  @override
+  String get language => 'भाषा';
+
+  @override
+  String get selectLanguage => 'भाषा चुनें';
 }

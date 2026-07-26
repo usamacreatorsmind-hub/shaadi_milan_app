@@ -8,6 +8,7 @@ import 'package:shadi_milan/core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/drawer.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../../../l10n/app_translation_service.dart';
+import '../../../../translitration/models/bilingual_value.dart';
 import '../notifier/analytics_provider.dart';
 import '../notifier/user_nofier.dart';
 import 'agen_profile.screen.dart';
@@ -19,8 +20,7 @@ class AgentDashboardScreen extends ConsumerStatefulWidget {
   const AgentDashboardScreen({required this.agentId, super.key});
 
   @override
-  ConsumerState<AgentDashboardScreen> createState() =>
-      _AgentDashboardScreenState();
+  ConsumerState<AgentDashboardScreen> createState() => _AgentDashboardScreenState();
 }
 
 class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
@@ -38,9 +38,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(usersPaymentsNotifierProvider.notifier)
-          .getUsersPayment(agentId: widget.agentId);
+      ref.read(usersPaymentsNotifierProvider.notifier).getUsersPayment(agentId: widget.agentId);
       ref.read(agentUsersNotifierProvider.notifier).getUsersForAgent();
     });
   }
@@ -55,11 +53,20 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
 
     return Scaffold(
       drawer: AppDrawer(agentAsync: agentAsync),
-
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Invalidate and re-fetch data
+          ref.invalidate(analyticsProvider(widget.agentId));
+          await Future.wait([
+            ref.read(usersPaymentsNotifierProvider.notifier).getUsersPayment(agentId: widget.agentId),
+            ref.read(agentUsersNotifierProvider.notifier).getUsersForAgent(),
+          ]);
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverAppBar(
             expandedHeight: 180.0,
 
             leading: Builder(
@@ -77,11 +84,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
             pinned: true,
             title: Text(
               AppLabels.dashboardTitle(context),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
             ),
             backgroundColor: theme.primaryColor,
             flexibleSpace: FlexibleSpaceBar(
@@ -100,38 +103,20 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 30),
-                      Text(
-                        AppLabels.welcome(context),
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 16,
-                        ),
-                      ),
+                      Text(AppLabels.welcome(context), style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 16)),
                       const SizedBox(height: 8),
                       agentAsync.when(
                         data: (agent) => Text(
                           agent.agentName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
                         ),
                         loading: () => Text(
                           AppLabels.loading(context),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
                         ),
                         error: (error, stack) => Text(
                           AppLabels.staffMember(context),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -140,33 +125,59 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
               ),
             ),
             actions: [
-              // 🌐 Language Toggle
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.translate, color: Colors.white),
-                onSelected: (String code) {
-                  ref.read(appTranslationServiceProvider).setLanguageCode(code);
-                  ref.read(localeProvider.notifier).state = Locale(code);
-                },
-                itemBuilder: (BuildContext context) => AppTranslation
-                    .supportedTranslations
-                    .map(
-                      (lang) => PopupMenuItem<String>(
-                        value: lang.languageCode,
-                        child: Text(lang.nativeName),
+              // 🌐 Language Toggle Switch
+              Consumer(
+                builder: (context, ref, _) {
+                  final locale = ref.watch(localeProvider);
+                  final isHindi = locale.languageCode == 'hi';
+
+                  return Row(
+                    children: [
+                      Text(
+                        "EN",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: isHindi ? FontWeight.normal : FontWeight.bold,
+                        ),
                       ),
-                    )
-                    .toList(),
+                      Transform.scale(
+                        scale: 0.7,
+                        child: Switch(
+                          value: isHindi,
+                          activeColor: Colors.white,
+                          activeTrackColor: Colors.white24,
+                          inactiveThumbColor: Colors.white,
+                          inactiveTrackColor: Colors.white24,
+                          onChanged: (val) {
+                            final code = val ? 'hi' : 'en';
+                            ref.read(appTranslationServiceProvider).setLanguageCode(code);
+                            ref.read(localeProvider.notifier).state = Locale(code);
+                          },
+                        ),
+                      ),
+                      Text(
+                        "हि",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: isHindi ? FontWeight.bold : FontWeight.normal,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                  );
+                },
               ),
 
-              // notificattion
+              // notification
               IconButton(
                 icon: const Icon(Icons.notifications, color: Colors.white),
                 onPressed: () {
                   context.router.push(const AgentnotificationRoute());
                 },
               ),
-
-              const SizedBox(width: 20),
+              
               IconButton(
                 icon: const Icon(Icons.logout, color: Colors.white),
                 onPressed: () => _showLogoutDialog(context),
@@ -175,30 +186,20 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildStatsGrid(analyticsAsync, usersAsync),
                   const SizedBox(height: 24),
-                  Text(
-                    AppLabels.quickActions(context),
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text(AppLabels.quickActions(context), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   _buildQuickActions(context),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        AppLabels.recentClients(context),
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Text(AppLabels.recentClients(context), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                       TextButton(
                         onPressed: () {
                           AutoTabsRouter.of(context).setActiveIndex(1);
@@ -207,22 +208,18 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+
                   _buildRecentClientsList(usersAsync),
-                  const SizedBox(height: 80),
                 ],
               ),
             ),
           ),
         ],
       ),
-    );
+    ));
   }
 
-  Widget _buildStatsGrid(
-    AsyncValue<dynamic> analyticsAsync,
-    AsyncValue<dynamic> usersAsync,
-  ) {
+  Widget _buildStatsGrid(AsyncValue<dynamic> analyticsAsync, AsyncValue<dynamic> usersAsync) {
     return GridView.count(
       crossAxisCount: 2,
       crossAxisSpacing: 16,
@@ -277,23 +274,12 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
     );
   }
 
-  Widget _buildStatCard({
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-  }) {
+  Widget _buildStatCard({required String title, required String value, required IconData icon, required Color color}) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -306,28 +292,17 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
               Icon(icon, color: color, size: 28),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
                 child: Text(
                   title,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
           ),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).textTheme.bodyLarge?.color,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color),
           ),
         ],
       ),
@@ -338,6 +313,15 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
+        _buildActionButton(
+          context,
+          icon: Icons.person_add_alt_1_rounded,
+          label: "Add Client",
+          color: Colors.orange,
+          onTap: () {
+            context.router.push(AgentAddClientRoute());
+          },
+        ),
         _buildActionButton(
           context,
           icon: Icons.analytics,
@@ -374,20 +358,13 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           Container(
             width: 60,
             height: 60,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
             child: Icon(icon, color: color, size: 28),
           ),
           const SizedBox(height: 8),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).textTheme.bodyMedium?.color,
-            ),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Theme.of(context).textTheme.bodyMedium?.color),
           ),
         ],
       ),
@@ -399,10 +376,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
       data: (users) {
         if (users.isEmpty) {
           return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(AppLabels.noClientsYet(context)),
-            ),
+            child: Padding(padding: const EdgeInsets.all(16.0), child: Text(AppLabels.noClientsYet(context))),
           );
         }
         final recentUsers = users.take(5).toList();
@@ -423,33 +397,27 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
               ),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Theme.of(
-                    context,
-                  ).primaryColor.withOpacity(0.1),
-                  backgroundImage: user.profileImageUrl.isNotEmpty
-                      ? NetworkImage(user.profileImageUrl)
-                      : null,
+                  backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                  backgroundImage: user.profileImageUrl.isNotEmpty ? NetworkImage(user.profileImageUrl) : null,
                   child: user.profileImageUrl.isEmpty
                       ? Text(
                           user.fullName.isNotEmpty
-                              ? user.fullName[0].toUpperCase()
+                              ? user.fullName.en.isNotEmpty
+                                    ? user.fullName.en[0].toUpperCase()
+                                    : user.fullName.hi.isNotEmpty
+                                    ? user.fullName.hi[0].toUpperCase()
+                                    : '?'
                               : '?',
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          style: TextStyle(color: Theme.of(context).primaryColor),
                         )
                       : null,
                 ),
-                title: Text(
-                  user.fullName,
+                title: BilingualParser(
+                  value: user.fullName,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(user.email),
-                trailing: const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 16,
-                  color: Colors.grey,
-                ),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
                 onTap: () {
                   context.router.push(ViewUserRoute(userId: user.uid));
                 },
@@ -459,8 +427,7 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) =>
-          Center(child: Text('${AppLabels.errorOccurred(context)}: $e')),
+      error: (e, _) => Center(child: Text('${AppLabels.errorOccurred(context)}: $e')),
     );
   }
 
@@ -472,20 +439,14 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
           title: Text(AppLabels.logout(context)),
           content: Text(AppLabels.logoutConfirm(context)),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(AppLabels.cancel(context)),
-            ),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text(AppLabels.cancel(context))),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               onPressed: () {
                 Navigator.pop(context);
                 FirebaseAuth.instance.signOut();
               },
-              child: Text(
-                AppLabels.logout(context),
-                style: const TextStyle(color: Colors.white),
-              ),
+              child: Text(AppLabels.logout(context), style: const TextStyle(color: Colors.white)),
             ),
           ],
         );

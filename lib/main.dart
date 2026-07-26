@@ -182,11 +182,7 @@ Future<void> main() async {
         await AwesomeNotifications().requestPermissionToSendNotifications();
       }
 
-      await Future.wait([
-        NotificationService.init(),
-        InAppMessagingService.init(),
-        FlutterScreenshotBlocker.enableScreenshotBlocking(),
-      ]);
+      await Future.wait([NotificationService.init(), InAppMessagingService.init(), FlutterScreenshotBlocker.enableScreenshotBlocking()]);
     } catch (e, s) {
       debugPrint('Initialization Error: $e');
       debugPrintStack(stackTrace: s);
@@ -199,12 +195,7 @@ Future<void> main() async {
     debugPrint(details.exceptionAsString());
   };
 
-  runApp(
-    ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-      ],
-      child: const App(),
-    ),
-  );
+  runApp(SafeArea(
+      top: false,
+      child: ProviderScope(overrides: [sharedPreferencesProvider.overrideWithValue(sharedPreferences)], child: App())));
 }

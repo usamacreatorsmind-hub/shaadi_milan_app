@@ -331,14 +331,7 @@ class _TextFormWidgetState extends ConsumerState<AppTextField> {
               ),
             ),
           ),
-          validator:
-              widget.validator ??
-              (value) {
-                if (value == null || value.isEmpty) {
-                  return '${AppLabels.pleaseEnter(context)} ${widget.label.toLowerCase()}';
-                }
-                return null;
-              },
+          validator: widget.validator,
         ),
       ),
     );
@@ -450,14 +443,7 @@ class _AppDropDownWidgetState<T> extends ConsumerState<AppDropDown<T>> {
           )
           .toList(),
       onChanged: widget.onChanged,
-      validator:
-          widget.validator ??
-          (value) {
-            if (value == null) {
-              return '${AppLabels.pleaseSelect(context)} ${widget.label.toLowerCase()}';
-            }
-            return null;
-          },
+      validator: widget.validator,
     );
   }
 }

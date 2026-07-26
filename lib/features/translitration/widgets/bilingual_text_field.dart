@@ -41,6 +41,7 @@ class _BilingualTextFieldState extends ConsumerState<BilingualTextField> {
   late TextEditingController _englishController;
   Timer? _debounce;
   bool _isTransliterating = false;
+  bool _isHindiManuallyEdited = false;
 
   @override
   void initState() {
@@ -73,29 +74,47 @@ class _BilingualTextFieldState extends ConsumerState<BilingualTextField> {
       return;
     }
 
+    // If user is typing in Hindi, mark it as manually edited to prevent overwrite
+    if (!isEnglishInput) {
+      _isHindiManuallyEdited = true;
+    } else {
+      _isHindiManuallyEdited = false;
+    }
+
     setState(() => _isTransliterating = true);
-    _debounce = Timer(const Duration(milliseconds: 1200), () async {
+    _debounce = Timer(const Duration(milliseconds: 800), () async {
       try {
         final targetLanguage = isEnglishInput ? 'hi' : 'en';
-        final result = await ref
-            .read(transliterationProvider)
-            .convert(value, targetLanguage: targetLanguage);
+
+        // Skip auto-syncing Hindi if user just manually typed in Hindi box
+        if (isEnglishInput && _isHindiManuallyEdited) {
+          setState(() => _isTransliterating = false);
+          return;
+        }
+
+        // Clean up the text
+        final cleanValue = value.trim().replaceAll(RegExp(r'\s+'), ' ');
+        if (cleanValue.isEmpty) {
+          setState(() => _isTransliterating = false);
+          return;
+        }
+
+        final result = await ref.read(transliterationProvider).convert(cleanValue, targetLanguage: targetLanguage);
 
         if (mounted) {
           if (isEnglishInput) {
-            // Only update if the result is different to avoid cursor jumping and loops
-            if (widget.controller.text != result) {
+            // Only update Hindi if user isn't actively fixing it
+            if (widget.controller.text.trim() != result.trim() && !_isHindiManuallyEdited) {
               widget.controller.text = result;
             }
           } else {
-            if (_englishController.text != result) {
+            if (_englishController.text.trim() != result.trim()) {
               _englishController.text = result;
             }
           }
         }
       } catch (e) {
         debugPrint("Transliteration error: $e");
-        // We don't show snackbar here anymore to avoid annoying the user if bidirectional isn't 100% supported
       } finally {
         if (mounted) setState(() => _isTransliterating = false);
       }
@@ -110,8 +129,7 @@ class _BilingualTextFieldState extends ConsumerState<BilingualTextField> {
         // English Field
         AppTextField(
           controller: _englishController,
-          label:
-              "${widget.label} ${AppLocalizations.of(context)!.englishSuffix}",
+          label: "${widget.label} ${AppLocalizations.of(context)!.englishSuffix}",
           hint: AppLocalizations.of(context)!.transliterateHint,
           prefixIcon: Icons.abc,
           iconColor: Theme.of(context).primaryColor,
@@ -125,11 +143,7 @@ class _BilingualTextFieldState extends ConsumerState<BilingualTextField> {
         if (_isTransliterating)
           const Padding(
             padding: EdgeInsets.only(left: 20.0, top: 4),
-            child: SizedBox(
-              height: 2,
-              width: 100,
-              child: LinearProgressIndicator(),
-            ),
+            child: SizedBox(height: 2, width: 100, child: LinearProgressIndicator()),
           ),
 
         const SizedBox(height: 12),

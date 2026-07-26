@@ -15,20 +15,13 @@ class UserPhysicalFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final PhysicalProfile? existingPhysicalProfile;
   final void Function(VoidCallback)? registerSubmit;
-  const UserPhysicalFormScreen({
-    super.key,
-    required this.mode,
-    required this.existingPhysicalProfile,
-    this.registerSubmit,
-  });
+  const UserPhysicalFormScreen({super.key, required this.mode, required this.existingPhysicalProfile, this.registerSubmit});
 
   @override
-  ConsumerState<UserPhysicalFormScreen> createState() =>
-      _UserPhysicalFormScreenState();
+  ConsumerState<UserPhysicalFormScreen> createState() => _UserPhysicalFormScreenState();
 }
 
-class _UserPhysicalFormScreenState
-    extends ConsumerState<UserPhysicalFormScreen> {
+class _UserPhysicalFormScreenState extends ConsumerState<UserPhysicalFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _disabilityDetailsController = TextEditingController();
   final _disabilityDetailsEnController = TextEditingController();
@@ -67,21 +60,14 @@ class _UserPhysicalFormScreenState
   void initState() {
     super.initState();
     widget.registerSubmit?.call(_submitForm);
-    if (widget.mode == FormMode.edit &&
-        widget.existingPhysicalProfile != null) {
+    if (widget.mode == FormMode.edit && widget.existingPhysicalProfile != null) {
       final profile = widget.existingPhysicalProfile!;
       _selectedHeight = profile.height.round();
       _selectedWeight = profile.weight.round();
 
-      _selectedBodyType = _bodyTypeOptions.values.firstWhere(
-        (e) => e.en == profile.bodyType.en,
-        orElse: () => profile.bodyType,
-      );
+      _selectedBodyType = _bodyTypeOptions.values.firstWhere((e) => e.en == profile.bodyType.en, orElse: () => profile.bodyType);
 
-      _selectedComplexion = _complexionOptions.values.firstWhere(
-        (e) => e.en == profile.complexion.en,
-        orElse: () => profile.complexion,
-      );
+      _selectedComplexion = _complexionOptions.values.firstWhere((e) => e.en == profile.complexion.en, orElse: () => profile.complexion);
 
       _physicallyChallenged = profile.physicallyChallenged;
       _disabilityDetailsController.text = profile.disabilityDetails?.hi ?? '';
@@ -97,42 +83,35 @@ class _UserPhysicalFormScreenState
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      if (_selectedBodyType == null ||
-          _selectedComplexion == null ||
-          _selectedHeight == null ||
-          _selectedWeight == null) {
-        return;
-      }
+    final notifier = ref.read(userPhysicalControllerProvider.notifier);
 
-      final notifier = ref.read(userPhysicalControllerProvider.notifier);
+    final disability = _physicallyChallenged
+        ? BilingualValue(hi: _disabilityDetailsController.text, en: _disabilityDetailsEnController.text)
+        : null;
 
-      final disability = _physicallyChallenged
-          ? BilingualValue(
-              hi: _disabilityDetailsController.text,
-              en: _disabilityDetailsEnController.text,
-            )
-          : null;
+    final height = _selectedHeight?.toDouble() ?? 160.0;
+    final weight = _selectedWeight?.toDouble() ?? 60.0;
+    final bodyType = _selectedBodyType ?? _bodyTypeOptions['Average']!;
+    final complexion = _selectedComplexion ?? _complexionOptions['Wheatish']!;
 
-      if (widget.mode == FormMode.create) {
-        notifier.savePhysicals(
-          height: _selectedHeight!.toDouble(),
-          weight: _selectedWeight!.toDouble(),
-          bodyType: _selectedBodyType!,
-          complexion: _selectedComplexion!,
-          physicallyChallenged: _physicallyChallenged,
-          disabilityDetails: disability,
-        );
-      } else {
-        notifier.updatePhysicals(
-          height: _selectedHeight!.toDouble(),
-          weight: _selectedWeight!.toDouble(),
-          bodyType: _selectedBodyType!,
-          complexion: _selectedComplexion!,
-          physicallyChallenged: _physicallyChallenged,
-          disabilityDetails: disability,
-        );
-      }
+    if (widget.mode == FormMode.create) {
+      notifier.savePhysicals(
+        height: height,
+        weight: weight,
+        bodyType: bodyType,
+        complexion: complexion,
+        physicallyChallenged: _physicallyChallenged,
+        disabilityDetails: disability,
+      );
+    } else {
+      notifier.updatePhysicals(
+        height: height,
+        weight: weight,
+        bodyType: bodyType,
+        complexion: complexion,
+        physicallyChallenged: _physicallyChallenged,
+        disabilityDetails: disability,
+      );
     }
   }
 
@@ -148,30 +127,16 @@ class _UserPhysicalFormScreenState
     final physicalState = ref.watch(userPhysicalControllerProvider);
     final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
-    ref.listen<PhysicalState>(userPhysicalControllerProvider, (
-      previous,
-      current,
-    ) {
+    ref.listen<PhysicalState>(userPhysicalControllerProvider, (previous, current) {
       if (current.error != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
       } else if (current.physical != null && !physicalState.isLoading) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLabels.physicalProfileSavedSuccessfully(context)),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.physicalProfileSavedSuccessfully(context))));
       }
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          AppLabels.physicalDetails(context),
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
+      appBar: AppBar(title: Text(AppLabels.physicalDetails(context), style: Theme.of(context).textTheme.headlineMedium)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -186,12 +151,6 @@ class _UserPhysicalFormScreenState
                 onChanged: (value) {
                   setState(() => _selectedHeight = value);
                 },
-                validator: (value) {
-                  if (value == null) {
-                    return AppLabels.isRequired(context);
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16),
               AppDropDown<int>(
@@ -201,12 +160,6 @@ class _UserPhysicalFormScreenState
                 itemLabel: (kg) => '$kg kg',
                 onChanged: (value) {
                   setState(() => _selectedWeight = value);
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return AppLabels.isRequired(context);
-                  }
-                  return null;
                 },
               ),
               const SizedBox(height: 16),
@@ -218,12 +171,6 @@ class _UserPhysicalFormScreenState
                 onChanged: (value) {
                   setState(() => _selectedBodyType = value);
                 },
-                validator: (value) {
-                  if (value == null) {
-                    return AppLabels.selectBodyType(context);
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16),
               AppDropDown<BilingualValue>(
@@ -233,12 +180,6 @@ class _UserPhysicalFormScreenState
                 itemLabel: (comp) => isHindi ? comp.hi : comp.en,
                 onChanged: (value) {
                   setState(() => _selectedComplexion = value);
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return AppLabels.selectComplexion(context);
-                  }
-                  return null;
                 },
               ),
               const SizedBox(height: 16),
@@ -259,9 +200,7 @@ class _UserPhysicalFormScreenState
                   prefixIcon: Icons.accessible,
                   label: AppLabels.disabilityDetails(context),
                   hint: AppLabels.disabilityDetailsHint(context),
-                  validator: (v) => v == null || v.isEmpty
-                      ? AppLabels.pleaseEnter(context)
-                      : null,
+                  validator: (v) => v == null || v.isEmpty ? AppLabels.pleaseEnter(context) : null,
                 ),
               ],
               const SizedBox(height: 20),
@@ -270,10 +209,7 @@ class _UserPhysicalFormScreenState
               else
                 (widget.registerSubmit != null
                     ? const SizedBox.shrink()
-                    : AppButton(
-                        onPressed: _submitForm,
-                        text: AppLabels.physicalProfile(context),
-                      )),
+                    : AppButton(onPressed: _submitForm, text: AppLabels.physicalProfile(context))),
             ],
           ),
         ),
