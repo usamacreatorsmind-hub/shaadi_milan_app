@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:shadi_milan/app/providers/global_providers.dart';
 import 'package:shadi_milan/app/router/app_router.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
-
 import '../../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 
