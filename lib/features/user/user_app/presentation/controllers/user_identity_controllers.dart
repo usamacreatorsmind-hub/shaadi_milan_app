@@ -19,20 +19,20 @@ class UserIdentityController extends StateNotifier<IdentityState> {
 
   Future<void> updateIdentity({
     required BilingualValue gender,
+    required BilingualValue firstName,
+    required BilingualValue lastName,
     required DateTime dob,
     required int age,
-    required String aadhar,
-    required BilingualValue aboutMe,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     final identityProfile = IdentityProfile(
       profileId: _uid,
       gender: gender,
+      firstName: firstName,
+      lastName: lastName,
       dob: dob,
       age: age,
-      aadhar: aadhar,
-      aboutMe: aboutMe,
     );
 
     try {
@@ -52,20 +52,20 @@ class UserIdentityController extends StateNotifier<IdentityState> {
 
   Future<void> saveIdentity({
     required BilingualValue gender,
+    required BilingualValue firstName,
+    required BilingualValue lastName,
     required DateTime dob,
     required int age,
-    required String aadhar,
-    required BilingualValue aboutMe,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     final identityProfile = IdentityProfile(
       profileId: _uid,
-      aboutMe: aboutMe,
+      firstName: firstName,
+      lastName: lastName,
       gender: gender,
       dob: dob,
       age: age,
-      aadhar: aadhar,
     );
 
     try {

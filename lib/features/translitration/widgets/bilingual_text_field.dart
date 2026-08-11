@@ -20,6 +20,7 @@ class BilingualTextField extends ConsumerStatefulWidget {
   final String? Function(String?)? validator;
   final int maxLines;
   final TextInputType keyboardType;
+  final bool showHindi;
 
   const BilingualTextField({
     super.key,
@@ -31,6 +32,7 @@ class BilingualTextField extends ConsumerStatefulWidget {
     this.validator,
     this.maxLines = 1,
     this.keyboardType = TextInputType.text,
+    this.showHindi = true,
   });
 
   @override
@@ -129,38 +131,40 @@ class _BilingualTextFieldState extends ConsumerState<BilingualTextField> {
         // English Field
         AppTextField(
           controller: _englishController,
-          label: "${widget.label} ${AppLocalizations.of(context)!.englishSuffix}",
-          hint: AppLocalizations.of(context)!.transliterateHint,
-          prefixIcon: Icons.abc,
+          label: widget.showHindi ? "${widget.label} ${AppLocalizations.of(context)!.englishSuffix}" : widget.label,
+          hint: widget.showHindi ? AppLocalizations.of(context)!.transliterateHint : widget.hint,
+          prefixIcon: widget.showHindi ? Icons.abc : widget.prefixIcon,
           iconColor: Theme.of(context).primaryColor,
           obscureText: false,
           keyboardType: widget.keyboardType,
           maxLines: widget.maxLines,
-          validator: (v) => null,
+          validator: (v) => widget.showHindi ? null : widget.validator?.call(v),
           onChanged: (v) => _onFieldChanged(v, true),
         ),
 
-        if (_isTransliterating)
+        if (widget.showHindi && _isTransliterating)
           const Padding(
             padding: EdgeInsets.only(left: 20.0, top: 4),
             child: SizedBox(height: 2, width: 100, child: LinearProgressIndicator()),
           ),
 
-        const SizedBox(height: 12),
+        if (widget.showHindi) ...[
+          const SizedBox(height: 12),
 
-        // Hindi Field
-        AppTextField(
-          controller: widget.controller,
-          label: "${widget.label} (हिन्दी)",
-          hint: widget.hint,
-          prefixIcon: widget.prefixIcon,
-          iconColor: Theme.of(context).primaryColor,
-          obscureText: false,
-          keyboardType: widget.keyboardType,
-          maxLines: widget.maxLines,
-          validator: widget.validator,
-          onChanged: (v) => _onFieldChanged(v, false),
-        ),
+          // Hindi Field
+          AppTextField(
+            controller: widget.controller,
+            label: "${widget.label} (हिन्दी)",
+            hint: widget.hint,
+            prefixIcon: widget.prefixIcon,
+            iconColor: Theme.of(context).primaryColor,
+            obscureText: false,
+            keyboardType: widget.keyboardType,
+            maxLines: widget.maxLines,
+            validator: widget.validator,
+            onChanged: (v) => _onFieldChanged(v, false),
+          ),
+        ],
       ],
     );
   }

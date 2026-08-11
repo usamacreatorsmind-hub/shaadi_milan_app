@@ -1,3 +1,4 @@
+import 'package:shadi_milan/core/notification/notification_service.dart';
 import '../../data/repositories_impl/data_source/firebase_auth_ds.dart';
 import '../../domain/states/agent_state.dart';
 import '../../domain/states/user_state.dart';
@@ -22,7 +23,16 @@ final authStateProvider = StreamProvider<Either<AgentEntity, UserEntity>?>((
   ref,
 ) {
   final authRepository = ref.watch(authRepositoryProvider);
-  return authRepository.authStateChanges();
+  final stream = authRepository.authStateChanges();
+
+  stream.listen((either) {
+    either?.fold(
+      (agent) => NotificationService.saveAdminTokenToFirestore(agent.uid),
+      (user) => NotificationService.saveUserTokenToFirestore(user.uid),
+    );
+  });
+
+  return stream;
 });
 
 /// Helper to invalidate auth cache after profile creation

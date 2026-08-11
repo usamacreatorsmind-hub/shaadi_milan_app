@@ -263,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @navHome.
   ///
   /// In en, this message translates to:
-  /// **'Home'**
+  /// **'Matches'**
   String get navHome;
 
   /// No description provided for @navWishlist.
@@ -283,6 +283,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get navProfile;
+
+  /// No description provided for @navChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get navChat;
 
   /// No description provided for @navDashboard.
   ///
@@ -407,7 +413,7 @@ abstract class AppLocalizations {
   /// No description provided for @home.
   ///
   /// In en, this message translates to:
-  /// **'Home'**
+  /// **'Matches'**
   String get home;
 
   /// No description provided for @homeSubtitle.

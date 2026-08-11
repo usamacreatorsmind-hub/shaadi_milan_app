@@ -124,33 +124,33 @@ class _MatrimonyFormFlowScreenState extends ConsumerState<MatrimonyFormFlowScree
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 80.0),
+            padding: EdgeInsets.only(bottom: state.step == MatrimonyStep.user ? 0.0 : 80.0),
             child: IndexedStack(index: MatrimonyStep.values.indexOf(state.step), children: _buildSteps(state)),
           ),
-          Positioned(
-            bottom: 30,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Row(
-                children: [
-                  // ⬅ PREVIOUS
-                  if (state.step != MatrimonyStep.identity) ...[
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          ref.read(metrimonyControllerProvider.notifier).previousStep();
-                        },
-                        child: Text(AppLocalizations.of(context)!.back),
+          if (state.step != MatrimonyStep.user)
+            Positioned(
+              bottom: 20,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Row(
+                  children: [
+                    // ⬅ PREVIOUS
+                    if (state.step != MatrimonyStep.identity) ...[
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            ref.read(metrimonyControllerProvider.notifier).previousStep();
+                          },
+                          child: Text(AppLabels.back(context)),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                  ],
+                      const SizedBox(width: 12),
+                    ],
 
-                  // ⏭ SKIP (Always enabled to make data filling non-mandatory)
-                  if (state.step != MatrimonyStep.user) ...[
+                    // ⏭ SKIP (Always enabled to make data filling non-mandatory)
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () {
@@ -162,17 +162,12 @@ class _MatrimonyFormFlowScreenState extends ConsumerState<MatrimonyFormFlowScree
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         icon: const Icon(Icons.skip_next_rounded, size: 20),
-                        label: const Text(
-                          "Skip",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        label: const Text("Skip", style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
                     const SizedBox(width: 12),
-                  ],
 
-                  // ➡ NEXT
-                  if (state.step != MatrimonyStep.user)
+                    // ➡ NEXT
                     Expanded(
                       child: FilledButton(
                         onPressed: () {
@@ -186,13 +181,13 @@ class _MatrimonyFormFlowScreenState extends ConsumerState<MatrimonyFormFlowScree
                         },
                         child: state.isLoading
                             ? const SizedBox(height: 40, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                            : Text(AppLocalizations.of(context)!.next),
+                            : Text(AppLabels.next(context)),
                       ),
                     ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

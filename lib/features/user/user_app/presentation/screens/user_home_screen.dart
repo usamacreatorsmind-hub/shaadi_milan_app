@@ -1,3 +1,6 @@
+import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
@@ -5,13 +8,8 @@ import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_state
 import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 
-import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
-import '../../../../../app/custom/custom_widgets/user_drawer.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
-import '../../../../widgets/marquee.dart';
-
 import '../../../../../core/filters/home_filter_controller.dart';
-
 import '../../../../../app/router/app_router.dart';
 import '../../domain/states/religion_state.dart';
 import '../../domain/states/state_city.dart';
@@ -24,6 +22,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// =======================
 /// USER HOME SCREEN
 /// =======================
+
 @RoutePage()
 class UserHomeScreen extends ConsumerStatefulWidget {
   const UserHomeScreen({super.key});
@@ -82,9 +81,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
       final states = locationAsync.value!;
       final stateObj = states.where((s) => s.name == filter.state).firstOrNull;
       if (stateObj != null) {
-        final cityObj = stateObj.cities
-            .where((c) => c.id == filter.city || c.name == filter.city)
-            .firstOrNull;
+        final cityObj = stateObj.cities.where((c) => c.id == filter.city || c.name == filter.city).firstOrNull;
         if (cityObj != null) {
           resolvedCity = cityObj.name;
         }
@@ -93,14 +90,10 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
 
     if (religionsAsync.hasValue) {
       final religions = religionsAsync.value!;
-      final religionObj = religions
-          .where((r) => r.id == filter.religion || r.name == filter.religion)
-          .firstOrNull;
+      final religionObj = religions.where((r) => r.id == filter.religion || r.name == filter.religion).firstOrNull;
       if (religionObj != null) {
         resolvedReligion = religionObj.name;
-        final casteObj = religionObj.castes
-            .where((c) => c.id == filter.caste || c.name == filter.caste)
-            .firstOrNull;
+        final casteObj = religionObj.castes.where((c) => c.id == filter.caste || c.name == filter.caste).firstOrNull;
         if (casteObj != null) {
           resolvedCaste = casteObj.name;
         }
@@ -122,33 +115,10 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
     }
 
     bool isRecommended(MatrimonyProfileViewModel viewModel) {
-      // COMMENTED OUT AS PER REQUEST - WE NOW SHOW ALL PROFILES DIRECTLY
       return true;
-      /*
-      final profile = viewModel.profile;
-      final profileUser = viewModel.user;
-
-      final candidateIds = <String>{
-        profile.userId,
-        profile.metrimonyId,
-        profile.identity.profileId,
-        profileUser?.uid ?? '',
-        profileUser?.profileId ?? '',
-        profileUser?.metrimonyId ?? '',
-      }..removeWhere((id) => id.isEmpty);
-
-      final matches = candidateIds.any(recommendedProfileIdSet.contains);
-      debugPrint(
-        'Recommended check for ${profileUser?.fullName ?? profile.userId}: '
-        'candidates=$candidateIds, suggested=$recommendedProfileIds, match=$matches',
-      );
-      return matches;
-      */
     }
 
     return Scaffold(
-      drawer: UserDrawer(userAsync: currentUserAsync),
-
       body: currentUserAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -170,116 +140,45 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
           if (paymentState.status == PayStatus.idle) {
             return CustomScrollView(
               slivers: [
-                ModernGradientAppBar(
-                  title: AppLabels.home(context),
-                  subtitle: AppLabels.homeSubtitle(context),
-                  leading: Builder(
-                    builder: (context) => IconButton(
-                      icon: const Icon(Icons.menu, color: Colors.white),
-                      onPressed: () => Scaffold.of(context).openDrawer(),
-                    ),
+                SliverAppBar(
+                  pinned: true,
+                  floating: true,
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  title: const Text(
+                    "My matches",
+                    style: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold),
                   ),
+                  centerTitle: true,
                   actions: [
                     IconButton(
-                      icon: const Icon(
-                        Icons.notifications_outlined,
-                        color: Colors.white,
-                      ),
-                      onPressed: () =>
-                          context.router.push(const UserNotificationRoute()),
+                      icon: const Icon(Icons.notifications_none_outlined, color: Colors.black87),
+                      onPressed: () => context.router.push(const UserNotificationRoute()),
                     ),
                   ],
                 ),
-                // other slivers...
 
-                /// ================= LOCATION BAR =================
+                /// ================= FILTER CHIPS =================
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     child: Row(
                       children: [
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  color: Theme.of(context).primaryColor,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Marquee(
-                                    pauseDuration: const Duration(milliseconds: 500),
-                                    velocity: 50,
-
-                                    filterText.isEmpty
-                                        ? AppLabels.allProfiles(context)
-                                        : filterText,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                        _FilterChip(label: "Filters", icon: Icons.tune, onTap: () => _showFilterDialog(context)),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: "Just Joined",
+                          isSelected: filter.justJoined,
+                          onTap: () => ref.read(homeFilterProvider.notifier).toggleJustJoined(),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.filter_list),
-                          onPressed: () {
-                            showGeneralDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              barrierLabel: 'Filter',
-                              transitionDuration: const Duration(
-                                milliseconds: 400,
-                              ),
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const FilterRightSheet(),
-                              transitionBuilder:
-                                  (
-                                    context,
-                                    animation,
-                                    secondaryAnimation,
-                                    child,
-                                  ) {
-                                    return SlideTransition(
-                                      position: Tween(
-                                        begin: const Offset(1, 0),
-                                        end: Offset.zero,
-                                      ).animate(animation),
-                                      child: child,
-                                    );
-                                  },
-                            );
-                          },
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: "From my City",
+                          isSelected: filter.fromMyCity,
+                          onTap: () => ref.read(homeFilterProvider.notifier).toggleFromMyCity(),
                         ),
                       ],
-                    ),
-                  ),
-                ),
-
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: _HomeSummaryCard(
-                      fullName: user.fullName.en,
-                      hasFilter: filterText.isNotEmpty,
-                      filterText: filterText.isEmpty
-                          ? AppLabels.allProfiles(context)
-                          : filterText,
                     ),
                   ),
                 ),
@@ -293,19 +192,12 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.errorContainer,
                           borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.error.withValues(alpha: 0.35),
-                          ),
+                          border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.35)),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.warning_amber_rounded,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
+                            Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
@@ -316,30 +208,19 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onErrorContainer,
+                                      color: Theme.of(context).colorScheme.onErrorContainer,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     AppLabels.completeProfileMessage(context),
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onErrorContainer,
-                                    ),
+                                    style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onErrorContainer),
                                   ),
                                   const SizedBox(height: 10),
                                   TextButton.icon(
-                                    onPressed: () => context.router.push(
-                                      const MatrimonyFormFlowRoute(),
-                                    ),
+                                    onPressed: () => context.router.push(const MatrimonyFormFlowRoute()),
                                     icon: const Icon(Icons.edit_note_rounded),
-                                    label: Text(
-                                      AppLabels.completeProfileButton(context),
-                                    ),
+                                    label: Text(AppLabels.completeProfileButton(context)),
                                   ),
                                 ],
                               ),
@@ -352,70 +233,64 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
 
                 /// ================= PROFILES LIST =================
                 homeState.metrimonyProfiles.when(
-                  loading: () => const SliverToBoxAdapter(
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
+                  loading: () => const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator())),
                   error: (e, _) {
                     debugPrint('Error loading profiles: $e');
 
-                    return SliverToBoxAdapter(
-                      child: Center(child: Text(e.toString())),
-                    );
+                    return SliverToBoxAdapter(child: Center(child: Text(e.toString())));
                   },
                   data: (profiles) {
-                    final filteredProfiles = profiles.where((viewModel) {
+                    final currentUserProfile = profiles.where((p) => p.profile.userId == user.uid).firstOrNull?.profile;
+                    final myCity = currentUserProfile?.address.city.en.toLowerCase().trim() ?? '';
+
+                    var filteredProfiles = profiles.where((viewModel) {
                       final profile = viewModel.profile;
+
+                      // Don't show the current user's own profile in the matches list
+                      if (profile.userId == user.uid) return false;
 
                       // If no state is selected, or if state matches
                       final stateMatch =
-                          filter.state.isEmpty ||
-                          (profile.address.state.en.toLowerCase() ==
-                              filter.state.toLowerCase());
+                          filter.state.isEmpty || (profile.address.state.en.toLowerCase().trim() == filter.state.toLowerCase().trim());
+
                       // If no city is selected, or if city matches
                       final cityMatch =
-                          filter.city.isEmpty ||
-                          (profile.address.city.en.toLowerCase() ==
-                              filter.city.toLowerCase());
+                          filter.city.isEmpty || (profile.address.city.en.toLowerCase().trim() == filter.city.toLowerCase().trim());
 
                       // If no religion is selected, or if religion matches
                       final religionMatch =
                           filter.religion.isEmpty ||
-                          (profile.cultural.religion.en.toLowerCase() ==
-                              filter.religion.toLowerCase());
+                          (profile.cultural.religion.en.toLowerCase().trim() == filter.religion.toLowerCase().trim());
 
                       // If no caste is selected, or if caste matches
                       final casteMatch =
-                          filter.caste.isEmpty ||
-                          (profile.cultural.caste.en.toLowerCase() ==
-                              filter.caste.toLowerCase());
+                          filter.caste.isEmpty || (profile.cultural.caste.en.toLowerCase().trim() == filter.caste.toLowerCase().trim());
 
                       // Gender matching logic
-                      bool genderMatch;
+                      bool genderMatch = true;
                       final filterGender = filter.gender;
-                      if (filterGender.isEmpty) {
-                        // Initial/Default state: show opposite gender
-                        final currentUserGender =
-                            user.gender.en.toLowerCase();
-                        final opposite =
-                            (currentUserGender == 'male') ? 'female' : 'male';
-                        genderMatch =
-                            profile.identity.gender.en.toLowerCase() == opposite;
-                      } else if (filterGender == AppLabels.allProfiles(context)) {
-                        // Explicitly show all
-                        genderMatch = true;
-                      } else {
-                        // Filter by specific gender
-                        genderMatch =
-                            profile.identity.gender.en.toLowerCase() ==
-                            filterGender.toLowerCase();
+
+                      if (filterGender.isNotEmpty && filterGender != AppLabels.allProfiles(context)) {
+                        genderMatch = profile.identity.gender.en.toLowerCase() == filterGender.toLowerCase();
                       }
 
-                      return stateMatch &&
-                          cityMatch &&
-                          religionMatch &&
-                          casteMatch &&
-                          genderMatch;
+                      // "From my City" filter
+                      bool cityFilterMatch = true;
+                      if (filter.fromMyCity && myCity.isNotEmpty) {
+                        cityFilterMatch = profile.address.city.en.toLowerCase().trim() == myCity;
+                      }
+
+                      return stateMatch && cityMatch && religionMatch && casteMatch && genderMatch && cityFilterMatch;
                     }).toList();
+
+                    // "Just Joined" sorting: Sort by createdAt descending if enabled
+                    if (filter.justJoined) {
+                      filteredProfiles.sort((a, b) {
+                        final dateA = a.user?.createdAt ?? DateTime(1900);
+                        final dateB = b.user?.createdAt ?? DateTime(1900);
+                        return dateB.compareTo(dateA); // Newest first
+                      });
+                    }
 
                     // Only show recommended profiles
                     final visibleProfiles = filteredProfiles.where((viewModel) {
@@ -431,33 +306,17 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                             decoration: BoxDecoration(
                               color: Theme.of(context).cardColor,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.outlineVariant,
-                              ),
+                              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                             ),
                             child: Column(
                               children: [
-                                Icon(
-                                  Icons.search_off_rounded,
-                                  size: 42,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
+                                Icon(Icons.search_off_rounded, size: 42, color: Theme.of(context).colorScheme.primary),
                                 const SizedBox(height: 10),
-                                Text(
-                                  AppLabels.noProfilesFound(context),
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                Text(AppLabels.noProfilesFound(context), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                                 const SizedBox(height: 10),
                                 TextButton.icon(
                                   onPressed: () {
-                                    ref
-                                        .read(homeFilterProvider.notifier)
-                                        .reset();
+                                    ref.read(homeFilterProvider.notifier).reset();
                                   },
                                   icon: const Icon(Icons.refresh_rounded),
                                   label: Text(AppLabels.resetFilters(context)),
@@ -470,31 +329,42 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                     }
 
                     return SliverPadding(
-                      padding: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate((context, index) {
                           final viewModel = visibleProfiles[index];
                           final profile = viewModel.profile;
                           final user = viewModel.user;
                           final agent = viewModel.agent;
-                          final displayName = user?.fullName.en ?? 'N/A';
+                          final isHindi = Localizations.localeOf(context).languageCode == 'hi';
+                          final displayName = user != null ? (isHindi ? user.fullName.hi : user.fullName.en) : 'N/A';
+
                           final designation = profile.employment.designation;
+                          final caste = isHindi ? profile.cultural.caste.hi : profile.cultural.caste.en;
+                          final location = isHindi
+                              ? "${profile.address.city.hi}, ${profile.address.state.hi}"
+                              : "${profile.address.city.en}, ${profile.address.state.en}";
+
+                          final allImages = {
+                            if (profile.images.primaryImageUrl.isNotEmpty) profile.images.primaryImageUrl,
+                            ...profile.images.secondaryImageUrls.where((url) => url.isNotEmpty),
+                            if (profile.images.profileImageUrl.isNotEmpty) profile.images.profileImageUrl,
+                            if (profile.images.imageWithAgentUrl.isNotEmpty) profile.images.imageWithAgentUrl,
+                          }.toList(); // Ensure unique URLs
 
                           return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
+                            padding: const EdgeInsets.only(bottom: 24),
                             child: ProfileCard(
                               uid: profile.userId,
                               name: displayName.isEmpty ? 'N/A' : displayName,
                               age: profile.identity.age,
-                              designation:
-                                  designation?.isNotEmpty == true
-                                      ? designation!
-                                      : 'N/A',
-                              imageUrl: profile.images.primaryImageUrl,
+                              dob: profile.identity.dob,
+                              designation: designation,
+                              images: allImages,
                               agentDesignation: agent?.designation.label,
+                              location: location,
+                              height: "${profile.physical.height} cm",
+                              caste: caste,
                             ),
                           );
                         }, childCount: visibleProfiles.length),
@@ -515,70 +385,55 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
       ),
     );
   }
+
+  void _showFilterDialog(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Filter',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) => const FilterRightSheet(),
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween(begin: const Offset(1, 0), end: Offset.zero).animate(animation),
+          child: child,
+        );
+      },
+    );
+  }
 }
 
-class _HomeSummaryCard extends StatelessWidget {
-  final String fullName;
-  final bool hasFilter;
-  final String filterText;
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final IconData? icon;
+  final VoidCallback? onTap;
+  final bool isSelected;
 
-  const _HomeSummaryCard({
-    required this.fullName,
-    required this.hasFilter,
-    required this.filterText,
-  });
+  const _FilterChip({required this.label, this.icon, this.onTap, this.isSelected = false});
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        gradient: LinearGradient(
-          colors: [colors.primaryContainer, colors.surfaceContainerHighest],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? theme.primaryColor : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isSelected ? theme.primaryColor : Colors.grey.shade300),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${AppLabels.welcomeLabel(context)}${fullName.isEmpty ? 'User' : fullName.split(' ').first}',
-            style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            hasFilter
-                ? AppLabels.showingFiltered(context)
-                : AppLabels.showingAllMatches(context),
-            style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-            decoration: BoxDecoration(
-              color: colors.surface.withValues(alpha: 0.85),
-              borderRadius: BorderRadius.circular(999),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[Icon(icon, size: 16, color: isSelected ? Colors.white : Colors.grey.shade700), const SizedBox(width: 6)],
+            Text(
+              label,
+              style: TextStyle(color: isSelected ? Colors.white : Colors.grey.shade700, fontSize: 13, fontWeight: FontWeight.w500),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.tune_rounded, size: 16),
-                const SizedBox(width: 6),
-                Flexible(
-                  child: Text(
-                    filterText,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -608,10 +463,7 @@ class FilterRightSheet extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    AppLabels.filterProfiles(context),
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
+                  Text(AppLabels.filterProfiles(context), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   Row(
                     children: [
                       TextButton(
@@ -620,10 +472,7 @@ class FilterRightSheet extends ConsumerWidget {
                         },
                         child: Text(AppLabels.reset(context)),
                       ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
-                      ),
+                      IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
                     ],
                   ),
                 ],
@@ -638,26 +487,17 @@ class FilterRightSheet extends ConsumerWidget {
                       // ================= LOCATION SECTION =================
                       Text(
                         AppLabels.location(context),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                        ),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey),
                       ),
                       const SizedBox(height: 8),
                       locationAsync.when(
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
+                        loading: () => const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('Error: $e'),
                         data: (states) {
                           /// Selected state object
-                          final selectedState = states
-                              .where((s) => s.name == filter.state)
-                              .firstOrNull;
+                          final selectedState = states.where((s) => s.name == filter.state).firstOrNull;
 
-                          final selectedCity = selectedState?.cities
-                              .where((c) => c.id == filter.city || c.name == filter.city)
-                              .firstOrNull;
+                          final selectedCity = selectedState?.cities.where((c) => c.id == filter.city || c.name == filter.city).firstOrNull;
 
                           return Column(
                             children: [
@@ -668,9 +508,7 @@ class FilterRightSheet extends ConsumerWidget {
                                 itemLabel: (s) => s.name,
                                 onChanged: (val) {
                                   if (val != null) {
-                                    ref
-                                        .read(homeFilterProvider.notifier)
-                                        .updateState(val.name);
+                                    ref.read(homeFilterProvider.notifier).updateState(val.name);
                                   }
                                 },
                               ),
@@ -682,9 +520,7 @@ class FilterRightSheet extends ConsumerWidget {
                                 itemLabel: (c) => c.name,
                                 onChanged: (val) {
                                   if (val != null) {
-                                    ref
-                                        .read(homeFilterProvider.notifier)
-                                        .updateCity(val.id);
+                                    ref.read(homeFilterProvider.notifier).updateCity(val.id);
                                   }
                                 },
                               ),
@@ -698,11 +534,7 @@ class FilterRightSheet extends ConsumerWidget {
                       // ================= GENDER SECTION =================
                       Text(
                         AppLabels.gender(context),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                        ),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey),
                       ),
                       const SizedBox(height: 8),
                       _buildDropdown<String>(
@@ -712,9 +544,7 @@ class FilterRightSheet extends ConsumerWidget {
                         itemLabel: (g) => g,
                         onChanged: (val) {
                           if (val != null) {
-                            ref
-                                .read(homeFilterProvider.notifier)
-                                .updateGender(val);
+                            ref.read(homeFilterProvider.notifier).updateGender(val);
                           }
                         },
                       ),
@@ -724,21 +554,14 @@ class FilterRightSheet extends ConsumerWidget {
                       // ================= RELIGION SECTION =================
                       Text(
                         AppLabels.cultural(context),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                        ),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey),
                       ),
                       const SizedBox(height: 8),
                       religionsAsync.when(
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
+                        loading: () => const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Text('Error: $e'),
                         data: (religions) {
-                          final selectedReligion = religions
-                              .where((r) => r.id == filter.religion || r.name == filter.religion)
-                              .firstOrNull;
+                          final selectedReligion = religions.where((r) => r.id == filter.religion || r.name == filter.religion).firstOrNull;
 
                           final selectedCaste = selectedReligion?.castes
                               .where((c) => c.id == filter.caste || c.name == filter.caste)
@@ -753,9 +576,7 @@ class FilterRightSheet extends ConsumerWidget {
                                 itemLabel: (r) => r.name,
                                 onChanged: (val) {
                                   if (val != null) {
-                                    ref
-                                        .read(homeFilterProvider.notifier)
-                                        .updateReligion(val.id);
+                                    ref.read(homeFilterProvider.notifier).updateReligion(val.id);
                                   }
                                 },
                               ),
@@ -767,9 +588,7 @@ class FilterRightSheet extends ConsumerWidget {
                                 itemLabel: (c) => c.name,
                                 onChanged: (val) {
                                   if (val != null) {
-                                    ref
-                                        .read(homeFilterProvider.notifier)
-                                        .updateCaste(val.id);
+                                    ref.read(homeFilterProvider.notifier).updateCaste(val.id);
                                   }
                                 },
                               ),
@@ -786,10 +605,7 @@ class FilterRightSheet extends ConsumerWidget {
 
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(AppLabels.applyFilters(context)),
-                ),
+                child: ElevatedButton(onPressed: () => Navigator.pop(context), child: Text(AppLabels.applyFilters(context))),
               ),
             ],
           ),
@@ -814,13 +630,9 @@ class FilterRightSheet extends ConsumerWidget {
         DropdownButtonFormField<T>(
           isExpanded: true,
           value: items.contains(value) ? value : null,
-          items: items
-              .map((e) => DropdownMenuItem<T>(value: e, child: Text(itemLabel(e))))
-              .toList(),
+          items: items.map((e) => DropdownMenuItem<T>(value: e, child: Text(itemLabel(e)))).toList(),
           onChanged: onChanged,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
+          decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
         ),
       ],
     );
@@ -830,188 +642,196 @@ class FilterRightSheet extends ConsumerWidget {
 /// =======================
 /// PROFILE CARD (SIMPLE)
 /// =======================
-class ProfileCard extends StatelessWidget {
+class ProfileCard extends StatefulWidget {
   final String uid;
   final String name;
   final int age;
+  final DateTime dob;
   final dynamic designation;
-  final String imageUrl;
+  final List<String> images;
   final String? agentDesignation;
+  final String location;
+  final String height;
+  final String caste;
 
   const ProfileCard({
     super.key,
     required this.uid,
     required this.name,
     required this.age,
+    required this.dob,
     required this.designation,
-    required this.imageUrl,
+    required this.images,
     this.agentDesignation,
+    required this.location,
+    required this.height,
+    required this.caste,
   });
 
   @override
+  State<ProfileCard> createState() => _ProfileCardState();
+}
+
+class _ProfileCardState extends State<ProfileCard> {
+  int _currentImageIndex = 0;
+
+  @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(22),
-        onTap: () => context.router.push(UserDetailRoute(uid: uid)),
+        onTap: () => context.router.push(UserDetailRoute(uid: widget.uid)),
+        borderRadius: BorderRadius.circular(24),
         child: Container(
-          width: double.infinity,
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: colors.outlineVariant),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow.withValues(alpha: 0.06),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 15, offset: const Offset(0, 5))],
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(22),
-                ),
-                child: Stack(
-                  children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.70,
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.65,
                       width: double.infinity,
-                      child: imageUrl.isEmpty
+                      child: widget.images.isEmpty
                           ? Container(
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.person, size: 64),
+                              color: Colors.grey[200],
+                              child: const Icon(Icons.person, size: 80, color: Colors.grey),
                             )
-                          : Image.network(
-                              imageUrl,
-                              fit: BoxFit.fitHeight,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Container(
-                                    color: Colors.grey[300],
-                                    child: const Icon(Icons.person, size: 64),
+                          : Stack(
+                              children: [
+                                PageView.builder(
+                                  itemCount: widget.images.length,
+                                  onPageChanged: (index) {
+                                    setState(() {
+                                      _currentImageIndex = index;
+                                    });
+                                  },
+                                  itemBuilder: (context, index) {
+                                    return CachedNetworkImage(
+                                      imageUrl: widget.images[index],
+                                      fit: BoxFit.cover,
+                                      memCacheWidth: (MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio).round(),
+                                      placeholder: (context, url) => Shimmer.fromColors(
+                                        baseColor: Colors.grey[300]!,
+                                        highlightColor: Colors.grey[100]!,
+                                        child: Container(width: double.infinity, height: double.infinity, color: Colors.white),
+                                      ),
+                                      errorWidget: (context, url, error) => Container(
+                                        color: Colors.grey[200],
+                                        child: const Icon(Icons.error_outline, size: 80, color: Colors.grey),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                // Image Indicators (Tinder style)
+                                if (widget.images.length > 1)
+                                  Positioned(
+                                    top: 12,
+                                    left: 12,
+                                    right: 12,
+                                    child: Row(
+                                      children: List.generate(
+                                        widget.images.length,
+                                        (index) => Expanded(
+                                          child: Container(
+                                            height: 3,
+                                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                                            decoration: BoxDecoration(
+                                              color: _currentImageIndex == index ? Colors.white : Colors.white.withOpacity(0.4),
+                                              borderRadius: BorderRadius.circular(2),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
+                              ],
                             ),
                     ),
-                    Positioned.fill(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withValues(alpha: 0.65),
-                            ],
-                          ),
+                  ),
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.black.withOpacity(0.1), Colors.transparent, Colors.black.withOpacity(0.7)],
+                          stops: const [0.0, 0.5, 1.0],
                         ),
                       ),
                     ),
-                    Positioned(
-                      left: 14,
-                      right: 14,
-                      bottom: 14,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  Positioned(
+                    top: 24,
+                    right: 16,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(color: Colors.black.withOpacity(0.3), borderRadius: BorderRadius.circular(20)),
+                      child: Row(
                         children: [
-                          if (agentDesignation != null)
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: colors.primary.withValues(alpha: 0.8),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                agentDesignation!,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                            ),
+                          const Icon(Icons.image_outlined, color: Colors.white, size: 16),
+                          const SizedBox(width: 4),
                           Text(
-                            name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.cake_outlined,
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                '$age ${AppLabels.ageYrs(context)}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              const Icon(
-                                Icons.work_outline_rounded,
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 5),
-                              Expanded(
-                                child: designation is BilingualValue
-                                    ? BilingualParser(
-                                        value: designation,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      )
-                                    : Text(
-                                        designation.toString(),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                              ),
-                            ],
+                            "${widget.images.length}",
+                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: FilledButton.tonalIcon(
-                    onPressed: () =>
-                        context.router.push(UserDetailRoute(uid: uid)),
-                    icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                    label: Text(AppLabels.viewProfile(context)),
                   ),
-                ),
+                  Positioned(
+                    left: 20,
+                    bottom: 20,
+                    right: 20,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
+                        Text(
+                          "${widget.name}${widget.age > 0 ? ', ${widget.age}' : ''}",
+                          style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        if (widget.dob.year != 1900) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            "DOB: ${DateFormat('dd MMM yyyy').format(widget.dob)}",
+                            style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                        if (widget.height != "0.0 cm" || widget.location.isNotEmpty || widget.caste.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            [
+                              if (widget.height != "0.0 cm") widget.height,
+                              if (widget.location.isNotEmpty) widget.location,
+                              if (widget.caste.isNotEmpty) widget.caste,
+                            ].join(' • '),
+                            style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14),
+                          ),
+                        ],
+                        if (widget.designation != null &&
+                            widget.designation.toString().toLowerCase() != 'null' &&
+                            widget.designation.toString().isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.designation is BilingualValue
+                                ? (Localizations.localeOf(context).languageCode == 'hi'
+                                      ? (widget.designation as BilingualValue).hi
+                                      : (widget.designation as BilingualValue).en)
+                                : widget.designation.toString(),
+                            style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

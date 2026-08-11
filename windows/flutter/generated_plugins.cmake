@@ -12,7 +12,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_remote_config
   firebase_storage
   flutter_secure_storage_windows
-  flutter_timezone
   share_plus
   syncfusion_pdfviewer_windows
   url_launcher_windows

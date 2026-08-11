@@ -96,7 +96,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get agentIdLabel => 'Staff ID: ';
 
   @override
-  String get navHome => 'Home';
+  String get navHome => 'Matches';
 
   @override
   String get navWishlist => 'WishList';
@@ -106,6 +106,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navProfile => 'Profile';
+
+  @override
+  String get navChat => 'Chat';
 
   @override
   String get navDashboard => 'Dashboard';
@@ -168,7 +171,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noClientsYet => 'No clients yet';
 
   @override
-  String get home => 'Home';
+  String get home => 'Matches';
 
   @override
   String get homeSubtitle => 'Find your best match';

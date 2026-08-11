@@ -489,13 +489,12 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                 title: context.l10n.identityInformation,
                 icon: Icons.person,
                 children: [
+                  _InfoRow("First Name", profile.identity.firstName),
+                  _InfoRow("Last Name", profile.identity.lastName),
                   _InfoRow(context.l10n.fullName, profile.user.fullName),
                   _InfoRow(context.l10n.dateOfBirth, profile.identity.dob.toLocal().toString().split(' ')[0]),
                   _InfoRow(context.l10n.male, '${profile.identity.age} ${context.l10n.ageYrs}'),
                   _InfoRow(context.l10n.gender, profile.identity.gender),
-                  _InfoRow(context.l10n.aadharCard, profile.identity.aadhar),
-                  if (profile.identity.aboutMe.hi.isNotEmpty || profile.identity.aboutMe.en.isNotEmpty)
-                    _InfoRow(context.l10n.aboutMe, profile.identity.aboutMe),
                 ],
               ),
               const SizedBox(height: 16),
@@ -526,7 +525,6 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                 children: [
                   _InfoRow(context.l10n.religion, resolvedReligion),
                   _InfoRow(context.l10n.caste, resolvedCaste),
-                  _InfoRow(context.l10n.subCaste, profile.cultural.subCaste),
                   _InfoRow(context.l10n.languages, profile.cultural.languages.map((l) => langCode == 'hi' ? l.hi : l.en).join(', ')),
                 ],
               ),
@@ -541,8 +539,6 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                   if (!profile.education.isIlletrate && profile.education.education != null) ...[
                     _InfoRow(context.l10n.course, profile.education.education!.course),
                     _InfoRow(context.l10n.collegeUniversity, profile.education.education!.college),
-                    _InfoRow(context.l10n.passingYear, '${profile.education.education!.passingYear}'),
-                    _InfoRow(context.l10n.percentage, '${profile.education.education!.percentage}%'),
                   ],
                   if (profile.education.extraQualification?.qualifications.isNotEmpty == true)
                     _InfoRow(
@@ -561,7 +557,7 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                   _InfoRow(context.l10n.jobType, profile.employment.jobType),
                   if (profile.employment.company != null) _InfoRow(context.l10n.organization, profile.employment.company!),
                   if (profile.employment.designation != null) _InfoRow(context.l10n.designation, profile.employment.designation!),
-                  if (profile.employment.annualIncome != null) _InfoRow(context.l10n.annualIncome, '₹${profile.employment.annualIncome}'),
+                  if (profile.employment.annualIncome != null) _InfoRow(context.l10n.annualIncome, profile.employment.annualIncome!),
                   if (profile.employment.workLocation != null) _InfoRow(context.l10n.workLocation, profile.employment.workLocation!),
                 ],
               ),
@@ -588,8 +584,6 @@ class _MatrimonyProfileTab extends ConsumerWidget {
                 icon: Icons.location_on,
                 children: [
                   _InfoRow(context.l10n.address, profile.address.addressLine1),
-                  _InfoRow(context.l10n.post, profile.address.post),
-                  _InfoRow(context.l10n.policeStation, profile.address.policeStation),
                   _InfoRow(context.l10n.city, resolvedCity),
                   _InfoRow(context.l10n.state, resolvedState),
                   _InfoRow(context.l10n.pincode, profile.address.pincode),
@@ -685,11 +679,8 @@ class _MatrimonyHeaderCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 36,
-              backgroundImage: profile.images.primaryImageUrl.isNotEmpty
-                  ? NetworkImage(profile.images.primaryImageUrl)
-                  : const NetworkImage(
-                      'https://firebasestorage.googleapis.com/v0/b/fir-app-e3a53.firebasestorage.app/o/company_files%2Ficon-7797704_640.png?alt=media&token=90d1d7fc-9dd9-4ab9-8dfc-480646f5777f',
-                    ),
+              backgroundImage: profile.images.primaryImageUrl.isNotEmpty ? NetworkImage(profile.images.primaryImageUrl) : null,
+              child: profile.images.primaryImageUrl.isEmpty ? Icon(Icons.person, size: 36, color: Colors.grey[400]) : null,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -859,7 +850,9 @@ class _ImagesTabSection extends StatelessWidget {
 
     final hasAadhar = images.aadharCardUrl.isNotEmpty;
 
-    if (allImages.isEmpty && !hasAadhar) return const SizedBox.shrink();
+    if (allImages.isEmpty && !hasAadhar) {
+      allImages.add(MapEntry(context.l10n.primaryPhoto, ''));
+    }
 
     final tabCount = allImages.length + (hasAadhar ? 1 : 0);
 
@@ -942,7 +935,21 @@ class _ImageViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (imageUrl.isEmpty) return _ImageError(label: label);
+    if (imageUrl.isEmpty) {
+      return Container(
+        color: Colors.grey[200],
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.person, size: 80, color: Colors.grey[400]),
+              const SizedBox(height: 8),
+              Text('$label not available', style: TextStyle(color: Colors.grey[600])),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -950,7 +957,7 @@ class _ImageViewer extends StatelessWidget {
         children: [
           Expanded(
             child: GestureDetector(
-              onTap: () => _openFullscreen(context),
+              onTap: () => _openFullscreen(context, imageUrl),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
@@ -973,7 +980,7 @@ class _ImageViewer extends StatelessWidget {
     );
   }
 
-  void _openFullscreen(BuildContext context) {
+  void _openFullscreen(BuildContext context, String url) {
     showDialog(
       context: context,
       barrierColor: Colors.black,
@@ -987,7 +994,7 @@ class _ImageViewer extends StatelessWidget {
                 minScale: 1,
                 maxScale: 4,
                 child: Image.network(
-                  imageUrl,
+                  url,
                   fit: BoxFit.contain,
                   loadingBuilder: (_, child, progress) {
                     if (progress == null) return child;

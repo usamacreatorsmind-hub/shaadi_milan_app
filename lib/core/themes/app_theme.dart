@@ -245,7 +245,7 @@ class AppTheme {
     const Color surface = Color(0xFF1A1A1A);
     const Color card = Color(0xFF1F1F1F);
 
-    const Color primaryRed = Color(0xFFB71C1C); // deep red
+    const Color primaryRed = Color(0xFFC70310); // deep red
     const Color accentRed = Color(0xFFE53935); // soft red highlight
 
     return ThemeData(

@@ -25,8 +25,6 @@ class UserCultureFormScreen extends ConsumerStatefulWidget {
 
 class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _subCasteController = TextEditingController();
-  final _subCasteEnController = TextEditingController();
 
   final _manualCasteController = TextEditingController();
   final _manualCasteEnController = TextEditingController();
@@ -44,8 +42,8 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
     if (widget.mode == FormMode.edit && widget.existingCulturalProfile != null) {
       final cult = widget.existingCulturalProfile!;
 
-      _subCasteController.text = cult.subCaste.hi;
-      _subCasteEnController.text = cult.subCaste.en;
+      _manualCasteController.text = cult.caste.hi;
+      _manualCasteEnController.text = cult.caste.en;
 
       languages.addAll(cult.languages);
 
@@ -74,17 +72,14 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
       religionBilingual = religionsMap[religionId]!;
     }
 
-    if (casteId.toLowerCase().trim().contains('other')) {
-      final manual = _manualCasteController.text.trim();
-      final manualEn = _manualCasteEnController.text.trim();
-      if (manual.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.pleaseSelectCaste(context))));
-        return;
-      }
-      casteBilingual = BilingualValue(hi: manual, en: manualEn);
-    } else if (castesMap.containsKey(casteId)) {
-      casteBilingual = castesMap[casteId]!;
+    final manual = _manualCasteController.text.trim();
+    final manualEn = _manualCasteEnController.text.trim();
+
+    if (manualEn.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.pleaseSelectCaste(context))));
+      return;
     }
+    casteBilingual = BilingualValue(hi: manual, en: manualEn);
 
     List<BilingualValue> finalLanguages = List.from(languages);
     final hiLang = _languagesController.text.trim();
@@ -96,24 +91,12 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
     final notifier = ref.read(cultureControllerProvider.notifier);
 
     widget.mode == FormMode.create
-        ? notifier.saveCultural(
-            religion: religionBilingual,
-            caste: casteBilingual,
-            subCaste: BilingualValue(hi: _subCasteController.text.trim(), en: _subCasteEnController.text.trim()),
-            languages: finalLanguages,
-          )
-        : notifier.updateCultural(
-            religion: religionBilingual,
-            caste: casteBilingual,
-            subCaste: BilingualValue(hi: _subCasteController.text.trim(), en: _subCasteEnController.text.trim()),
-            languages: finalLanguages,
-          );
+        ? notifier.saveCultural(religion: religionBilingual, caste: casteBilingual, languages: finalLanguages)
+        : notifier.updateCultural(religion: religionBilingual, caste: casteBilingual, languages: finalLanguages);
   }
 
   @override
   void dispose() {
-    _subCasteController.dispose();
-    _subCasteEnController.dispose();
     _manualCasteController.dispose();
     _manualCasteEnController.dispose();
     _languagesController.dispose();
@@ -173,63 +156,20 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              Consumer(
-                builder: (context, ref, child) {
-                  final religionState = ref.watch(religionControllerProvider);
-
-                  if (religionState.religionId.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-
-                  final castesAsyncValue = ref.watch(castesByReligionProvider(religionState.religionId));
-
-                  return castesAsyncValue.when(
-                    data: (castes) {
-                      final selectedCaste = castes.where((c) => c.id == religionState.casteId).firstOrNull;
-
-                      return AppDropDown<CasteModel>(
-                        label: AppLabels.caste(context),
-                        items: castes,
-                        value: selectedCaste,
-                        itemLabel: (c) => c.name,
-                        onChanged: (value) {
-                          if (value != null) {
-                            ref.read(religionControllerProvider.notifier).setCaste(value.id);
-                          }
-                        },
-                      );
-                    },
-                    loading: () => const CircularProgressIndicator(),
-                    error: (err, _) => Text(AppLabels.error(context, err.toString())),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              if (ref.watch(religionControllerProvider).casteId.toLowerCase().contains('other'))
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: BilingualTextField(
-                    controller: _manualCasteController,
-                    englishController: _manualCasteEnController,
-                    label: AppLabels.specifyCaste(context),
-                    hint: AppLabels.specifyCasteHint(context),
-                    prefixIcon: Icons.edit,
-                  ),
-                ),
               BilingualTextField(
-                controller: _subCasteController,
-                englishController: _subCasteEnController,
-                label: AppLabels.subCasteLabel(context),
-                hint: AppLabels.subCasteHint(context),
-                prefixIcon: Icons.group_add,
+                controller: _manualCasteController,
+                englishController: _manualCasteEnController,
+                label: AppLabels.caste(context),
+                hint: AppLabels.specifyCasteHint(context),
+                prefixIcon: Icons.edit,
               ),
-              const SizedBox(height: 12),
+
               const SizedBox(height: 24),
               _sectionHeader(AppLabels.addKnownLanguages(context)),
               const SizedBox(height: 16),
               _extraCourseInput(),
               if (languages.isNotEmpty) ...[const SizedBox(height: 12), _extraCourseChips()],
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
               state.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : (widget.registerSubmit != null
@@ -266,9 +206,10 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
         ),
         const SizedBox(height: 8),
         Align(
-          alignment: Alignment.centerRight,
+          alignment: Alignment.center,
           child: AppButton(
-            width: 180,
+            color: Colors.red,
+            width: double.infinity,
             onPressed: () {
               final hi = _languagesController.text.trim();
               final en = _languagesEnController.text.trim();
@@ -298,8 +239,9 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
           spacing: 8,
           runSpacing: 8,
           children: languages.map((lang) {
+            final isHindi = Localizations.localeOf(context).languageCode == 'hi';
             return Chip(
-              label: Text("${lang.hi} | ${lang.en}"),
+              label: Text(isHindi ? lang.hi : lang.en),
               deleteIcon: const Icon(Icons.close, size: 18),
               onDeleted: () => setState(() => languages.remove(lang)),
               backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),

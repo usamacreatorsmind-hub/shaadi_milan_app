@@ -21,24 +21,20 @@ class UserIdentityFormScreen extends ConsumerStatefulWidget {
   final FormMode mode;
   final IdentityProfile? existingIdentityProfile;
   final void Function(VoidCallback)? registerSubmit;
-  const UserIdentityFormScreen({
-    super.key,
-    required this.mode,
-    this.existingIdentityProfile,
-    this.registerSubmit,
-  });
+  const UserIdentityFormScreen({super.key, required this.mode, this.existingIdentityProfile, this.registerSubmit});
 
   @override
-  ConsumerState<UserIdentityFormScreen> createState() =>
-      _UserIdentityFormScreenState();
+  ConsumerState<UserIdentityFormScreen> createState() => _UserIdentityFormScreenState();
 }
 
-class _UserIdentityFormScreenState
-    extends ConsumerState<UserIdentityFormScreen> {
+class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _aadharController = TextEditingController();
-  final _aboutMeController = TextEditingController();
-  final _aboutMeEnController = TextEditingController();
+
+  final _firstNameCtrl = TextEditingController();
+  final _firstNameEnCtrl = TextEditingController();
+
+  final _lastNameCtrl = TextEditingController();
+  final _lastNameEnCtrl = TextEditingController();
 
   DateTime? _selectedDate;
 
@@ -46,21 +42,22 @@ class _UserIdentityFormScreenState
   void initState() {
     super.initState();
     widget.registerSubmit?.call(_submitForm);
-    if (widget.mode == FormMode.edit &&
-        widget.existingIdentityProfile != null) {
-      _aadharController.text = widget.existingIdentityProfile!.aadhar;
-      _aboutMeController.text = widget.existingIdentityProfile!.aboutMe.hi;
-      _aboutMeEnController.text = widget.existingIdentityProfile!.aboutMe.en;
-
-      _selectedDate = widget.existingIdentityProfile!.dob;
+    if (widget.mode == FormMode.edit && widget.existingIdentityProfile != null) {
+      final profile = widget.existingIdentityProfile!;
+      _firstNameCtrl.text = profile.firstName.hi;
+      _firstNameEnCtrl.text = profile.firstName.en;
+      _lastNameCtrl.text = profile.lastName.hi;
+      _lastNameEnCtrl.text = profile.lastName.en;
+      _selectedDate = profile.dob;
     }
   }
 
   @override
   void dispose() {
-    _aadharController.dispose();
-    _aboutMeController.dispose();
-    _aboutMeEnController.dispose();
+    _firstNameCtrl.dispose();
+    _firstNameEnCtrl.dispose();
+    _lastNameCtrl.dispose();
+    _lastNameEnCtrl.dispose();
     super.dispose();
   }
 
@@ -84,8 +81,7 @@ class _UserIdentityFormScreenState
     final today = DateTime.now();
     int age = today.year - dob.year;
 
-    if (today.month < dob.month ||
-        (today.month == dob.month && today.day < dob.day)) {
+    if (today.month < dob.month || (today.month == dob.month && today.day < dob.day)) {
       age--;
     }
     return age;
@@ -102,59 +98,36 @@ class _UserIdentityFormScreenState
 
     BilingualValue gender = BilingualValue.empty();
     try {
-      final user = await ref
-          .read(userRepositoryProvider)
-          .fetchUser(targetUid);
+      final user = await ref.read(userRepositoryProvider).fetchUser(targetUid);
 
       if (!mounted) return;
       gender = user.gender;
     } catch (e) {
       print(e.toString());
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLabels.errorFetchingUserData(context, e.toString()),
-            ),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.errorFetchingUserData(context, e.toString()))));
       }
       return;
     }
 
     if (gender.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLabels.genderNotFound(context))),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.genderNotFound(context))));
       return;
     }
     if (!_formKey.currentState!.validate()) return;
 
     final notifier = ref.read(identityControllerProvider.notifier);
-    final aboutMe = BilingualValue(
-      hi: _aboutMeController.text.trim(),
-      en: _aboutMeEnController.text.trim(),
-    );
+
+    final firstName = BilingualValue(hi: _firstNameCtrl.text.trim(), en: _firstNameEnCtrl.text.trim());
+    final lastName = BilingualValue(hi: _lastNameCtrl.text.trim(), en: _lastNameEnCtrl.text.trim());
 
     final dob = _selectedDate ?? DateTime(1900);
     final ageValue = _age ?? 0;
 
     if (widget.mode == FormMode.create) {
-      notifier.saveIdentity(
-        gender: gender,
-        dob: dob,
-        age: ageValue,
-        aadhar: _aadharController.text.trim(),
-        aboutMe: aboutMe,
-      );
+      notifier.saveIdentity(gender: gender, firstName: firstName, lastName: lastName, dob: dob, age: ageValue);
     } else {
-      notifier.updateIdentity(
-        gender: gender,
-        dob: dob,
-        age: ageValue,
-        aadhar: _aadharController.text.trim(),
-        aboutMe: aboutMe,
-      );
+      notifier.updateIdentity(gender: gender, firstName: firstName, lastName: lastName, dob: dob, age: ageValue);
     }
   }
 
@@ -165,15 +138,11 @@ class _UserIdentityFormScreenState
     ref.listen<IdentityState>(identityControllerProvider, (previous, current) {
       if (current.error != null) {
         print(current.error);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
       }
 
       if (current.identity != null && previous?.identity == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLabels.identitySavedSuccessfully(context))),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.identitySavedSuccessfully(context))));
       }
     });
 
@@ -182,9 +151,7 @@ class _UserIdentityFormScreenState
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(
-          widget.mode == FormMode.create
-              ? AppLabels.createIdentity(context)
-              : AppLabels.editIdentity(context),
+          widget.mode == FormMode.create ? AppLabels.createIdentity(context) : AppLabels.editIdentity(context),
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
@@ -196,81 +163,50 @@ class _UserIdentityFormScreenState
             children: [
               const SizedBox(height: 12),
               BilingualTextField(
-                controller: _aboutMeController,
-                englishController: _aboutMeEnController,
+                controller: _firstNameCtrl,
+                englishController: _firstNameEnCtrl,
                 prefixIcon: Icons.person_outline,
-                label: AppLabels.aboutMe(context),
-                hint: AppLabels.tellUsAboutYourself(context),
-                keyboardType: TextInputType.multiline,
-                maxLines: 3,
+                label: "First Name",
+                hint: "Enter first name",
+                showHindi: false,
               ),
               const SizedBox(height: 16),
-              AppTextField(
-                controller: _aadharController,
-                maxLines: 1,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  MaxLengthFormatter(max: 12),
-                ],
-                showWordCount: true,
-                counterType: CounterType.characters,
-                prefixIcon: Icons.credit_card,
-                iconColor: Theme.of(context).colorScheme.primary,
-                label: AppLabels.aadharNumber(context),
-                hint: AppLabels.enterAadharNumber(context),
-                obscureText: false,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value != null && value.isNotEmpty) {
-                    return Validators.validateAadhar(context, value);
-                  }
-                  return null;
-                },
+              BilingualTextField(
+                controller: _lastNameCtrl,
+                englishController: _lastNameEnCtrl,
+                prefixIcon: Icons.person_outline,
+                label: "Last Name",
+                hint: "Enter last name",
+                showHindi: false,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               ListTile(
                 leading: CircleAvatar(
                   radius: 20,
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.primary.withOpacity(0.15),
-                  child: Icon(
-                    Icons.date_range_outlined,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                  backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                  child: Icon(Icons.date_range_outlined, color: Theme.of(context).colorScheme.primary),
                 ),
                 title: Text(
                   _selectedDate == null
                       ? AppLabels.selectDateOfBirth(context)
-                      : AppLabels.dobValue(
-                          context,
-                          DateFormat('dd/MM/yyyy').format(_selectedDate!),
-                        ),
+                      : AppLabels.dobValue(context, DateFormat('dd/MM/yyyy').format(_selectedDate!)),
                 ),
-                subtitle: _age == null
-                    ? null
-                    : Text(AppLabels.ageYears(context, _age!)),
+                subtitle: _age == null ? null : Text(AppLabels.ageYears(context, _age!)),
                 onTap: widget.mode == FormMode.edit ? null : () => _selectDate(context),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
-                  side: BorderSide(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withOpacity(0.5),
-                  ),
+                  side: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
                 ),
               ),
               const SizedBox(height: 20),
               identityState.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : (widget.registerSubmit != null
-                      ? const SizedBox.shrink()
-                      : AppButton(
-                          onPressed: _submitForm,
-                          text: widget.mode == FormMode.create
-                              ? AppLabels.saveIdentity(context)
-                              : AppLabels.updateIdentity(context),
-                        )),
+                        ? const SizedBox.shrink()
+                        : AppButton(
+                            onPressed: _submitForm,
+                            text: widget.mode == FormMode.create ? AppLabels.saveIdentity(context) : AppLabels.updateIdentity(context),
+                          )),
               const SizedBox(height: 16),
             ],
           ),

@@ -3,22 +3,16 @@ import '../../../../translitration/models/bilingual_value.dart';
 class Education {
   final BilingualValue college;
   final BilingualValue course;
-  final int passingYear;
-  final double percentage;
 
   Education({
     required this.college,
     required this.course,
-    required this.passingYear,
-    required this.percentage,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'college': college.toMap(),
       'course': course.toMap(),
-      'percentage': percentage,
-      'passingYear': passingYear,
     };
   }
 
@@ -30,8 +24,6 @@ class Education {
       course: map['course'] != null && map['course'] is Map
           ? BilingualValue.fromMap(Map<String, dynamic>.from(map['course']))
           : BilingualValue.empty(),
-      passingYear: int.tryParse(map['passingYear']?.toString() ?? '') ?? 0,
-      percentage: double.tryParse(map['percentage']?.toString() ?? '') ?? 0.0,
     );
   }
 
@@ -39,14 +31,12 @@ class Education {
     return Education(
       college: BilingualValue.empty(),
       course: BilingualValue.empty(),
-      passingYear: 0,
-      percentage: 0.0,
     );
   }
 
   @override
   String toString() {
-    return 'Education(college: $college, course: $course, passingYear: $passingYear, percentage: $percentage)';
+    return 'Education(college: $college, course: $course)';
   }
 }
 

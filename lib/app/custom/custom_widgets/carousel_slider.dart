@@ -1,9 +1,6 @@
-import 'package:shadi_milan/core/constants/app_labels.dart';
-
 import 'carusel_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:shadi_milan/core/constants/app_constants.dart';
 
 class CustomCarouselSlider extends StatelessWidget {
   final List<String> imageUrls;
@@ -12,7 +9,12 @@ class CustomCarouselSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (imageUrls.isEmpty) {
-      return Center(child: Text(AppLabels.noImagesToDisplay(context)));
+      return Container(
+        color: Colors.grey[200],
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height * 0.85,
+        child: Icon(Icons.person, size: 100, color: Colors.grey[400]),
+      );
     }
 
     return CarouselSlider(
@@ -51,11 +53,7 @@ class CustomCarouselSlider extends StatelessWidget {
                       top: MediaQuery.of(context).padding.top + 8,
                       right: 8,
                       child: IconButton(
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 30,
-                        ),
+                        icon: const Icon(Icons.close, color: Colors.white, size: 30),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),

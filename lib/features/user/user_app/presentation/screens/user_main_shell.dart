@@ -37,7 +37,7 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
       routes: [
         UserHomeRoute(),
         UserWishListRoute(userId: uid),
-        SupportTicketsRoute(userId: uid),
+        UserChatRoute(),
         UserProfileRoute(userId: uid),
       ],
       transitionBuilder: (context, child, animation) =>
@@ -81,9 +81,9 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
                 label: AppLabels.navWishlist(context),
               ),
               BottomNavigationBarItem(
-                icon: const Icon(Icons.support_agent_outlined),
-                activeIcon: const Icon(Icons.support_agent),
-                label:  AppLabels.navSupport(context),
+                icon: const Icon(Icons.chat_bubble_outline),
+                activeIcon: const Icon(Icons.chat_bubble),
+                label:  AppLabels.navChat(context),
               ),
               BottomNavigationBarItem(
                 icon: const Icon(Icons.person_outline),

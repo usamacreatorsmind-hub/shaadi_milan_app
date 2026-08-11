@@ -18,10 +18,7 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   MatrimonyRepositoryImpl(this._remoteDS);
 
   @override
-  Future<void> createMatrimonyProfile(
-    String uid,
-    Map<String, dynamic> profileData,
-  ) async {
+  Future<void> createMatrimonyProfile(String uid, Map<String, dynamic> profileData) async {
     await _remoteDS.createProfile(uid, profileData);
   }
 
@@ -61,10 +58,7 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   }
 
   @override
-  Future<void> updateEmploymentProfile(
-    String uid,
-    EmploymentProfile employment,
-  ) {
+  Future<void> updateEmploymentProfile(String uid, EmploymentProfile employment) {
     return _remoteDS.updateEmployment(uid, employment);
   }
 
@@ -96,32 +90,25 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   // ---------------- Get Single Sections ----------------
 
   @override
-  Future<AddressProfile> getAddressProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).address;
+  Future<AddressProfile> getAddressProfile(String uid) async => (await getMatrimonyProfile(uid)).address;
 
   @override
-  Future<CulturalProfile> getCulturalProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).cultural;
+  Future<CulturalProfile> getCulturalProfile(String uid) async => (await getMatrimonyProfile(uid)).cultural;
 
   @override
-  Future<EducationProfile> getEducationProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).education;
+  Future<EducationProfile> getEducationProfile(String uid) async => (await getMatrimonyProfile(uid)).education;
 
   @override
-  Future<EmploymentProfile> getEmploymentProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).employment;
+  Future<EmploymentProfile> getEmploymentProfile(String uid) async => (await getMatrimonyProfile(uid)).employment;
 
   @override
-  Future<FamilyProfile> getFamilyProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).family;
+  Future<FamilyProfile> getFamilyProfile(String uid) async => (await getMatrimonyProfile(uid)).family;
 
   @override
-  Future<IdentityProfile> getIdentityProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).identity;
+  Future<IdentityProfile> getIdentityProfile(String uid) async => (await getMatrimonyProfile(uid)).identity;
 
   @override
-  Future<PhysicalProfile> getPhysicalProfile(String uid) async =>
-      (await getMatrimonyProfile(uid)).physical;
+  Future<PhysicalProfile> getPhysicalProfile(String uid) async => (await getMatrimonyProfile(uid)).physical;
 
   @override
   Future<List<MatrimonyProfile>> getAllMatrimonyProfiles() {

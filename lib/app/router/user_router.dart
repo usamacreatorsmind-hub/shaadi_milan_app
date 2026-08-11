@@ -83,6 +83,10 @@ class UserRouter {
       guards: [AuthGuard(ref), UserGuard(ref)],
     ),
     AutoRoute(
+      page: UserChatRoomRoute.page,
+      guards: [AuthGuard(ref), UserGuard(ref)],
+    ),
+    AutoRoute(
       page: UserImageFormRoute.page,
       guards: [AuthGuard(ref), UserGuard(ref)],
     ),

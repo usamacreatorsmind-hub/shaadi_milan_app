@@ -1,3 +1,4 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import '../../../../app/custom/custom_widgets/app_logo.dart';
@@ -27,8 +28,8 @@ class RoleSelectionScreen extends ConsumerWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFFFE0E6), // Soft Pink
-              Color(0xFFFFF5F7), // Very Light Pink
+              Color(0xFFFFF4F5), // Ultra Soft Red
+              Color(0xFFFFFAF0), // Floral White (Creamy)
               Colors.white,
             ],
           ),
@@ -44,9 +45,9 @@ class RoleSelectionScreen extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.pink.withOpacity(0.1)),
+                      border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.1)),
                     ),
                     child: Consumer(
                       builder: (context, ref, _) {
@@ -61,14 +62,14 @@ class RoleSelectionScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: isHindi ? FontWeight.normal : FontWeight.bold,
-                                color: isHindi ? Colors.grey : Colors.pink,
+                                color: isHindi ? Colors.grey : Theme.of(context).primaryColor,
                               ),
                             ),
                             Transform.scale(
                               scale: 0.7,
                               child: Switch(
                                 value: isHindi,
-                                activeColor: Colors.pink,
+                                activeColor: Theme.of(context).primaryColor,
                                 onChanged: (val) {
                                   final code = val ? 'hi' : 'en';
                                   ref.read(appTranslationServiceProvider).setLanguageCode(code);
@@ -81,7 +82,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: isHindi ? FontWeight.bold : FontWeight.normal,
-                                color: isHindi ? Colors.pink : Colors.grey,
+                                color: isHindi ? Theme.of(context).primaryColor : Colors.grey,
                               ),
                             ),
                           ],
@@ -106,10 +107,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                         builder: (context, double value, child) {
                           return Opacity(
                             opacity: value,
-                            child: Transform.translate(
-                              offset: Offset(0, 20 * (1 - value)),
-                              child: child,
-                            ),
+                            child: Transform.translate(offset: Offset(0, 20 * (1 - value)), child: child),
                           );
                         },
                         child: Column(
@@ -139,30 +137,33 @@ class RoleSelectionScreen extends ConsumerWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 20),
 
-                      /// 👔 Agent Card
-                      _EnhancedRoleCard(
-                        title: AppLabels.staffPortal(context),
-                        subtitle: AppLabels.manageLeadsSubtitle(context),
-                        icon: Icons.business_center_rounded,
-                        beginColor: const Color(0xFF6A11CB),
-                        endColor: const Color(0xFF2575FC),
-                        delay: 0.2,
-                        onTap: () => context.router.push(AgentLoginRoute()),
-                      ),
+                      Column(
+                        children: [
+                          /// 👔 Agent Card
+                          _EnhancedRoleCard(
+                            title: AppLabels.staffPortal(context),
+                            subtitle: AppLabels.manageLeadsSubtitle(context),
+                            icon: Icons.business_center_rounded,
+                            beginColor: const Color(0xFFC70310), // Matching Theme Red
+                            endColor: const Color(0xFF8B0000),   // Deep Maroon
+                            delay: 0.2,
+                            onTap: () => context.router.push(AgentLoginRoute()),
+                          ),
+                          const SizedBox(height: 24),
 
-                      const SizedBox(height: 40),
-
-                      /// ❤️ User Card
-                      _EnhancedRoleCard(
-                        title: AppLabels.memberPortal(context),
-                        subtitle: AppLabels.findSoulmateSubtitle(context),
-                        icon: Icons.favorite_rounded,
-                        beginColor: const Color(0xFFFF512F),
-                        endColor: const Color(0xFFDD2476),
-                        delay: 0.4,
-                        onTap: () => context.router.push(UserLoginRoute()),
+                          /// ❤️ User Card
+                          _EnhancedRoleCard(
+                            title: AppLabels.memberPortal(context),
+                            subtitle: AppLabels.findSoulmateSubtitle(context),
+                            icon: Icons.favorite_rounded,
+                            beginColor: const Color(0xFFFFD700), // Gold
+                            endColor: const Color(0xFFB8860B),   // Dark Gold
+                            delay: 0.4,
+                            onTap: () => context.router.push(UserLoginRoute()),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -177,82 +178,46 @@ class RoleSelectionScreen extends ConsumerWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.7),
-                      border: Border(
-                        top: BorderSide(color: Colors.pink.withOpacity(0.1)),
-                      ),
+                      color: Colors.white.withOpacity(0.8),
+                      border: Border(top: BorderSide(color: Theme.of(context).primaryColor.withOpacity(0.08))),
                     ),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.verified_user,
-                                  size: 14,
-                                  color: Colors.green,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  AppLabels.verifiedProfiles(context),
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black54,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            GestureDetector(
-                              onTap: () {
-                                context.pushRoute(const ContactUsRoute());
-                              },
-                              child: Text(
-                                AppLabels.needHelpContactUs(context),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).primaryColor,
-                                  decoration: TextDecoration.underline,
-                                ),
+                            const Icon(Icons.verified_user, size: 14, color: Colors.green),
+                            const SizedBox(width: 6),
+                            Text(
+                              AppLabels.verifiedProfiles(context),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 12),
+
+                        // 🔗 Links Row
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            GestureDetector(
-                              onTap: () =>
-                                  context.pushRoute(const PrivacyPolicyRoute()),
-                              child: Text(
-                                AppLabels.privacyPolicy(context),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).primaryColor,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
+                            _FooterLink(
+                              text: AppLabels.privacyPolicy(context),
+                              onTap: () => context.pushRoute(const PrivacyPolicyRoute()),
                             ),
-                            GestureDetector(
-                              onTap: () => context.pushRoute(
-                                const TermsAndConditionsRoute(),
-                              ),
-                              child: Text(
-                                AppLabels.termsAndConditions(context),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).primaryColor,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
+                            _LinkSeparator(),
+                            _FooterLink(
+                              text: AppLabels.termsAndConditions(context),
+                              onTap: () => context.pushRoute(const TermsAndConditionsRoute()),
+                            ),
+                            _LinkSeparator(),
+                            _FooterLink(
+                              text: AppLabels.needHelpContactUs(context),
+                              onTap: () => context.pushRoute(const ContactUsRoute()),
                             ),
                           ],
                         ),
@@ -264,6 +229,66 @@ class RoleSelectionScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SocialIconButton extends StatelessWidget {
+  final dynamic icon; // Using dynamic to avoid FaIconData vs IconData type mismatch
+  final Color color;
+  final VoidCallback onTap;
+
+  const _SocialIconButton({
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(50),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        child: FaIcon(icon, color: color, size: 20),
+      ),
+    );
+  }
+}
+
+class _FooterLink extends StatelessWidget {
+  final String text;
+  final VoidCallback onTap;
+
+  const _FooterLink({required this.text, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).primaryColor,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    );
+  }
+}
+
+class _LinkSeparator extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Text(
+        "|",
+        style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
       ),
     );
   }
@@ -304,10 +329,7 @@ class _EnhancedRoleCardState extends State<_EnhancedRoleCard> {
       builder: (context, double value, child) {
         return Opacity(
           opacity: value,
-          child: Transform.translate(
-            offset: Offset(0, 50 * (1 - value)),
-            child: child,
-          ),
+          child: Transform.translate(offset: Offset(0, 50 * (1 - value)), child: child),
         );
       },
       child: GestureDetector(
@@ -327,35 +349,19 @@ class _EnhancedRoleCardState extends State<_EnhancedRoleCard> {
                 end: Alignment.centerRight,
               ),
               borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.endColor.withOpacity(0.3),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: widget.endColor.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8))],
             ),
             child: Stack(
               children: [
                 // Decorative background circle
-                Positioned(
-                  right: -20,
-                  top: -20,
-                  child: CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Colors.white.withOpacity(0.1),
-                  ),
-                ),
+                Positioned(right: -20, top: -20, child: CircleAvatar(radius: 60, backgroundColor: Colors.white.withOpacity(0.1))),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
                         child: Icon(widget.icon, color: Colors.white, size: 32),
                       ),
                       const SizedBox(width: 20),
@@ -366,20 +372,10 @@ class _EnhancedRoleCardState extends State<_EnhancedRoleCard> {
                           children: [
                             Text(
                               widget.title,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              widget.subtitle,
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 14,
-                              ),
-                            ),
+                            Text(widget.subtitle, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14)),
                           ],
                         ),
                       ),

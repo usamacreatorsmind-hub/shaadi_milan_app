@@ -49,6 +49,7 @@ class AppLabels {
   static String navHome(BuildContext context) => _loc(context).navHome;
   static String navWishlist(BuildContext context) => _loc(context).navWishlist;
   static String navSupport(BuildContext context) => _loc(context).navSupport;
+  static String navChat(BuildContext context) => _loc(context).navChat;
   static String navProfile(BuildContext context) => _loc(context).navProfile;
   static String navDashboard(BuildContext context) => _loc(context).navDashboard;
   static String navClients(BuildContext context) => _loc(context).navClients;

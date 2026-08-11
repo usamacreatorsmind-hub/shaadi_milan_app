@@ -7,6 +7,8 @@ class HomeFilterState {
   final String religion;
   final String caste;
   final String gender;
+  final bool justJoined;
+  final bool fromMyCity;
 
   const HomeFilterState({
     this.state = '',
@@ -14,6 +16,8 @@ class HomeFilterState {
     this.religion = '',
     this.caste = '',
     this.gender = '',
+    this.justJoined = false,
+    this.fromMyCity = false,
   });
 
   HomeFilterState copyWith({
@@ -22,6 +26,8 @@ class HomeFilterState {
     String? religion,
     String? caste,
     String? gender,
+    bool? justJoined,
+    bool? fromMyCity,
   }) {
     return HomeFilterState(
       state: state ?? this.state,
@@ -29,6 +35,8 @@ class HomeFilterState {
       religion: religion ?? this.religion,
       caste: caste ?? this.caste,
       gender: gender ?? this.gender,
+      justJoined: justJoined ?? this.justJoined,
+      fromMyCity: fromMyCity ?? this.fromMyCity,
     );
   }
 }

@@ -60,6 +60,7 @@ import '../../features/user/user_app/presentation/screens/forms/support_ticket_f
 import '../../features/user/user_app/presentation/screens/support_tickets_screen.dart';
 import '../../features/user/user_app/presentation/screens/forms/user_address_form_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_chat_screen.dart';
+import '../../features/user/user_app/presentation/screens/user_chat_room_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_details_screen.dart';
 import '../../features/user/user_app/presentation/screens/user_home_screen.dart';
 import '../../features/user/user_app/presentation/screens/forms/user_image_form_screen.dart';

@@ -1263,6 +1263,53 @@ class UserBiodataCheckRouteArgs {
 }
 
 /// generated route for
+/// [UserChatRoomScreen]
+class UserChatRoomRoute extends PageRouteInfo<UserChatRoomRouteArgs> {
+  UserChatRoomRoute({
+    Key? key,
+    required String peerId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserChatRoomRoute.name,
+         args: UserChatRoomRouteArgs(key: key, peerId: peerId),
+         initialChildren: children,
+       );
+
+  static const String name = 'UserChatRoomRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<UserChatRoomRouteArgs>();
+      return UserChatRoomScreen(key: args.key, peerId: args.peerId);
+    },
+  );
+}
+
+class UserChatRoomRouteArgs {
+  const UserChatRoomRouteArgs({this.key, required this.peerId});
+
+  final Key? key;
+
+  final String peerId;
+
+  @override
+  String toString() {
+    return 'UserChatRoomRouteArgs{key: $key, peerId: $peerId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! UserChatRoomRouteArgs) return false;
+    return key == other.key && peerId == other.peerId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ peerId.hashCode;
+}
+
+/// generated route for
 /// [UserChatScreen]
 class UserChatRoute extends PageRouteInfo<void> {
   const UserChatRoute({List<PageRouteInfo>? children})

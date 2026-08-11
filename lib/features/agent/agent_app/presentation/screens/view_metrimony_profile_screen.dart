@@ -19,12 +19,10 @@ class MetrimonyProfileScreen extends ConsumerStatefulWidget {
   const MetrimonyProfileScreen({super.key, required this.userId});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _ViewMetrimonyProfileScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _ViewMetrimonyProfileScreenState();
 }
 
-class _ViewMetrimonyProfileScreenState
-    extends ConsumerState<MetrimonyProfileScreen> {
+class _ViewMetrimonyProfileScreenState extends ConsumerState<MetrimonyProfileScreen> {
   @override
   void initState() {
     super.initState();
@@ -39,9 +37,7 @@ class _ViewMetrimonyProfileScreenState
   Widget build(BuildContext context) {
     final locationAsync = ref.watch(locationJsonProvider);
     final religionsAsync = ref.watch(religionsProvider);
-    final profileAsync = ref.watch(
-      matrimonyProfileViewModelProvider(widget.userId),
-    );
+    final profileAsync = ref.watch(matrimonyProfileViewModelProvider(widget.userId));
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -59,9 +55,7 @@ class _ViewMetrimonyProfileScreenState
               label: Text(context.l10n.matchProfiles),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
           );
@@ -84,10 +78,7 @@ class _ViewMetrimonyProfileScreenState
             children: [
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text(
-                context.l10n.errorLoadingUser,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text(context.l10n.errorLoadingUser, style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
               Text(
                 error.toString(),
@@ -97,9 +88,7 @@ class _ViewMetrimonyProfileScreenState
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: () {
-                  ref.invalidate(
-                    matrimonyProfileViewModelProvider(widget.userId),
-                  );
+                  ref.invalidate(matrimonyProfileViewModelProvider(widget.userId));
                 },
                 icon: const Icon(Icons.refresh),
                 label: Text(context.l10n.retry),
@@ -113,11 +102,7 @@ class _ViewMetrimonyProfileScreenState
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.favorite_border,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
+                  const Icon(Icons.favorite_border, size: 64, color: Colors.grey),
                   const SizedBox(height: 16),
                   Text(context.l10n.matrimonyProfileNotCreatedYet),
                 ],
@@ -132,17 +117,11 @@ class _ViewMetrimonyProfileScreenState
 
           if (locationAsync.hasValue) {
             final states = locationAsync.value!;
-            final stateObj = states
-                .where((s) => s.name == profile.address.state)
-                .firstOrNull;
+            final stateObj = states.where((s) => s.name == profile.address.state.en || s.name == profile.address.state.hi).firstOrNull;
             if (stateObj != null) {
               resolvedState = stateObj.name;
               final cityObj = stateObj.cities
-                  .where(
-                    (c) =>
-                        c.id == profile.address.city ||
-                        c.name == profile.address.city,
-                  )
+                  .where((c) => c.id == profile.address.city.en || c.id == profile.address.city.hi || c.name == profile.address.city.en || c.name == profile.address.city.hi)
                   .firstOrNull;
               if (cityObj != null) {
                 resolvedCity = cityObj.name;
@@ -153,20 +132,12 @@ class _ViewMetrimonyProfileScreenState
           if (religionsAsync.hasValue) {
             final religions = religionsAsync.value!;
             final religionObj = religions
-                .where(
-                  (r) =>
-                      r.id == profile.cultural.religion ||
-                      r.name == profile.cultural.religion,
-                )
+                .where((r) => r.id == profile.cultural.religion.en || r.id == profile.cultural.religion.hi || r.name == profile.cultural.religion.en || r.name == profile.cultural.religion.hi)
                 .firstOrNull;
             if (religionObj != null) {
               resolvedReligion = religionObj.name;
               final casteObj = religionObj.castes
-                  .where(
-                    (c) =>
-                        c.id == profile.cultural.caste ||
-                        c.name == profile.cultural.caste,
-                  )
+                  .where((c) => c.id == profile.cultural.caste.en || c.id == profile.cultural.caste.hi || c.name == profile.cultural.caste.en || c.name == profile.cultural.caste.hi)
                   .firstOrNull;
               if (casteObj != null) {
                 resolvedCaste = casteObj.name;
@@ -188,20 +159,12 @@ class _ViewMetrimonyProfileScreenState
                   title: context.l10n.identityInformation,
                   icon: Icons.person,
                   children: [
+                    _InfoRow("First Name", profile.identity.firstName),
+                    _InfoRow("Last Name", profile.identity.lastName),
                     _InfoRow(context.l10n.fullName, profile.user.fullName),
-                    _InfoRow(
-                      context.l10n.dateOfBirth,
-                      profile.identity.dob.toLocal().toString().split(' ')[0],
-                    ),
-                    _InfoRow(
-                      context.l10n.age,
-                      context.l10n.yearsOld(profile.identity.age),
-                    ),
+                    _InfoRow(context.l10n.dateOfBirth, profile.identity.dob.toLocal().toString().split(' ')[0]),
+                    _InfoRow(context.l10n.age, context.l10n.yearsOld(profile.identity.age)),
                     _InfoRow(context.l10n.gender, profile.identity.gender),
-                    _InfoRow(
-                      context.l10n.aadharNumber,
-                      profile.identity.aadhar,
-                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -211,30 +174,16 @@ class _ViewMetrimonyProfileScreenState
                   title: context.l10n.physicalInformation,
                   icon: Icons.accessibility,
                   children: [
-                    _InfoRow(
-                      context.l10n.height,
-                      '${profile.physical.height} cm',
-                    ),
-                    _InfoRow(
-                      context.l10n.weightKg,
-                      '${profile.physical.weight} kg',
-                    ),
+                    _InfoRow(context.l10n.height, '${profile.physical.height} cm'),
+                    _InfoRow(context.l10n.weightKg, '${profile.physical.weight} kg'),
                     _InfoRow(context.l10n.bodyType, profile.physical.bodyType),
-                    _InfoRow(
-                      context.l10n.complexion,
-                      profile.physical.complexion,
-                    ),
+                    _InfoRow(context.l10n.complexion, profile.physical.complexion),
                     _InfoRow(
                       context.l10n.physicallyChallenged,
-                      profile.physical.physicallyChallenged
-                          ? context.l10n.yesLabel
-                          : context.l10n.noLabel,
+                      profile.physical.physicallyChallenged ? context.l10n.yesLabel : context.l10n.noLabel,
                     ),
                     if (profile.physical.disabilityDetails != null)
-                      _InfoRow(
-                        context.l10n.disabilityDetails,
-                        profile.physical.disabilityDetails ?? '',
-                      ),
+                      _InfoRow(context.l10n.disabilityDetails, profile.physical.disabilityDetails ?? ''),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -246,14 +195,7 @@ class _ViewMetrimonyProfileScreenState
                   children: [
                     _InfoRow(context.l10n.religion, resolvedReligion),
                     _InfoRow(context.l10n.caste, resolvedCaste),
-                    _InfoRow(
-                      context.l10n.subCaste,
-                      profile.cultural.subCaste as String,
-                    ),
-                    _InfoRow(
-                      context.l10n.languages,
-                      profile.cultural.languages.join(', '),
-                    ),
+                    _InfoRow(context.l10n.languages, profile.cultural.languages.join(', ')),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -263,42 +205,13 @@ class _ViewMetrimonyProfileScreenState
                   title: context.l10n.education,
                   icon: Icons.school,
                   children: [
-                    _InfoRow(
-                      context.l10n.isIlliterate,
-                      profile.education.isIlletrate
-                          ? context.l10n.yesLabel
-                          : context.l10n.noLabel,
-                    ),
-                    if (!profile.education.isIlletrate &&
-                        profile.education.education != null) ...[
-                      _InfoRow(
-                        context.l10n.course,
-                        profile.education.education!.course,
-                      ),
-                      _InfoRow(
-                        context.l10n.collegeUniversity,
-                        profile.education.education!.college as String,
-                      ),
-                      _InfoRow(
-                        context.l10n.passingYear,
-                        '${profile.education.education!.passingYear}',
-                      ),
-                      _InfoRow(
-                        context.l10n.percentage,
-                        '${profile.education.education!.percentage}%',
-                      ),
+                    _InfoRow(context.l10n.isIlliterate, profile.education.isIlletrate ? context.l10n.yesLabel : context.l10n.noLabel),
+                    if (!profile.education.isIlletrate && profile.education.education != null) ...[
+                      _InfoRow(context.l10n.course, profile.education.education!.course),
+                      _InfoRow(context.l10n.collegeUniversity, profile.education.education!.college as String),
                     ],
-                    if (profile.education.extraQualification != null &&
-                        profile
-                            .education
-                            .extraQualification!
-                            .qualifications
-                            .isNotEmpty)
-                      _InfoRow(
-                        context.l10n.extraQualifications,
-                        profile.education.extraQualification!.qualifications
-                            .join(', '),
-                      ),
+                    if (profile.education.extraQualification != null && profile.education.extraQualification!.qualifications.isNotEmpty)
+                      _InfoRow(context.l10n.extraQualifications, profile.education.extraQualification!.qualifications.join(', ')),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -309,26 +222,10 @@ class _ViewMetrimonyProfileScreenState
                   icon: Icons.work,
                   children: [
                     _InfoRow(context.l10n.jobType, profile.employment.jobType),
-                    if (profile.employment.company != null)
-                      _InfoRow(
-                        context.l10n.organization,
-                        profile.employment.company,
-                      ),
-                    if (profile.employment.designation != null)
-                      _InfoRow(
-                        context.l10n.designation,
-                        profile.employment.designation ?? '',
-                      ),
-                    if (profile.employment.annualIncome != null)
-                      _InfoRow(
-                        context.l10n.annualIncome,
-                        '₹${profile.employment.annualIncome}',
-                      ),
-                    if (profile.employment.workLocation != null)
-                      _InfoRow(
-                        context.l10n.workLocation,
-                        profile.employment.workLocation ?? '',
-                      ),
+                    if (profile.employment.company != null) _InfoRow(context.l10n.organization, profile.employment.company),
+                    if (profile.employment.designation != null) _InfoRow(context.l10n.designation, profile.employment.designation ?? ''),
+                    if (profile.employment.annualIncome != null) _InfoRow(context.l10n.annualIncome, profile.employment.annualIncome),
+                    if (profile.employment.workLocation != null) _InfoRow(context.l10n.workLocation, profile.employment.workLocation ?? ''),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -338,30 +235,12 @@ class _ViewMetrimonyProfileScreenState
                   title: context.l10n.familyInformation,
                   icon: Icons.family_restroom,
                   children: [
-                    _InfoRow(
-                      context.l10n.fatherName,
-                      profile.family.fatherName,
-                    ),
-                    _InfoRow(
-                      context.l10n.motherName,
-                      profile.family.motherName,
-                    ),
-                    _InfoRow(
-                      context.l10n.numberOfBrothers,
-                      '${profile.family.numberOfBrothers}',
-                    ),
-                    _InfoRow(
-                      context.l10n.numberOfSisters,
-                      '${profile.family.numberOfSisters}',
-                    ),
-                    _InfoRow(
-                      context.l10n.familyType,
-                      profile.family.familyType,
-                    ),
-                    _InfoRow(
-                      context.l10n.familyStatus,
-                      profile.family.familyStatus,
-                    ),
+                    _InfoRow(context.l10n.fatherName, profile.family.fatherName),
+                    _InfoRow(context.l10n.motherName, profile.family.motherName),
+                    _InfoRow(context.l10n.numberOfBrothers, '${profile.family.numberOfBrothers}'),
+                    _InfoRow(context.l10n.numberOfSisters, '${profile.family.numberOfSisters}'),
+                    _InfoRow(context.l10n.familyType, profile.family.familyType),
+                    _InfoRow(context.l10n.familyStatus, profile.family.familyStatus),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -371,15 +250,7 @@ class _ViewMetrimonyProfileScreenState
                   title: context.l10n.address,
                   icon: Icons.location_on,
                   children: [
-                    _InfoRow(
-                      context.l10n.address,
-                      profile.address.addressLine1,
-                    ),
-                    _InfoRow(context.l10n.post, profile.address.post),
-                    _InfoRow(
-                      context.l10n.policeStation,
-                      profile.address.policeStation,
-                    ),
+                    _InfoRow(context.l10n.address, profile.address.addressLine1),
                     _InfoRow(context.l10n.city, resolvedCity),
                     _InfoRow(context.l10n.state, resolvedState),
                     _InfoRow(context.l10n.pincode, profile.address.pincode),
@@ -394,26 +265,11 @@ class _ViewMetrimonyProfileScreenState
                       title: context.l10n.agentInformation,
                       icon: Icons.support_agent,
                       children: [
-                        _InfoRow(
-                          context.l10n.agentName,
-                          profile.agentEntity!.agentName,
-                        ),
-                        _InfoRow(
-                          context.l10n.phone,
-                          profile.agentEntity!.agentMobile,
-                        ),
-                        _InfoRow(
-                          context.l10n.email,
-                          profile.agentEntity!.agentEmail,
-                        ),
-                        _InfoRow(
-                          context.l10n.license,
-                          profile.agentEntity!.agentLicenseNumber,
-                        ),
-                        _InfoRow(
-                          context.l10n.city,
-                          profile.agentEntity!.agentCity,
-                        ),
+                        _InfoRow(context.l10n.agentName, profile.agentEntity!.agentName),
+                        _InfoRow(context.l10n.phone, profile.agentEntity!.agentMobile),
+                        _InfoRow(context.l10n.email, profile.agentEntity!.agentEmail),
+                        _InfoRow(context.l10n.license, profile.agentEntity!.agentLicenseNumber),
+                        _InfoRow(context.l10n.city, profile.agentEntity!.agentCity),
                       ],
                     ),
                   ),
@@ -458,9 +314,7 @@ class _UserInfoCard extends StatelessWidget {
                         "https://firebasestorage.googleapis.com/v0/b/fir-app-e3a53.firebasestorage.app/o/company_files%2Ficon-7797704_640.png?alt=media&token=90d1d7fc-9dd9-4ab9-8dfc-480646f5777f",
                       ),
                 // onBackgroundImageError: (_, __) {},
-                child: profile.images.primaryImageUrl.isEmpty
-                    ? const Icon(Icons.person, size: 1)
-                    : null,
+                child: profile.images.primaryImageUrl.isEmpty ? const Icon(Icons.person, size: 1) : null,
               ),
             ),
             const SizedBox(width: 16),
@@ -470,25 +324,13 @@ class _UserInfoCard extends StatelessWidget {
                 children: [
                   BilingualParser(
                     value: profile.user.fullName,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    context.l10n.yearsOld(profile.identity.age),
-                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                  ),
+                  Text(context.l10n.yearsOld(profile.identity.age), style: TextStyle(color: Colors.grey[600], fontSize: 14)),
                   const SizedBox(height: 4),
-                  Text(
-                    profile.user.email,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                  ),
-                  Text(
-                    profile.user.phone,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                  ),
+                  Text(profile.user.email, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                  Text(profile.user.phone, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                 ],
               ),
             ),
@@ -505,11 +347,7 @@ class _SectionCard extends StatelessWidget {
   final IconData icon;
   final List<Widget> children;
 
-  const _SectionCard({
-    required this.title,
-    required this.icon,
-    required this.children,
-  });
+  const _SectionCard({required this.title, required this.icon, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -525,13 +363,7 @@ class _SectionCard extends StatelessWidget {
               children: [
                 Icon(icon, size: 20, color: Theme.of(context).primaryColor),
                 const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ],
             ),
             const Divider(height: 20),
@@ -560,16 +392,11 @@ class _InfoRow extends StatelessWidget {
         children: [
           Expanded(
             flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(color: Colors.grey[600], fontSize: 14),
-            ),
+            child: Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
           ),
           Expanded(
             flex: 3,
-            child: value is BilingualValue
-                ? BilingualParser(value: value as BilingualValue)
-                : Text(value?.toString() ?? ''),
+            child: value is BilingualValue ? BilingualParser(value: value as BilingualValue) : Text(value?.toString() ?? ''),
           ),
         ],
       ),
@@ -589,29 +416,18 @@ class _ImagesTabSection extends StatelessWidget {
     final List<MapEntry<String, String>> allImages = [];
 
     if (images.primaryImageUrl.isNotEmpty) {
-      allImages.add(
-        MapEntry(context.l10n.primaryPhoto, images.primaryImageUrl),
-      );
+      allImages.add(MapEntry(context.l10n.primaryPhoto, images.primaryImageUrl));
     }
     if (images.profileImageUrl.isNotEmpty) {
-      allImages.add(
-        MapEntry(context.l10n.profilePhoto, images.profileImageUrl),
-      );
+      allImages.add(MapEntry(context.l10n.profilePhoto, images.profileImageUrl));
     }
     if (images.imageWithAgentUrl.isNotEmpty) {
-      allImages.add(
-        MapEntry(context.l10n.photoWithAgent, images.imageWithAgentUrl),
-      );
+      allImages.add(MapEntry(context.l10n.photoWithAgent, images.imageWithAgentUrl));
     }
 
     // Add all secondary images
     for (int i = 0; i < images.secondaryImageUrls.length; i++) {
-      allImages.add(
-        MapEntry(
-          '${context.l10n.gallery} ${i + 1}',
-          images.secondaryImageUrls[i],
-        ),
-      );
+      allImages.add(MapEntry('${context.l10n.gallery} ${i + 1}', images.secondaryImageUrls[i]));
     }
 
     final hasAadhar = images.aadharCardUrl.isNotEmpty;
@@ -637,19 +453,9 @@ class _ImagesTabSection extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.photo_library,
-                      size: 20,
-                      color: Theme.of(context).primaryColor,
-                    ),
+                    Icon(Icons.photo_library, size: 20, color: Theme.of(context).primaryColor),
                     const SizedBox(width: 8),
-                    Text(
-                      context.l10n.photosAndDocuments,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text(context.l10n.photosAndDocuments, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -663,10 +469,8 @@ class _ImagesTabSection extends StatelessWidget {
                 indicatorColor: Theme.of(context).primaryColor,
                 tabs: [
                   ...allImages.map((entry) => Tab(text: entry.key)),
-                  if (images.aadharCardUrl.isNotEmpty)
-                    Tab(text: context.l10n.aadharCard),
-                  if (images.bioDataUrl.isNotEmpty)
-                    Tab(text: context.l10n.bioData),
+                  if (images.aadharCardUrl.isNotEmpty) Tab(text: context.l10n.aadharCard),
+                  if (images.bioDataUrl.isNotEmpty) Tab(text: context.l10n.bioData),
                 ],
               ),
 
@@ -676,21 +480,10 @@ class _ImagesTabSection extends StatelessWidget {
                 child: TabBarView(
                   children: [
                     // Image tabs
-                    ...allImages.map(
-                      (entry) =>
-                          _ImageViewer(imageUrl: entry.value, label: entry.key),
-                    ),
+                    ...allImages.map((entry) => _ImageViewer(imageUrl: entry.value, label: entry.key)),
 
-                    if (images.aadharCardUrl.isNotEmpty)
-                      _DocumentViewer(
-                        documentUrl: images.aadharCardUrl,
-                        label: context.l10n.aadharCard,
-                      ),
-                    if (images.bioDataUrl.isNotEmpty)
-                      _DocumentViewer(
-                        documentUrl: images.bioDataUrl,
-                        label: context.l10n.bioData,
-                      ),
+                    if (images.aadharCardUrl.isNotEmpty) _DocumentViewer(documentUrl: images.aadharCardUrl, label: context.l10n.aadharCard),
+                    if (images.bioDataUrl.isNotEmpty) _DocumentViewer(documentUrl: images.bioDataUrl, label: context.l10n.bioData),
                   ],
                 ),
               ),
@@ -715,16 +508,9 @@ class _ImageError extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.broken_image_outlined,
-              size: 56,
-              color: Colors.grey[500],
-            ),
+            Icon(Icons.broken_image_outlined, size: 56, color: Colors.grey[500]),
             const SizedBox(height: 8),
-            Text(
-              '${label} ${context.l10n.notAvailable}',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            Text('${label} ${context.l10n.notAvailable}', style: TextStyle(color: Colors.grey[600])),
           ],
         ),
       ),
@@ -772,10 +558,7 @@ class _ImageViewer extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            context.l10n.tapToViewFullscreen,
-            style: TextStyle(color: Colors.grey[600], fontSize: 12),
-          ),
+          Text(context.l10n.tapToViewFullscreen, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
         ],
       ),
     );
@@ -800,15 +583,9 @@ class _ImageViewer extends StatelessWidget {
                   fit: BoxFit.contain,
                   loadingBuilder: (_, child, progress) {
                     if (progress == null) return child;
-                    return const Center(
-                      child: CircularProgressIndicator(color: Colors.white),
-                    );
+                    return const Center(child: CircularProgressIndicator(color: Colors.white));
                   },
-                  errorBuilder: (_, __, ___) => const Icon(
-                    Icons.broken_image,
-                    color: Colors.white,
-                    size: 64,
-                  ),
+                  errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.white, size: 64),
                 ),
               ),
             ),
@@ -847,23 +624,14 @@ class _DocumentViewer extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            isPdf ? Icons.picture_as_pdf : Icons.image,
-            size: 80,
-            color: Theme.of(context).primaryColor,
-          ),
+          Icon(isPdf ? Icons.picture_as_pdf : Icons.image, size: 80, color: Theme.of(context).primaryColor),
           const SizedBox(height: 16),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          Text(label, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => _openDocument(context, isPdf),
             icon: const Icon(Icons.open_in_new),
-            label: Text(
-              isPdf ? context.l10n.openPdf : context.l10n.viewDocument,
-            ),
+            label: Text(isPdf ? context.l10n.openPdf : context.l10n.viewDocument),
           ),
           const SizedBox(height: 12),
           Text(
@@ -882,20 +650,13 @@ class _DocumentViewer extends StatelessWidget {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => PdfViewerBottomsheet(
-          source: documentUrl,
-          title: label,
-          isLocal: false,
-        ),
+        builder: (context) => PdfViewerBottomsheet(source: documentUrl, title: label, isLocal: false),
       );
     } else {
       showDialog(
         context: context,
         builder: (_) => Dialog(
-          child: Image.network(
-            documentUrl,
-            errorBuilder: (_, __, ___) => _ImageError(label: label),
-          ),
+          child: Image.network(documentUrl, errorBuilder: (_, __, ___) => _ImageError(label: label)),
         ),
       );
     }

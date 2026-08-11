@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 
 import '../../../../../app/providers/global_providers.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
@@ -60,3 +62,15 @@ final userEducationControllerProvider =
       final uid = ref.watch(targetUserIdProvider);
       return UserEducationController(uid ?? '', ref);
     });
+
+/// Provider to fetch degrees from master_degrees collection
+final degreesProvider = FutureProvider<List<BilingualValue>>((ref) async {
+  final snapshot = await FirebaseFirestore.instance
+      .collection('master_degrees')
+      .orderBy('en') // Optional sorting
+      .get();
+
+  return snapshot.docs.map((doc) {
+    return BilingualValue.fromMap(doc.data());
+  }).toList();
+});

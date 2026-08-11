@@ -30,9 +30,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(usersPaymentsNotifierProvider.notifier)
-          .getUsersPayment(agentId: widget.agentId);
+      ref.read(usersPaymentsNotifierProvider.notifier).getUsersPayment(agentId: widget.agentId);
     });
   }
 
@@ -46,8 +44,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
       drawer: AppDrawer(agentAsync: ref.watch(agentProvider(widget.agentId))),
 
       body: analyticsAsync.when(
-        loading: () =>
-            Center(child: CircularProgressIndicator(color: theme.primaryColor)),
+        loading: () => Center(child: CircularProgressIndicator(color: theme.primaryColor)),
         error: (e, _) => Center(child: Text(e.toString())),
         data: (analytics) {
           return DefaultTabController(
@@ -75,48 +72,19 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                               );
                             },
                           ),
-                          if (ref
-                                  .read(revenueFilterProvider.notifier)
-                                  .state
-                                  .city
-                                  .isNotEmpty ||
-                              ref
-                                  .read(revenueFilterProvider.notifier)
-                                  .state
-                                  .religion
-                                  .isNotEmpty ||
-                              ref
-                                  .read(revenueFilterProvider.notifier)
-                                  .state
-                                  .caste
-                                  .isNotEmpty ||
-                              ref
-                                  .read(revenueFilterProvider.notifier)
-                                  .state
-                                  .gender
-                                  .isNotEmpty ||
-                              ref
-                                      .read(revenueFilterProvider.notifier)
-                                      .state
-                                      .startDate
-                                      .day !=
-                                  DateTime.now().day ||
-                              ref
-                                      .read(revenueFilterProvider.notifier)
-                                      .state
-                                      .endDate
-                                      .day !=
-                                  DateTime.now().day)
+                          if (ref.read(revenueFilterProvider.notifier).state.city.isNotEmpty ||
+                              ref.read(revenueFilterProvider.notifier).state.religion.isNotEmpty ||
+                              ref.read(revenueFilterProvider.notifier).state.caste.isNotEmpty ||
+                              ref.read(revenueFilterProvider.notifier).state.gender.isNotEmpty ||
+                              ref.read(revenueFilterProvider.notifier).state.startDate.day != DateTime.now().day ||
+                              ref.read(revenueFilterProvider.notifier).state.endDate.day != DateTime.now().day)
                             Positioned(
                               right: 8,
                               top: 8,
                               child: Container(
                                 width: 10,
                                 height: 10,
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
+                                decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
                               ),
                             ),
                         ],
@@ -155,21 +123,14 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                 items: [
                                   Card(
                                     elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Column(
                                         children: [
                                           Text(
-                                            AppLocalizations.of(
-                                              context,
-                                            )!.revenueByGender,
-                                            style: theme.textTheme.titleMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                            AppLocalizations.of(context)!.revenueByGender,
+                                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                                           ),
                                           const SizedBox(height: 16),
                                           SizedBox(
@@ -181,46 +142,35 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                                 centerSpaceRadius: 40,
                                                 sections: [
                                                   PieChartSectionData(
-                                                    value: analytics.maleRevenue
-                                                        .toDouble(),
-                                                    title:
-                                                        '${AppLocalizations.of(context)!.male}\n₹${analytics.maleRevenue}',
+                                                    value: analytics.maleRevenue.toDouble(),
+                                                    title: '${AppLocalizations.of(context)!.male}\n₹${analytics.maleRevenue}',
                                                     color: Colors.blue,
                                                     radius: 50,
                                                     titleStyle: const TextStyle(
                                                       fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontWeight: FontWeight.bold,
                                                       color: Colors.white,
                                                     ),
                                                   ),
                                                   PieChartSectionData(
-                                                    value: analytics
-                                                        .femaleRevenue
-                                                        .toDouble(),
-                                                    title:
-                                                        '${AppLocalizations.of(context)!.female}\n₹${analytics.femaleRevenue}',
+                                                    value: analytics.femaleRevenue.toDouble(),
+                                                    title: '${AppLocalizations.of(context)!.female}\n₹${analytics.femaleRevenue}',
                                                     color: Colors.pink,
                                                     radius: 50,
                                                     titleStyle: const TextStyle(
                                                       fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontWeight: FontWeight.bold,
                                                       color: Colors.white,
                                                     ),
                                                   ),
                                                   PieChartSectionData(
-                                                    value: analytics
-                                                        .otherRevenue
-                                                        .toDouble(),
-                                                    title:
-                                                        '${AppLocalizations.of(context)!.other}\n₹${analytics.otherRevenue}',
+                                                    value: analytics.otherRevenue.toDouble(),
+                                                    title: '${AppLocalizations.of(context)!.other}\n₹${analytics.otherRevenue}',
                                                     color: Colors.purple,
                                                     radius: 50,
                                                     titleStyle: const TextStyle(
                                                       fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontWeight: FontWeight.bold,
                                                       color: Colors.white,
                                                     ),
                                                   ),
@@ -230,29 +180,13 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                           ),
                                           const SizedBox(height: 16),
                                           Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              _LegendItem(
-                                                color: Colors.blue,
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.male,
-                                              ),
+                                              _LegendItem(color: Colors.blue, text: AppLocalizations.of(context)!.male),
                                               const SizedBox(width: 16),
-                                              _LegendItem(
-                                                color: Colors.pink,
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.female,
-                                              ),
+                                              _LegendItem(color: Colors.pink, text: AppLocalizations.of(context)!.female),
                                               const SizedBox(width: 16),
-                                              _LegendItem(
-                                                color: Colors.purple,
-                                                text: AppLocalizations.of(
-                                                  context,
-                                                )!.other,
-                                              ),
+                                              _LegendItem(color: Colors.purple, text: AppLocalizations.of(context)!.other),
                                             ],
                                           ),
                                         ],
@@ -261,21 +195,14 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                   ),
                                   Card(
                                     elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Column(
                                         children: [
                                           Text(
-                                            AppLocalizations.of(
-                                              context,
-                                            )!.revenueByReligion,
-                                            style: theme.textTheme.titleMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                            AppLocalizations.of(context)!.revenueByReligion,
+                                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                                           ),
                                           const SizedBox(height: 16),
                                           SizedBox(
@@ -284,36 +211,19 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                               PieChartData(
                                                 sectionsSpace: 2,
                                                 centerSpaceRadius: 40,
-                                                sections: analytics
-                                                    .religionRevenue
-                                                    .entries
-                                                    .map((entry) {
-                                                      return PieChartSectionData(
-                                                        value: entry.value
-                                                            .toDouble(),
-                                                        title:
-                                                            '${entry.key}\n₹${entry.value}',
-                                                        color:
-                                                            Colors
-                                                                .primaries[entry
-                                                                    .key
-                                                                    .hashCode %
-                                                                Colors
-                                                                    .primaries
-                                                                    .length],
-                                                        radius: 50,
-                                                        titleStyle:
-                                                            const TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                      );
-                                                    })
-                                                    .toList(),
+                                                sections: analytics.religionRevenue.entries.map((entry) {
+                                                  return PieChartSectionData(
+                                                    value: entry.value.toDouble(),
+                                                    title: '${entry.key}\n₹${entry.value}',
+                                                    color: Colors.primaries[entry.key.hashCode % Colors.primaries.length],
+                                                    radius: 50,
+                                                    titleStyle: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  );
+                                                }).toList(),
                                               ),
                                             ),
                                           ),
@@ -322,22 +232,12 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                             spacing: 8,
                                             runSpacing: 8,
                                             alignment: WrapAlignment.center,
-                                            children: analytics
-                                                .religionRevenue
-                                                .entries
-                                                .map((entry) {
-                                                  return _LegendItem(
-                                                    color:
-                                                        Colors.primaries[entry
-                                                                .key
-                                                                .hashCode %
-                                                            Colors
-                                                                .primaries
-                                                                .length],
-                                                    text: entry.key,
-                                                  );
-                                                })
-                                                .toList(),
+                                            children: analytics.religionRevenue.entries.map((entry) {
+                                              return _LegendItem(
+                                                color: Colors.primaries[entry.key.hashCode % Colors.primaries.length],
+                                                text: entry.key,
+                                              );
+                                            }).toList(),
                                           ),
                                         ],
                                       ),
@@ -345,22 +245,15 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                   ),
                                   Card(
                                     elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Column(
                                         children: [
                                           Text(
-                                            AppLocalizations.of(
-                                              context,
-                                            )!.revenueByCaste,
+                                            AppLocalizations.of(context)!.revenueByCaste,
 
-                                            style: theme.textTheme.titleMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                                           ),
                                           const SizedBox(height: 16),
                                           SizedBox(
@@ -369,35 +262,19 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                               PieChartData(
                                                 sectionsSpace: 2,
                                                 centerSpaceRadius: 40,
-                                                sections: analytics
-                                                    .casteRevenue
-                                                    .entries
-                                                    .map((entry) {
-                                                      return PieChartSectionData(
-                                                        value: entry.value
-                                                            .toDouble(),
-                                                        title:
-                                                            '${entry.key}\n₹${entry.value}',
-                                                        color:
-                                                            Colors.accents[entry
-                                                                    .key
-                                                                    .hashCode %
-                                                                Colors
-                                                                    .accents
-                                                                    .length],
-                                                        radius: 50,
-                                                        titleStyle:
-                                                            const TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                      );
-                                                    })
-                                                    .toList(),
+                                                sections: analytics.casteRevenue.entries.map((entry) {
+                                                  return PieChartSectionData(
+                                                    value: entry.value.toDouble(),
+                                                    title: '${entry.key}\n₹${entry.value}',
+                                                    color: Colors.accents[entry.key.hashCode % Colors.accents.length],
+                                                    radius: 50,
+                                                    titleStyle: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  );
+                                                }).toList(),
                                               ),
                                             ),
                                           ),
@@ -406,22 +283,12 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                                             spacing: 8,
                                             runSpacing: 8,
                                             alignment: WrapAlignment.center,
-                                            children: analytics
-                                                .casteRevenue
-                                                .entries
-                                                .map((entry) {
-                                                  return _LegendItem(
-                                                    color:
-                                                        Colors.accents[entry
-                                                                .key
-                                                                .hashCode %
-                                                            Colors
-                                                                .accents
-                                                                .length],
-                                                    text: entry.key,
-                                                  );
-                                                })
-                                                .toList(),
+                                            children: analytics.casteRevenue.entries.map((entry) {
+                                              return _LegendItem(
+                                                color: Colors.accents[entry.key.hashCode % Colors.accents.length],
+                                                text: entry.key,
+                                              );
+                                            }).toList(),
                                           ),
                                         ],
                                       ),
@@ -440,11 +307,7 @@ class _AgentRevenueScreenState extends ConsumerState<AgentRevenueScreen> {
                       slivers: [
                         SliverPadding(
                           padding: const EdgeInsets.all(16),
-                          sliver: SliverList(
-                            delegate: SliverChildListDelegate([
-                              _DailyRevenueChart(analytics),
-                            ]),
-                          ),
+                          sliver: SliverList(delegate: SliverChildListDelegate([_DailyRevenueChart(analytics)])),
                         ),
                       ],
                     ),
@@ -493,17 +356,12 @@ class _RegionRevenueBarChart extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Center(
-            child: Text(AppLocalizations.of(context)!.noRegionDataForChart),
-          ),
+          child: Center(child: Text(AppLocalizations.of(context)!.noRegionDataForChart)),
         ),
       );
     }
 
-    final sortedEntries = regionRevenue.entries.toList()
-      ..sort(
-        (a, b) => b.value.compareTo(a.value),
-      ); // Sort by revenue descending
+    final sortedEntries = regionRevenue.entries.toList()..sort((a, b) => b.value.compareTo(a.value)); // Sort by revenue descending
 
     return Card(
       elevation: 2,
@@ -514,9 +372,7 @@ class _RegionRevenueBarChart extends StatelessWidget {
           children: [
             Text(
               AppLocalizations.of(context)!.regionRevenueDistribution,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -533,10 +389,7 @@ class _RegionRevenueBarChart extends StatelessWidget {
                           toY: data.value.toDouble(),
                           color: Colors.teal, // Consistent color for regions
                           width: 16,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(4),
-                            topRight: Radius.circular(4),
-                          ),
+                          borderRadius: const BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(4)),
                         ),
                       ],
                       showingTooltipIndicators: [0],
@@ -544,25 +397,17 @@ class _RegionRevenueBarChart extends StatelessWidget {
                   }).toList(),
                   titlesData: FlTitlesData(
                     show: true,
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
+                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
 
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
+                    leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
-                          if (value.toInt() >= 0 &&
-                              value.toInt() < sortedEntries.length) {
+                          if (value.toInt() >= 0 && value.toInt() < sortedEntries.length) {
                             return Padding(
                               padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(
-                                sortedEntries[value.toInt()].key,
-                                style: const TextStyle(fontSize: 10),
-                              ),
+                              child: Text(sortedEntries[value.toInt()].key, style: const TextStyle(fontSize: 10)),
                             );
                           }
                           return const Text('');
@@ -580,19 +425,11 @@ class _RegionRevenueBarChart extends StatelessWidget {
                         final region = sortedEntries[group.x.toInt()].key;
                         return BarTooltipItem(
                           '$region\n',
-                          const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
+                          const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                           children: <TextSpan>[
                             TextSpan(
                               text: rod.toY.toInt().toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
                             ),
                           ],
                         );
@@ -617,9 +454,7 @@ class _TransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (payments.isEmpty) {
-      return Center(
-        child: Text(AppLocalizations.of(context)!.noTransactionsFound),
-      );
+      return Center(child: Text(AppLocalizations.of(context)!.noTransactionsFound));
     }
 
     return ListView.builder(
@@ -630,21 +465,13 @@ class _TransactionList extends StatelessWidget {
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: _getStatusColor(payment.status).withOpacity(0.1),
-              child: Icon(
-                _getStatusIcon(payment.status),
-                color: _getStatusColor(payment.status),
-              ),
+              child: Icon(_getStatusIcon(payment.status), color: _getStatusColor(payment.status)),
             ),
-            title: Text(
-              payment.fullName,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            title: Text(payment.fullName, style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -662,29 +489,15 @@ class _TransactionList extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  "₹${payment.amount}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
+                Text("₹${payment.amount}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 if (payment.agentCommission > 0)
                   Text(
                     "${AppLocalizations.of(context)!.commission}: ₹${payment.agentCommission.toStringAsFixed(2)}",
-                    style: const TextStyle(
-                      color: Colors.orange,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(color: Colors.orange, fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 Text(
                   payment.status,
-                  style: TextStyle(
-                    color: _getStatusColor(payment.status),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: TextStyle(color: _getStatusColor(payment.status), fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -736,15 +549,9 @@ class _RevenueRow extends StatelessWidget {
       children: [
         Row(
           children: [
-            _RevenueCard(
-              AppLocalizations.of(context)!.totalRevenue,
-              '₹${analytics.totalRevenue}',
-            ),
+            _RevenueCard(AppLocalizations.of(context)!.totalRevenue, '₹${analytics.totalRevenue}'),
             const SizedBox(width: 12),
-            _RevenueCard(
-              AppLocalizations.of(context)!.todayRevenue,
-              '₹${analytics.todayRevenue}',
-            ),
+            _RevenueCard(AppLocalizations.of(context)!.todayRevenue, '₹${analytics.todayRevenue}'),
           ],
         ),
         const SizedBox(height: 12),
@@ -780,19 +587,11 @@ class _RevenueCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Text(
-                title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: Colors.grey[600],
-                ),
-              ),
+              Text(title, style: theme.textTheme.titleMedium?.copyWith(color: Colors.grey[600])),
               const SizedBox(height: 8),
               Text(
                 value,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: color ?? theme.primaryColor,
-                ),
+                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: color ?? theme.primaryColor),
               ),
             ],
           ),
@@ -817,12 +616,7 @@ class _PaymentStatusPie extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(
-              AppLocalizations.of(context)!.paymentStatus,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text(AppLocalizations.of(context)!.paymentStatus, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             SizedBox(
               height: 200,
@@ -836,33 +630,21 @@ class _PaymentStatusPie extends StatelessWidget {
                       title: '${analytics.successCount}',
                       color: Colors.green,
                       radius: 50,
-                      titleStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      titleStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     PieChartSectionData(
                       value: analytics.pendingCount.toDouble(),
                       title: '${analytics.pendingCount}',
                       color: Colors.orange,
                       radius: 50,
-                      titleStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      titleStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     PieChartSectionData(
                       value: analytics.failedCount.toDouble(),
                       title: '${analytics.failedCount}',
                       color: Colors.red,
                       radius: 50,
-                      titleStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      titleStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ],
                 ),
@@ -872,20 +654,11 @@ class _PaymentStatusPie extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _LegendItem(
-                  color: Colors.green,
-                  text: AppLocalizations.of(context)!.success,
-                ),
+                _LegendItem(color: Colors.green, text: AppLocalizations.of(context)!.success),
                 const SizedBox(width: 16),
-                _LegendItem(
-                  color: Colors.orange,
-                  text: AppLocalizations.of(context)!.pending,
-                ),
+                _LegendItem(color: Colors.orange, text: AppLocalizations.of(context)!.pending),
                 const SizedBox(width: 16),
-                _LegendItem(
-                  color: Colors.red,
-                  text: AppLocalizations.of(context)!.failed,
-                ),
+                _LegendItem(color: Colors.red, text: AppLocalizations.of(context)!.failed),
               ],
             ),
           ],
@@ -924,8 +697,7 @@ class _DailyRevenueChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final sortedEntries = analytics.dailyRevenue.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
+    final sortedEntries = analytics.dailyRevenue.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
 
     return Card(
       elevation: 2,
@@ -936,9 +708,7 @@ class _DailyRevenueChart extends StatelessWidget {
           children: [
             Text(
               AppLocalizations.of(context)!.dailyRevenueTrend,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -948,25 +718,17 @@ class _DailyRevenueChart extends StatelessWidget {
                   gridData: FlGridData(show: true, drawVerticalLine: false),
                   titlesData: FlTitlesData(
                     show: true,
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
+                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
-                          if (value.toInt() >= 0 &&
-                              value.toInt() < sortedEntries.length) {
+                          if (value.toInt() >= 0 && value.toInt() < sortedEntries.length) {
                             final date = sortedEntries[value.toInt()].key;
                             return Padding(
                               padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(
-                                "${date.day}/${date.month}",
-                                style: const TextStyle(fontSize: 10),
-                              ),
+                              child: Text("${date.day}/${date.month}", style: const TextStyle(fontSize: 10)),
                             );
                           }
                           return const Text('');
@@ -977,21 +739,12 @@ class _DailyRevenueChart extends StatelessWidget {
                   borderData: FlBorderData(show: false),
                   lineBarsData: [
                     LineChartBarData(
-                      spots: List.generate(
-                        sortedEntries.length,
-                        (i) => FlSpot(
-                          i.toDouble(),
-                          sortedEntries[i].value.toDouble(),
-                        ),
-                      ),
+                      spots: List.generate(sortedEntries.length, (i) => FlSpot(i.toDouble(), sortedEntries[i].value.toDouble())),
                       isCurved: true,
                       color: theme.primaryColor,
                       barWidth: 3,
                       dotData: FlDotData(show: true),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        color: theme.primaryColor.withOpacity(0.1),
-                      ),
+                      belowBarData: BarAreaData(show: true, color: theme.primaryColor.withOpacity(0.1)),
                     ),
                   ],
                 ),
@@ -1002,9 +755,7 @@ class _DailyRevenueChart extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               AppLocalizations.of(context)!.revenueByPaymentStatus,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -1014,56 +765,30 @@ class _DailyRevenueChart extends StatelessWidget {
                   barGroups: [
                     BarChartGroupData(
                       x: 0,
-                      barRods: [
-                        BarChartRodData(
-                          toY: analytics.successCount.toDouble(),
-                          color: Colors.green,
-                          width: 20,
-                        ),
-                      ],
+                      barRods: [BarChartRodData(toY: analytics.successCount.toDouble(), color: Colors.green, width: 20)],
                     ),
                     BarChartGroupData(
                       x: 1,
-                      barRods: [
-                        BarChartRodData(
-                          toY: analytics.pendingCount.toDouble(),
-                          color: Colors.orange,
-                          width: 20,
-                        ),
-                      ],
+                      barRods: [BarChartRodData(toY: analytics.pendingCount.toDouble(), color: Colors.orange, width: 20)],
                     ),
                     BarChartGroupData(
                       x: 2,
-                      barRods: [
-                        BarChartRodData(
-                          toY: analytics.failedCount.toDouble(),
-                          color: Colors.red,
-                          width: 20,
-                        ),
-                      ],
+                      barRods: [BarChartRodData(toY: analytics.failedCount.toDouble(), color: Colors.red, width: 20)],
                     ),
                   ],
                   titlesData: FlTitlesData(
                     show: true,
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
+                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
                           switch (value.toInt()) {
                             case 0:
-                              return Text(
-                                AppLocalizations.of(context)!.success,
-                              );
+                              return Text(AppLocalizations.of(context)!.success);
                             case 1:
-                              return Text(
-                                AppLocalizations.of(context)!.pending,
-                              );
+                              return Text(AppLocalizations.of(context)!.pending);
                             case 2:
                               return Text(AppLocalizations.of(context)!.failed);
                             default:
@@ -1072,9 +797,7 @@ class _DailyRevenueChart extends StatelessWidget {
                         },
                       ),
                     ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
+                    leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   ),
                   borderData: FlBorderData(show: false),
                   barTouchData: BarTouchData(
@@ -1096,19 +819,11 @@ class _DailyRevenueChart extends StatelessWidget {
                         }
                         return BarTooltipItem(
                           '$status\n',
-                          const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
+                          const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                           children: <TextSpan>[
                             TextSpan(
                               text: rod.toY.toInt().toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
                             ),
                           ],
                         );
@@ -1121,9 +836,7 @@ class _DailyRevenueChart extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               AppLocalizations.of(context)!.revenueByReligion,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -1131,9 +844,7 @@ class _DailyRevenueChart extends StatelessWidget {
               child: BarChart(
                 BarChartData(
                   barGroups: analytics.religionRevenue.entries.map((entry) {
-                    final index = analytics.religionRevenue.keys
-                        .toList()
-                        .indexOf(entry.key);
+                    final index = analytics.religionRevenue.keys.toList().indexOf(entry.key);
                     return BarChartGroupData(
                       x: index,
                       barRods: [
@@ -1147,54 +858,34 @@ class _DailyRevenueChart extends StatelessWidget {
                   }).toList(),
                   titlesData: FlTitlesData(
                     show: true,
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
+                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
-                          final religion = analytics.religionRevenue.keys
-                              .elementAt(value.toInt());
+                          final religion = analytics.religionRevenue.keys.elementAt(value.toInt());
                           return Padding(
                             padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              religion,
-                              style: const TextStyle(fontSize: 10),
-                            ),
+                            child: Text(religion, style: const TextStyle(fontSize: 10)),
                           );
                         },
                       ),
                     ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
+                    leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   ),
                   borderData: FlBorderData(show: false),
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final religion = analytics.religionRevenue.keys
-                            .elementAt(group.x.toInt());
+                        final religion = analytics.religionRevenue.keys.elementAt(group.x.toInt());
                         return BarTooltipItem(
                           '$religion\n',
-                          const TextStyle(
-                            color: Colors.white,
-
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
+                          const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                           children: <TextSpan>[
                             TextSpan(
                               text: rod.toY.toInt().toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
                             ),
                           ],
                         );
@@ -1205,21 +896,14 @@ class _DailyRevenueChart extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              AppLocalizations.of(context)!.revenueByCaste,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text(AppLocalizations.of(context)!.revenueByCaste, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 24),
             SizedBox(
               height: 350,
               child: BarChart(
                 BarChartData(
                   barGroups: analytics.casteRevenue.entries.map((entry) {
-                    final index = analytics.casteRevenue.keys.toList().indexOf(
-                      entry.key,
-                    );
+                    final index = analytics.casteRevenue.keys.toList().indexOf(entry.key);
                     return BarChartGroupData(
                       x: index,
                       barRods: [
@@ -1233,55 +917,34 @@ class _DailyRevenueChart extends StatelessWidget {
                   }).toList(),
                   titlesData: FlTitlesData(
                     show: true,
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
+                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
-                          final caste = analytics.casteRevenue.keys.elementAt(
-                            value.toInt(),
-                          );
+                          final caste = analytics.casteRevenue.keys.elementAt(value.toInt());
                           return Padding(
                             padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              caste,
-                              style: const TextStyle(fontSize: 10),
-                            ),
+                            child: Text(caste, style: const TextStyle(fontSize: 10)),
                           );
                         },
                       ),
                     ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
+                    leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   ),
                   borderData: FlBorderData(show: false),
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final caste = analytics.casteRevenue.keys.elementAt(
-                          group.x.toInt(),
-                        );
+                        final caste = analytics.casteRevenue.keys.elementAt(group.x.toInt());
                         return BarTooltipItem(
                           '$caste\n',
-                          const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
+                          const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                           children: <TextSpan>[
                             TextSpan(
                               text: rod.toY.toInt().toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
                             ),
                           ],
                         );
@@ -1316,20 +979,13 @@ class _RegionRevenueList extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(
-                AppLocalizations.of(context)!.regions,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child: Text(AppLocalizations.of(context)!.regions, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             ),
             const Divider(),
             if (regionRevenue.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Center(
-                  child: Text(AppLocalizations.of(context)!.noRegionData),
-                ),
+                child: Center(child: Text(AppLocalizations.of(context)!.noRegionData)),
               )
             else
               ...regionRevenue.entries.map((e) {
@@ -1337,10 +993,7 @@ class _RegionRevenueList extends StatelessWidget {
                   title: Text(e.key),
                   trailing: Text(
                     '₹ ${e.value}',
-                    style: TextStyle(
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold),
                   ),
                 );
               }).toList(),

@@ -95,7 +95,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get agentIdLabel => 'स्टाफ आईडी: ';
 
   @override
-  String get navHome => 'होम';
+  String get navHome => 'मैचेस';
 
   @override
   String get navWishlist => 'विशलिस्ट';
@@ -105,6 +105,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get navProfile => 'प्रोफाइल';
+
+  @override
+  String get navChat => 'चैट';
 
   @override
   String get navDashboard => 'डैशबोर्ड';
@@ -167,7 +170,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get noClientsYet => 'अभी तक कोई ग्राहक नहीं';
 
   @override
-  String get home => 'होम';
+  String get home => 'मैचेस';
 
   @override
   String get homeSubtitle => 'अपना सबसे अच्छा साथी खोजें';

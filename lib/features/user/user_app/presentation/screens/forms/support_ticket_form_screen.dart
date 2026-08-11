@@ -136,8 +136,9 @@ class _CreateSupportTicketScreenState
                           setState(() => _selectedCategory = value);
                         },
                         validator: (value) {
-                          if (value == null)
+                          if (value == null) {
                             return AppLabels.pleaseSelectCategory(context);
+                          }
                           return null;
                         },
                       ),

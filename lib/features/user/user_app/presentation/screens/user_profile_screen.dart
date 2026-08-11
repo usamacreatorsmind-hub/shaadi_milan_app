@@ -1,3 +1,8 @@
+import 'package:in_app_review/in_app_review.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
+import 'package:shadi_milan/features/l10n/app_translation_service.dart';
+import 'package:shadi_milan/core/notification/notification_provider.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,49 +12,40 @@ import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/pa
 
 import '../../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
-import '../../../../../app/custom/custom_widgets/user_drawer.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
+import '../../../../translitration/models/bilingual_value.dart';
 import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
 
-final userProfileScreenProvider =
-    StreamProvider.family<MetrimonyProfileViewModel, String>((ref, userId) {
-      final repository = ref.watch(matrimonyRepositoryProvider);
-      final userRepo = ref.watch(userRepositoryProvider);
-      final agentRepo = ref.watch(agentRepositoryProvider);
+final userProfileScreenProvider = StreamProvider.family<MetrimonyProfileViewModel, String>((ref, userId) {
+  final repository = ref.watch(matrimonyRepositoryProvider);
+  final userRepo = ref.watch(userRepositoryProvider);
+  final agentRepo = ref.watch(agentRepositoryProvider);
 
-      return repository.watchMatrimonyProfile(userId).asyncMap((
-        matrimonyProfile,
-      ) async {
-        final user = await userRepo.fetchUser(userId);
+  return repository.watchMatrimonyProfile(userId).asyncMap((matrimonyProfile) async {
+    final user = await userRepo.fetchUser(userId);
 
-        // fetch AgentEntity
-        AgentEntity? agent;
-        if (user.agentId.isNotEmpty) {
-          try {
-            agent = await agentRepo.fetchAgent(user.agentId);
-          } catch (e) {
-            debugPrint(
-              'Error fetching agent with ID: ${user.agentId}, Error: $e',
-            );
-            agent = null;
-          }
-        } else {
-          debugPrint('Staff Id is empty for user: $userId');
-        }
+    // fetch AgentEntity
+    AgentEntity? agent;
+    if (user.agentId.isNotEmpty) {
+      try {
+        agent = await agentRepo.fetchAgent(user.agentId);
+      } catch (e) {
+        debugPrint('Error fetching agent with ID: ${user.agentId}, Error: $e');
+        agent = null;
+      }
+    } else {
+      debugPrint('Staff Id is empty for user: $userId');
+    }
 
-        return MetrimonyProfileViewModel(
-          metrimonyProfile: matrimonyProfile,
-          userProfile: user,
-          agentEntity: agent,
-        );
-      });
-    });
+    return MetrimonyProfileViewModel(metrimonyProfile: matrimonyProfile, userProfile: user, agentEntity: agent);
+  });
+});
 
 @RoutePage()
 class UserProfileScreen extends ConsumerWidget {
@@ -63,7 +59,6 @@ class UserProfileScreen extends ConsumerWidget {
 
     final currentUserAsync = ref.watch(currentUserProvider);
     return Scaffold(
-      drawer: UserDrawer(userAsync: currentUserAsync),
       backgroundColor: Colors.grey[100],
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -75,16 +70,7 @@ class UserProfileScreen extends ConsumerWidget {
         data: (profile) {
           return CustomScrollView(
             slivers: [
-              ModernGradientAppBar(
-                title: AppLabels.myProfile(context),
-                subtitle: AppLabels.manageAccount(context),
-                leading: Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.white),
-                    onPressed: () => Scaffold.of(context).openDrawer(),
-                  ),
-                ),
-              ),
+              ModernGradientAppBar(title: AppLabels.myProfile(context), subtitle: AppLabels.manageAccount(context), centerTitle: true),
 
               SliverToBoxAdapter(child: _ProfileHeaderCard(profile: profile)),
 
@@ -103,37 +89,22 @@ class UserProfileScreen extends ConsumerWidget {
                         //  check for payments collection if status is success then show premium card
                         Consumer(
                           builder: (context, ref, child) {
-                            final paymentState = ref.watch(
-                              paymentNotifierProvider(userId),
-                            );
+                            final paymentState = ref.watch(paymentNotifierProvider(userId));
                             if (paymentState.status == PayStatus.loading) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
+                              return const Center(child: CircularProgressIndicator());
                             }
 
                             // change after publishing on playstore
                             if (paymentState.status == PayStatus.idle) {
                               return GestureDetector(
-                                onTap: () => AutoRouter.of(context).push(
-                                  UserPaymentSuccessRoute(user: profile.user),
-                                ),
+                                onTap: () => AutoRouter.of(context).push(UserPaymentSuccessRoute(user: profile.user)),
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 18,
-                                  ),
+                                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                                   decoration: BoxDecoration(
                                     color: Colors.green.shade50,
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: Colors.green.shade200,
-                                      width: 1.5,
-                                    ),
+                                    border: Border.all(color: Colors.green.shade200, width: 1.5),
                                   ),
                                   child: Row(
                                     children: [
@@ -141,23 +112,13 @@ class UserProfileScreen extends ConsumerWidget {
                                       Container(
                                         height: 45,
                                         width: 45,
-                                        decoration: BoxDecoration(
-                                          color: Colors.green.shade500,
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        child: const Icon(
-                                          Icons.verified_user_rounded,
-                                          color: Colors.white,
-                                          size: 26,
-                                        ),
+                                        decoration: BoxDecoration(color: Colors.green.shade500, borderRadius: BorderRadius.circular(12)),
+                                        child: const Icon(Icons.verified_user_rounded, color: Colors.white, size: 26),
                                       ),
                                       const SizedBox(width: 16),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               AppLabels.premiumActive(context),
@@ -169,23 +130,13 @@ class UserProfileScreen extends ConsumerWidget {
                                               ),
                                             ),
                                             Text(
-                                              AppLabels.premiumMemberMessage(
-                                                context,
-                                              ),
-                                              style: const TextStyle(
-                                                fontSize: 17,
-                                                color: Colors.black87,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                              AppLabels.premiumMemberMessage(context),
+                                              style: const TextStyle(fontSize: 17, color: Colors.black87, fontWeight: FontWeight.w600),
                                             ),
                                           ],
                                         ),
                                       ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 14,
-                                        color: Colors.green.shade300,
-                                      ),
+                                      Icon(Icons.arrow_forward_ios, size: 14, color: Colors.green.shade300),
                                     ],
                                   ),
                                 ),
@@ -201,9 +152,7 @@ class UserProfileScreen extends ConsumerWidget {
                           icon: Icons.person_search_outlined,
                           title: AppLabels.myProfile(context),
                           onTap: () {
-                            AutoRouter.of(
-                              context,
-                            ).push(MyProfileRoute(uid: userId));
+                            AutoRouter.of(context).push(MyProfileRoute(uid: userId));
                           },
                         ),
                         _SettingsTile(
@@ -215,18 +164,10 @@ class UserProfileScreen extends ConsumerWidget {
                                 context: context,
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,
-                                builder: (context) => AgentBottomSheet(
-                                  agent: profile.agentEntity!,
-                                ),
+                                builder: (context) => AgentBottomSheet(agent: profile.agentEntity!),
                               );
                             } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppLabels.noAgentAssigned(context),
-                                  ),
-                                ),
-                              );
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.noAgentAssigned(context))));
                             }
                           },
                         ),
@@ -250,10 +191,17 @@ class UserProfileScreen extends ConsumerWidget {
                           },
                         ),
 
-                        // 🔹 ACCOUNT SETTINGS SECTION
-                        _SectionTitle(
-                          title: AppLabels.accountSettings(context),
+                        // Support Tickets
+                        _SettingsTile(
+                          icon: Icons.support_agent_outlined,
+                          title: AppLabels.supportTickets(context),
+                          onTap: () {
+                            AutoRouter.of(context).push(SupportTicketsRoute(userId: userId));
+                          },
                         ),
+
+                        // 🔹 ACCOUNT SETTINGS SECTION
+                        _SectionTitle(title: AppLabels.accountSettings(context)),
 
                         _SettingsTile(
                           icon: Icons.lock_outline,
@@ -269,9 +217,7 @@ class UserProfileScreen extends ConsumerWidget {
                           icon: Icons.payment_outlined,
                           title: AppLabels.paymentHistory(context),
                           onTap: () {
-                            AutoRouter.of(
-                              context,
-                            ).push(UserPaymentOrderHistoryRoute());
+                            AutoRouter.of(context).push(UserPaymentOrderHistoryRoute());
                           },
                         ),
 
@@ -279,51 +225,117 @@ class UserProfileScreen extends ConsumerWidget {
                           icon: Icons.family_restroom_outlined,
                           title: AppLabels.postMarriagePayment(context),
                           onTap: () {
-                            AutoRouter.of(context).push(
-                              UserAfterMarriagePaymentRoute(userId: userId),
+                            AutoRouter.of(context).push(UserAfterMarriagePaymentRoute(userId: userId));
+                          },
+                        ),
+
+                        _SettingsTile(
+                          icon: Icons.notifications_outlined,
+                          title: AppLabels.notifications(context),
+                          trailing: Consumer(
+                            builder: (context, ref, _) {
+                              final count = ref.watch(unreadNotificationsCountProvider);
+                              if (count <= 0) return const Icon(Icons.arrow_forward_ios, size: 16);
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(12)),
+                                constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                                child: Text(
+                                  count > 99 ? '99+' : count.toString(),
+                                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
+                              );
+                            },
+                          ),
+                          onTap: () {
+                            AutoRouter.of(context).push(const UserNotificationRoute());
+                          },
+                        ),
+
+                        _SettingsTile(
+                          icon: Icons.language,
+                          title: AppLabels.language(context),
+                          onTap: () => _showLanguageDialog(context, ref),
+                        ),
+
+                        // 🔹 LEGAL & INFO SECTION
+                        _SectionTitle(title: AppLabels.legalAndInfo(context)),
+
+                        _SettingsTile(
+                          icon: Icons.info_outline,
+                          title: AppLabels.aboutUs(context),
+                          onTap: () {
+                            AutoRouter.of(context).push(const AboutUsRoute());
+                          },
+                        ),
+
+                        _SettingsTile(
+                          icon: Icons.privacy_tip_outlined,
+                          title: AppLabels.privacyPolicy(context),
+                          onTap: () {
+                            AutoRouter.of(context).push(const PrivacyPolicyRoute());
+                          },
+                        ),
+
+                        _SettingsTile(
+                          icon: Icons.description_outlined,
+                          title: AppLabels.termsAndConditions(context),
+                          onTap: () {
+                            AutoRouter.of(context).push(const TermsAndConditionsRoute());
+                          },
+                        ),
+
+                        _SettingsTile(
+                          icon: Icons.share_outlined,
+                          title: AppLabels.shareApp(context),
+                          onTap: () async {
+                            const String packageName = "com.shaadimilan.app";
+                            const String playStoreLink = "https://play.google.com/store/apps/details?id=$packageName";
+                            await Share.share(
+                              'Check out ${AppConstants.appName}! Find your perfect match here: $playStoreLink',
+                              subject: 'Download ${AppConstants.appNameRaw} App',
                             );
                           },
                         ),
 
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          child: OutlinedButton(
-                            style: ButtonStyle(
-                              foregroundColor: WidgetStateProperty.all(
-                                Theme.of(context).primaryColor,
-                              ),
-                              side: WidgetStateProperty.all(
-                                BorderSide(
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                              ),
-                              padding: WidgetStateProperty.all(
-                                const EdgeInsets.symmetric(vertical: 14),
-                              ),
-                              shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                              ),
-                            ),
-                            onPressed: () {
-                              //LOGOUT HERE
-
-                              ref.watch(authRepositoryProvider).signOut();
-
-                              AutoRouter.of(context).replace(UserLoginRoute());
-
-                              debugPrint("Logout button pressed");
-                            },
-                            child: Text(AppLabels.logout(context)),
-                          ),
+                        _SettingsTile(
+                          icon: Icons.star_rate_outlined,
+                          title: AppLabels.rateUs(context),
+                          onTap: () async {
+                            final InAppReview inAppReview = InAppReview.instance;
+                            if (await inAppReview.isAvailable()) {
+                              inAppReview.openStoreListing(appStoreId: 'YOUR_IOS_APP_ID_HERE');
+                            }
+                          },
                         ),
 
-                        const SizedBox(height: 100),
+                        const SizedBox(height: 10),
                       ],
                     );
                   }, childCount: 1),
+                ),
+              ),
+
+              SliverToBoxAdapter(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.logout, size: 20),
+                    label: Text(AppLabels.logout(context), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red.shade700,
+                      side: BorderSide(color: Colors.red.shade200, width: 1.5),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      backgroundColor: Colors.red.shade50.withOpacity(0.5),
+                    ),
+                    onPressed: () {
+                      ref.read(authRepositoryProvider).signOut();
+                      AutoRouter.of(context).replace(UserLoginRoute());
+                    },
+                  ),
                 ),
               ),
             ],
@@ -332,6 +344,31 @@ class UserProfileScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+void _showLanguageDialog(BuildContext context, WidgetRef ref) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(AppLabels.selectLanguage(context)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: AppTranslation.supportedTranslations.map((translation) {
+            return ListTile(
+              title: Text(translation.nativeName),
+              subtitle: Text(translation.name),
+              onTap: () {
+                ref.read(appTranslationServiceProvider).setLanguageCode(translation.languageCode);
+                ref.read(localeProvider.notifier).state = Locale(translation.languageCode);
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        ),
+      );
+    },
+  );
 }
 
 class _ProfileHeaderCard extends StatelessWidget {
@@ -347,157 +384,79 @@ class _ProfileHeaderCard extends StatelessWidget {
     final primaryColor = theme.primaryColor;
 
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.12),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 8))],
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: primaryColor.withOpacity(0.2), width: 2),
+                      ),
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundColor: primaryColor.withOpacity(0.1),
+                        backgroundImage: hasImage ? NetworkImage(profile.userProfile.profileImageUrl) : null,
+                        child: !hasImage
+                            ? Text(
+                                profile.userProfile.fullName.en.isNotEmpty ? profile.userProfile.fullName.en[0].toUpperCase() : '?',
+                                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: primaryColor),
+                              )
+                            : null,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                      child: const Icon(Icons.check, color: Colors.white, size: 16),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                BilingualParser(
+                  value: profile.user.fullName,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  profile.user.email?.toLowerCase() ?? AppLabels.notAvailableShort(context),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.03),
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildStatColumn(context, AppLabels.profile(context), "85%"),
+                _buildVerticalDivider(),
+                _buildStatColumn(context, AppLabels.profileStatus(context), AppLabels.active(context)),
+                _buildVerticalDivider(),
+                _buildStatColumn(context, AppLabels.trustScore(context), "4.8"),
+              ],
+            ),
           ),
         ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: Stack(
-          children: [
-            // 1. Decorative Background Element
-            Positioned(
-              right: -50,
-              top: -50,
-              child: CircleAvatar(
-                radius: 80,
-                backgroundColor: primaryColor.withOpacity(0.05),
-              ),
-            ),
-
-            // 2. Main Content
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-              child: Column(
-                children: [
-                  // --- Avatar with Status Indicator ---
-                  Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: primaryColor.withOpacity(0.1),
-                            width: 4,
-                          ),
-                        ),
-                        child: CircleAvatar(
-                          radius: 55,
-                          backgroundColor: primaryColor.withOpacity(0.1),
-                          backgroundImage: hasImage
-                              ? NetworkImage(
-                                  profile.userProfile.profileImageUrl,
-                                )
-                              : null,
-                          child: !hasImage
-                              ? Text(
-                                  profile.userProfile.fullName.en.isNotEmpty
-                                      ? profile.userProfile.fullName.en[0]
-                                            .toUpperCase()
-                                      : '?',
-                                  style: TextStyle(
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold,
-                                    color: primaryColor,
-                                  ),
-                                )
-                              : null,
-                        ),
-                      ),
-                      // Verification Badge
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // --- Name & Badge ---
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          profile.user.fullName.en.isEmpty
-                              ? AppLabels.notAvailableShort(context)
-                              : profile.user.fullName.en,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFF1A1A1A),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.stars_rounded,
-                        color: Colors.amber[700],
-                        size: 20,
-                      ),
-                    ],
-                  ),
-
-                  // --- Subtitle (Email/Role) ---
-                  Text(
-                    profile.user.email?.toLowerCase() ??
-                        AppLabels.notAvailableShort(context),
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-                  const Divider(height: 1, thickness: 0.5),
-                  const SizedBox(height: 20),
-
-                  // --- Profile Stats Row ---
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildStatColumn(
-                        context,
-                        AppLabels.profile(context),
-                        "85%",
-                      ),
-                      _buildVerticalDivider(),
-                      _buildStatColumn(
-                        context,
-                        AppLabels.profileStatus(context),
-                        AppLabels.active(context),
-                      ),
-                      _buildVerticalDivider(),
-                      _buildStatColumn(
-                        context,
-                        AppLabels.trustScore(context),
-                        "4.8",
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -507,20 +466,19 @@ class _ProfileHeaderCard extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87),
         ),
         const SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+        Text(
+          label,
+          style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),
+        ),
       ],
     );
   }
 
   Widget _buildVerticalDivider() {
-    return Container(height: 30, width: 1, color: Colors.grey[200]);
+    return Container(height: 24, width: 1, color: Colors.grey[300]);
   }
 }
 
@@ -540,42 +498,36 @@ class _PremiumCard extends StatelessWidget {
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
-
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.9,
-              ),
-              // theme color
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
               backgroundColor: theme.canvasColor,
               builder: (BuildContext context) {
                 return const AgentFormWidget();
               },
             );
-
             return;
           }
-
-          AutoRouter.of(
-            context,
-          ).push(UserPaymentRoute(userId: profile!.userProfile.uid));
+          AutoRouter.of(context).push(UserPaymentRoute(userId: profile!.userProfile.uid));
         }
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: theme.primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [theme.primaryColor, theme.primaryColor.withOpacity(0.8)],
+          ),
+          boxShadow: [BoxShadow(color: theme.primaryColor.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 6))],
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.workspace_premium_outlined,
-              size: 50,
-              color: theme.primaryColor,
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(14)),
+              child: const Icon(Icons.workspace_premium, size: 30, color: Colors.white),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -584,28 +536,14 @@ class _PremiumCard extends StatelessWidget {
                 children: [
                   Text(
                     AppLabels.upgradeToPremium(context),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                    ),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    AppLabels.premiumUpgradeBenefits(context),
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.primaryColor.withOpacity(0.8),
-                    ),
-                  ),
+                  const SizedBox(height: 4),
+                  Text(AppLabels.premiumUpgradeBenefits(context), style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.9))),
                 ],
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: theme.primaryColor.withOpacity(0.6),
-            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white),
           ],
         ),
       ),
@@ -648,9 +586,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
     });
 
     try {
-      final agent = await ref
-          .read(agentRepositoryProvider)
-          .fetchAgentEntitybyAgentId(agentId);
+      final agent = await ref.read(agentRepositoryProvider).fetchAgentEntitybyAgentId(agentId);
 
       if (mounted) {
         setState(() {
@@ -712,10 +648,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
             ),
             const SizedBox(height: 24),
 
-            if (selectedTab == 1)
-              _buildAgentForm()
-            else
-              _buildContactAndSupportForm(),
+            if (selectedTab == 1) _buildAgentForm() else _buildContactAndSupportForm(),
           ],
         ),
       ),
@@ -724,31 +657,16 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
 
   void _assignAgent({required String agentId}) {
     if (agentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLabels.pleaseEnterStaffId(context))),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.pleaseEnterStaffId(context))));
       return;
     }
 
-    ref
-        .read(userRepositoryProvider)
-        .updateAgentId(
-          ref.read(authRepositoryProvider).currentUser!.uid,
-          agentId,
-        );
+    ref.read(userRepositoryProvider).updateAgentId(ref.read(authRepositoryProvider).currentUser!.uid, agentId);
 
     /// update state
-    ref.invalidate(
-      userProfileScreenProvider(
-        ref.read(authRepositoryProvider).currentUser!.uid,
-      ),
-    );
+    ref.invalidate(userProfileScreenProvider(ref.read(authRepositoryProvider).currentUser!.uid));
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLabels.agentAssignedSuccessfully(context, agentId)),
-      ),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.agentAssignedSuccessfully(context, agentId))));
 
     _agentIdController.clear();
     Navigator.pop(context);
@@ -762,10 +680,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
         children: [
           Text(
             AppLabels.agentSetupDescription(context),
-            style: TextStyle(
-              fontSize: 16,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-            ),
+            style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
           ),
           const SizedBox(height: 20),
           TextField(
@@ -773,14 +688,9 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
             decoration: InputDecoration(
               labelText: AppLabels.staffId(context),
               hintText: AppLabels.staffIdHint(context),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               prefixIcon: const Icon(Icons.person_outline),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: _fetchAgent,
-              ),
+              suffixIcon: IconButton(icon: const Icon(Icons.search), onPressed: _fetchAgent),
             ),
             onSubmitted: (_) => _fetchAgent(),
           ),
@@ -804,56 +714,22 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                   CircleAvatar(
                     radius: 50,
 
-                    backgroundImage: _fetchedAgent!.profileImageUrl.isNotEmpty
-                        ? NetworkImage(_fetchedAgent!.profileImageUrl)
-                        : null,
+                    backgroundImage: _fetchedAgent!.profileImageUrl.isNotEmpty ? NetworkImage(_fetchedAgent!.profileImageUrl) : null,
 
-                    backgroundColor: Theme.of(
-                      context,
-                    ).primaryColor.withOpacity(0.15),
+                    backgroundColor: Theme.of(context).primaryColor.withOpacity(0.15),
                   ),
                   const SizedBox(width: 16),
 
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        AppLabels.agentDetailsHeader(context),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Text(AppLabels.agentDetailsHeader(context), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
-                      Text(
-                        "${AppLabels.fullName(context)}: ${_fetchedAgent!.agentName}",
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-
-                        "${AppLabels.phone(context)}: ${_fetchedAgent!.agentMobile}",
-                      ),
-                      Text(
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-
-                        "${AppLabels.email(context)}: ${_fetchedAgent!.agentEmail}",
-                      ),
-                      Text(
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-
-                        "${AppLabels.staffId(context)}: ${_fetchedAgent!.agentId}",
-                      ),
-                      Text(
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-
-                        "${AppLabels.address(context)}: ${_fetchedAgent!.agentAddress}",
-                      ),
+                      Text("${AppLabels.fullName(context)}: ${_fetchedAgent!.agentName}", maxLines: 2, overflow: TextOverflow.ellipsis),
+                      Text(maxLines: 2, overflow: TextOverflow.ellipsis, "${AppLabels.phone(context)}: ${_fetchedAgent!.agentMobile}"),
+                      Text(maxLines: 2, overflow: TextOverflow.ellipsis, "${AppLabels.email(context)}: ${_fetchedAgent!.agentEmail}"),
+                      Text(maxLines: 2, overflow: TextOverflow.ellipsis, "${AppLabels.staffId(context)}: ${_fetchedAgent!.agentId}"),
+                      Text(maxLines: 2, overflow: TextOverflow.ellipsis, "${AppLabels.address(context)}: ${_fetchedAgent!.agentAddress}"),
                       const SizedBox(height: 8),
                     ],
                   ),
@@ -865,21 +741,14 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _fetchedAgent != null
-                  ? () => _assignAgent(agentId: _fetchedAgent!.uid)
-                  : null,
+              onPressed: _fetchedAgent != null ? () => _assignAgent(agentId: _fetchedAgent!.uid) : null,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 backgroundColor: Theme.of(context).primaryColor,
                 foregroundColor: Colors.white,
               ),
-              child: Text(
-                AppLabels.assignAgent(context),
-                style: const TextStyle(fontSize: 16),
-              ),
+              child: Text(AppLabels.assignAgent(context), style: const TextStyle(fontSize: 16)),
             ),
           ),
           const SizedBox(height: 20),
@@ -895,10 +764,7 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
         children: [
           Text(
             AppLabels.noStaffIdSupport(context),
-            style: TextStyle(
-              fontSize: 16,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-            ),
+            style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -950,25 +816,14 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppLabels.supportRequestSubmitted(context),
-                          ),
-                        ),
-                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.supportRequestSubmitted(context))));
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: Text(
-                      AppLabels.submitRequest(context),
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    child: Text(AppLabels.submitRequest(context), style: const TextStyle(fontSize: 16)),
                   ),
                 ),
               ],
@@ -987,12 +842,7 @@ class _ActionTab extends StatelessWidget {
 
   final VoidCallback onTap;
 
-  const _ActionTab({
-    required this.icon,
-    required this.title,
-    this.isSelected = false,
-    required this.onTap,
-  });
+  const _ActionTab({required this.icon, required this.title, this.isSelected = false, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -1004,13 +854,9 @@ class _ActionTab extends StatelessWidget {
       child: Container(
         height: 56,
         decoration: BoxDecoration(
-          color: isSelected
-              ? theme.primaryColor.withOpacity(0.1)
-              : theme.colorScheme.surface,
+          color: isSelected ? theme.primaryColor.withOpacity(0.1) : theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isSelected ? theme.primaryColor : theme.dividerColor,
-          ),
+          border: Border.all(color: isSelected ? theme.primaryColor : theme.dividerColor),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1021,11 +867,7 @@ class _ActionTab extends StatelessWidget {
               child: Text(
                 title,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isSelected ? theme.primaryColor : null,
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: isSelected ? theme.primaryColor : null),
               ),
             ),
           ],
@@ -1042,10 +884,10 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      padding: const EdgeInsets.fromLTRB(20, 24, 16, 12),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey[600], letterSpacing: 1.2, height: 1.5),
       ),
     );
   }
@@ -1057,38 +899,33 @@ class _SettingsTile extends StatelessWidget {
   final Widget? trailing;
   final VoidCallback? onTap;
 
-  const _SettingsTile({
-    required this.icon,
-    required this.title,
-    this.trailing,
-    this.onTap,
-  });
+  const _SettingsTile({required this.icon, required this.title, this.trailing, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Container(
-      margin: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: ListTile(
-        leading: Icon(icon, color: theme.primaryColor),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: theme.primaryColor.withOpacity(0.08), borderRadius: BorderRadius.circular(12)),
+          child: Icon(icon, color: theme.primaryColor, size: 22),
+        ),
         title: Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
         ),
-        trailing: trailing ?? const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: trailing ?? Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey[400]),
         onTap: onTap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }

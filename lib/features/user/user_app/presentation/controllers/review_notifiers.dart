@@ -5,7 +5,6 @@ import '../../data/datasources/firebase/review_firestore.dart';
 import '../../data/repositories_impl/review_repo_imp.dart';
 import '../../domain/repositories/review_repository.dart';
 import '../../domain/states/review_state.dart';
-import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ReviewNotifier extends StateNotifier<ReviewState> {

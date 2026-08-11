@@ -40,225 +40,229 @@ class _UserBiodataCheckScreenState extends ConsumerState<UserBiodataCheckScreen>
     final imageState = ref.watch(imagePickerProvider);
 
     if (state.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Center(child: CircularProgressIndicator());
     }
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        title: Text(AppLabels.verifyYourProfile(context), style: Theme.of(context).textTheme.headlineMedium),
-        centerTitle: true,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _warningCard(),
-
-          _section(AppLabels.details(context), Icons.person, [
-            _infoRow(AppLabels.fullName(context), currentUser?.fullName),
-            _infoRow(AppLabels.phone(context), currentUser?.phone),
-            _infoRow(AppLabels.email(context), currentUser?.email),
-          ]),
-
-          _section(AppLabels.saveIdentity(context), Icons.badge, [
-            _infoRow(AppLabels.gender(context), profile.identity.gender),
-            _infoRow(AppLabels.selectDateOfBirth(context), DateFormat('dd MMM yyyy').format(profile.identity.dob)),
-            _infoRow(AppLabels.ageYrs(context), AppLabels.ageYears(context, profile.identity.age)),
-            _infoRow(AppLabels.aadharNumber(context), profile.identity.aadhar),
-            _infoRow(AppLabels.aboutMe(context), profile.identity.aboutMe),
-          ]),
-
-          _section(AppLabels.physicalProfile(context), Icons.accessibility_new, [
-            _infoRow(AppLabels.height(context), profile.physical.height),
-            _infoRow(AppLabels.weightKg(context), profile.physical.weight),
-            _infoRow(AppLabels.selectComplexion(context), profile.physical.complexion),
-            _infoRow(AppLabels.selectBodyType(context), profile.physical.bodyType),
-            if (profile.physical.physicallyChallenged) _infoRow(AppLabels.physicallyChallenged(context), AppLabels.success(context)),
-            if (profile.physical.physicallyChallenged && profile.physical.disabilityDetails != null)
-              _infoRow(AppLabels.details(context), profile.physical.disabilityDetails),
-          ]),
-
-          _section(AppLabels.religionAndCaste(context), Icons.temple_hindu, [
-            _infoRow(AppLabels.religion(context), profile.cultural.religion),
-            _infoRow(AppLabels.caste(context), profile.cultural.caste),
-            _infoRow(AppLabels.subCasteLabel(context), profile.cultural.subCaste),
-            // _infoRow('Mother Tongue', profile.cultural.motherTongue),
-            _chipWrap(AppLabels.languagesKnown(context), profile.cultural.languages.map((l) => isHindi ? l.hi : l.en).toList()),
-          ]),
-
-          _section(AppLabels.education(context), Icons.school, [
-            _infoRow(AppLabels.collegeUniversity(context), profile.education.education?.college),
-            _infoRow(AppLabels.degreeCourse(context), profile.education.education?.course),
-            _infoRow(AppLabels.percentageCGPA(context), profile.education.education?.percentage),
-            _infoRow(AppLabels.passingYear(context), profile.education.education?.passingYear),
-
-            // add additional courses
-            // Languages
-
-            // Additional Courses (Firebase)
-            _chipWrap(
-              AppLabels.additionalQualifications(context),
-              (profile.education.extraQualification?.qualifications ?? []).map((q) => isHindi ? q.hi : q.en).toList(),
-            ),
-          ]),
-
-          _section(AppLabels.employmentDetails(context), Icons.work, [
-            _infoRow(AppLabels.organization(context), profile.employment.company),
-            _infoRow(AppLabels.role(context), profile.employment.designation),
-            _infoRow(AppLabels.annualIncome(context), profile.employment.annualIncome),
-            _infoRow(AppLabels.designation(context), profile.employment.designation),
-            _infoRow(AppLabels.jobType(context), profile.employment.jobType),
-          ]),
-
-          _section(AppLabels.familyDetails(context), Icons.family_restroom, [
-            _infoRow(AppLabels.fatherName(context), profile.family.fatherName),
-            _infoRow(AppLabels.motherName(context), profile.family.motherName),
-            _infoRow(AppLabels.numberOfBrothers(context), profile.family.numberOfBrothers),
-            _infoRow(AppLabels.numberOfSisters(context), profile.family.numberOfSisters),
-            _infoRow(AppLabels.familyType(context), profile.family.familyType),
-            _infoRow(AppLabels.lifeStyleStatus(context), profile.family.familyStatus),
-          ]),
-
-          _section(AppLabels.location(context), Icons.location_on, [
-            _infoRow(AppLabels.location(context), profile.address.addressLine1),
-            _infoRow(AppLabels.post(context), profile.address.post),
-            _infoRow(AppLabels.city(context), profile.address.city),
-            _infoRow(AppLabels.state(context), profile.address.state),
-            _infoRow(AppLabels.pinCodeLabel(context), profile.address.pincode),
-          ]),
-
-          _imageSection(profile.images, imageState),
-
-          if (imageState.aadharPdfPath != null && imageState.aadharPdfPath!.isNotEmpty)
-            _section(AppLabels.aadharDocument(context), Icons.document_scanner, [
-              imageState.aadharPdfPath!.toLowerCase().endsWith('.pdf')
-                  ? GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) => PdfViewerBottomsheet(
-                            source: imageState.aadharPdfPath!,
-                            title: AppLabels.aadharDocument(context),
-                            isLocal: true,
-                          ),
-                        );
-                      },
-                      child: Row(
-                        children: [
-                          const Icon(Icons.picture_as_pdf, color: Colors.redAccent),
-                          const SizedBox(width: 8),
-                          Text(
-                            AppLabels.document(context),
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: Image.file(File(imageState.aadharPdfPath!), height: 200, width: double.infinity, fit: BoxFit.cover),
-                    ),
-            ]),
-
-          if (imageState.bioDataPath != null && imageState.bioDataPath!.isNotEmpty)
-            _section(AppLabels.uploadBioData(context), Icons.description, [
-              imageState.bioDataPath!.toLowerCase().endsWith('.pdf')
-                  ? GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) =>
-                              PdfViewerBottomsheet(source: imageState.bioDataPath!, title: AppLabels.uploadBioData(context), isLocal: true),
-                        );
-                      },
-                      child: Row(
-                        children: [
-                          const Icon(Icons.picture_as_pdf, color: Colors.redAccent),
-                          const SizedBox(width: 8),
-                          Text(
-                            AppLabels.document(context),
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: Image.file(File(imageState.bioDataPath!), height: 200, width: double.infinity, fit: BoxFit.cover),
-                    ),
-            ]),
-
-          Container(
-            margin: const EdgeInsets.only(top: 20),
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
-            ),
-            child: Column(
-              children: [
-                CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  value: isAgreed,
-                  onChanged: (v) => setState(() => isAgreed = v ?? false),
-                  title: Text(AppLabels.confirmDetailsCorrect(context), style: const TextStyle(fontWeight: FontWeight.w600)),
+            children: [
+              const SizedBox(height: 8),
+              Center(
+                child: Text(
+                  AppLabels.verifyYourProfile(context),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.black87),
                 ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: isAgreed ? _confirmSubmit : null,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 52),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              ),
+              const SizedBox(height: 20),
+              _warningCard(),
+
+              // ... rest of ListView remains same ...
+              _section(AppLabels.details(context), Icons.person_outline, [
+                _infoRow(AppLabels.fullName(context), currentUser?.fullName),
+                _infoRow(AppLabels.phone(context), currentUser?.phone),
+                _infoRow(AppLabels.email(context), currentUser?.email),
+              ]),
+
+              _section(AppLabels.saveIdentity(context), Icons.badge_outlined, [
+                _infoRow("First Name", profile.identity.firstName),
+                _infoRow("Last Name", profile.identity.lastName),
+                _infoRow(AppLabels.gender(context), profile.identity.gender),
+                _infoRow(AppLabels.selectDateOfBirth(context), DateFormat('dd MMM yyyy').format(profile.identity.dob)),
+                _infoRow(AppLabels.ageYrs(context), AppLabels.ageYears(context, profile.identity.age)),
+              ]),
+
+              _section(AppLabels.physicalProfile(context), Icons.accessibility_new_rounded, [
+                _infoRow(AppLabels.height(context), profile.physical.height),
+                _infoRow(AppLabels.weightKg(context), profile.physical.weight),
+                _infoRow(AppLabels.selectComplexion(context), profile.physical.complexion),
+                _infoRow(AppLabels.selectBodyType(context), profile.physical.bodyType),
+                if (profile.physical.physicallyChallenged) _infoRow(AppLabels.physicallyChallenged(context), AppLabels.success(context)),
+                if (profile.physical.physicallyChallenged && profile.physical.disabilityDetails != null)
+                  _infoRow(AppLabels.details(context), profile.physical.disabilityDetails),
+              ]),
+
+              _section(AppLabels.religionAndCaste(context), Icons.temple_hindu_outlined, [
+                _infoRow(AppLabels.religion(context), profile.cultural.religion),
+                _infoRow(AppLabels.caste(context), profile.cultural.caste),
+                _chipWrap(AppLabels.languagesKnown(context), profile.cultural.languages.map((l) => isHindi ? l.hi : l.en).toList()),
+              ]),
+
+              _section(AppLabels.education(context), Icons.school_outlined, [
+                _infoRow(AppLabels.collegeUniversity(context), profile.education.education?.college),
+                _infoRow(AppLabels.degreeCourse(context), profile.education.education?.course),
+                _chipWrap(
+                  AppLabels.additionalQualifications(context),
+                  (profile.education.extraQualification?.qualifications ?? []).map((q) => isHindi ? q.hi : q.en).toList(),
+                ),
+              ]),
+
+              _section(AppLabels.employmentDetails(context), Icons.work_outline_rounded, [
+                _infoRow(AppLabels.jobType(context), profile.employment.jobType),
+                if (profile.employment.jobType.en != 'Not Working') ...[
+                  _infoRow(AppLabels.organization(context), profile.employment.company),
+                  _infoRow(AppLabels.designation(context), profile.employment.designation),
+                  _infoRow(AppLabels.annualIncome(context), profile.employment.annualIncome),
+                  _infoRow(AppLabels.workLocation(context), profile.employment.workLocation),
+                ],
+              ]),
+
+              _section(AppLabels.familyDetails(context), Icons.family_restroom_outlined, [
+                _infoRow(AppLabels.fatherName(context), profile.family.fatherName),
+                _infoRow(AppLabels.motherName(context), profile.family.motherName),
+                _infoRow(AppLabels.numberOfBrothers(context), profile.family.numberOfBrothers),
+                _infoRow(AppLabels.numberOfSisters(context), profile.family.numberOfSisters),
+                _infoRow(AppLabels.familyType(context), profile.family.familyType),
+                _infoRow(AppLabels.lifeStyleStatus(context), profile.family.familyStatus),
+              ]),
+
+              _section(AppLabels.location(context), Icons.location_on_outlined, [
+                _infoRow(AppLabels.location(context), profile.address.addressLine1),
+                _infoRow(AppLabels.city(context), profile.address.city),
+                _infoRow(AppLabels.state(context), profile.address.state),
+                _infoRow(AppLabels.pinCodeLabel(context), profile.address.pincode),
+              ]),
+
+              _imageSection(profile.images, imageState),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+        // 🔒 FIXED BOTTOM BAR
+        // 🔒 COMPACT BOTTOM BAR
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
+            border: Border(top: BorderSide(color: Colors.grey.shade100)),
+          ),
+          child: SafeArea(
+            top: false,
+            bottom: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 🏁 Agreement Section
+                GestureDetector(
+                  onTap: () => setState(() => isAgreed = !isAgreed),
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: isAgreed ? Theme.of(context).primaryColor : Colors.transparent,
+                            border: Border.all(color: isAgreed ? Theme.of(context).primaryColor : Colors.grey.shade400, width: 1.5),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: isAgreed ? const Icon(Icons.check, size: 12, color: Colors.white) : null,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            AppLabels.confirmDetailsCorrect(context),
+                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.black54),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Text(AppLabels.finalSubmit(context), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ),
+                // 🚀 Button Row
+                Row(
+                  children: [
+                    // ⬅ BACK BUTTON
+                    Expanded(
+                      flex: 1,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          ref.read(metrimonyControllerProvider.notifier).previousStep();
+                        },
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 44),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          side: BorderSide(color: Colors.grey.shade300),
+                          foregroundColor: Colors.black87,
+                          padding: EdgeInsets.zero,
+                        ),
+                        child: Text(AppLabels.back(context), style: const TextStyle(fontSize: 13)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // ➡ SUBMIT BUTTON
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton(
+                        onPressed: isAgreed ? _confirmSubmit : null,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 44),
+                          backgroundColor: Theme.of(context).primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          AppLabels.finalSubmit(context).toUpperCase(),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   // ================= UI HELPERS =================
   Widget _section(String title, IconData icon, List<Widget> children) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade100),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 4))],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Row(
               children: [
-                Icon(icon, size: 20, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 8),
-                Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, size: 18, color: Theme.of(context).primaryColor),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor.withOpacity(0.8)),
+                ),
               ],
             ),
-            const SizedBox(height: 10),
-            ...children,
-          ],
-        ),
+          ),
+          const Divider(indent: 16, endIndent: 16),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Column(children: children),
+          ),
+        ],
       ),
     );
   }
@@ -275,22 +279,28 @@ class _UserBiodataCheckScreenState extends ConsumerState<UserBiodataCheckScreen>
       displayValue = value.toString().trim();
     }
 
-    if (displayValue.isEmpty) {
-      return const SizedBox();
-    }
+    if (displayValue.isEmpty) return const SizedBox();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            flex: 4,
-            child: Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+            flex: 3,
+            child: Text(
+              label,
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+            ),
           ),
+          const SizedBox(width: 8),
           Expanded(
-            flex: 6,
-            child: Text(displayValue, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            flex: 4,
+            child: Text(
+              displayValue,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
+              textAlign: TextAlign.right,
+            ),
           ),
         ],
       ),
@@ -347,79 +357,35 @@ class _UserBiodataCheckScreenState extends ConsumerState<UserBiodataCheckScreen>
   Widget _imageSection(ProfileImages? images, ImagesState localImages) {
     // Check for local images (just picked)
     final hasLocalProfile = localImages.profileImage != null && localImages.profileImage!.isNotEmpty;
-    final hasLocalPrimary = localImages.primaryImage != null && localImages.primaryImage!.isNotEmpty;
-    final hasLocalAgent = localImages.imageWithAgentUrl != null && localImages.imageWithAgentUrl!.isNotEmpty;
-    final hasLocalSecondary = localImages.secondaryImages.isNotEmpty;
-
     // Check for network images (already uploaded)
     final hasNetProfile = images?.profileImageUrl != null && images!.profileImageUrl.isNotEmpty;
-    final hasNetPrimary = images?.primaryImageUrl != null && images!.primaryImageUrl.isNotEmpty;
-    final hasNetAgent = images?.imageWithAgentUrl != null && images!.imageWithAgentUrl.isNotEmpty;
-    final netSecondary = images?.secondaryImageUrls.where((url) => url.isNotEmpty).toList() ?? [];
-    final hasNetSecondary = netSecondary.isNotEmpty;
 
-    if (!hasLocalProfile && !hasLocalPrimary && !hasLocalAgent && !hasLocalSecondary &&
-        !hasNetProfile && !hasNetPrimary && !hasNetAgent && !hasNetSecondary) {
-      return const SizedBox();
-    }
+    if (!hasLocalProfile && !hasNetProfile) return const SizedBox();
 
-    return _section(AppLabels.photos(context), Icons.photo_library, [
-      // 1. Profile Image
-      if (hasLocalProfile || hasNetProfile) ...[
-        _infoRow(AppLabels.profileImage(context), ""),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: hasLocalProfile
-              ? Image.file(File(localImages.profileImage!), height: 200, width: double.infinity, fit: BoxFit.cover)
-              : Image.network(images!.profileImageUrl, height: 200, width: double.infinity, fit: BoxFit.cover),
-        ),
-        const SizedBox(height: 16),
-      ],
-
-      // 2. Matrimony Image
-      if (hasLocalPrimary || hasNetPrimary) ...[
-        _infoRow(AppLabels.matrimonyImage(context), ""),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: hasLocalPrimary
-              ? Image.file(File(localImages.primaryImage!), height: 200, width: double.infinity, fit: BoxFit.cover)
-              : Image.network(images!.primaryImageUrl, height: 200, width: double.infinity, fit: BoxFit.cover),
-        ),
-        const SizedBox(height: 16),
-      ],
-
-      // 3. Image with Agent
-      if (hasLocalAgent || hasNetAgent) ...[
-        _infoRow(AppLabels.imageWithAgent(context), ""),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: hasLocalAgent
-              ? Image.file(File(localImages.imageWithAgentUrl!), height: 200, width: double.infinity, fit: BoxFit.cover)
-              : Image.network(images!.imageWithAgentUrl, height: 200, width: double.infinity, fit: BoxFit.cover),
-        ),
-        const SizedBox(height: 16),
-      ],
-
-      // 4. Gallery Images
-      if (hasLocalSecondary || hasNetSecondary) ...[
-        _infoRow(AppLabels.galleryImages(context), ""),
-        SizedBox(
-          height: 100,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: hasLocalSecondary ? localImages.secondaryImages.length : netSecondary.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 10),
-            itemBuilder: (_, i) {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: hasLocalSecondary
-                    ? Image.file(File(localImages.secondaryImages[i]), width: 100, fit: BoxFit.cover)
-                    : Image.network(netSecondary[i], width: 100, fit: BoxFit.cover),
-              );
-            },
+    return _section(AppLabels.photos(context), Icons.photo_library_outlined, [
+      Center(
+        child: Container(
+          width: 160,
+          height: 160,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.2), width: 4),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 12, offset: const Offset(0, 6))],
+          ),
+          child: ClipOval(
+            child: hasLocalProfile
+                ? Image.file(File(localImages.profileImage!), fit: BoxFit.cover)
+                : Image.network(images!.profileImageUrl, fit: BoxFit.cover),
           ),
         ),
-      ],
+      ),
+      const SizedBox(height: 12),
+      Center(
+        child: Text(
+          AppLabels.profileImage(context),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+        ),
+      ),
     ]);
   }
 
@@ -439,9 +405,10 @@ class _UserBiodataCheckScreenState extends ConsumerState<UserBiodataCheckScreen>
     });
 
     final imageState = ref.read(imagePickerProvider);
-    
+
     // Check if any local file needs uploading
-    final hasFilesToUpload = imageState.profileImage != null ||
+    final hasFilesToUpload =
+        imageState.profileImage != null ||
         imageState.primaryImage != null ||
         imageState.imageWithAgentUrl != null ||
         imageState.secondaryImages.isNotEmpty ||
@@ -484,21 +451,21 @@ class _UserBiodataCheckScreenState extends ConsumerState<UserBiodataCheckScreen>
 
       if (mounted) {
         Navigator.pop(context); // Close dialog
-        
+
         final isAgent = ref.read(authStateProvider).value?.isLeft() ?? false;
         if (isAgent) {
           // Agent led registration finished
           ref.read(targetUserIdOverrideProvider.notifier).state = null; // Clear override
-          
+
           // Refresh agent's dashboard data immediately
           ref.invalidate(agentUsersNotifierProvider);
           ref.invalidate(usersPaymentsNotifierProvider);
           ref.invalidate(analyticsProvider(agentId));
-          
+
           // Trigger fetch so it's ready when we arrive at dashboard
           ref.read(agentUsersNotifierProvider.notifier).getUsersForAgent();
           ref.read(usersPaymentsNotifierProvider.notifier).getUsersPayment(agentId: agentId);
-          
+
           context.router.replaceAll([AgentMainShellRoute(agentId: agentId)]);
         } else {
           context.router.replaceAll([UserMainShellRoute()]);
@@ -507,9 +474,7 @@ class _UserBiodataCheckScreenState extends ConsumerState<UserBiodataCheckScreen>
     } catch (e) {
       if (mounted) {
         Navigator.pop(context); // Close dialog
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Submission failed: $e'), backgroundColor: Colors.red),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Submission failed: $e'), backgroundColor: Colors.red));
       }
     }
   }

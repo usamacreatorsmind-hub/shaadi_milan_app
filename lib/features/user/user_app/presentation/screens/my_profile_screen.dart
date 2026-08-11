@@ -128,7 +128,16 @@ class MyProfileScreen extends ConsumerWidget {
                               },
                             ),
                           )
-                        : Text(AppLabels.noPhotosAvailable(context)),
+                        : Container(
+                            width: 100,
+                            height: 100,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(Icons.person, size: 50, color: Colors.grey[400]),
+                          ),
                   ],
                 ),
 
@@ -181,28 +190,6 @@ class MyProfileScreen extends ConsumerWidget {
                   ],
                 ),
 
-                // 📝 ABOUT ME
-                _DetailSection(
-                  title: AppLabels.aboutMe(context),
-                  actionChip: _EditChip(
-                    onTap: () => context.router.push(UserIdentityFormRoute(mode: FormMode.edit, existingIdentityProfile: profile.identity)),
-                  ),
-                  children: [
-                    if (profile.identity.aboutMe.isNotEmpty)
-                      BilingualParser(
-                        value: profile.identity.aboutMe,
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(color: Colors.grey[700]),
-                      )
-                    else
-                      Text(
-                        AppLabels.noDescriptionAvailable(context),
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                  ],
-                ),
-
                 // 📋 BASIC INFO
                 _DetailSection(
                   title: AppLabels.basicInformation(context),
@@ -210,7 +197,6 @@ class MyProfileScreen extends ConsumerWidget {
                     onTap: () => context.router.push(UserIdentityFormRoute(mode: FormMode.edit, existingIdentityProfile: profile.identity)),
                   ),
                   children: [
-                    _DetailRow(AppLabels.aadharNumber(context), profile.identity.aadhar),
                     _DetailRow(AppLabels.age(context), AppLabels.ageYearsOld(context, profile.identity.age)),
                     _DetailRow(AppLabels.gender(context), profile.identity.gender),
                     _DetailRow(AppLabels.dateOfBirth(context), profile.identity.dob.toString().split(" ").first),
@@ -227,8 +213,6 @@ class MyProfileScreen extends ConsumerWidget {
                   children: [
                     _DetailRow(AppLabels.course(context), profile.education.education?.course),
                     _DetailRow(AppLabels.collegeUniversity(context), profile.education.education?.college),
-                    _DetailRow(AppLabels.passingYear(context), profile.education.education?.passingYear.toString()),
-                    _DetailRow(AppLabels.percentageCGPA(context), profile.education.education?.percentage.toString()),
                   ],
                 ),
 
@@ -265,7 +249,7 @@ class MyProfileScreen extends ConsumerWidget {
                   ),
                   children: [
                     _DetailRow(AppLabels.organization(context), profile.employment.company),
-                    _DetailRow(AppLabels.annualIncome(context), profile.employment.annualIncome?.toString()),
+                    _DetailRow(AppLabels.annualIncome(context), profile.employment.annualIncome),
                     _DetailRow(AppLabels.jobType(context), profile.employment.jobType),
                     _DetailRow(AppLabels.designation(context), profile.employment.designation),
                   ],
@@ -322,7 +306,6 @@ class MyProfileScreen extends ConsumerWidget {
                   children: [
                     _DetailRow(AppLabels.religion(context), resolvedReligion),
                     _DetailRow(AppLabels.caste(context), resolvedCaste),
-                    _DetailRow(AppLabels.subCasteLabel(context), profile.cultural.subCaste),
                     _DetailRow(
                       AppLabels.addKnownLanguages(context),
                       profile.cultural.languages.map((l) => isHindi ? l.hi : l.en).join(", "),

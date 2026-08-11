@@ -1,13 +1,13 @@
 /// Central place to manage all app-wide technical constants.
 /// UI labels are managed in AppLabels.
-class  AppConstants {
+class AppConstants {
   AppConstants._();
 
   static const String appName = 'Shaadi Milan';
   static const String appNameRaw = 'Shaadi Milan';
 
   // ─── Assets ─────────────────────────────────────────────────────────────────
-  static const String appLogoPath = 'assets/img.png';
+  static const String appLogoPath = 'assets/logo.png';
 
   // ─── Contact Details ────────────────────────────────────────────────────────
   static const String supportEmail = 'shaadimilanapp@gmail.com';
@@ -21,10 +21,8 @@ class  AppConstants {
   static const String supportHours = '9 AM – 6 PM (IST), Monday to Sunday';
 
   // ─── URLs ───────────────────────────────────────────────────────────────────
-  static const String privacyPolicyUrl =
-      'https://privacy.creatorsmind.co.in/shaadi-milan-app-privacy-policy/';
-  static const String termsAndConditionsUrl =
-      'https://privacy.creatorsmind.co.in/terms-and-conditions-for-shaadi-milan-app/';
+  static const String privacyPolicyUrl = 'https://privacy.creatorsmind.co.in/shaadi-milan-app-privacy-policy/';
+  static const String termsAndConditionsUrl = 'https://privacy.creatorsmind.co.in/terms-and-conditions-for-shaadi-milan-app/';
 
   // ─── Deep / Action Links ────────────────────────────────────────────────────
   static const String emailLink = 'mailto:$supportEmail';
@@ -52,7 +50,7 @@ class  AppConstants {
 
   // ─── Design ─────────────────────────────────────────────────────────────────
   static const String fontFamily = 'Roboto';
-  static const int primaryRedHex = 0xFFB11226;
+  static const int primaryRedHex = 0xFFC70310;
   static const int accentRedHex = 0xFFE53935;
 
   // ─── Firestore Collections ──────────────────────────────────────────────────

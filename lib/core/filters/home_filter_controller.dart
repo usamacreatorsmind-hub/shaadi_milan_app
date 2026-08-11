@@ -1,18 +1,13 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'home_filter_state.dart';
 
 /// =======================
 /// FILTER PROVIDER
 /// =======================
-final homeFilterProvider =
-    StateNotifierProvider<HomeFilterController, HomeFilterState>(
-      (ref) => HomeFilterController(),
-    );
+final homeFilterProvider = StateNotifierProvider<HomeFilterController, HomeFilterState>((ref) => HomeFilterController());
 
 class HomeFilterController extends StateNotifier<HomeFilterState> {
-  HomeFilterController() : super(   HomeFilterState());
+  HomeFilterController() : super(HomeFilterState());
 
   void updateState(String value) {
     // reset city when state changes
@@ -38,5 +33,13 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
 
   void updateGender(String value) {
     state = state.copyWith(gender: value);
+  }
+
+  void toggleJustJoined() {
+    state = state.copyWith(justJoined: !state.justJoined);
+  }
+
+  void toggleFromMyCity() {
+    state = state.copyWith(fromMyCity: !state.fromMyCity);
   }
 }

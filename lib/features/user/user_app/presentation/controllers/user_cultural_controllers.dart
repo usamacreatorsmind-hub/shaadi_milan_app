@@ -14,27 +14,18 @@ class UserCulturalController extends StateNotifier<CulturalState> {
   final String _uid;
   final Ref _ref;
 
-  UserCulturalController(this._matrimonyRepository, this._uid, this._ref)
-    : super(CulturalState.initial);
+  UserCulturalController(this._matrimonyRepository, this._uid, this._ref) : super(CulturalState.initial);
 
   Future<void> saveCultural({
     required BilingualValue religion,
     required BilingualValue caste,
-    required BilingualValue subCaste,
     required List<BilingualValue> languages,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-    final culturalProfile = CulturalProfile(
-      religion: religion,
-      caste: caste,
-      subCaste: subCaste,
-      languages: languages,
-    );
+    final culturalProfile = CulturalProfile(religion: religion, caste: caste, languages: languages);
 
     try {
-      _ref
-          .read(metrimonyControllerProvider.notifier)
-          .saveCultural(culturalProfile);
+      _ref.read(metrimonyControllerProvider.notifier).saveCultural(culturalProfile);
 
       state = state.copyWith(cultural: culturalProfile, isLoading: false);
 
@@ -46,31 +37,17 @@ class UserCulturalController extends StateNotifier<CulturalState> {
     }
   }
 
-  void updateCultural({
-    required BilingualValue religion,
-    required BilingualValue caste,
-    required BilingualValue subCaste,
-    required List<BilingualValue> languages,
-  }) {
+  void updateCultural({required BilingualValue religion, required BilingualValue caste, required List<BilingualValue> languages}) {
     state = state.copyWith(isLoading: true, error: null);
-    final culturalProfile = CulturalProfile(
-      religion: religion,
-      caste: caste,
-      subCaste: subCaste,
-      languages: languages,
-    );
+    final culturalProfile = CulturalProfile(religion: religion, caste: caste, languages: languages);
 
     try {
-      _ref
-          .read(matrimonyRepositoryProvider)
-          .updateCulturalProfile(_uid, culturalProfile);
+      _ref.read(matrimonyRepositoryProvider).updateCulturalProfile(_uid, culturalProfile);
 
       state = state.copyWith(cultural: culturalProfile, isLoading: false);
       debugPrint('✅ Cultural Updated Successfully');
       debugPrint(culturalProfile.toString());
-      _ref
-          .read(metrimonyControllerProvider.notifier)
-          .saveCultural(culturalProfile);
+      _ref.read(metrimonyControllerProvider.notifier).saveCultural(culturalProfile);
     } catch (e) {
       debugPrint('❌ Cultural Update Failed: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -78,11 +55,8 @@ class UserCulturalController extends StateNotifier<CulturalState> {
   }
 }
 
-final cultureControllerProvider =
-    StateNotifierProvider.autoDispose<UserCulturalController, CulturalState>((
-      ref,
-    ) {
-      final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
-      final uid = ref.watch(targetUserIdProvider);
-      return UserCulturalController(matrimonyRepo, uid ?? '', ref);
-    });
+final cultureControllerProvider = StateNotifierProvider.autoDispose<UserCulturalController, CulturalState>((ref) {
+  final matrimonyRepo = ref.read(matrimonyRepositoryProvider);
+  final uid = ref.watch(targetUserIdProvider);
+  return UserCulturalController(matrimonyRepo, uid ?? '', ref);
+});

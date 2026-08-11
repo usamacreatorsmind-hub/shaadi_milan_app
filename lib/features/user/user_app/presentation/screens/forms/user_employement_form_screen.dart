@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,10 +27,8 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
   final _companyController = TextEditingController();
   final _companyEnController = TextEditingController();
 
-  final _annualIncomeController = TextEditingController();
-
-  final _designationController = TextEditingController();
-  final _designationEnController = TextEditingController();
+  BilingualValue? _selectedDesignation;
+  BilingualValue? _selectedAnnualIncome;
 
   final _workLocationController = TextEditingController();
   final _workLocationEnController = TextEditingController();
@@ -54,10 +53,8 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
       _companyController.text = profile.company?.hi ?? "";
       _companyEnController.text = profile.company?.en ?? "";
 
-      _designationController.text = profile.designation?.hi ?? "";
-      _designationEnController.text = profile.designation?.en ?? "";
-
-      _annualIncomeController.text = profile.annualIncome?.toString() ?? "";
+      _selectedDesignation = profile.designation;
+      _selectedAnnualIncome = profile.annualIncome;
 
       _workLocationController.text = profile.workLocation?.hi ?? "";
       _workLocationEnController.text = profile.workLocation?.en ?? "";
@@ -70,9 +67,6 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
   void dispose() {
     _companyController.dispose();
     _companyEnController.dispose();
-    _annualIncomeController.dispose();
-    _designationController.dispose();
-    _designationEnController.dispose();
     _workLocationController.dispose();
     _workLocationEnController.dispose();
     super.dispose();
@@ -95,9 +89,6 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
 
     // For other job types, save whatever is filled
     final company = _companyController.text.isEmpty ? null : BilingualValue(hi: _companyController.text, en: _companyEnController.text);
-    final designation = _designationController.text.isEmpty
-        ? null
-        : BilingualValue(hi: _designationController.text, en: _designationEnController.text);
     final workLocation = _workLocationController.text.isEmpty
         ? null
         : BilingualValue(hi: _workLocationController.text, en: _workLocationEnController.text);
@@ -106,16 +97,16 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
       notifier.saveEmployment(
         jobType: jobType,
         company: company,
-        designation: designation,
-        annualIncome: int.tryParse(_annualIncomeController.text),
+        designation: _selectedDesignation,
+        annualIncome: _selectedAnnualIncome,
         workLocation: workLocation,
       );
     } else {
       notifier.updateEmployment(
         jobType: jobType,
         company: company,
-        designation: designation,
-        annualIncome: int.tryParse(_annualIncomeController.text),
+        designation: _selectedDesignation,
+        annualIncome: _selectedAnnualIncome,
         workLocation: workLocation,
       );
     }
@@ -135,6 +126,7 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
     });
 
     Widget buildEmploymentForm() {
+      final isHindi = Localizations.localeOf(context).languageCode == 'hi';
       return Column(
         children: [
           BilingualTextField(
@@ -145,16 +137,24 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
             hint: AppLabels.organizationHint(context),
           ),
           const SizedBox(height: 16),
-
-          BilingualTextField(
-            controller: _designationController,
-            englishController: _designationEnController,
-            prefixIcon: Icons.work,
-            label: AppLabels.designation(context),
-            hint: AppLabels.designationHint(context),
+          // Designation Dropdown
+          Consumer(
+            builder: (context, ref, child) {
+              final designationsAsync = ref.watch(designationsProvider);
+              return designationsAsync.when(
+                data: (items) => AppDropDown<BilingualValue>(
+                  label: AppLabels.designation(context),
+                  items: items,
+                  value: _selectedDesignation,
+                  itemLabel: (d) => isHindi ? d.hi : d.en,
+                  onChanged: (val) => setState(() => _selectedDesignation = val),
+                ),
+                loading: () => const LinearProgressIndicator(),
+                error: (e, _) => Text("Error loading designations"),
+              );
+            },
           ),
           const SizedBox(height: 16),
-
           BilingualTextField(
             controller: _workLocationController,
             englishController: _workLocationEnController,
@@ -163,15 +163,22 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
             hint: AppLabels.workLocationHint(context),
           ),
           const SizedBox(height: 16),
-
-          AppTextField(
-            controller: _annualIncomeController,
-            prefixIcon: Icons.currency_rupee,
-            iconColor: Theme.of(context).colorScheme.primary,
-            label: AppLabels.annualIncome(context),
-            hint: AppLabels.annualIncomeHint(context),
-            obscureText: false,
-            keyboardType: TextInputType.number,
+          // Annual Income Dropdown
+          Consumer(
+            builder: (context, ref, child) {
+              final incomesAsync = ref.watch(annualIncomesProvider);
+              return incomesAsync.when(
+                data: (items) => AppDropDown<BilingualValue>(
+                  label: AppLabels.annualIncome(context),
+                  items: items,
+                  value: _selectedAnnualIncome,
+                  itemLabel: (i) => isHindi ? i.hi : i.en,
+                  onChanged: (val) => setState(() => _selectedAnnualIncome = val),
+                ),
+                loading: () => const LinearProgressIndicator(),
+                error: (e, _) => Text("Error loading income ranges"),
+              );
+            },
           ),
         ],
       );

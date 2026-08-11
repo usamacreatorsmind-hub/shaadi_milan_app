@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../app/providers/global_providers.dart';
@@ -20,7 +21,7 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
     required BilingualValue jobType,
     BilingualValue? company,
     BilingualValue? designation,
-    int? annualIncome,
+    BilingualValue? annualIncome,
     BilingualValue? workLocation,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
@@ -47,7 +48,7 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
     required BilingualValue jobType,
     BilingualValue? company,
     BilingualValue? designation,
-    int? annualIncome,
+    BilingualValue? annualIncome,
     BilingualValue? workLocation,
   }) {
     state = state.copyWith(isLoading: true, error: null);
@@ -83,3 +84,27 @@ final userEmploymentControllerProvider =
       final uid = ref.watch(targetUserIdProvider);
       return UserEmploymentController(matrimonyRepo, uid ?? '', ref);
     });
+
+/// Provider to fetch designations from master_designations collection
+final designationsProvider = FutureProvider<List<BilingualValue>>((ref) async {
+  final snapshot = await FirebaseFirestore.instance
+      .collection('master_designations')
+      .orderBy('en')
+      .get();
+
+  return snapshot.docs.map((doc) {
+    return BilingualValue.fromMap(doc.data());
+  }).toList();
+});
+
+/// Provider to fetch annual incomes from master_annual_incomes collection
+final annualIncomesProvider = FutureProvider<List<BilingualValue>>((ref) async {
+  final snapshot = await FirebaseFirestore.instance
+      .collection('master_annual_incomes')
+      .orderBy('en') // You might want a specific sort order for income
+      .get();
+
+  return snapshot.docs.map((doc) {
+    return BilingualValue.fromMap(doc.data());
+  }).toList();
+});

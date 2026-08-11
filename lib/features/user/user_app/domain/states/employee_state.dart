@@ -4,7 +4,7 @@ class EmploymentProfile {
   final BilingualValue jobType;
   final BilingualValue? company;
   final BilingualValue? designation;
-  final int? annualIncome;
+  final BilingualValue? annualIncome;
   final BilingualValue? workLocation;
 
   EmploymentProfile({
@@ -20,7 +20,7 @@ class EmploymentProfile {
       'jobType': jobType.toMap(),
       'company': company?.toMap(),
       'designation': designation?.toMap(),
-      'annualIncome': annualIncome,
+      'annualIncome': annualIncome?.toMap(),
       'workLocation': workLocation?.toMap(),
     };
   }
@@ -42,7 +42,7 @@ class EmploymentProfile {
       jobType: parseBilingual(map['jobType']),
       company: parseOptionalBilingual(map['company']),
       designation: parseOptionalBilingual(map['designation']),
-      annualIncome: int.tryParse(map['annualIncome']?.toString() ?? ''),
+      annualIncome: parseOptionalBilingual(map['annualIncome']),
       workLocation: parseOptionalBilingual(map['workLocation']),
     );
   }
@@ -56,7 +56,7 @@ class EmploymentProfile {
     BilingualValue? jobType,
     BilingualValue? company,
     BilingualValue? designation,
-    int? annualIncome,
+    BilingualValue? annualIncome,
     BilingualValue? workLocation,
   }) {
     return EmploymentProfile(

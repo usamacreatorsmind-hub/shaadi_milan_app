@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 import '../../../../../app/custom/custom_widgets/chip_and_action_chip.dart';
-import '../../../../../app/custom/custom_widgets/user_drawer.dart';
+
 import '../../../../../app/router/app_router.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/review_state.dart';
@@ -44,7 +44,6 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     }
 
     return Scaffold(
-      drawer: UserDrawer(userAsync: currentUserAsync),
       body: allReviewsAsync.isLoading
           ? const Center(child: CircularProgressIndicator())
           : allReviewsAsync.error != null

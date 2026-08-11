@@ -30,12 +30,6 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
   final _atController = TextEditingController();
   final _atEnController = TextEditingController();
 
-  final _postController = TextEditingController();
-  final _postEnController = TextEditingController();
-
-  final _policeStationController = TextEditingController();
-  final _policeStationEnController = TextEditingController();
-
   final _districtController = TextEditingController();
   final _stateController = TextEditingController();
   final _pinController = TextEditingController();
@@ -48,12 +42,6 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
       final profile = widget.existingAddressProfile!;
       _atController.text = profile.addressLine1.hi;
       _atEnController.text = profile.addressLine1.en;
-
-      _postController.text = profile.post.hi;
-      _postEnController.text = profile.post.en;
-
-      _policeStationController.text = profile.policeStation.hi;
-      _policeStationEnController.text = profile.policeStation.en;
 
       _stateController.text = profile.state.en;
       _districtController.text = profile.city.en;
@@ -70,10 +58,6 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
   void dispose() {
     _atController.dispose();
     _atEnController.dispose();
-    _postController.dispose();
-    _postEnController.dispose();
-    _policeStationController.dispose();
-    _policeStationEnController.dispose();
     _districtController.dispose();
     _stateController.dispose();
     _pinController.dispose();
@@ -87,8 +71,6 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     final location = ref.read(homeFilterProvider);
 
     final at = BilingualValue(hi: _atController.text.trim(), en: _atEnController.text.trim());
-    final post = BilingualValue(hi: _postController.text.trim(), en: _postEnController.text.trim());
-    final policeStation = BilingualValue(hi: _policeStationController.text.trim(), en: _policeStationEnController.text.trim());
 
     final bilingualData = await ref.read(bilingualLocationProvider.future);
     final statesMap = bilingualData['states']!;
@@ -100,8 +82,8 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     if (widget.mode == FormMode.create) {
       notifier.saveAddress(
         at: at,
-        post: post,
-        policeStation: policeStation,
+        post: BilingualValue.empty(),
+        policeStation: BilingualValue.empty(),
         district: cityBilingual,
         stateName: stateBilingual,
         pin: _pinController.text.trim(),
@@ -109,8 +91,8 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     } else {
       notifier.updateAddress(
         at: at,
-        post: post,
-        policeStation: policeStation,
+        post: BilingualValue.empty(),
+        policeStation: BilingualValue.empty(),
         district: cityBilingual,
         stateName: stateBilingual,
         pin: _pinController.text.trim(),
@@ -150,22 +132,6 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                   prefixIcon: Icons.location_on,
                   label: AppLabels.place(context),
                   hint: AppLabels.placeHint(context),
-                ),
-                const SizedBox(height: 16),
-                BilingualTextField(
-                  controller: _postController,
-                  englishController: _postEnController,
-                  prefixIcon: Icons.local_post_office,
-                  label: AppLabels.post(context),
-                  hint: AppLabels.postHint(context),
-                ),
-                const SizedBox(height: 16),
-                BilingualTextField(
-                  controller: _policeStationController,
-                  englishController: _policeStationEnController,
-                  prefixIcon: Icons.local_police,
-                  label: AppLabels.policeStation(context),
-                  hint: AppLabels.policeStationHint(context),
                 ),
                 const SizedBox(height: 16),
                 locationAsync.when(
