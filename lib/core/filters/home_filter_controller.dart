@@ -42,4 +42,8 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
   void toggleFromMyCity() {
     state = state.copyWith(fromMyCity: !state.fromMyCity);
   }
+
+  void updateAgeRange(double min, double max) {
+    state = state.copyWith(minAge: min, maxAge: max);
+  }
 }

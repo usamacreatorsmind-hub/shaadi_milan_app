@@ -21,6 +21,7 @@ import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
+import 'user_home_screen.dart';
 
 final userProfileScreenProvider = StreamProvider.family<MetrimonyProfileViewModel, String>((ref, userId) {
   final repository = ref.watch(matrimonyRepositoryProvider);
@@ -153,6 +154,25 @@ class UserProfileScreen extends ConsumerWidget {
                           title: AppLabels.myProfile(context),
                           onTap: () {
                             AutoRouter.of(context).push(MyProfileRoute(uid: userId));
+                          },
+                        ),
+                        _SettingsTile(
+                          icon: Icons.tune_rounded,
+                          title: "Partner Preferences",
+                          onTap: () {
+                            showGeneralDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              barrierLabel: 'Preferences',
+                              transitionDuration: const Duration(milliseconds: 400),
+                              pageBuilder: (context, animation, secondaryAnimation) => const FilterRightSheet(),
+                              transitionBuilder: (context, animation, secondaryAnimation, child) {
+                                return SlideTransition(
+                                  position: Tween(begin: const Offset(1, 0), end: Offset.zero).animate(animation),
+                                  child: child,
+                                );
+                              },
+                            );
                           },
                         ),
                         _SettingsTile(

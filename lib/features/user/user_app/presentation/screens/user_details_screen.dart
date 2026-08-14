@@ -17,6 +17,8 @@ import '../../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/carousel_slider.dart';
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../../../translitration/models/bilingual_value.dart';
+import '../../../user_razorpay/domain/states/payment.dart';
+import '../../../user_razorpay/presentation/notifier/payment_notifier.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../domain/states/image_state.dart';
 import '../../domain/states/metrimony_state.dart';
@@ -147,47 +149,159 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 ),
                               ),
                             ),
+                            // Wishlist Button on Image
                             Positioned(
-                              bottom: 20,
+                              top: MediaQuery.of(context).padding.top + 10,
+                              right: 20,
+                              child: Consumer(
+                                builder: (context, ref, child) {
+                                  final currentUserId = ref.watch(authRepositoryProvider).currentUser?.uid;
+                                  if (currentUserId == null) return const SizedBox.shrink();
+
+                                  final wishlistAsync = ref.watch(myWishlistStreamProvider(currentUserId));
+
+                                  return wishlistAsync.when(
+                                    data: (wishlists) {
+                                      final isSaved = wishlists.any((w) => w.receiverId == widget.uid);
+                                      return Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          onTap: () async {
+                                            final wishlistRepo = ref.read(myWishlistNotifierProvider.notifier);
+                                            if (isSaved) {
+                                              final wish = wishlists.firstWhere((w) => w.receiverId == widget.uid);
+                                              await wishlistRepo.removeWishlist(wish.id);
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(const SnackBar(content: Text('Removed from Wishlist')));
+                                              }
+                                            } else {
+                                              final currentUserData = await ref.read(userRepositoryProvider).fetchUser(currentUserId);
+                                              final agentId = viewModel.user?.agentId ?? '';
+
+                                              final wishListItem = WishlistEntity(
+                                                senderId: currentUserId,
+                                                receiverId: widget.uid,
+                                                receiverAgent: agentId,
+                                                senderAgent: currentUserData.agentId,
+                                                status: "pending",
+                                                updatedAt: DateTime.now(),
+                                              );
+
+                                              await wishlistRepo.addWishlist(wishListItem);
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(const SnackBar(content: Text('Saved to Wishlist')));
+                                              }
+                                            }
+                                          },
+                                          borderRadius: BorderRadius.circular(30),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: BoxDecoration(
+                                              color: isSaved ? Colors.red : Colors.black26,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(color: Colors.white24),
+                                            ),
+                                            child: Icon(isSaved ? Icons.favorite : Icons.favorite_border, color: Colors.white, size: 24),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    loading: () => const SizedBox.shrink(),
+                                    error: (_, __) => const SizedBox.shrink(),
+                                  );
+                                },
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 24,
                               left: 20,
                               right: 20,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  BilingualParser(
-                                    value: viewModel.user?.fullName ?? BilingualValue(en: 'N/A', hi: 'N/A'),
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
                                   Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text(
-                                        '${AppLabels.ageYearsOld(context, profile.identity.age)} • ',
-                                        style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w500),
-                                      ),
                                       Expanded(
-                                        child: BilingualParser(
-                                          value: profile.employment.designation ?? BilingualValue.empty(),
-                                          style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w500),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                BilingualParser(
+                                                  value: viewModel.user?.fullName ?? BilingualValue(en: 'N/A', hi: 'N/A'),
+                                                  style: const TextStyle(
+                                                    fontSize: 28,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                    letterSpacing: 0.5,
+                                                    shadows: [Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 2))],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Consumer(
+                                                  builder: (context, ref, child) {
+                                                    final paymentState = ref.watch(paymentNotifierProvider(widget.uid));
+                                                    if (paymentState.status == PayStatus.success) {
+                                                      return Container(
+                                                        padding: const EdgeInsets.all(4),
+                                                        decoration: const BoxDecoration(color: Colors.amber, shape: BoxShape.circle),
+                                                        child: const Icon(Icons.verified, color: Colors.white, size: 18),
+                                                      );
+                                                    }
+                                                    return const SizedBox.shrink();
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 6),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white.withValues(alpha: 0.2),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                                                  ),
+                                                  child: Text(
+                                                    '${AppLabels.ageYearsOld(context, profile.identity.age)}',
+                                                    style: const TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: BilingualParser(
+                                                    value: profile.employment.designation ?? BilingualValue.empty(),
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight.w500,
+                                                      shadows: [Shadow(color: Colors.black45, blurRadius: 8)],
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 12),
                                   Row(
                                     children: [
                                       const Icon(Icons.location_on, size: 18, color: Colors.white70),
                                       const SizedBox(width: 4),
                                       Text(
                                         isHindi ? profile.address.city.hi : profile.address.city.en,
-                                        style: const TextStyle(fontSize: 14, color: Colors.white70),
+                                        style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w400),
                                       ),
                                     ],
                                   ),
@@ -200,31 +314,49 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                     ),
                     SliverToBoxAdapter(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        padding: const EdgeInsets.only(top: 24, bottom: 8),
                         decoration: BoxDecoration(
                           color: theme.scaffoldBackgroundColor,
                           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
                         ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            SizedBox(
+                              height: 100,
+                              child: ListView(
+                                scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
                                 children: [
-                                  _buildQuickStat(
+                                  _buildHighlightCard(
                                     context,
                                     Icons.height,
                                     AppLabels.height(context),
                                     _formatHeight(profile.physical.height.round()),
                                   ),
-                                  _buildQuickStat(
+                                  _buildHighlightCard(
                                     context,
                                     Icons.temple_hindu,
                                     AppLabels.religion(context),
                                     bText(profile.cultural.religion),
                                   ),
-                                  _buildQuickStat(context, Icons.group, AppLabels.caste(context), bText(profile.cultural.caste)),
+                                  _buildHighlightCard(context, Icons.group, AppLabels.caste(context), bText(profile.cultural.caste)),
+                                  _buildHighlightCard(context, Icons.work, AppLabels.jobType(context), bText(profile.employment.jobType)),
+                                  if (profile.employment.annualIncome != null && bText(profile.employment.annualIncome!) != 'N/A')
+                                    _buildHighlightCard(
+                                      context,
+                                      Icons.currency_rupee,
+                                      AppLabels.annualIncome(context),
+                                      bText(profile.employment.annualIncome!),
+                                    ),
+                                  _buildHighlightCard(
+                                    context,
+                                    Icons.school,
+                                    AppLabels.education(context),
+                                    profile.education.isIlletrate == true
+                                        ? AppLabels.illiterate(context)
+                                        : bText(profile.education.education?.course ?? BilingualValue.empty()),
+                                  ),
                                 ],
                               ),
                             ),
@@ -300,6 +432,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                       _InfoCard(
                         title: AppLabels.employment(context),
                         icon: Icons.work,
+                        isHighlighted: true,
                         children: [
                           _InfoTile(
                             label: AppLabels.jobType(context),
@@ -462,13 +595,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          icon: const Icon(Icons.favorite_border, size: 18),
-                          label: Text(
-                            AppLabels.addToWishlist(context),
-                            style: const TextStyle(fontSize: 12),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                          icon: const Icon(Icons.inbox_outlined, size: 18),
+                          label: const Text("Inbox", style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: theme.primaryColor,
@@ -477,41 +605,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          onPressed: () async {
-                            final currentUserId = ref.read(authRepositoryProvider).currentUser?.uid;
-                            final profileId = viewModel.user?.uid;
-                            final agentId = viewModel.user?.agentId;
-
-                            if (currentUserId == null || profileId == null || agentId == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Required IDs are missing.')));
-                              return;
-                            }
-
-                            final wishlistRepo = ref.read(wishlistRepositoryProvider);
-                            final existing = await wishlistRepo.getExistingWishlist(senderId: currentUserId, receiverId: profileId);
-
-                            if (existing != null) {
-                              ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(SnackBar(content: Text(AppLabels.alreadyAddedToWishlist(context))));
-                              return;
-                            }
-
-                            final userRepo = ref.read(userRepositoryProvider);
-                            final currentUserData = await userRepo.fetchUser(currentUserId);
-                            final senderAgent = currentUserData.agentId;
-
-                            final wishListItem = WishlistEntity(
-                              senderId: currentUserId,
-                              receiverId: profileId,
-                              receiverAgent: agentId,
-                              senderAgent: senderAgent,
-                              status: "pending",
-                              updatedAt: DateTime.now(),
-                            );
-
-                            await ref.read(myWishlistNotifierProvider.notifier).addWishlist(wishListItem);
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.addedToWishlist(context))));
+                          onPressed: () {
+                            context.pushRoute(const UserChatRoute());
                           },
                         ),
                       ),
@@ -649,18 +744,43 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
     );
   }
 
-  Widget _buildQuickStat(BuildContext context, IconData icon, String label, String value) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: Theme.of(context).primaryColor.withOpacity(0.1), shape: BoxShape.circle),
-          child: Icon(icon, color: Theme.of(context).primaryColor, size: 18),
-        ),
-        const SizedBox(height: 6),
-        Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-        Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-      ],
+  Widget _buildHighlightCard(BuildContext context, IconData icon, String label, String value) {
+    final theme = Theme.of(context);
+    return Container(
+      width: 110,
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.primaryColor.withValues(alpha: 0.1)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: theme.primaryColor.withValues(alpha: 0.08), shape: BoxShape.circle),
+            child: Icon(icon, color: theme.primaryColor, size: 20),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(fontSize: 10, color: Colors.grey[600], fontWeight: FontWeight.w500),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 
@@ -720,42 +840,52 @@ class _InfoCard extends StatelessWidget {
   final String title;
   final IconData icon;
   final List<Widget> children;
+  final bool isHighlighted;
 
-  const _InfoCard({required this.title, required this.icon, required this.children});
+  const _InfoCard({required this.title, required this.icon, required this.children, this.isHighlighted = false});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       clipBehavior: Clip.antiAlias,
-      foregroundDecoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        border: Border(left: BorderSide(color: Theme.of(context).primaryColor, width: 4)),
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 6))],
+        color: isHighlighted ? theme.primaryColor.withValues(alpha: 0.02) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: isHighlighted ? theme.primaryColor.withValues(alpha: 0.1) : Colors.transparent, width: 1),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 16, offset: const Offset(0, 8))],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Row(
               children: [
-                CircleAvatar(
-                  radius: 18,
-                  backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                  child: Icon(icon, color: Theme.of(context).primaryColor, size: 18),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: theme.primaryColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                  child: Icon(icon, color: theme.primaryColor, size: 20),
                 ),
-                const SizedBox(width: 10),
-                Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isHighlighted ? theme.primaryColor : Colors.black87),
+                ),
+                if (isHighlighted) ...[
+                  const Spacer(),
+                  Icon(Icons.auto_awesome_rounded, color: theme.primaryColor.withValues(alpha: 0.4), size: 18),
+                ],
               ],
             ),
-            const SizedBox(height: 10),
-            const Divider(),
-            ...children,
-          ],
-        ),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
+          ),
+        ],
       ),
     );
   }

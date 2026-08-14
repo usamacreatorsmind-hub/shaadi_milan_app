@@ -9,6 +9,8 @@ class HomeFilterState {
   final String gender;
   final bool justJoined;
   final bool fromMyCity;
+  final double minAge;
+  final double maxAge;
 
   const HomeFilterState({
     this.state = '',
@@ -18,6 +20,8 @@ class HomeFilterState {
     this.gender = '',
     this.justJoined = false,
     this.fromMyCity = false,
+    this.minAge = 18,
+    this.maxAge = 60,
   });
 
   HomeFilterState copyWith({
@@ -28,6 +32,8 @@ class HomeFilterState {
     String? gender,
     bool? justJoined,
     bool? fromMyCity,
+    double? minAge,
+    double? maxAge,
   }) {
     return HomeFilterState(
       state: state ?? this.state,
@@ -37,6 +43,8 @@ class HomeFilterState {
       gender: gender ?? this.gender,
       justJoined: justJoined ?? this.justJoined,
       fromMyCity: fromMyCity ?? this.fromMyCity,
+      minAge: minAge ?? this.minAge,
+      maxAge: maxAge ?? this.maxAge,
     );
   }
 }
