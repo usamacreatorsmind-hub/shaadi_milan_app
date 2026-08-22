@@ -99,7 +99,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navHome => 'Matches';
 
   @override
-  String get navWishlist => 'WishList';
+  String get navWishlist => 'Inbox';
 
   @override
   String get navSupport => 'Support';
@@ -2189,7 +2189,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addedToWishlist => 'Added to wishlist!';
 
   @override
-  String get wishlistTitle => 'Wishlist';
+  String get wishlistTitle => 'Inbox';
 
   @override
   String get manageInterests => 'Manage your interests';
@@ -2228,6 +2228,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get manageAccount => 'Manage your account';
+
+  @override
+  String get premiumMembership => 'Premium Membership';
 
   @override
   String get premiumActive => 'Premium Active';

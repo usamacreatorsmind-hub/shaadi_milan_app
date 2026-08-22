@@ -30,6 +30,19 @@ abstract class AuthRepository {
 
   Future<void> logout();
 
-  Future<dynamic> checkPhoneAlreadyRegistered(String trim) async {}
+  Future<dynamic> checkPhoneAlreadyRegistered(String trim);
   Future<bool> checkUserExists({required String phone, required String email});
+
+  Future<void> verifyPhoneNumber({
+    required String phoneNumber,
+    required Function(String verificationId) onCodeSent,
+    required Function(FirebaseAuthException e) onVerificationFailed,
+  });
+
+  Future<UserCredential> signInWithPhoneCredential(
+    String verificationId,
+    String smsCode,
+  );
+
+  Future<void> updatePassword(String newPassword);
 }

@@ -43,40 +43,20 @@ class AnimatedGlassAppBar extends StatelessWidget {
       actions: actions,
       expandedHeight: expandedHeight,
       collapsedHeight: collapsedHeight,
-      backgroundColor: Colors.transparent,
-
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black87,
+      iconTheme: const IconThemeData(color: Colors.black87),
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
-          final t =
-              ((constraints.maxHeight - kToolbarHeight) /
-                      (expandedHeight - kToolbarHeight))
-                  .clamp(0.0, 1.0);
+          final t = ((constraints.maxHeight - kToolbarHeight) / (expandedHeight - kToolbarHeight)).clamp(0.0, 1.0);
 
-          final blur = 4 + (1 - t) * 12;
           final logoScale = 0.75 + t * 0.25;
           final titleOpacity = t;
 
           return Stack(
             fit: StackFit.expand,
             children: [
-              // 🌫 Glass background
-              ClipRRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white.withOpacity(0.95),
-                          Colors.pink.shade50.withOpacity(0.9),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              Container(color: Colors.white),
 
               // 🌸 Content
               Padding(
@@ -114,21 +94,13 @@ class AnimatedGlassAppBar extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              ShaderMask(
-                                shaderCallback: (bounds) => LinearGradient(
-                                  colors: [
-                                    theme.primaryColor,
-                                    Colors.pinkAccent,
-                                  ],
-                                ).createShader(bounds),
-                                child: Text(
-                                  title ?? AppLabels.appName(context),
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
-                                    letterSpacing: 1,
-                                  ),
+                              Text(
+                                title ?? AppLabels.appName(context),
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                  color: theme.primaryColor,
+                                  letterSpacing: 1,
                                 ),
                               ),
                               if (subtitle != null) ...[
@@ -154,27 +126,16 @@ class AnimatedGlassAppBar extends StatelessWidget {
           );
         },
       ),
-
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(
           height: 1,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.transparent,
-                Colors.pinkAccent.withOpacity(0.3),
-                Colors.transparent,
-              ],
-            ),
-          ),
+          color: Colors.grey.shade200,
         ),
       ),
     );
   }
 }
-
- 
 
 /// Modern gradient app bar with smooth animations
 class ModernGradientAppBar extends StatelessWidget {
@@ -198,11 +159,6 @@ class ModernGradientAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final defaultGradient = [
-      theme.primaryColor,
-      theme.primaryColor.withOpacity(0.8),
-      Colors.pinkAccent.withOpacity(0.6),
-    ];
 
     return SliverAppBar(
       pinned: true,
@@ -210,35 +166,22 @@ class ModernGradientAppBar extends StatelessWidget {
       expandedHeight: subtitle != null ? 120 : 80,
       leading: leading,
       actions: actions,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black87,
+      iconTheme: const IconThemeData(color: Colors.black87),
       flexibleSpace: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: gradientColors ?? defaultGradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: theme.primaryColor.withOpacity(0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
+        color: Colors.white,
         child: FlexibleSpaceBar(
           centerTitle: centerTitle,
           titlePadding: EdgeInsets.only(left: centerTitle ? 0 : 56, bottom: 16),
           title: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: centerTitle
-                ? CrossAxisAlignment.center
-                : CrossAxisAlignment.start,
+            crossAxisAlignment: centerTitle ? CrossAxisAlignment.center : CrossAxisAlignment.start,
             children: [
               Text(
                 title,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black87,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -248,13 +191,20 @@ class ModernGradientAppBar extends StatelessWidget {
                 Text(
                   subtitle!,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.black54,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
             ],
           ),
+        ),
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Container(
+          height: 1,
+          color: Colors.grey.shade200,
         ),
       ),
     );
@@ -288,6 +238,8 @@ class MinimalAppBar extends StatelessWidget {
       leading: leading,
       actions: actions,
       backgroundColor: backgroundColor ?? Colors.white,
+      foregroundColor: Colors.black87,
+      iconTheme: const IconThemeData(color: Colors.black87),
       title: Text(
         title,
         style: TextStyle(
@@ -300,16 +252,8 @@ class MinimalAppBar extends StatelessWidget {
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(
-          height: 2,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.transparent,
-                theme.primaryColor.withOpacity(0.3),
-                Colors.transparent,
-              ],
-            ),
-          ),
+          height: 1,
+          color: Colors.grey.shade200,
         ),
       ),
     );
@@ -346,12 +290,14 @@ class FloatingAppBar extends StatelessWidget {
         elevation: elevation,
         leading: leading,
         actions: actions,
-        backgroundColor: backgroundColor ?? theme.primaryColor,
+        backgroundColor: backgroundColor ?? Colors.white,
+        foregroundColor: Colors.black87,
+        iconTheme: const IconThemeData(color: Colors.black87),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           title,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: theme.primaryColor,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -384,8 +330,7 @@ class SearchableAppBar extends StatefulWidget {
   State<SearchableAppBar> createState() => _SearchableAppBarState();
 }
 
-class _SearchableAppBarState extends State<SearchableAppBar>
-    with SingleTickerProviderStateMixin {
+class _SearchableAppBarState extends State<SearchableAppBar> with SingleTickerProviderStateMixin {
   bool _isSearching = false;
   final _searchController = TextEditingController();
   late AnimationController _animationController;
@@ -394,14 +339,8 @@ class _SearchableAppBarState extends State<SearchableAppBar>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
+    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _animation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
   }
 
   @override
@@ -431,7 +370,9 @@ class _SearchableAppBarState extends State<SearchableAppBar>
       pinned: true,
       elevation: 2,
       leading: widget.leading,
-      backgroundColor: theme.primaryColor,
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black87,
+      iconTheme: const IconThemeData(color: Colors.black87),
       title: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         child: _isSearching
@@ -439,10 +380,10 @@ class _SearchableAppBarState extends State<SearchableAppBar>
                 key: const ValueKey('search'),
                 controller: _searchController,
                 autofocus: widget.autoFocusSearch,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.black87),
                 decoration: InputDecoration(
                   hintText: widget.searchHint ?? AppLabels.searchHint(context),
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                  hintStyle: TextStyle(color: Colors.black54),
                   border: InputBorder.none,
                 ),
                 onChanged: widget.onSearch,
@@ -450,20 +391,12 @@ class _SearchableAppBarState extends State<SearchableAppBar>
             : Text(
                 widget.title,
                 key: const ValueKey('title'),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: const TextStyle(color: Colors.black87, fontSize: 20, fontWeight: FontWeight.w600),
               ),
       ),
       actions: [
         IconButton(
-          icon: AnimatedIcon(
-            icon: AnimatedIcons.search_ellipsis,
-            progress: _animation,
-            color: Colors.white,
-          ),
+          icon: AnimatedIcon(icon: AnimatedIcons.search_ellipsis, progress: _animation, color: theme.primaryColor),
           onPressed: _toggleSearch,
         ),
         if (widget.actions != null && !_isSearching) ...widget.actions!,
@@ -500,21 +433,17 @@ class HeroAppBar extends StatelessWidget {
     return SliverAppBar(
       pinned: true,
       stretch: true,
-
       expandedHeight: expandedHeight,
-      backgroundColor: theme.primaryColor,
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black87,
+      iconTheme: const IconThemeData(color: Colors.black87),
       leading: leading,
       actions: actions,
-
       flexibleSpace: FlexibleSpaceBar(
-        stretchModes: const [
-          StretchMode.zoomBackground,
-          StretchMode.blurBackground,
-        ],
+        stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
 
         /// TITLE AREA (SAFE)
         titlePadding: const EdgeInsetsDirectional.only(start: 16, bottom: 16),
-
         title: SafeArea(
           bottom: false, // only protect top
           child: Column(
@@ -525,18 +454,12 @@ class HeroAppBar extends StatelessWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: backgroundImage != null ? Colors.white : Colors.black87,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.4,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black26,
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+                  shadows: backgroundImage != null ? [const Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 2))] : null,
                 ),
               ),
               const SizedBox(height: 2),
@@ -544,17 +467,11 @@ class HeroAppBar extends StatelessWidget {
                 subtitle,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white70,
+                style: TextStyle(
+                  color: backgroundImage != null ? Colors.white70 : Colors.black54,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black26,
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+                  shadows: backgroundImage != null ? [const Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 2))] : null,
                 ),
               ),
             ],
@@ -565,36 +482,21 @@ class HeroAppBar extends StatelessWidget {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            if (backgroundImage != null)
-              backgroundImage!
-            else
+            if (backgroundImage != null) ...[
+              backgroundImage!,
+
+              /// DARK OVERLAY
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      theme.primaryColor,
-                      theme.primaryColor.withOpacity(0.85),
-                      const Color.fromARGB(255, 23, 235, 58),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                    colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.2)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
                 ),
               ),
-
-            /// DARK OVERLAY
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.black.withOpacity(0.6),
-                    Colors.black.withOpacity(0.2),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-            ),
+            ] else
+              Container(color: Colors.white),
           ],
         ),
       ),

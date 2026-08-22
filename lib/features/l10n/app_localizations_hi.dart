@@ -98,7 +98,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get navHome => 'मैचेस';
 
   @override
-  String get navWishlist => 'विशलिस्ट';
+  String get navWishlist => 'इनबॉक्स';
 
   @override
   String get navSupport => 'सपोर्ट';
@@ -2194,7 +2194,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get addedToWishlist => 'विशलिस्ट में जोड़ा गया!';
 
   @override
-  String get wishlistTitle => 'विशलिस्ट';
+  String get wishlistTitle => 'इनबॉक्स';
 
   @override
   String get manageInterests => 'अपनी रुचियों को प्रबंधित करें';
@@ -2235,6 +2235,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get manageAccount => 'अपना खाता प्रबंधित करें';
+
+  @override
+  String get premiumMembership => 'प्रीमियम सदस्यता';
 
   @override
   String get premiumActive => 'प्रीमियम सक्रिय';

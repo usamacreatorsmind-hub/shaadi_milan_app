@@ -269,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @navWishlist.
   ///
   /// In en, this message translates to:
-  /// **'WishList'**
+  /// **'Inbox'**
   String get navWishlist;
 
   /// No description provided for @navSupport.
@@ -4241,7 +4241,7 @@ abstract class AppLocalizations {
   /// No description provided for @wishlistTitle.
   ///
   /// In en, this message translates to:
-  /// **'Wishlist'**
+  /// **'Inbox'**
   String get wishlistTitle;
 
   /// No description provided for @manageInterests.
@@ -4315,6 +4315,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage your account'**
   String get manageAccount;
+
+  /// No description provided for @premiumMembership.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Membership'**
+  String get premiumMembership;
 
   /// No description provided for @premiumActive.
   ///

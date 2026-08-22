@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../app/router/app_router.dart';  
+import '../../../app/router/app_router.dart';
 import '../../../core/constants/app_constants.dart';
 
 @RoutePage()
@@ -16,118 +16,170 @@ class ContactUsScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
-          /// 🌈 Gradient App Bar
+          /// 🌈 Refined Header with Modern Gradient
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 240,
             pinned: true,
+            elevation: 0,
+            stretch: true,
             backgroundColor: theme.primaryColor,
+            automaticallyImplyLeading: true,
+            leading: const AutoLeadingButton(color: Colors.white),
             flexibleSpace: FlexibleSpaceBar(
+              stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
               centerTitle: true,
-              title: Text(AppLabels.contactUs(context)),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [theme.primaryColor, theme.colorScheme.secondary],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    SizedBox(height: 40),
-                    Icon(
-                      Icons.contact_support_outlined,
-                      size: 80,
-                      color: Colors.white,
+              title: Text(
+                AppLabels.contactUs(context),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 0.5),
+              ),
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [theme.primaryColor, const Color(0xFFE91E63)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                  // Background patterns
+                  Positioned(right: -30, top: -20, child: Icon(Icons.headset_mic_rounded, size: 200, color: Colors.white.withOpacity(0.1))),
+                  Positioned(
+                    left: -20,
+                    bottom: 20,
+                    child: Icon(Icons.support_agent_rounded, size: 120, color: Colors.white.withOpacity(0.1)),
+                  ),
+                  SafeArea(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+                          ),
+                          child: const Icon(Icons.contact_support_rounded, size: 56, color: Colors.white),
+                        ),
+                        const SizedBox(height: 40),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
 
-          /// 📄 Body
-          SliverPadding(
-            padding: const EdgeInsets.all(20),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                Text(
-                  AppLabels.hereToHelp(context),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+          /// 📄 Body Content
+          SliverToBoxAdapter(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+              ),
+              transform: Matrix4.translationValues(0, -32, 0),
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: 25),
+                  Text(
+                    AppLabels.hereToHelp(context),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.black87),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  AppLabels.contactDescription(context),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
+                  const SizedBox(height: 12),
+                  Text(
+                    AppLabels.contactDescription(context),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15, color: Colors.grey[600], height: 1.5, fontWeight: FontWeight.w500),
                   ),
-                ),
-                const SizedBox(height: 30),
+                  const SizedBox(height: 32),
 
-                _ContactTile(
-                  iconWidget: const Icon(Icons.email_outlined, color: Colors.redAccent),
-                  color: Colors.redAccent,
-                  title: AppLabels.emailUs(context),
-                  subtitle: AppConstants.supportEmail,
-                  onTap: () => _launchUrl(AppConstants.emailLink),
-                ),
-
-                _ContactTile(
-                  iconWidget: const Icon(Icons.phone_outlined, color: Colors.blueAccent),
-                  color: Colors.blueAccent,
-                  title: AppLabels.callUs(context),
-                  subtitle: AppLabels.phone(context),
-                  onTap: () => _launchUrl(AppConstants.phoneLink),
-                ),
-
-                _ContactTile(
-                  iconWidget: const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
-                  color: Colors.green,
-                  title: AppLabels.whatsapp(context),
-                  subtitle: AppLabels.phone(context),
-                  onTap: () => _launchUrl(AppConstants.whatsappLink),
-                ),
-
-                _ContactTile(
-                  iconWidget: const Icon(Icons.message_outlined, color: Colors.deepPurple),
-                  color: Colors.deepPurple,
-                  title: AppLabels.sendAMessage(context),
-                  subtitle: AppLabels.getBackShortly(context),
-                  onTap: () {
-                    context.pushRoute(SupportTicketFormRoute());
-                  },
-                ),
-
-                const SizedBox(height: 40),
-
-                /// ⏰ Support Time
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
+                  _ContactTile(
+                    icon: Icons.alternate_email_rounded,
+                    color: const Color(0xFFF44336),
+                    title: AppLabels.emailUs(context),
+                    subtitle: AppConstants.supportEmail,
+                    onTap: () => _launchUrl(AppConstants.emailLink),
                   ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.schedule, color: theme.colorScheme.primary),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          "${AppLabels.supportTeamAvailable(context)}\n${AppConstants.supportHours}",
-                          style: theme.textTheme.bodySmall,
+
+                  _ContactTile(
+                    icon: Icons.phone_in_talk_rounded,
+                    color: const Color(0xFF2196F3),
+                    title: AppLabels.callUs(context),
+                    subtitle: "+91 98765 43210", // Example phone or AppLabels.phone(context)
+                    onTap: () => _launchUrl(AppConstants.phoneLink),
+                  ),
+
+                  _ContactTile(
+                    icon: FontAwesomeIcons.whatsapp,
+                    color: const Color(0xFF4CAF50),
+                    title: AppLabels.whatsapp(context),
+                    subtitle: "Fast response via WhatsApp",
+                    onTap: () => _launchUrl(AppConstants.whatsappLink),
+                    isFaIcon: true,
+                  ),
+
+                  _ContactTile(
+                    icon: Icons.history_edu_rounded,
+                    color: theme.primaryColor,
+                    title: AppLabels.sendAMessage(context),
+                    subtitle: "Raise a support ticket",
+                    onTap: () {
+                      context.pushRoute(SupportTicketFormRoute());
+                    },
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  /// ⏰ Support Hours Card
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(color: theme.primaryColor.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
+                          child: Icon(Icons.access_time_filled_rounded, color: theme.primaryColor),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                AppLabels.supportTeamAvailable(context),
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                AppConstants.supportHours,
+                                style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ]),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
           ),
         ],
@@ -143,74 +195,68 @@ class ContactUsScreen extends StatelessWidget {
   }
 }
 
-/// 🔹 Reusable Contact Tile
+/// 🔹 Reusable Modern Contact Tile
 class _ContactTile extends StatelessWidget {
-  final Widget iconWidget;
+  final dynamic icon;
   final String title;
   final String subtitle;
   final Color color;
   final VoidCallback onTap;
+  final bool isFaIcon;
 
   const _ContactTile({
-    required this.iconWidget,
+    required this.icon,
     required this.title,
     required this.subtitle,
     required this.color,
     required this.onTap,
+    this.isFaIcon = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8))],
+      ),
       child: Material(
-        elevation: 4,
-        borderRadius: BorderRadius.circular(16),
-        color: theme.colorScheme.surface,
+        color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
           onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+            padding: const EdgeInsets.all(20),
             child: Row(
               children: [
                 Container(
-                  height: 46,
-                  width: 46,
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
+                  height: 52,
+                  width: 52,
+                  decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
+                  child: Center(
+                    child: isFaIcon ? Icon(Icons.info, color: color, size: 26) : Icon(Icons.info, color: color, size: 26),
                   ),
-                  child: iconWidget,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 18),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         title,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.black87),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         subtitle,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey.shade600,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600], fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
                 ),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 18,
-                  color: Colors.grey,
-                ),
+                Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey[300]),
               ],
             ),
           ),

@@ -11,6 +11,7 @@ import 'package:shadi_milan/features/auth/presentation/providers/auth_providers.
 import 'package:shadi_milan/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart' show agentFirestoreDsProvider;
 import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:shadi_milan/features/user/user_app/widgets/agent_bottom_sheet.dart';
+import 'package:shadi_milan/features/user/user_app/presentation/widgets/premium_upgrade_bottom_sheet.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../../../core/constants/app_labels.dart';
@@ -135,87 +136,24 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                           children: [
                             Hero(
                               tag: 'user-image-${widget.uid}',
-                              child: CustomCarouselSlider(imageUrls: images),
+                              child: CustomCarouselSlider(imageUrls: images, height: MediaQuery.of(context).size.height * 0.65),
                             ),
                             const Positioned.fill(
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [Colors.black38, Colors.transparent, Colors.transparent, Colors.black87],
-                                    stops: [0.0, 0.2, 0.7, 1.0],
+                              child: IgnorePointer(
+                                ignoring: true,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [Colors.black38, Colors.transparent, Colors.transparent, Colors.black87],
+                                      stops: [0.0, 0.2, 0.7, 1.0],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                            // Wishlist Button on Image
-                            Positioned(
-                              top: MediaQuery.of(context).padding.top + 10,
-                              right: 20,
-                              child: Consumer(
-                                builder: (context, ref, child) {
-                                  final currentUserId = ref.watch(authRepositoryProvider).currentUser?.uid;
-                                  if (currentUserId == null) return const SizedBox.shrink();
-
-                                  final wishlistAsync = ref.watch(myWishlistStreamProvider(currentUserId));
-
-                                  return wishlistAsync.when(
-                                    data: (wishlists) {
-                                      final isSaved = wishlists.any((w) => w.receiverId == widget.uid);
-                                      return Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          onTap: () async {
-                                            final wishlistRepo = ref.read(myWishlistNotifierProvider.notifier);
-                                            if (isSaved) {
-                                              final wish = wishlists.firstWhere((w) => w.receiverId == widget.uid);
-                                              await wishlistRepo.removeWishlist(wish.id);
-                                              if (context.mounted) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(const SnackBar(content: Text('Removed from Wishlist')));
-                                              }
-                                            } else {
-                                              final currentUserData = await ref.read(userRepositoryProvider).fetchUser(currentUserId);
-                                              final agentId = viewModel.user?.agentId ?? '';
-
-                                              final wishListItem = WishlistEntity(
-                                                senderId: currentUserId,
-                                                receiverId: widget.uid,
-                                                receiverAgent: agentId,
-                                                senderAgent: currentUserData.agentId,
-                                                status: "pending",
-                                                updatedAt: DateTime.now(),
-                                              );
-
-                                              await wishlistRepo.addWishlist(wishListItem);
-                                              if (context.mounted) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(const SnackBar(content: Text('Saved to Wishlist')));
-                                              }
-                                            }
-                                          },
-                                          borderRadius: BorderRadius.circular(30),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(10),
-                                            decoration: BoxDecoration(
-                                              color: isSaved ? Colors.red : Colors.black26,
-                                              shape: BoxShape.circle,
-                                              border: Border.all(color: Colors.white24),
-                                            ),
-                                            child: Icon(isSaved ? Icons.favorite : Icons.favorite_border, color: Colors.white, size: 24),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    loading: () => const SizedBox.shrink(),
-                                    error: (_, __) => const SizedBox.shrink(),
-                                  );
-                                },
-                              ),
-                            ),
+                            // Removed redundant Wishlist Button on Image to match design
                             Positioned(
                               bottom: 24,
                               left: 20,
@@ -224,84 +162,77 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                                    textBaseline: TextBaseline.alphabetic,
                                     children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                BilingualParser(
-                                                  value: viewModel.user?.fullName ?? BilingualValue(en: 'N/A', hi: 'N/A'),
-                                                  style: const TextStyle(
-                                                    fontSize: 28,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                    letterSpacing: 0.5,
-                                                    shadows: [Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 2))],
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Consumer(
-                                                  builder: (context, ref, child) {
-                                                    final paymentState = ref.watch(paymentNotifierProvider(widget.uid));
-                                                    if (paymentState.status == PayStatus.success) {
-                                                      return Container(
-                                                        padding: const EdgeInsets.all(4),
-                                                        decoration: const BoxDecoration(color: Colors.amber, shape: BoxShape.circle),
-                                                        child: const Icon(Icons.verified, color: Colors.white, size: 18),
-                                                      );
-                                                    }
-                                                    return const SizedBox.shrink();
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 6),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white.withValues(alpha: 0.2),
-                                                    borderRadius: BorderRadius.circular(12),
-                                                    border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                                                  ),
-                                                  child: Text(
-                                                    '${AppLabels.ageYearsOld(context, profile.identity.age)}',
-                                                    style: const TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Expanded(
-                                                  child: BilingualParser(
-                                                    value: profile.employment.designation ?? BilingualValue.empty(),
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.white,
-                                                      fontWeight: FontWeight.w500,
-                                                      shadows: [Shadow(color: Colors.black45, blurRadius: 8)],
-                                                    ),
-                                                    maxLines: 1,
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                      BilingualParser(
+                                        value: viewModel.user?.fullName ?? BilingualValue.empty(),
+                                        style: const TextStyle(
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          shadows: [Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 2))],
                                         ),
+                                      ),
+                                      Text(
+                                        ', ${profile.identity.age}',
+                                        style: const TextStyle(
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          shadows: [Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 2))],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Consumer(
+                                        builder: (context, ref, child) {
+                                          final paymentState = ref.watch(paymentNotifierProvider(widget.uid));
+                                          if (paymentState.status == PayStatus.success) {
+                                            return const Icon(Icons.verified, color: Colors.blue, size: 24);
+                                          }
+                                          return const SizedBox.shrink();
+                                        },
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '${profile.physical.height} cm • ${bText(profile.cultural.caste)} • ${bText(profile.employment.designation ?? BilingualValue.empty())}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      shadows: [Shadow(color: Colors.black45, blurRadius: 8)],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${bText(profile.address.city)}, ${bText(profile.address.state)}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      shadows: [Shadow(color: Colors.black45, blurRadius: 8)],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
                                   Row(
                                     children: [
-                                      const Icon(Icons.location_on, size: 18, color: Colors.white70),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        isHindi ? profile.address.city.hi : profile.address.city.en,
-                                        style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w400),
+                                      _buildStatusBadge(
+                                        context,
+                                        label: _timeAgo(viewModel.user?.lastSeen),
+                                        icon: Icons.circle,
+                                        iconColor: Colors.green,
+                                        backgroundColor: Colors.black.withOpacity(0.3),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      _buildStatusBadge(
+                                        context,
+                                        label: "You & Her",
+                                        icon: Icons.people,
+                                        iconColor: Colors.red,
+                                        backgroundColor: Colors.black.withOpacity(0.3),
+                                        textColor: Colors.white,
                                       ),
                                     ],
                                   ),
@@ -586,72 +517,96 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                 left: 0,
                 right: 0,
                 child: Container(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 25),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, -2))],
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
                   ),
                   child: Row(
                     children: [
+                      // 1. Chat Button
                       Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.inbox_outlined, size: 18),
-                          label: const Text("Inbox", style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: theme.primaryColor,
-                            elevation: 0,
-                            side: BorderSide(color: theme.primaryColor.withOpacity(0.2)),
-                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          onPressed: () {
-                            context.pushRoute(const UserChatRoute());
+                        child: _ActionButton(
+                          icon: Icons.chat_bubble_rounded,
+                          label: "Chat",
+                          backgroundColor: Colors.teal,
+                          onTap: () {
+                            final currentUserId = ref.read(authRepositoryProvider).currentUser?.uid;
+                            if (currentUserId == null) return;
+                            final paymentState = ref.read(paymentNotifierProvider(currentUserId));
+
+                            if (paymentState.status == PayStatus.success) {
+                              context.pushRoute(UserChatRoomRoute(peerId: viewModel.user!.uid));
+                            } else {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => const PremiumUpgradeBottomSheet(),
+                              );
+                            }
                           },
                         ),
                       ),
-                      const SizedBox(width: 8),
+
+                      // 2. Wishlist Button
                       Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                          label: Text(
-                            AppLabels.navChat(context),
-                            style: const TextStyle(fontSize: 12),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: theme.primaryColor,
-                            elevation: 0,
-                            side: BorderSide(color: theme.primaryColor.withOpacity(0.2)),
-                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          onPressed: () {
-                            context.pushRoute(UserChatRoomRoute(peerId: viewModel.user!.uid));
+                        child: Consumer(
+                          builder: (context, ref, _) {
+                            final currentUserId = ref.watch(authRepositoryProvider).currentUser?.uid;
+                            if (currentUserId == null) return const SizedBox.shrink();
+                            final wishlistAsync = ref.watch(myWishlistStreamProvider(currentUserId));
+
+                            return wishlistAsync.when(
+                              data: (wishlists) {
+                                final isSaved = wishlists.any((w) => w.receiverId == widget.uid);
+                                return _ActionButton(
+                                  icon: isSaved ? Icons.bookmark : Icons.bookmark_border,
+                                  label: "Wishlist",
+                                  backgroundColor: Colors.red,
+                                  onTap: () async {
+                                    final wishlistRepo = ref.read(myWishlistNotifierProvider.notifier);
+                                    if (isSaved) {
+                                      final wish = wishlists.firstWhere((w) => w.receiverId == widget.uid);
+                                      await wishlistRepo.removeWishlist(wish.id);
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Removed from Wishlist')));
+                                      }
+                                    } else {
+                                      final currentUserData = await ref.read(userRepositoryProvider).fetchUser(currentUserId);
+                                      final agentId = viewModel.user?.agentId ?? '';
+
+                                      final wishListItem = WishlistEntity(
+                                        senderId: currentUserId,
+                                        receiverId: widget.uid,
+                                        receiverAgent: agentId,
+                                        senderAgent: currentUserData.agentId,
+                                        status: "pending",
+                                        updatedAt: DateTime.now(),
+                                      );
+
+                                      await wishlistRepo.addWishlist(wishListItem);
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to Wishlist')));
+                                      }
+                                    }
+                                  },
+                                );
+                              },
+                              loading: () => const SizedBox.shrink(),
+                              error: (_, __) => const Icon(Icons.error, color: Colors.red),
+                            );
                           },
                         ),
                       ),
-                      const SizedBox(width: 8),
+
+                      // 3. Call/Agent Button
                       Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.support_agent, size: 18),
-                          label: Text(
-                            AppLabels.contactAgent(context),
-                            style: const TextStyle(fontSize: 12),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.primaryColor,
-                            foregroundColor: Colors.white,
-                            elevation: 2,
-                            shadowColor: theme.primaryColor.withOpacity(0.3),
-                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          onPressed: () {
+                        child: _ActionButton(
+                          icon: Icons.support_agent,
+                          label: AppLabels.contactAgent(context),
+                          backgroundColor: theme.primaryColor,
+                          onTap: () {
                             if (viewModel.user!.agentId.isEmpty) {
                               showModalBottomSheet(
                                 context: context,
@@ -803,6 +758,40 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
     final inches = totalInches % 12;
     return '$cm cm ($feet\'$inches")';
   }
+
+  Widget _buildStatusBadge(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required Color iconColor,
+    required Color backgroundColor,
+    Color textColor = Colors.white,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(20)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: iconColor, size: 14),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _timeAgo(DateTime? dateTime) {
+    if (dateTime == null) return 'N/A';
+    final duration = DateTime.now().difference(dateTime);
+    if (duration.inDays > 0) return '${duration.inDays}d ago';
+    if (duration.inHours > 0) return '${duration.inHours}h ago';
+    if (duration.inMinutes > 0) return '${duration.inMinutes}m ago';
+    return 'Just now';
+  }
 }
 
 // ================= HELPERS =================
@@ -831,6 +820,44 @@ class TabWidget extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color iconColor;
+  final Color backgroundColor;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.iconColor = Colors.white,
+    required this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: backgroundColor, shape: BoxShape.circle),
+            child: Icon(icon, color: iconColor, size: 24),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.black87, fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
     );
   }

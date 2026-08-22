@@ -9,6 +9,7 @@ import 'package:shadi_milan/features/agent/agent_app/presentation/screens/view_w
 import 'package:shadi_milan/features/auth/presentation/screens/view_agent_profile.dart';
 import 'package:shadi_milan/features/user/user_app/presentation/screens/my_review_screen.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_after_marriage_payment_screen.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_premium_plans_screen.dart';
 import '../../features/agent/agent_app/presentation/screens/agent_add_client_screen.dart';
 
 import '../../core/enums/enum.dart';
@@ -27,6 +28,7 @@ import '../../features/auth/domain/states/user_state.dart';
 import '../../features/auth/presentation/screens/agent_login_screen.dart';
 // Unified AuthWrapperScreen
 import '../../features/auth/presentation/screens/change_password_screen.dart';
+import '../../features/auth/presentation/screens/forgot_password_otp_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/user_login_screen.dart';
 import '../../features/auth/presentation/screens/user_register_screen.dart';

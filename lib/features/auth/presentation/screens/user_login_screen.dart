@@ -225,8 +225,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: () =>
-                                context.navigateTo(ResetPasswordRoute()),
+                            onPressed: () => context.navigateTo(const ResetPasswordRoute()),
                             child: Text(
                               AppLabels.forgotPassword(context),
                               style: TextStyle(

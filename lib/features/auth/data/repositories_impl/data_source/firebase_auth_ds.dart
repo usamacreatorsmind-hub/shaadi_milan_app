@@ -27,6 +27,19 @@ abstract class FirebaseAuthDs {
     required String email,
   });
   Future<bool> checkAgentIfExists({required String uid});
+
+  Future<void> verifyPhoneNumber({
+    required String phoneNumber,
+    required Function(String verificationId) onCodeSent,
+    required Function(FirebaseAuthException e) onVerificationFailed,
+  });
+
+  Future<UserCredential> signInWithPhoneCredential(
+    String verificationId,
+    String smsCode,
+  );
+
+  Future<void> updatePassword(String newPassword);
 }
 
 //////////////////////////////////////////////////////////
@@ -241,6 +254,48 @@ class FirebaseAuthDS implements FirebaseAuthDs {
 
   @override
   Stream<User?> authStateChanges() => _auth.authStateChanges();
+
+  @override
+  Future<void> verifyPhoneNumber({
+    required String phoneNumber,
+    required Function(String verificationId) onCodeSent,
+    required Function(FirebaseAuthException e) onVerificationFailed,
+  }) async {
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // Auto-resolution or instant verification
+        await _auth.signInWithCredential(credential);
+      },
+      verificationFailed: onVerificationFailed,
+      codeSent: (String verificationId, int? resendToken) {
+        onCodeSent(verificationId);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+  }
+
+  @override
+  Future<UserCredential> signInWithPhoneCredential(
+    String verificationId,
+    String smsCode,
+  ) async {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+    return await _auth.signInWithCredential(credential);
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      await user.updatePassword(newPassword);
+    } else {
+      throw Exception("No user signed in");
+    }
+  }
 
   Future<void> logout() async {
     await _auth.signOut();

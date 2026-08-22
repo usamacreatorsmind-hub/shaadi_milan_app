@@ -11,6 +11,7 @@ class HomeFilterState {
   final bool fromMyCity;
   final double minAge;
   final double maxAge;
+  final String searchQuery;
 
   const HomeFilterState({
     this.state = '',
@@ -22,6 +23,7 @@ class HomeFilterState {
     this.fromMyCity = false,
     this.minAge = 18,
     this.maxAge = 60,
+    this.searchQuery = '',
   });
 
   HomeFilterState copyWith({
@@ -34,6 +36,7 @@ class HomeFilterState {
     bool? fromMyCity,
     double? minAge,
     double? maxAge,
+    String? searchQuery,
   }) {
     return HomeFilterState(
       state: state ?? this.state,
@@ -45,6 +48,7 @@ class HomeFilterState {
       fromMyCity: fromMyCity ?? this.fromMyCity,
       minAge: minAge ?? this.minAge,
       maxAge: maxAge ?? this.maxAge,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 }

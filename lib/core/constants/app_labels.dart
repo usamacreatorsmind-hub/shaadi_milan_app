@@ -609,6 +609,7 @@ class AppLabels {
 
   static String noAgentAssociated(BuildContext context) => _loc(context).noAgentAssociated;
   static String manageAccount(BuildContext context) => _loc(context).manageAccount;
+  static String premiumMembership(BuildContext context) => _loc(context).premiumMembership;
   static String premiumActive(BuildContext context) => _loc(context).premiumActive;
   static String premiumMemberMessage(BuildContext context) => _loc(context).premiumMemberMessage;
   static String generalSection(BuildContext context) => _loc(context).generalSection;

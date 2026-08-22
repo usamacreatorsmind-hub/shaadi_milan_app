@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shadi_milan/core/constants/app_constants.dart';
- 
 
 class AppTheme {
-  static   Color primaryRed = Color(AppConstants.primaryRedHex); // Deep Wedding Red
-  static   Color accentRed = Color(AppConstants.accentRedHex); // Bright Red
+  static Color primaryRed = Color(AppConstants.primaryRedHex); // Deep Wedding Red
+  static Color accentRed = Color(AppConstants.accentRedHex); // Bright Red
 
   // -------------------- LIGHT THEME --------------------
   static ThemeData get lightTheme {
@@ -18,81 +17,21 @@ class AppTheme {
       fontFamily: AppConstants.fontFamily,
 
       textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          fontSize: 57,
-          fontWeight: FontWeight.w400,
-          letterSpacing: -0.25,
-        ),
-        displayMedium: TextStyle(
-          fontSize: 45,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0,
-        ),
-        displaySmall: TextStyle(
-          fontSize: 36,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0,
-        ),
-        headlineLarge: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0,
-        ),
-        headlineMedium: TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0,
-        ),
-        headlineSmall: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0,
-        ),
-        titleLarge: TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0,
-        ),
-        titleMedium: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.15,
-        ),
-        titleSmall: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.1,
-        ),
-        labelLarge: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.1,
-        ),
-        labelMedium: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.5,
-        ),
-        labelSmall: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.5,
-        ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0.15,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0.25,
-        ),
-        bodySmall: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0.4,
-        ),
+        displayLarge: TextStyle(fontSize: 57, fontWeight: FontWeight.w400, letterSpacing: -0.25),
+        displayMedium: TextStyle(fontSize: 45, fontWeight: FontWeight.w400, letterSpacing: 0),
+        displaySmall: TextStyle(fontSize: 36, fontWeight: FontWeight.w400, letterSpacing: 0),
+        headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.w400, letterSpacing: 0),
+        headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.w400, letterSpacing: 0),
+        headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.w400, letterSpacing: 0),
+        titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.w500, letterSpacing: 0),
+        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, letterSpacing: 0.15),
+        titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0.1),
+        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0.1),
+        labelMedium: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.5),
+        labelSmall: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 0.5),
+        bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.15),
+        bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, letterSpacing: 0.25),
+        bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, letterSpacing: 0.4),
       ),
 
       colorScheme: ColorScheme.light(
@@ -111,9 +50,7 @@ class AppTheme {
           foregroundColor: Colors.white,
           backgroundColor: primaryRed,
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
@@ -125,19 +62,16 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide:   BorderSide(color: primaryRed, width: 2),
+          borderSide: BorderSide(color: primaryRed, width: 2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: Colors.grey.shade400),
         ),
-        labelStyle:   TextStyle(color: primaryRed),
+        labelStyle: TextStyle(color: primaryRed),
         hintStyle: TextStyle(color: Colors.grey.shade600),
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 15,
-          horizontal: 20,
-        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
       ),
 
       snackBarTheme: SnackBarThemeData(
@@ -158,17 +92,13 @@ class AppTheme {
 
       // Add a custom theme for the switch
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith<Color?>((
-          Set<WidgetState> states,
-        ) {
+        thumbColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
           if (states.contains(WidgetState.selected)) {
             return primaryRed;
           }
           return null; // Use default color
         }),
-        trackColor: WidgetStateProperty.resolveWith<Color?>((
-          Set<WidgetState> states,
-        ) {
+        trackColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
           if (states.contains(WidgetState.selected)) {
             return primaryRed.withValues(alpha: 0.5);
           }
@@ -178,9 +108,7 @@ class AppTheme {
 
       // Add a custom theme for the radio button
       radioTheme: RadioThemeData(
-        fillColor: WidgetStateProperty.resolveWith<Color?>((
-          Set<WidgetState> states,
-        ) {
+        fillColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
           if (states.contains(WidgetState.selected)) {
             return primaryRed;
           }
@@ -190,9 +118,7 @@ class AppTheme {
 
       // Add a custom theme for the checkbox
       checkboxTheme: CheckboxThemeData(
-        fillColor: WidgetStateProperty.resolveWith<Color?>((
-          Set<WidgetState> states,
-        ) {
+        fillColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
           if (states.contains(WidgetState.selected)) {
             return primaryRed;
           }
@@ -221,6 +147,16 @@ class AppTheme {
         selectionHandleColor: primaryRed,
       ),
 
+      // ---------------- APP BAR ----------------
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold),
+        iconTheme: IconThemeData(color: Colors.black87),
+      ),
+
       // Add a custom theme for the date picker
       datePickerTheme: DatePickerThemeData(
         backgroundColor: Colors.white,
@@ -228,9 +164,7 @@ class AppTheme {
         headerForegroundColor: Colors.white,
         dayForegroundColor: WidgetStateProperty.all(Colors.black87),
         yearForegroundColor: WidgetStateProperty.all(Colors.black87),
-        todayBackgroundColor: WidgetStateProperty.all(
-          primaryRed.withValues(alpha: 0.2),
-        ),
+        todayBackgroundColor: WidgetStateProperty.all(primaryRed.withValues(alpha: 0.2)),
         todayForegroundColor: WidgetStateProperty.all(primaryRed),
         confirmButtonStyle: TextButton.styleFrom(foregroundColor: primaryRed),
 
@@ -255,12 +189,7 @@ class AppTheme {
       scaffoldBackgroundColor: background,
       primaryColor: primaryRed,
 
-      colorScheme: const ColorScheme.dark(
-        primary: primaryRed,
-        secondary: accentRed,
-        surface: surface,
-        error: Color(0xFFEF5350),
-      ),
+      colorScheme: const ColorScheme.dark(primary: primaryRed, secondary: accentRed, surface: surface, error: Color(0xFFEF5350)),
 
       // ---------------- BUTTONS ----------------
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -270,14 +199,8 @@ class AppTheme {
           elevation: 3,
           shadowColor: accentRed.withValues(alpha: 0.3),
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.4,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, letterSpacing: 0.4),
         ),
       ),
 
@@ -285,10 +208,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surface,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: accentRed, width: 1.5),
@@ -296,10 +216,7 @@ class AppTheme {
         labelStyle: const TextStyle(color: Colors.white70),
         hintStyle: TextStyle(color: Colors.grey.shade500),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 16,
-          horizontal: 20,
-        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       ),
 
       // ---------------- APP BAR ----------------
@@ -309,11 +226,7 @@ class AppTheme {
 
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         iconTheme: IconThemeData(color: Colors.white),
       ),
 
@@ -349,26 +262,15 @@ class AppTheme {
       textTheme: const TextTheme(
         bodyMedium: TextStyle(color: Colors.white),
         bodySmall: TextStyle(color: Colors.white70),
-        headlineMedium: TextStyle(
-          color: Colors.white,
-          backgroundColor: Colors.white,
-          fontWeight: FontWeight.w600,
-        ),
+        headlineMedium: TextStyle(color: Colors.white, backgroundColor: Colors.white, fontWeight: FontWeight.w600),
 
-        titleMedium: TextStyle(
-          color: Colors.white,
-
-          fontWeight: FontWeight.w600,
-        ),
+        titleMedium: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
       ),
 
       // ---------------- ICONS ----------------
       iconTheme: const IconThemeData(color: Colors.white70),
 
-      dividerTheme: DividerThemeData(
-        color: Colors.white.withValues(alpha: 0.08),
-        thickness: 1,
-      ),
+      dividerTheme: DividerThemeData(color: Colors.white.withValues(alpha: 0.08), thickness: 1),
     );
   }
 }

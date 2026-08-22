@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
-
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/states/agent_state.dart';
 import '../../domain/states/user_state.dart';
@@ -20,18 +19,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<dynamic> checkPhoneAlreadyRegistered(String phone) async {
-    final usersQuery = await firestore
-        .collection('users')
-        .where('phone', isEqualTo: phone)
-        .get();
+    final usersQuery = await firestore.collection('users').where('phone', isEqualTo: phone).get();
     if (usersQuery.docs.isNotEmpty) {
       return true;
     }
 
-    final agentsQuery = await firestore
-        .collection('agents')
-        .where('phone', isEqualTo: phone)
-        .get();
+    final agentsQuery = await firestore.collection('agents').where('phone', isEqualTo: phone).get();
     if (agentsQuery.docs.isNotEmpty) {
       return true;
     }
@@ -45,29 +38,20 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Stream<Either<AgentEntity, UserEntity>?>
-  authStateChanges() => ds.authStateChanges().asyncMap((user) async {
+  Stream<Either<AgentEntity, UserEntity>?> authStateChanges() => ds.authStateChanges().asyncMap((user) async {
     if (user == null) return null;
 
     try {
       // Try cache first, then network — avoids blocking on slow connections
       final getOptions = const GetOptions(source: Source.serverAndCache);
 
-      final userDoc = await firestore
-          .collection('users')
-          .doc(user.uid)
-          .get(getOptions)
-          .timeout(const Duration(seconds: 10));
+      final userDoc = await firestore.collection('users').doc(user.uid).get(getOptions).timeout(const Duration(seconds: 10));
 
       if (userDoc.exists) {
         return Right(UserEntity.fromMap(userDoc.data()!));
       }
 
-      final agentDoc = await firestore
-          .collection('agents')
-          .doc(user.uid)
-          .get(getOptions)
-          .timeout(const Duration(seconds: 10));
+      final agentDoc = await firestore.collection('agents').doc(user.uid).get(getOptions).timeout(const Duration(seconds: 10));
 
       if (agentDoc.exists) {
         return Left(AgentEntity.fromMap(agentDoc.data()!));
@@ -143,20 +127,30 @@ class AuthRepositoryImpl implements AuthRepository {
     // show aget page
 
     // 3️⃣ create user (THIS WAS MISSING)
-    await ds.signUpUserWithEmail(
-      gender: gender,
-
-      fullName: fullName,
-      email: email,
-      password: password,
-      agentId: agentId,
-
-      phone: phone,
-    );
+    await ds.signUpUserWithEmail(gender: gender, fullName: fullName, email: email, password: password, agentId: agentId, phone: phone);
   }
 
   @override
   Future<void> logout() {
     return ds.logout();
+  }
+
+  @override
+  Future<void> verifyPhoneNumber({
+    required String phoneNumber,
+    required Function(String verificationId) onCodeSent,
+    required Function(FirebaseAuthException e) onVerificationFailed,
+  }) {
+    return ds.verifyPhoneNumber(phoneNumber: phoneNumber, onCodeSent: onCodeSent, onVerificationFailed: onVerificationFailed);
+  }
+
+  @override
+  Future<UserCredential> signInWithPhoneCredential(String verificationId, String smsCode) {
+    return ds.signInWithPhoneCredential(verificationId, smsCode);
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) {
+    return ds.updatePassword(newPassword);
   }
 }

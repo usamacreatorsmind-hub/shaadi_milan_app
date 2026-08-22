@@ -39,14 +39,38 @@ class _UserChatRoomScreenState extends ConsumerState<UserChatRoomScreen> {
       final currentUserId = ref.read(userProvider)?.uid;
       if (currentUserId != null) {
         final chatId = _getChatId(currentUserId, widget.peerId);
-        ref
-            .read(firestoreProvider)
+        final firestore = ref.read(firestoreProvider);
+
+        // 1. Reset unread count in chat metadata
+        firestore
             .collection('chats')
             .doc(chatId)
             .set({'unreadCount_$currentUserId': 0}, SetOptions(merge: true))
             .catchError((e) => debugPrint("Error resetting unread count: $e"));
+
+        // 2. Mark received messages as seen
+        _markMessagesAsSeen(currentUserId, chatId);
       }
     });
+  }
+
+  Future<void> _markMessagesAsSeen(String currentUserId, String chatId) async {
+    final firestore = ref.read(firestoreProvider);
+    final messages = await firestore
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .where('receiverId', isEqualTo: currentUserId)
+        .where('status', isNotEqualTo: 'seen')
+        .get();
+
+    if (messages.docs.isNotEmpty) {
+      final batch = firestore.batch();
+      for (var doc in messages.docs) {
+        batch.update(doc.reference, {'status': 'seen'});
+      }
+      await batch.commit();
+    }
   }
 
   String _getChatId(String uid1, String uid2) {
@@ -72,6 +96,7 @@ class _UserChatRoomScreenState extends ConsumerState<UserChatRoomScreen> {
       'receiverId': widget.peerId,
       'message': messageText,
       'timestamp': FieldValue.serverTimestamp(),
+      'status': 'sent',
     });
 
     // 2. Update chat metadata and increment unread count for receiver
@@ -106,8 +131,8 @@ class _UserChatRoomScreenState extends ConsumerState<UserChatRoomScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: theme.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
         title: StreamBuilder<DocumentSnapshot>(
           stream: firestore.collection('users').doc(widget.peerId).snapshots(),
           builder: (context, snapshot) {
@@ -165,6 +190,17 @@ class _UserChatRoomScreenState extends ConsumerState<UserChatRoomScreen> {
                   if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
                   final messages = snapshot.data!.docs;
+
+                  // Mark messages as seen when they arrive if screen is active
+                  if (messages.isNotEmpty &&
+                      messages.any(
+                        (m) =>
+                            (m.data() as Map<String, dynamic>)['receiverId'] == currentUserId &&
+                            (m.data() as Map<String, dynamic>)['status'] != 'seen',
+                      )) {
+                    _resetUnreadCount();
+                  }
+
                   if (messages.isEmpty) {
                     return Center(
                       child: Column(
@@ -212,6 +248,7 @@ class _UserChatRoomScreenState extends ConsumerState<UserChatRoomScreen> {
                           _ChatBubble(
                             message: data['message'] ?? '',
                             isMe: isMe,
+                            status: data['status'] ?? 'sent',
                             time: timestamp != null ? DateFormat('hh:mm a').format(timestamp.toDate()) : '',
                           ),
                         ],
@@ -296,9 +333,10 @@ class _UserChatRoomScreenState extends ConsumerState<UserChatRoomScreen> {
 class _ChatBubble extends StatelessWidget {
   final String message;
   final bool isMe;
+  final String status;
   final String time;
 
-  const _ChatBubble({required this.message, required this.isMe, required this.time});
+  const _ChatBubble({required this.message, required this.isMe, required this.status, required this.time});
 
   @override
   Widget build(BuildContext context) {
@@ -324,10 +362,28 @@ class _ChatBubble extends StatelessWidget {
           children: [
             Text(message, style: TextStyle(color: isMe ? Colors.white : Colors.black87, fontSize: 15, height: 1.2)),
             const SizedBox(height: 4),
-            Text(time, style: TextStyle(color: isMe ? Colors.white.withValues(alpha: 0.7) : Colors.black38, fontSize: 10)),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(time, style: TextStyle(color: isMe ? Colors.white.withValues(alpha: 0.7) : Colors.black38, fontSize: 10)),
+                if (isMe) ...[const SizedBox(width: 4), _buildStatusIcon(status)],
+              ],
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildStatusIcon(String status) {
+    switch (status) {
+      case 'seen':
+        return const Icon(Icons.done_all, size: 14, color: Colors.blueAccent);
+      case 'delivered':
+        return const Icon(Icons.done_all, size: 14, color: Colors.white70);
+      case 'sent':
+      default:
+        return const Icon(Icons.done, size: 14, color: Colors.white70);
+    }
   }
 }

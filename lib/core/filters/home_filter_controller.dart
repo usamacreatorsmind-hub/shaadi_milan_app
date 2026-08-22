@@ -46,4 +46,21 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
   void updateAgeRange(double min, double max) {
     state = state.copyWith(minAge: min, maxAge: max);
   }
+
+  void updateSearchQuery(String value) {
+    state = state.copyWith(searchQuery: value);
+  }
+
+  bool get isFilterActive {
+    return state.state.isNotEmpty ||
+        state.city.isNotEmpty ||
+        state.religion.isNotEmpty ||
+        state.caste.isNotEmpty ||
+        state.gender.isNotEmpty ||
+        state.justJoined ||
+        state.fromMyCity ||
+        state.minAge > 18 ||
+        state.maxAge < 60 ||
+        state.searchQuery.isNotEmpty;
+  }
 }

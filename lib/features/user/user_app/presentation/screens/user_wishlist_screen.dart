@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/app/custom/custom_widgets/shimmer.dart';
@@ -7,13 +8,9 @@ import 'package:shadi_milan/features/translitration/models/bilingual_value.dart'
 import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
-
 import '../../../../../../core/constants/app_labels.dart';
-import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
-
 import '../../../../../app/router/app_router.dart';
 import '../../../../auth/domain/states/user_state.dart';
-import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/state_city.dart';
 import 'my_profile_screen.dart';
 
@@ -52,48 +49,49 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> with Si
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final profileAsync = ref.watch(currentUserProfileProvider);
     final paymentState = ref.watch(paymentNotifierProvider(widget.userId));
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.white,
       body: paymentState.status == PayStatus.idle
           ? NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                ModernGradientAppBar(
-                  title: AppLabels.wishlistTitle(context),
-                  subtitle: AppLabels.manageInterests(context),
-                  centerTitle: true,
-                ),
                 SliverToBoxAdapter(
                   child: Container(
-                    color: theme.scaffoldBackgroundColor,
-                    child: Column(
-                      children: [
-                        Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _buildStatusFilter(theme)),
-                        const SizedBox(height: 8),
-                        TabBar(
-                          controller: _tabController,
-                          indicatorColor: theme.primaryColor,
-                          labelColor: theme.primaryColor,
-                          unselectedLabelColor: theme.primaryColor,
-                          tabs: [
-                            Tab(text: AppLabels.myWishlist(context)),
-                            Tab(text: AppLabels.wishlistedMe(context)),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
+                    padding: const EdgeInsets.only(top: 8),
+                    color: Colors.white,
+                    child: Column(children: [_buildStatusFilter(theme), const SizedBox(height: 8)]),
+                  ),
+                ),
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _SliverAppBarDelegate(
+                    TabBar(
+                      controller: _tabController,
+                      indicatorColor: theme.primaryColor,
+                      labelColor: theme.primaryColor,
+                      unselectedLabelColor: Colors.grey,
+                      labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                      indicatorSize: TabBarIndicatorSize.label,
+                      indicatorWeight: 3,
+                      tabs: [
+                        Tab(text: AppLabels.myWishlist(context)),
+                        Tab(text: AppLabels.wishlistedMe(context)),
                       ],
                     ),
                   ),
                 ),
               ],
-              body: TabBarView(
-                controller: _tabController,
-                children: [
-                  _MyWishlistTab(userId: widget.userId, statusFilter: _selectedStatus),
-                  _WishlistedMeTab(userId: widget.userId, statusFilter: _selectedStatus),
-                ],
+              body: Container(
+                color: Colors.grey[50],
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _MyWishlistTab(userId: widget.userId, statusFilter: _selectedStatus),
+                    _WishlistedMeTab(userId: widget.userId, statusFilter: _selectedStatus),
+                  ],
+                ),
               ),
             )
           : UserPaymentScreen(userId: widget.userId),
@@ -102,10 +100,11 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> with Si
 
   Widget _buildStatusFilter(ThemeData theme) {
     return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      height: 45,
+      margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListView(
         scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           _buildFilterChip(null, AppLabels.all(context), theme),
           ...WishlistStatus.values.map((status) => _buildFilterChip(status, _getStatusLabel(status), theme)),
@@ -117,28 +116,36 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> with Si
   Widget _buildFilterChip(WishlistStatus? status, String label, ThemeData theme) {
     final isSelected = _selectedStatus == status;
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: FilterChip(
-        selected: isSelected,
-        label: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : theme.primaryColor,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        selectedColor: theme.primaryColor,
-        onSelected: (selected) {
+      padding: const EdgeInsets.only(right: 10),
+      child: InkWell(
+        onTap: () {
           setState(() {
-            _selectedStatus = selected ? status : null;
+            _selectedStatus = isSelected ? null : status;
           });
           ref.read(myWishlistNotifierProvider.notifier).setStatusFilter(_selectedStatus);
           ref.read(wishlistedMeNotifierProvider.notifier).setStatusFilter(_selectedStatus);
         },
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: theme.primaryColor),
+        borderRadius: BorderRadius.circular(25),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? theme.primaryColor : Colors.white,
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: isSelected ? theme.primaryColor : Colors.grey.shade300, width: 1.5),
+            boxShadow: isSelected
+                ? [BoxShadow(color: theme.primaryColor.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))]
+                : null,
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.grey[700],
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -213,17 +220,25 @@ class _MyWishlistTab extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 80, color: Colors.grey[300]),
-            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))],
+              ),
+              child: Icon(icon, size: 64, color: Theme.of(context).primaryColor.withValues(alpha: 0.3)),
+            ),
+            const SizedBox(height: 24),
             Text(
               title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.black87),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               subtitle,
-              style: TextStyle(color: Colors.grey[400]),
+              style: TextStyle(color: Colors.grey[500], fontSize: 15, height: 1.5),
               textAlign: TextAlign.center,
             ),
           ],
@@ -286,17 +301,25 @@ class _WishlistedMeTab extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 80, color: Colors.grey[300]),
-            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))],
+              ),
+              child: Icon(icon, size: 64, color: Theme.of(context).primaryColor.withValues(alpha: 0.3)),
+            ),
+            const SizedBox(height: 24),
             Text(
               title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.black87),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               subtitle,
-              style: TextStyle(color: Colors.grey[400]),
+              style: TextStyle(color: Colors.grey[500], fontSize: 15, height: 1.5),
               textAlign: TextAlign.center,
             ),
           ],
@@ -328,24 +351,28 @@ class WishlistProfileCard extends ConsumerWidget {
     final heroTag = 'wishlist-image-${wishlist.id}-$profileId-${isMyWishlist ? 'my' : 'me'}';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 6))],
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 15, offset: const Offset(0, 8))],
       ),
+      clipBehavior: Clip.antiAlias,
       child: profileAsync.when(
-        loading: () => const Padding(padding: EdgeInsets.all(16), child: ShimmerLoading.rectangular(height: 100)),
-        error: (_, _) => ListTile(
-          leading: CircleAvatar(
-            backgroundColor: Colors.grey[200],
-            child: const Icon(Icons.person_off, color: Colors.grey),
+        loading: () => const ShimmerLoading.rectangular(height: 180),
+        error: (err, _) => ListTile(
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: Colors.red[50], shape: BoxShape.circle),
+            child: const Icon(Icons.error_outline, color: Colors.red),
           ),
-          title: Text(AppLabels.couldNotLoadProfile(context)),
+          title: Text(AppLabels.couldNotLoadProfile(context), style: const TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Text('${AppLabels.profileId(context)}: $profileId'),
         ),
         data: (profile) {
-          final imageUrl = profile.images.primaryImageUrl;
+          final imageUrl = profile.images.primaryImageUrl.isNotEmpty
+              ? profile.images.primaryImageUrl
+              : (profile.images.profileImageUrl.isNotEmpty ? profile.images.profileImageUrl : '');
           final hasImage = imageUrl.isNotEmpty;
 
           String resolvedState = profile.address.state.en;
@@ -366,10 +393,7 @@ class WishlistProfileCard extends ConsumerWidget {
           }
 
           return InkWell(
-            onTap: () {
-              context.router.push(UserDetailRoute(uid: profile.user.uid));
-            },
-            borderRadius: BorderRadius.circular(20),
+            onTap: () => context.router.push(UserDetailRoute(uid: profile.user.uid)),
             child: Column(
               children: [
                 Padding(
@@ -381,17 +405,27 @@ class WishlistProfileCard extends ConsumerWidget {
                       Hero(
                         tag: heroTag,
                         child: Container(
-                          padding: const EdgeInsets.all(2),
+                          width: 90,
+                          height: 90,
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: theme.primaryColor.withValues(alpha: 0.1), width: 2),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(0, 4))],
                           ),
-                          child: CircleAvatar(
-                            radius: 36,
-                            backgroundColor: theme.primaryColor.withValues(alpha: 0.05),
-                            backgroundImage: hasImage ? NetworkImage(imageUrl) : null,
-                            child: !hasImage ? Icon(Icons.person, color: theme.primaryColor, size: 30) : null,
-                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: hasImage
+                              ? CachedNetworkImage(
+                                  imageUrl: imageUrl,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => const ShimmerLoading.rectangular(height: 90, width: 90),
+                                  errorWidget: (context, url, error) => Container(
+                                    color: theme.primaryColor.withValues(alpha: 0.05),
+                                    child: Icon(Icons.person, color: theme.primaryColor, size: 40),
+                                  ),
+                                )
+                              : Container(
+                                  color: theme.primaryColor.withValues(alpha: 0.05),
+                                  child: Icon(Icons.person, color: theme.primaryColor, size: 40),
+                                ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -406,7 +440,7 @@ class WishlistProfileCard extends ConsumerWidget {
                                 Expanded(
                                   child: BilingualParser(
                                     value: profile.user.fullName.en.isNotEmpty ? profile.user.fullName : BilingualValue.empty(),
-                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                                    style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: Colors.black),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -414,20 +448,24 @@ class WishlistProfileCard extends ConsumerWidget {
                                 _buildStatusBadge(context, wishlist.status),
                               ],
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              '${profile.identity.age} ${AppLabels.ageYrs(context)} • ${profile.employment.jobType.isNotEmpty ? profile.employment.jobType : AppLabels.notAvailableShort(context)}',
-                              style: TextStyle(fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.w500),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(8)),
+                              child: Text(
+                                '${profile.identity.age} ${AppLabels.ageYrs(context)} • ${profile.employment.jobType.isNotEmpty ? profile.employment.jobType : AppLabels.notAvailableShort(context)}',
+                                style: TextStyle(fontSize: 13, color: Colors.grey[800], fontWeight: FontWeight.w600),
+                              ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 8),
                             Row(
                               children: [
-                                Icon(Icons.location_on, size: 16, color: theme.primaryColor.withValues(alpha: 0.6)),
-                                const SizedBox(width: 4),
+                                Icon(Icons.location_on_rounded, size: 16, color: theme.primaryColor.withValues(alpha: 0.7)),
+                                const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
                                     '$resolvedCity, $resolvedState',
-                                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                                    style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -440,26 +478,32 @@ class WishlistProfileCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-                Divider(height: 1, color: Colors.grey[100]),
-                // Action Row
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    border: Border(top: BorderSide(color: Colors.grey[100]!)),
+                  ),
                   child: Row(
                     children: [
-                      Icon(Icons.access_time, size: 14, color: Colors.grey[400]),
-                      const SizedBox(width: 4),
-                      Text(_formatDateTime(context, wishlist.updatedAt), style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                      Icon(Icons.update_rounded, size: 16, color: Colors.grey[400]),
+                      const SizedBox(width: 6),
+                      Text(
+                        _formatDateTime(context, wishlist.updatedAt),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.w500),
+                      ),
                       const Spacer(),
-                      TextButton.icon(
+                      ElevatedButton.icon(
                         onPressed: () => _showStatusUpdateDialog(context),
-                        icon: Icon(Icons.edit_note, size: 18, color: theme.primaryColor),
-                        label: Text(
-                          AppLabels.updateStatus(context),
-                          style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold),
-                        ),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          visualDensity: VisualDensity.compact,
+                        icon: const Icon(Icons.edit_note_rounded, size: 18),
+                        label: Text(AppLabels.updateStatus(context), style: const TextStyle(fontSize: 13)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primaryColor,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                          minimumSize: const Size(0, 36),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
                     ],
@@ -602,6 +646,45 @@ class WishlistProfileCard extends ConsumerWidget {
     if (dateTime.millisecondsSinceEpoch == 0) {
       return AppLabels.notAvailableShort(context);
     }
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays == 0) {
+      if (difference.inHours == 0) {
+        return '${difference.inMinutes} mins ago';
+      }
+      return '${difference.inHours} hours ago';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    }
+
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._tabBar);
+
+  final TabBar _tabBar;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Colors.grey[100]!)),
+      ),
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }

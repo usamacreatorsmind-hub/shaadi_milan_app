@@ -3,7 +3,7 @@
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter/material.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:flutter_screenshot_blocker/flutter_screenshot_blocker.dart';
+// // import 'package:flutter_screenshot_blocker/flutter_screenshot_blocker.dart';
 
 // import 'core/notification/notification_service.dart';
 // import 'app/app.dart';
@@ -87,7 +87,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenshot_blocker/flutter_screenshot_blocker.dart';
+// import 'package:flutter_screenshot_blocker/flutter_screenshot_blocker.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'features/l10n/app_translation_service.dart';
@@ -182,7 +182,7 @@ Future<void> main() async {
         await AwesomeNotifications().requestPermissionToSendNotifications();
       }
 
-      await Future.wait([NotificationService.init(), InAppMessagingService.init(), FlutterScreenshotBlocker.enableScreenshotBlocking()]);
+      await Future.wait([NotificationService.init(), InAppMessagingService.init()]);
     } catch (e, s) {
       debugPrint('Initialization Error: $e');
       debugPrintStack(stackTrace: s);
@@ -195,7 +195,10 @@ Future<void> main() async {
     debugPrint(details.exceptionAsString());
   };
 
-  runApp(SafeArea(
+  runApp(
+    SafeArea(
       top: false,
-      child: ProviderScope(overrides: [sharedPreferencesProvider.overrideWithValue(sharedPreferences)], child: App())));
+      child: ProviderScope(overrides: [sharedPreferencesProvider.overrideWithValue(sharedPreferences)], child: App()),
+    ),
+  );
 }

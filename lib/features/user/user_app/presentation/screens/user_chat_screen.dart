@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:shadi_milan/app/providers/global_providers.dart';
 import 'package:shadi_milan/app/router/app_router.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
+import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 import '../../../../../../core/constants/app_labels.dart';
 import '../../../../../app/custom/custom_widgets/animated_app_bar.dart';
 
@@ -21,14 +23,23 @@ class _UserChatScreenState extends ConsumerState<UserChatScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final currentUserId = ref.watch(userProvider)?.uid ?? '';
+    final paymentState = ref.watch(paymentNotifierProvider(currentUserId));
+
+    if (paymentState.status != PayStatus.success) {
+      return const Scaffold(
+        body: Center(
+          child: Text(
+            "Go Premium to access Inbox",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          ModernGradientAppBar(title: AppLabels.navChat(context), subtitle: 'Recent conversations', centerTitle: true),
-        ],
-        body: Container(color: theme.primaryColor.withValues(alpha: 0.02), child: _chatList()),
-      ),
+      body: Container(color: theme.primaryColor.withValues(alpha: 0.02), child: _chatList()),
     );
   }
 

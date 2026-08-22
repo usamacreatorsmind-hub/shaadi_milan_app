@@ -34,7 +34,22 @@ final targetUserIdOverrideProvider = StateProvider<String?>((ref) => null);
 final targetUserIdProvider = Provider<String?>((ref) {
   final override = ref.watch(targetUserIdOverrideProvider);
   if (override != null) return override;
-  
+
   final authUser = ref.watch(userProvider);
   return authUser?.uid;
+});
+
+final totalUnreadMessagesProvider = StreamProvider<int>((ref) {
+  final user = ref.watch(userProvider);
+  if (user == null) return Stream.value(0);
+
+  final firestore = ref.watch(firestoreProvider);
+  return firestore.collection('chats').where('participants', arrayContains: user.uid).snapshots().map((snapshot) {
+    int total = 0;
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      total += (data['unreadCount_${user.uid}'] as num? ?? 0).toInt();
+    }
+    return total;
+  });
 });

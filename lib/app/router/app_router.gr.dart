@@ -578,6 +578,22 @@ class ContactUsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ForgotPasswordOtpScreen]
+class ForgotPasswordOtpRoute extends PageRouteInfo<void> {
+  const ForgotPasswordOtpRoute({List<PageRouteInfo>? children})
+    : super(ForgotPasswordOtpRoute.name, initialChildren: children);
+
+  static const String name = 'ForgotPasswordOtpRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return ForgotPasswordOtpScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [MatrimonyFormFlowScreen]
 class MatrimonyFormFlowRoute extends PageRouteInfo<void> {
   const MatrimonyFormFlowRoute({List<PageRouteInfo>? children})
@@ -1988,6 +2004,22 @@ class UserPhysicalFormRouteArgs {
   @override
   int get hashCode =>
       key.hashCode ^ mode.hashCode ^ existingPhysicalProfile.hashCode;
+}
+
+/// generated route for
+/// [UserPremiumPlansScreen]
+class UserPremiumPlansRoute extends PageRouteInfo<void> {
+  const UserPremiumPlansRoute({List<PageRouteInfo>? children})
+    : super(UserPremiumPlansRoute.name, initialChildren: children);
+
+  static const String name = 'UserPremiumPlansRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const UserPremiumPlansScreen();
+    },
+  );
 }
 
 /// generated route for
