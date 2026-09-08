@@ -4855,6 +4855,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Language'**
   String get selectLanguage;
+
+  /// No description provided for @tabReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get tabReceived;
+
+  /// No description provided for @tabAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get tabAccepted;
+
+  /// No description provided for @tabContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts'**
+  String get tabContacts;
+
+  /// No description provided for @tabSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get tabSent;
+
+  /// No description provided for @tabMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get tabMore;
+
+  /// No description provided for @noContactsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No Contacts Yet'**
+  String get noContactsYet;
+
+  /// No description provided for @noContactsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles you connect with will appear here.'**
+  String get noContactsSubtitle;
+
+  /// No description provided for @noSentRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No Sent Requests'**
+  String get noSentRequests;
+
+  /// No description provided for @noSentRequestsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles you liked will appear here.'**
+  String get noSentRequestsSubtitle;
+
+  /// No description provided for @noNewRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No New Requests'**
+  String get noNewRequests;
+
+  /// No description provided for @noNewRequestsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Interests you receive will appear here.'**
+  String get noNewRequestsSubtitle;
+
+  /// No description provided for @noAcceptedRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No Accepted Requests'**
+  String get noAcceptedRequests;
+
+  /// No description provided for @noAcceptedRequestsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles where interest is matched will appear here.'**
+  String get noAcceptedRequestsSubtitle;
+
+  /// No description provided for @tabRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests'**
+  String get tabRequests;
+
+  /// No description provided for @tabDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted'**
+  String get tabDeleted;
+
+  /// No description provided for @interestMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We are interested in your profile.'**
+  String get interestMessage;
+
+  /// No description provided for @moreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'more >'**
+  String get moreLabel;
+
+  /// No description provided for @buttonDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get buttonDecline;
+
+  /// No description provided for @buttonAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get buttonAccept;
+
+  /// No description provided for @buttonChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get buttonChat;
+
+  /// No description provided for @buttonCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get buttonCall;
+
+  /// No description provided for @errCouldNotLaunchDialer.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not launch phone dialer'**
+  String get errCouldNotLaunchDialer;
+
+  /// No description provided for @errPhoneNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number not available'**
+  String get errPhoneNotAvailable;
 }
 
 class _AppLocalizationsDelegate

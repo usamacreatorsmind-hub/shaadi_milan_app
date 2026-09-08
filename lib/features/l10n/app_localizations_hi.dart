@@ -2525,4 +2525,77 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get selectLanguage => 'भाषा चुनें';
+
+  @override
+  String get tabReceived => 'प्राप्त';
+
+  @override
+  String get tabAccepted => 'स्वीकृत';
+
+  @override
+  String get tabContacts => 'संपर्क';
+
+  @override
+  String get tabSent => 'भेजे गए';
+
+  @override
+  String get tabMore => 'अधिक';
+
+  @override
+  String get noContactsYet => 'अभी तक कोई संपर्क नहीं';
+
+  @override
+  String get noContactsSubtitle =>
+      'जिन प्रोफाइल से आप जुड़ेंगे वे यहाँ दिखाई देंगी।';
+
+  @override
+  String get noSentRequests => 'कोई भेजी गई विनती नहीं';
+
+  @override
+  String get noSentRequestsSubtitle =>
+      'आपकी पसंद की गई प्रोफाइल यहाँ दिखाई देंगी।';
+
+  @override
+  String get noNewRequests => 'कोई नई विनती नहीं';
+
+  @override
+  String get noNewRequestsSubtitle =>
+      'आपको मिलने वाली रुचियां यहाँ दिखाई देंगी।';
+
+  @override
+  String get noAcceptedRequests => 'कोई स्वीकृत विनती नहीं';
+
+  @override
+  String get noAcceptedRequestsSubtitle =>
+      'जिन प्रोफाइल में रुचि मेल खाती है वे यहाँ दिखाई देंगी।';
+
+  @override
+  String get tabRequests => 'विनतियां';
+
+  @override
+  String get tabDeleted => 'हटाए गए';
+
+  @override
+  String get interestMessage => 'हमें आपकी प्रोफाइल में दिलचस्पी है।';
+
+  @override
+  String get moreLabel => 'और >';
+
+  @override
+  String get buttonDecline => 'अस्वीकार करें';
+
+  @override
+  String get buttonAccept => 'स्वीकार करें';
+
+  @override
+  String get buttonChat => 'चैट';
+
+  @override
+  String get buttonCall => 'कॉल';
+
+  @override
+  String get errCouldNotLaunchDialer => 'फोन डायलर लॉन्च नहीं किया जा सका';
+
+  @override
+  String get errPhoneNotAvailable => 'फ़ोन नंबर उपलब्ध नहीं है';
 }

@@ -1,13 +1,16 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:shadi_milan/app/custom/custom_widgets/shimmer.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
-
 import '../../../../../app/router/app_router.dart';
 import '../../../../../core/enums/enum.dart';
 import '../../../../auth/domain/states/agent_state.dart';
 import '../../../../translitration/models/bilingual_value.dart';
+import '../../../user_razorpay/domain/states/payment.dart';
+import '../../../user_razorpay/presentation/notifier/payment_notifier.dart';
 import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
@@ -80,44 +83,50 @@ class MyProfileScreen extends ConsumerWidget {
           final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 20),
+            padding: const EdgeInsets.only(bottom: 30),
             child: Column(
               children: [
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 _ProfileHeroCard(profile: profile),
+                const SizedBox(height: 8),
                 _DetailSection(
                   title: AppLabels.photos(context),
                   actionChip: _EditChip(onTap: () => context.router.push(const UserImageFormRoute())),
                   children: [
                     profile.images.secondaryImageUrls.isNotEmpty
                         ? SizedBox(
-                            height: 120,
+                            height: 110,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: profile.images.secondaryImageUrls.length,
+                              padding: const EdgeInsets.symmetric(vertical: 5),
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                   onTap: () => showPhotoDialogBox(photoUrl: profile.images.secondaryImageUrls[index], context: context),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 10),
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 8, offset: const Offset(0, 2)),
+                                      ],
+                                    ),
                                     child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(16),
                                       child: Image.network(
                                         profile.images.secondaryImageUrls[index],
                                         width: 100,
                                         height: 100,
                                         fit: BoxFit.cover,
                                         loadingBuilder: (context, child, loadingProgress) {
-                                          if (loadingProgress == null) {
-                                            return child; // image loaded
-                                          }
+                                          if (loadingProgress == null) return child;
                                           return ShimmerProfileCard(width: 100, height: 100);
                                         },
                                         errorBuilder: (context, error, stackTrace) {
                                           return Container(
                                             width: 100,
                                             height: 100,
-                                            decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12)),
+                                            color: Colors.grey.shade100,
                                             child: const Icon(Icons.broken_image, color: Colors.grey),
                                           );
                                         },
@@ -129,14 +138,21 @@ class MyProfileScreen extends ConsumerWidget {
                             ),
                           )
                         : Container(
-                            width: 100,
+                            width: double.infinity,
                             height: 100,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.grey.shade200, style: BorderStyle.solid),
                             ),
-                            child: Icon(Icons.person, size: 50, color: Colors.grey[400]),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.add_a_photo_outlined, size: 32, color: Colors.grey[400]),
+                                const SizedBox(height: 8),
+                                Text(AppLabels.noPhotosAvailable(context), style: TextStyle(color: Colors.grey[500], fontSize: 13)),
+                              ],
+                            ),
                           ),
                   ],
                 ),
@@ -183,9 +199,24 @@ class MyProfileScreen extends ConsumerWidget {
                         },
                       ),
                     if (profile.metrimonyProfile.images.aadharCardUrl.isEmpty && profile.metrimonyProfile.images.bioDataUrl.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(AppLabels.aadharCardNotUploaded(context), style: const TextStyle(color: Colors.grey)),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade100),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(Icons.badge_outlined, color: Colors.grey.shade400, size: 32),
+                            const SizedBox(height: 8),
+                            Text(
+                              AppLabels.aadharCardNotUploaded(context),
+                              style: TextStyle(color: Colors.grey.shade600, fontSize: 13, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
                       ),
                   ],
                 ),
@@ -406,17 +437,20 @@ class DetailRowWithAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Text(label, style: TextStyle(color: Colors.grey[600])),
-          ),
+          Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
           InkWell(
             onTap: onTap,
-            child: Text(
-              value,
-              style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).primaryColor),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(color: Theme.of(context).primaryColor.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+              child: Text(
+                value,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Theme.of(context).primaryColor),
+              ),
             ),
           ),
         ],
@@ -440,69 +474,67 @@ class _ProfileHeroCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: primaryColor.withOpacity(0.08), blurRadius: 24, offset: const Offset(0, 8)),
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
-        ],
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [BoxShadow(color: primaryColor.withOpacity(0.12), blurRadius: 30, offset: const Offset(0, 10))],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
         child: Stack(
           children: [
-            // Decorative background element
-            Positioned(
-              top: -50,
-              right: -50,
-              child: Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: primaryColor.withOpacity(0.05)),
-              ),
-            ),
+            Positioned(top: -40, right: -40, child: CircleAvatar(radius: 80, backgroundColor: primaryColor.withOpacity(0.05))),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Profile Image
                       GestureDetector(
                         onTap: () => showPhotoDialogBox(photoUrl: profile.userProfile.profileImageUrl, context: context),
-                        child: Container(
-                          padding: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: primaryColor.withOpacity(0.2), width: 2),
-                          ),
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: primaryColor.withOpacity(0.1),
-                            backgroundImage: hasImage ? NetworkImage(profile.userProfile.profileImageUrl) : null,
-                            child: !hasImage
-                                ? Text(
-                                    profile.userProfile.fullName.en.isNotEmpty ? profile.userProfile.fullName.en[0].toUpperCase() : '?',
-                                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: primaryColor),
-                                  )
-                                : null,
+                        child: Hero(
+                          tag: 'profile_image',
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [primaryColor.withOpacity(0.5), primaryColor.withOpacity(0.1)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: 46,
+                              backgroundColor: Colors.white,
+                              child: CircleAvatar(
+                                radius: 43,
+                                backgroundColor: primaryColor.withOpacity(0.1),
+                                backgroundImage: hasImage ? NetworkImage(profile.userProfile.profileImageUrl) : null,
+                                child: !hasImage
+                                    ? Text(
+                                        profile.userProfile.fullName.en.isNotEmpty ? profile.userProfile.fullName.en[0].toUpperCase() : '?',
+                                        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: primaryColor),
+                                      )
+                                    : null,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 20),
                       // User Basic Info
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 8),
                             Row(
                               children: [
                                 Expanded(
                                   child: BilingualParser(
                                     value: profile.user.fullName,
                                     style: theme.textTheme.titleLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w800,
                                       color: Colors.black87,
                                       letterSpacing: -0.5,
                                     ),
@@ -510,51 +542,151 @@ class _ProfileHeroCard extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                Icon(Icons.verified, color: Colors.blue.shade400, size: 20),
+                                const SizedBox(width: 4),
+                                Icon(Icons.verified, color: Colors.blue.shade500, size: 18),
                               ],
-                            ),
-                            const SizedBox(height: 12),
-                            _buildInfoItem(
-                              icon: Icons.phone_android_rounded,
-                              text: profile.user.phone.isEmpty ? AppLabels.notAvailableShort(context) : profile.user.phone,
-                              color: Colors.grey.shade600,
                             ),
                             const SizedBox(height: 6),
                             _buildInfoItem(
-                              icon: Icons.alternate_email_rounded,
+                              icon: Icons.phone_iphone_rounded,
+                              text: profile.user.phone.isEmpty ? AppLabels.notAvailableShort(context) : profile.user.phone,
+                              color: Colors.grey.shade700,
+                            ),
+                            const SizedBox(height: 4),
+                            _buildInfoItem(
+                              icon: Icons.email_outlined,
                               text: profile.user.email.isEmpty ? AppLabels.notAvailableShort(context) : profile.user.email,
-                              color: Colors.grey.shade600,
+                              color: Colors.grey.shade700,
+                            ),
+                            const SizedBox(height: 10),
+                            // Matrimony ID
+                            GestureDetector(
+                              onTap: () {
+                                Clipboard.setData(ClipboardData(text: profile.metrimonyProfile.metrimonyId));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text("ID Copied"),
+                                    behavior: SnackBarBehavior.floating,
+                                    width: 150,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade50,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.grey.shade200),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        profile.metrimonyProfile.metrimonyId.isEmpty ? "NO-ID" : profile.metrimonyProfile.metrimonyId,
+                                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.grey.shade800),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Icon(Icons.copy_all_rounded, size: 14, color: primaryColor),
+                                  ],
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  const Divider(height: 1),
-                  const SizedBox(height: 20),
-                  // Attributes Wrap
+                  const SizedBox(height: 24),
+                  // Subscription Card
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final paymentState = ref.watch(paymentNotifierProvider(profile.userProfile.uid));
+                      final isPremium = paymentState.status == PayStatus.success;
+
+                      return Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: isPremium
+                                ? [const Color(0xFF1E88E5), const Color(0xFF1565C0)]
+                                : [Colors.grey.shade100, Colors.grey.shade200],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: isPremium ? Colors.white.withOpacity(0.2) : Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                isPremium ? Icons.auto_awesome_rounded : Icons.person_outline_rounded,
+                                color: isPremium ? Colors.white : Colors.grey.shade600,
+                                size: 18,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isPremium ? "Platinum Plus" : "Free Member",
+                                    style: TextStyle(
+                                      color: isPremium ? Colors.white : Colors.black87,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  Text(
+                                    isPremium
+                                        ? "Valid till ${DateFormat('d MMM, yyyy').format(paymentState.payment!.createdAt.add(const Duration(days: 365)))}"
+                                        : "Upgrade for benefits",
+                                    style: TextStyle(color: isPremium ? Colors.white70 : Colors.grey.shade600, fontSize: 11),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(height: 1, thickness: 1, color: Color(0xFFF0F0F0)),
+                  const SizedBox(height: 16),
+                  // Attributes
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
+                    alignment: WrapAlignment.center,
                     children: [
                       _buildPill(
                         label: profile.identity.gender,
-                        icon: Icons.person_search_rounded,
-                        backgroundColor: Colors.blue.shade50,
-                        textColor: Colors.blue.shade700,
+                        icon: Icons.face_rounded,
+                        backgroundColor: const Color(0xFFFFF4F4),
+                        textColor: const Color(0xFFD32F2F),
                       ),
                       _buildPill(
                         label: AppLabels.ageYearsOld(context, profile.identity.age),
-                        icon: Icons.calendar_today_rounded,
-                        backgroundColor: Colors.orange.shade50,
-                        textColor: Colors.orange.shade700,
+                        icon: Icons.cake_rounded,
+                        backgroundColor: const Color(0xFFF4F9FF),
+                        textColor: const Color(0xFF1976D2),
                       ),
                       _buildPill(
                         label: profile.employment.designation,
-                        icon: Icons.work_history_rounded,
-                        backgroundColor: Colors.purple.shade50,
-                        textColor: Colors.purple.shade700,
+                        icon: Icons.business_center_rounded,
+                        backgroundColor: const Color(0xFFF4FFF6),
+                        textColor: const Color(0xFF388E3C),
                       ),
                     ],
                   ),
@@ -588,7 +720,11 @@ class _ProfileHeroCard extends StatelessWidget {
   Widget _buildPill({required dynamic label, required IconData icon, required Color backgroundColor, required Color textColor}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: textColor.withOpacity(0.1), width: 1),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -597,11 +733,11 @@ class _ProfileHeroCard extends StatelessWidget {
           label is BilingualValue
               ? BilingualParser(
                   value: label,
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: textColor),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: textColor),
                 )
               : Text(
                   label.toString(),
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: textColor),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: textColor),
                 ),
         ],
       ),
@@ -627,25 +763,27 @@ class _DetailSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 14, offset: const Offset(0, 6))],
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const Spacer(),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.black87, letterSpacing: -0.5),
+              ),
               if (actionChip != null) actionChip!,
-              const SizedBox(width: 8),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           ...children,
         ],
       ),
@@ -660,26 +798,25 @@ class _EditChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: theme.primaryColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: theme.primaryColor.withOpacity(0.3)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.edit, size: 14, color: theme.primaryColor),
-            const SizedBox(width: 4),
-            Text(
-              "Edit",
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: theme.primaryColor),
-            ),
-          ],
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(color: theme.primaryColor.withOpacity(0.08), borderRadius: BorderRadius.circular(12)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.edit_note_rounded, size: 18, color: theme.primaryColor),
+              const SizedBox(width: 4),
+              Text(
+                "Edit",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: theme.primaryColor),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -695,18 +832,32 @@ class _DetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Text(label, style: TextStyle(color: Colors.grey[600])),
+            flex: 2,
+            child: Text(
+              label,
+              style: TextStyle(color: Colors.grey[500], fontSize: 14, fontWeight: FontWeight.w500),
+            ),
           ),
-          value is BilingualValue
-              ? BilingualParser(value: value as BilingualValue)
-              : Text(
-                  (value == null || value.toString().isEmpty) ? AppLabels.notAvailableShort(context) : value.toString(),
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 3,
+            child: value is BilingualValue
+                ? BilingualParser(
+                    value: value as BilingualValue,
+                    textAlign: TextAlign.end,
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.black87),
+                  )
+                : Text(
+                    (value == null || value.toString().isEmpty) ? AppLabels.notAvailableShort(context) : value.toString(),
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.black87),
+                    textAlign: TextAlign.end,
+                  ),
+          ),
         ],
       ),
     );

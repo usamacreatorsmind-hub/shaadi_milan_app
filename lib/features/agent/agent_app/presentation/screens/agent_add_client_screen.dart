@@ -9,8 +9,6 @@ import '../../../../../app/custom/custom_widgets/validators.dart';
 import '../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../app/providers/global_providers.dart';
 import '../../../../../app/router/app_router.dart';
-import '../../../../../core/constants/app_labels.dart';
-import '../../../../../core/enums/enum.dart';
 import '../../../../translitration/models/bilingual_value.dart';
 import '../../../../translitration/widgets/bilingual_text_field.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';

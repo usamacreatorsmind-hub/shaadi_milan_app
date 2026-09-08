@@ -3,7 +3,6 @@ import 'package:shadi_milan/core/constants/app_labels.dart';
 import '../../../../app/custom/custom_widgets/app_logo.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../core/app_version_config/remote_config_service.dart';
-import '../../../../core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 

@@ -1,4 +1,6 @@
+import 'package:flutter/services.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/features/l10n/app_translation_service.dart';
@@ -450,11 +452,85 @@ class _ProfileHeaderCard extends StatelessWidget {
                   style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  profile.user.email?.toLowerCase() ?? AppLabels.notAvailableShort(context),
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  textAlign: TextAlign.center,
+                const SizedBox(height: 12),
+
+                // 🆔 Matrimony ID with Copy Action
+                GestureDetector(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: profile.metrimonyProfile.metrimonyId));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("ID Copied to Clipboard")));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          profile.metrimonyProfile.metrimonyId,
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey.shade800),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(Icons.copy_rounded, size: 16, color: Colors.grey.shade600),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // 🗓 Subscription Info Card
+                Consumer(
+                  builder: (context, ref, _) {
+                    final paymentState = ref.watch(paymentNotifierProvider(profile.userProfile.uid));
+                    final isPremium = paymentState.status == PayStatus.success;
+
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: isPremium ? const Color(0xFFF1F4FF) : Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: isPremium ? Colors.blue.withOpacity(0.2) : Colors.grey.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: RichText(
+                              text: TextSpan(
+                                style: const TextStyle(fontSize: 15, color: Colors.black87),
+                                children: [
+                                  TextSpan(
+                                    text: "Account - ",
+                                    style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                                  ),
+                                  TextSpan(
+                                    text: isPremium ? "Platinum Plus" : "Free Member",
+                                    style: TextStyle(color: isPremium ? Colors.blue.shade800 : Colors.black87, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          if (isPremium && paymentState.payment != null) ...[
+                            Container(
+                              width: 1,
+                              height: 20,
+                              color: Colors.grey.shade300,
+                              margin: const EdgeInsets.symmetric(horizontal: 12),
+                            ),
+                            Text(
+                              "till ${DateFormat('d MMM, yyyy').format(paymentState.payment!.createdAt.add(const Duration(days: 365)))}",
+                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
@@ -22,6 +23,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/premium_upgrade_bottom_sheet.dart';
+
+/// =======================
+/// BLOCKED USERS PROVIDER
+/// =======================
+final blockedUsersProvider = StateProvider<Set<String>>((ref) => {});
 
 /// =======================
 /// USER HOME SCREEN
@@ -56,9 +62,8 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
 
-      // Fetch the matrimony profiles when screen loads
-      ref.invalidate(homeControllerProvider);
-      // ref.invalidate(currentUserRecommendedIdsProvider);
+      // No need to invalidate here as watch() handles initial fetch and stream updates.
+      // Caching provided by Riverpod will make the app feel much faster on subsequent opens.
 
       try {
         // ignore: use_build_context_synchronously
@@ -140,323 +145,389 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
 
     return Scaffold(
       body: currentUserAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const _HomeShimmer(),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (user) {
           if (user == null) return Center(child: Text(AppLabels.userNotFound(context)));
 
-          // Watch the payment status directly for this user.
-          // The PaymentNotifier fetches the status from Firebase.
           final paymentState = ref.watch(paymentNotifierProvider(user.uid));
 
           if (paymentState.status == PayStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const _HomeShimmer();
           }
 
-          // Show profiles regardless of payment status.
-          // Premium checks are handled at the action level (e.g., Chat button).
           return homeState.metrimonyProfiles.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const _HomeShimmer(),
             error: (e, _) => Center(child: Text(e.toString())),
             data: (profiles) {
-                final currentUserProfile = profiles.where((p) => p.profile.userId == user.uid).firstOrNull?.profile;
-                final myCity = currentUserProfile?.address.city.en.toLowerCase().trim() ?? '';
+              final currentUserProfile = profiles.where((p) => p.profile.userId == user.uid).firstOrNull?.profile;
+              final myCity = currentUserProfile?.address.city.en.toLowerCase().trim() ?? '';
 
-                var filteredProfiles = profiles.where((viewModel) {
-                  final profile = viewModel.profile;
-                  final userEntity = viewModel.user;
-                  if (profile.userId == user.uid) return false;
+              var filteredProfiles = profiles.where((viewModel) {
+                final profile = viewModel.profile;
+                final userEntity = viewModel.user;
+                if (profile.userId == user.uid) return false;
 
-                  // 🔍 ROBUST SEARCH LOGIC
-                  bool searchMatch = true;
-                  if (filter.searchQuery.isNotEmpty) {
-                    final queryParts = filter.searchQuery.toLowerCase().trim().split(RegExp(r'\s+'));
-                    final nameEn = userEntity?.fullName.en.toLowerCase() ?? '';
-                    final nameHi = userEntity?.fullName.hi.toLowerCase() ?? '';
-                    final mId = profile.metrimonyId.toLowerCase();
-                    final casteEn = profile.cultural.caste.en.toLowerCase();
-                    final casteHi = profile.cultural.caste.hi.toLowerCase();
-                    final religionEn = profile.cultural.religion.en.toLowerCase();
-                    final religionHi = profile.cultural.religion.hi.toLowerCase();
-                    final cityEn = profile.address.city.en.toLowerCase();
-                    final cityHi = profile.address.city.hi.toLowerCase();
+                // 👫 AUTOMATIC GENDER FILTER (Show only opposite gender)
+                final myGender = user.gender.en.toLowerCase().trim();
+                final theirGender = profile.identity.gender.en.toLowerCase().trim();
 
-                    // All parts of the query must match at least one field
-                    searchMatch = queryParts.every(
-                      (part) =>
-                          nameEn.contains(part) ||
-                          nameHi.contains(part) ||
-                          mId.contains(part) ||
-                          casteEn.contains(part) ||
-                          casteHi.contains(part) ||
-                          religionEn.contains(part) ||
-                          religionHi.contains(part) ||
-                          cityEn.contains(part) ||
-                          cityHi.contains(part),
-                    );
-                  }
-
-                  final stateMatch =
-                      filter.state.isEmpty || (profile.address.state.en.toLowerCase().trim() == filter.state.toLowerCase().trim());
-                  final cityMatch =
-                      filter.city.isEmpty || (profile.address.city.en.toLowerCase().trim() == filter.city.toLowerCase().trim());
-                  final religionMatch =
-                      filter.religion.isEmpty ||
-                      (profile.cultural.religion.en.toLowerCase().trim() == filter.religion.toLowerCase().trim());
-                  final casteMatch =
-                      filter.caste.isEmpty || (profile.cultural.caste.en.toLowerCase().trim() == filter.caste.toLowerCase().trim());
-
-                  bool genderMatch = true;
-                  final filterGender = filter.gender;
-                  if (filterGender.isNotEmpty && filterGender != AppLabels.allProfiles(context)) {
-                    genderMatch = profile.identity.gender.en.toLowerCase() == filterGender.toLowerCase();
-                  }
-
-                  bool cityFilterMatch = true;
-                  if (filter.fromMyCity && myCity.isNotEmpty) {
-                    cityFilterMatch = profile.address.city.en.toLowerCase().trim() == myCity;
-                  }
-
-                  // 🎂 AGE MATCH
-                  final ageMatch = profile.identity.age >= filter.minAge && profile.identity.age <= filter.maxAge;
-
-                  return searchMatch &&
-                      stateMatch &&
-                      cityMatch &&
-                      religionMatch &&
-                      casteMatch &&
-                      genderMatch &&
-                      cityFilterMatch &&
-                      ageMatch;
-                }).toList();
-
-                if (filter.justJoined) {
-                  filteredProfiles.sort((a, b) {
-                    final dateA = a.user?.createdAt ?? DateTime(1900);
-                    final dateB = b.user?.createdAt ?? DateTime(1900);
-                    return dateB.compareTo(dateA);
-                  });
+                bool genderMatch = true;
+                if (myGender == 'male') {
+                  genderMatch = theirGender == 'female';
+                } else if (myGender == 'female') {
+                  genderMatch = theirGender == 'male';
                 }
 
-                final visibleProfiles = filteredProfiles.where((viewModel) => isRecommended(viewModel)).toList();
+                // 🔍 ROBUST SEARCH LOGIC
+                bool searchMatch = true;
+                if (filter.searchQuery.isNotEmpty) {
+                  final queryParts = filter.searchQuery.toLowerCase().trim().split(RegExp(r'\s+'));
+                  final nameEn = userEntity?.fullName.en.toLowerCase() ?? '';
+                  final nameHi = userEntity?.fullName.hi.toLowerCase() ?? '';
+                  final mId = profile.metrimonyId.toLowerCase();
+                  final casteEn = profile.cultural.caste.en.toLowerCase();
+                  final casteHi = profile.cultural.caste.hi.toLowerCase();
+                  final religionEn = profile.cultural.religion.en.toLowerCase();
+                  final religionHi = profile.cultural.religion.hi.toLowerCase();
+                  final cityEn = profile.address.city.en.toLowerCase();
+                  final cityHi = profile.address.city.hi.toLowerCase();
 
-                return NestedScrollView(
-                  headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                    SliverPersistentHeader(
-                      pinned: true,
-                      delegate: _FilterHeaderDelegate(
-                        child: GestureDetector(
-                          // Absorb vertical drag to prevent page scrolling when interacting with horizontal chips
-                          onVerticalDragStart: (_) {},
-                          onVerticalDragUpdate: (_) {},
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                            child: Row(
-                              children: [
+                  // All parts of the query must match at least one field
+                  searchMatch = queryParts.every(
+                    (part) =>
+                        nameEn.contains(part) ||
+                        nameHi.contains(part) ||
+                        mId.contains(part) ||
+                        casteEn.contains(part) ||
+                        casteHi.contains(part) ||
+                        religionEn.contains(part) ||
+                        religionHi.contains(part) ||
+                        cityEn.contains(part) ||
+                        cityHi.contains(part),
+                  );
+                }
+
+                final stateMatch =
+                    filter.state.isEmpty || (profile.address.state.en.toLowerCase().trim() == filter.state.toLowerCase().trim());
+                final cityMatch = filter.city.isEmpty || (profile.address.city.en.toLowerCase().trim() == filter.city.toLowerCase().trim());
+                final religionMatch =
+                    filter.religion.isEmpty || (profile.cultural.religion.en.toLowerCase().trim() == filter.religion.toLowerCase().trim());
+                final casteMatch =
+                    filter.caste.isEmpty || (profile.cultural.caste.en.toLowerCase().trim() == filter.caste.toLowerCase().trim());
+
+                bool cityFilterMatch = true;
+                if (filter.fromMyCity && myCity.isNotEmpty) {
+                  cityFilterMatch = profile.address.city.en.toLowerCase().trim() == myCity;
+                }
+
+                // 🎂 AGE MATCH
+                final ageMatch = profile.identity.age >= filter.minAge && profile.identity.age <= filter.maxAge;
+
+                // 📅 DAILY MATCH (Updated in last 2 days)
+                bool dailyMatch = true;
+                if (filter.daily) {
+                  final twoDaysAgo = DateTime.now().subtract(const Duration(days: 2));
+                  final updatedAt = userEntity?.lastSeen ?? DateTime(1900);
+                  dailyMatch = updatedAt.isAfter(twoDaysAgo);
+                }
+
+                // 🤝 MY MATCHES (Same Religion + Opposite Gender)
+                bool myMatchesMatch = true;
+                if (filter.myMatches) {
+                  final userRelEn = user.fullName.en; // Using name as proxy if religion not in user entity
+                  // Assuming user's religion should match profile's religion
+                  // Better to check against currentUserProfile religion if available
+                  final myRel = currentUserProfile?.cultural.religion.en.toLowerCase().trim() ?? '';
+                  final profileRel = profile.cultural.religion.en.toLowerCase().trim();
+
+                  final myGender = user.gender.en.toLowerCase().trim();
+                  final profileGender = profile.identity.gender.en.toLowerCase().trim();
+
+                  final religionOk = myRel.isEmpty || profileRel == myRel;
+                  final genderOk = myGender.isEmpty || profileGender != myGender;
+
+                  myMatchesMatch = religionOk && genderOk;
+                }
+
+                return searchMatch &&
+                    stateMatch &&
+                    cityMatch &&
+                    religionMatch &&
+                    casteMatch &&
+                    genderMatch &&
+                    cityFilterMatch &&
+                    ageMatch &&
+                    dailyMatch &&
+                    myMatchesMatch;
+              }).toList();
+
+              if (filter.justJoined) {
+                // Filter for last 7 days if Just Joined is active
+                final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));
+                filteredProfiles = filteredProfiles.where((vm) {
+                  final createdAt = vm.user?.createdAt ?? DateTime(1900);
+                  return createdAt.isAfter(sevenDaysAgo);
+                }).toList();
+
+                filteredProfiles.sort((a, b) {
+                  final dateA = a.user?.createdAt ?? DateTime(1900);
+                  final dateB = b.user?.createdAt ?? DateTime(1900);
+                  return dateB.compareTo(dateA);
+                });
+              } else if (filter.daily) {
+                // Sort by last seen for Daily
+                filteredProfiles.sort((a, b) {
+                  final dateA = a.user?.lastSeen ?? DateTime(1900);
+                  final dateB = b.user?.lastSeen ?? DateTime(1900);
+                  return dateB.compareTo(dateA);
+                });
+              } else if (filter.myMatches) {
+                // Sort by last seen for My Matches
+                filteredProfiles.sort((a, b) {
+                  final dateA = a.user?.lastSeen ?? DateTime(1900);
+                  final dateB = b.user?.lastSeen ?? DateTime(1900);
+                  return dateB.compareTo(dateA);
+                });
+              }
+
+              final visibleProfiles = filteredProfiles.where((viewModel) => isRecommended(viewModel)).toList();
+
+              return NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _FilterHeaderDelegate(
+                      child: GestureDetector(
+                        // Absorb vertical drag to prevent page scrolling when interacting with horizontal chips
+                        onVerticalDragStart: (_) {},
+                        onVerticalDragUpdate: (_) {},
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                          child: Row(
+                            children: [
+                              _FilterChip(
+                                label: "Search & Filter",
+                                icon: Icons.search,
+                                onTap: () => _showFilterDialog(context),
+                                isSelected: ref.read(homeFilterProvider.notifier).isFilterActive,
+                              ),
+                              const SizedBox(width: 6),
+                              if (ref.read(homeFilterProvider.notifier).isFilterActive)
                                 _FilterChip(
-                                  label: "Search & Filter",
-                                  icon: Icons.search,
-                                  onTap: () => _showFilterDialog(context),
-                                  isSelected: ref.read(homeFilterProvider.notifier).isFilterActive,
-                                ),
-                                const SizedBox(width: 6),
-                                if (ref.read(homeFilterProvider.notifier).isFilterActive)
-                                  _FilterChip(
-                                    label: "Clear All",
-                                    icon: Icons.clear_all_rounded,
-                                    onTap: () {
-                                      ref.read(homeFilterProvider.notifier).reset();
-                                      HapticFeedback.mediumImpact();
-                                    },
-                                    isSelected: false,
-                                    activeColor: Colors.redAccent,
-                                  ),
-                                if (ref.read(homeFilterProvider.notifier).isFilterActive) const SizedBox(width: 6),
-                                _FilterChip(
-                                  label: "New Profiles",
-                                  isSelected: filter.justJoined,
+                                  label: "Clear All",
+                                  icon: Icons.clear_all_rounded,
                                   onTap: () {
-                                    ref.read(homeFilterProvider.notifier).toggleJustJoined();
-                                    HapticFeedback.lightImpact();
+                                    ref.read(homeFilterProvider.notifier).reset();
+                                    HapticFeedback.mediumImpact();
                                   },
-                                  icon: Icons.fiber_new_rounded,
+                                  isSelected: false,
+                                  activeColor: Colors.redAccent,
                                 ),
-                                const SizedBox(width: 6),
-                                _FilterChip(
-                                  label: "Near Me",
-                                  isSelected: filter.fromMyCity,
-                                  onTap: () {
-                                    ref.read(homeFilterProvider.notifier).toggleFromMyCity();
-                                    HapticFeedback.lightImpact();
-                                  },
-                                  icon: Icons.location_on_rounded,
-                                ),
-                                const SizedBox(width: 6),
-                                _FilterChip(label: "Daily", isSelected: false, onTap: () {}, icon: Icons.event_note_rounded),
-                                const SizedBox(width: 6),
-                                _FilterChip(label: "My matches", isSelected: false, onTap: () {}, icon: Icons.people_alt_rounded),
-                              ],
-                            ),
+                              if (ref.read(homeFilterProvider.notifier).isFilterActive) const SizedBox(width: 6),
+                              _FilterChip(
+                                label: "New Profiles",
+                                isSelected: filter.justJoined,
+                                onTap: () {
+                                  ref.read(homeFilterProvider.notifier).toggleJustJoined();
+                                  HapticFeedback.lightImpact();
+                                },
+                                icon: Icons.fiber_new_rounded,
+                              ),
+                              const SizedBox(width: 6),
+                              _FilterChip(
+                                label: "Near Me",
+                                isSelected: filter.fromMyCity,
+                                onTap: () {
+                                  ref.read(homeFilterProvider.notifier).toggleFromMyCity();
+                                  HapticFeedback.lightImpact();
+                                },
+                                icon: Icons.location_on_rounded,
+                              ),
+                              const SizedBox(width: 6),
+                              _FilterChip(
+                                label: "Daily",
+                                isSelected: filter.daily,
+                                onTap: () {
+                                  ref.read(homeFilterProvider.notifier).toggleDaily();
+                                  HapticFeedback.lightImpact();
+                                },
+                                icon: Icons.event_note_rounded,
+                              ),
+                              const SizedBox(width: 6),
+                              _FilterChip(
+                                label: "My matches",
+                                isSelected: filter.myMatches,
+                                onTap: () {
+                                  ref.read(homeFilterProvider.notifier).toggleMyMatches();
+                                  HapticFeedback.lightImpact();
+                                },
+                                icon: Icons.people_alt_rounded,
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                    if (!user.isProfileCreated)
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  ),
+                  if (!user.isProfileCreated)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.errorContainer,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.35)),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      AppLabels.completeProfileTitle(context),
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: Theme.of(context).colorScheme.onErrorContainer,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      AppLabels.completeProfileMessage(context),
+                                      style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onErrorContainer),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    TextButton.icon(
+                                      onPressed: () => context.router.push(const MatrimonyFormFlowRoute()),
+                                      icon: const Icon(Icons.edit_note_rounded),
+                                      label: Text(AppLabels.completeProfileButton(context)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+                body: visibleProfiles.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Center(
                           child: Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.errorContainer,
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.35)),
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                             ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        AppLabels.completeProfileTitle(context),
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                          color: Theme.of(context).colorScheme.onErrorContainer,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        AppLabels.completeProfileMessage(context),
-                                        style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onErrorContainer),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      TextButton.icon(
-                                        onPressed: () => context.router.push(const MatrimonyFormFlowRoute()),
-                                        icon: const Icon(Icons.edit_note_rounded),
-                                        label: Text(AppLabels.completeProfileButton(context)),
-                                      ),
-                                    ],
-                                  ),
+                                Icon(Icons.search_off_rounded, size: 42, color: Theme.of(context).colorScheme.primary),
+                                const SizedBox(height: 10),
+                                Text(AppLabels.noProfilesFound(context), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                                const SizedBox(height: 10),
+                                TextButton.icon(
+                                  onPressed: () {
+                                    ref.read(homeFilterProvider.notifier).reset();
+                                  },
+                                  icon: const Icon(Icons.refresh_rounded),
+                                  label: Text(AppLabels.resetFilters(context)),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                  body: visibleProfiles.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Center(
-                            child: Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).cardColor,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.search_off_rounded, size: 42, color: Theme.of(context).colorScheme.primary),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    AppLabels.noProfilesFound(context),
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  TextButton.icon(
-                                    onPressed: () {
-                                      ref.read(homeFilterProvider.notifier).reset();
-                                    },
-                                    icon: const Icon(Icons.refresh_rounded),
-                                    label: Text(AppLabels.resetFilters(context)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                      : PageView.builder(
-                          controller: _pageController,
-                          scrollDirection: Axis.vertical,
-                          itemCount: visibleProfiles.length + (visibleProfiles.length ~/ 6),
-                          itemBuilder: (context, index) {
-                            // Every 5th item is a suggestions section
-                            if (index > 0 && (index + 1) % 5 == 0) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                child: _SuggestionsSection(allProfiles: filteredProfiles, currentUser: user),
-                              );
-                            }
-
-                            // Calculate actual profile index
-                            final profileIndex = index - (index ~/ 5);
-                            if (profileIndex >= visibleProfiles.length) return const SizedBox.shrink();
-
-                            final viewModel = visibleProfiles[profileIndex];
-                            final profile = viewModel.profile;
-                            final userEntity = viewModel.user;
-                            final agent = viewModel.agent;
-                            final isHindi = Localizations.localeOf(context).languageCode == 'hi';
-                            final displayName = userEntity != null ? (isHindi ? userEntity.fullName.hi : userEntity.fullName.en) : 'N/A';
-
-                            final designation = profile.employment.designation;
-                            final caste = isHindi ? profile.cultural.caste.hi : profile.cultural.caste.en;
-                            final location = isHindi
-                                ? "${profile.address.city.hi}, ${profile.address.state.hi}"
-                                : "${profile.address.city.en}, ${profile.address.state.en}";
-
-                            final allImages = {
-                              if (profile.images.primaryImageUrl.isNotEmpty) profile.images.primaryImageUrl,
-                              ...profile.images.secondaryImageUrls.where((url) => url.isNotEmpty),
-                              if (profile.images.profileImageUrl.isNotEmpty) profile.images.profileImageUrl,
-                              if (profile.images.imageWithAgentUrl.isNotEmpty) profile.images.imageWithAgentUrl,
-                            }.toList();
-
-                            // 🚀 PRE-CACHE next profile for smoother scrolling
-                            if (profileIndex + 1 < visibleProfiles.length) {
-                              final nextProfile = visibleProfiles[profileIndex + 1].profile;
-                              if (nextProfile.images.primaryImageUrl.isNotEmpty) {
-                                precacheImage(CachedNetworkImageProvider(nextProfile.images.primaryImageUrl), context);
-                              }
-                            }
-
+                      )
+                    : PageView.builder(
+                        controller: _pageController,
+                        scrollDirection: Axis.vertical,
+                        itemCount: visibleProfiles.length + (visibleProfiles.length ~/ 6),
+                        itemBuilder: (context, index) {
+                          // Every 5th item is a suggestions section
+                          if (index > 0 && (index + 1) % 5 == 0) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                              child: Consumer(
-                                builder: (context, ref, child) {
-                                  final paymentState = ref.watch(paymentNotifierProvider(profile.userId));
-                                  final isPremium = paymentState.status == PayStatus.success;
-
-                                  return ProfileCard(
-                                    uid: profile.userId,
-                                    name: displayName.isEmpty ? 'N/A' : displayName,
-                                    age: profile.identity.age,
-                                    dob: profile.identity.dob,
-                                    designation: designation,
-                                    images: allImages,
-                                    agentDesignation: agent?.designation.label,
-                                    location: location,
-                                    height: "${profile.physical.height} cm",
-                                    caste: caste,
-                                    isPremium: isPremium,
-                                    lastSeen: userEntity?.lastSeen,
-                                  );
-                                },
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: _SuggestionsSection(allProfiles: filteredProfiles, currentUser: user),
                             );
-                          },
-                        ),
-                );
-              },
-            );
+                          }
+
+                          // Calculate actual profile index
+                          final profileIndex = index - (index ~/ 5);
+                          if (profileIndex >= visibleProfiles.length) return const SizedBox.shrink();
+
+                          final viewModel = visibleProfiles[profileIndex];
+                          final profile = viewModel.profile;
+                          final userEntity = viewModel.user;
+                          final agent = viewModel.agent;
+                          final isHindi = Localizations.localeOf(context).languageCode == 'hi';
+                          final displayName = userEntity != null ? (isHindi ? userEntity.fullName.hi : userEntity.fullName.en) : 'N/A';
+
+                          final designation = profile.employment.designation;
+                          final caste = isHindi ? profile.cultural.caste.hi : profile.cultural.caste.en;
+                          final location = isHindi
+                              ? "${profile.address.city.hi}, ${profile.address.state.hi}"
+                              : "${profile.address.city.en}, ${profile.address.state.en}";
+
+                          final allImages = {
+                            if (profile.images.primaryImageUrl.isNotEmpty) profile.images.primaryImageUrl,
+                            ...profile.images.secondaryImageUrls.where((url) => url.isNotEmpty),
+                            if (profile.images.profileImageUrl.isNotEmpty) profile.images.profileImageUrl,
+                            if (profile.images.imageWithAgentUrl.isNotEmpty) profile.images.imageWithAgentUrl,
+                          }.toList();
+
+                          // 🚀 PRE-CACHE next profile for smoother scrolling
+                          if (profileIndex + 1 < visibleProfiles.length) {
+                            final nextProfile = visibleProfiles[profileIndex + 1].profile;
+                            if (nextProfile.images.primaryImageUrl.isNotEmpty) {
+                              precacheImage(CachedNetworkImageProvider(nextProfile.images.primaryImageUrl), context);
+                            }
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                            child: Consumer(
+                              builder: (context, ref, child) {
+                                final paymentState = ref.watch(paymentNotifierProvider(profile.userId));
+                                final isPremium = paymentState.status == PayStatus.success;
+                                final isBlocked = ref.watch(blockedUsersProvider).contains(profile.userId);
+
+                                return ProfileCard(
+                                  uid: profile.userId,
+                                  name: displayName.isEmpty ? 'N/A' : displayName,
+                                  age: profile.identity.age,
+                                  dob: profile.identity.dob,
+                                  designation: designation,
+                                  income: profile.employment.annualIncome,
+                                  degree: profile.education.education,
+                                  religion: isHindi ? profile.cultural.religion.hi : profile.cultural.religion.en,
+                                  images: allImages,
+                                  agentDesignation: agent?.designation.label,
+                                  location: location,
+                                  height: "${profile.physical.height.round()} cm",
+                                  caste: caste,
+                                  isPremium: isPremium,
+                                  isBlocked: isBlocked,
+                                  lastSeen: userEntity?.lastSeen,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+              );
+            },
+          );
         },
       ),
     );
@@ -828,12 +899,16 @@ class ProfileCard extends ConsumerStatefulWidget {
   final int age;
   final DateTime dob;
   final dynamic designation;
+  final dynamic income;
+  final dynamic degree;
+  final String religion;
   final List<String> images;
   final String? agentDesignation;
   final String location;
   final String height;
   final String caste;
   final bool isPremium;
+  final bool isBlocked;
   final DateTime? lastSeen;
 
   const ProfileCard({
@@ -843,12 +918,16 @@ class ProfileCard extends ConsumerStatefulWidget {
     required this.age,
     required this.dob,
     required this.designation,
+    this.income,
+    this.degree,
+    required this.religion,
     required this.images,
     this.agentDesignation,
     required this.location,
     required this.height,
     required this.caste,
     this.isPremium = false,
+    this.isBlocked = false,
     this.lastSeen,
   });
 
@@ -867,20 +946,28 @@ class _SuggestionsSection extends ConsumerWidget {
     final theme = Theme.of(context);
     final filter = ref.watch(homeFilterProvider);
 
-    // Filter suggestions based on preferences (Same religion or same city as fallback)
+    // 🔍 Improved suggestion logic
     final suggestions = allProfiles
         .where((vm) {
           if (vm.profile.userId == currentUser.uid) return false;
 
-          final matchesReligion = vm.profile.cultural.religion.en == filter.religion;
-          final matchesState = vm.profile.address.state.en == filter.state;
+          // Case-insensitive and handles empty filters
+          final matchesReligion =
+              filter.religion.isNotEmpty && vm.profile.cultural.religion.en.toLowerCase().trim() == filter.religion.toLowerCase().trim();
+          final matchesState =
+              filter.state.isNotEmpty && vm.profile.address.state.en.toLowerCase().trim() == filter.state.toLowerCase().trim();
 
           return matchesReligion || matchesState;
         })
         .take(4)
         .toList();
 
-    if (suggestions.isEmpty) return const SizedBox.shrink();
+    // 💡 FALLBACK: If no targeted suggestions, show the latest profiles instead of blank space
+    final finalSuggestions = suggestions.isNotEmpty
+        ? suggestions
+        : allProfiles.where((vm) => vm.profile.userId != currentUser.uid).take(4).toList();
+
+    if (finalSuggestions.isEmpty) return const SizedBox.shrink();
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -915,9 +1002,9 @@ class _SuggestionsSection extends ConsumerWidget {
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
             ),
-            itemCount: suggestions.length,
+            itemCount: finalSuggestions.length,
             itemBuilder: (context, index) {
-              final vm = suggestions[index];
+              final vm = finalSuggestions[index];
               final isHindi = Localizations.localeOf(context).languageCode == 'hi';
               final name = isHindi ? vm.user?.fullName.hi : vm.user?.fullName.en;
 
@@ -1091,23 +1178,34 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
             Positioned.fill(
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
-                onTap: () => context.pushRoute(UserDetailRoute(uid: widget.uid)),
+                onTap: widget.isBlocked ? null : () => context.pushRoute(UserDetailRoute(uid: widget.uid)),
               ),
             ),
 
-            // 👑 Top Right Badges
+            // 👑 Top Right Badges & Options
             Positioned(
               top: 16,
               right: 16,
               child: Column(
                 children: [
-                  if (widget.isPremium)
+                  // 3 Dot Menu
+                  GestureDetector(
+                    onTap: () => _showProfileOptions(context, ref),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(color: Colors.black.withOpacity(0.4), shape: BoxShape.circle),
+                      child: const Icon(Icons.more_vert, color: Colors.white, size: 22),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (widget.isPremium) ...[
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
                       child: const Icon(Icons.workspace_premium, color: Colors.white, size: 18),
                     ),
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 10),
+                  ],
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), borderRadius: BorderRadius.circular(12)),
@@ -1128,7 +1226,7 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
             ),
 
             // ◀️ Navigation Arrows
-            if (widget.images.length > 1) ...[
+            if (widget.images.length > 1 && !widget.isBlocked) ...[
               Positioned(
                 left: 10,
                 top: 0,
@@ -1161,205 +1259,433 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
               ),
             ],
 
+            // 🚫 Blocked Overlay
+            if (widget.isBlocked)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.75),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.block_flipped, color: Colors.white, size: 64),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "Blocked Profile",
+                          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Text("You have blocked ${widget.name}", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14)),
+                        const SizedBox(height: 28),
+                        ElevatedButton.icon(
+                          onPressed: () => ref.read(blockedUsersProvider.notifier).update((state) => {...state}..remove(widget.uid)),
+                          icon: const Icon(Icons.undo_rounded, size: 18),
+                          label: const Text("Unblock Profile"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black87,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
             // 📝 Profile Info Overlay
             Positioned(
               left: 0,
               bottom: 0,
               right: 0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () => context.pushRoute(UserDetailRoute(uid: widget.uid)),
-                    behavior: HitTestBehavior.translucent,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Name and Age
-                          Text(
-                            "${widget.name}, ${widget.age}",
-                            style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: 0.5),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-
-                          // Details: Height • Caste • Occupation
-                          Text(
-                            [
-                              if (widget.height != "0 cm") widget.height,
-                              if (widget.caste.isNotEmpty) widget.caste,
-                              if (widget.designation != null)
-                                widget.designation is BilingualValue
-                                    ? (isHindi ? (widget.designation as BilingualValue).hi : (widget.designation as BilingualValue).en)
-                                    : widget.designation.toString(),
-                            ].join(' • '),
-                            style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 15, fontWeight: FontWeight.w500),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-
-                          // Location
-                          const SizedBox(height: 4),
-                          Text(
-                            widget.location,
-                            style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 15, fontWeight: FontWeight.w500),
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // Status Chips
-                          Row(
-                            children: [
-                              _StatusChip(
-                                icon: Icons.circle,
-                                iconColor: Colors.green,
-                                label: _timeAgo(widget.lastSeen),
-                                backgroundColor: Colors.black.withOpacity(0.4),
-                              ),
-                              const SizedBox(width: 10),
-                              _StatusChip(
-                                icon: Icons.people,
-                                iconColor: Colors.redAccent,
-                                label: "You & ${widget.isPremium ? 'Him' : 'Her'}", // Dynamic based on gender if available
-                                backgroundColor: Colors.black.withOpacity(0.4),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-
-                  // Connect Now Button or Actions
-                  if (!_showActions)
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: GestureDetector(
-                        onTap: () => setState(() => _showActions = true),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Color(0xFF09BE6E), Color(0xFF0AA4B8)],
-                            ),
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(color: const Color(0xFF0AA4B8).withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4)),
-                            ],
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.check, color: Colors.white),
-                              Text(
-                                " Connect Now",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  else
-                    Padding(
-                      padding: const EdgeInsets.all(0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-                        decoration: BoxDecoration(color: Colors.white),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Opacity(
+                opacity: widget.isBlocked ? 0.3 : 1.0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: widget.isBlocked ? null : () => context.pushRoute(UserDetailRoute(uid: widget.uid)),
+                      behavior: HitTestBehavior.translucent,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // 1. Chat Button
-                            _ActionButton(
-                              icon: Icons.chat_bubble_rounded,
-                              label: "Chat",
-                              backgroundColor: Colors.teal,
-                              onTap: () {
-                                final currentUserId = ref.read(currentUserProvider).value?.uid;
-                                if (currentUserId == null) return;
-                                final paymentState = ref.read(paymentNotifierProvider(currentUserId));
+                            // Name, Age and DOB
+                            Text(
+                              "${widget.name}, ${widget.age} (${DateFormat('dd MMM yyyy').format(widget.dob)})",
+                              style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
 
-                                if (paymentState.status == PayStatus.success) {
-                                  context.pushRoute(UserChatRoomRoute(peerId: widget.uid));
-                                } else {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    backgroundColor: Colors.transparent,
-                                    builder: (context) => const PremiumUpgradeBottomSheet(),
-                                  );
-                                }
-                              },
+                            // Row 1: Height · Location · Religion - Caste
+                            Text(
+                              [
+                                if (widget.height != "0 cm") widget.height,
+                                widget.location,
+                                "${widget.religion} - ${widget.caste}",
+                              ].join(' · '),
+                              style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 14, fontWeight: FontWeight.w500),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            // 2. Wishlist Button
-                            Consumer(
-                              builder: (context, ref, _) {
-                                final currentUserId = ref.watch(currentUserProvider).value?.uid;
-                                if (currentUserId == null) return const SizedBox.shrink();
-                                final wishlistAsync = ref.watch(myWishlistStreamProvider(currentUserId));
-                                return wishlistAsync.when(
-                                  data: (wishlists) {
-                                    final isSaved = wishlists.any((w) => w.receiverId == widget.uid);
-                                    return _ActionButton(
-                                      icon: isSaved ? Icons.bookmark : Icons.bookmark_border,
-                                      label: "Wishlist",
-                                      backgroundColor: Colors.red,
-                                      onTap: () async {
-                                        final wishlistRepo = ref.read(myWishlistNotifierProvider.notifier);
-                                        if (isSaved) {
-                                          final wish = wishlists.firstWhere((w) => w.receiverId == widget.uid);
-                                          await wishlistRepo.removeWishlist(wish.id);
-                                        } else {
-                                          final homeProfiles = ref.read(homeControllerProvider).metrimonyProfiles.value ?? [];
-                                          final profileVM = homeProfiles.firstWhere((p) => p.profile.userId == widget.uid);
-                                          final currentUserData = await ref.read(userRepositoryProvider).fetchUser(currentUserId);
-                                          final wishListItem = WishlistEntity(
-                                            senderId: currentUserId,
-                                            receiverId: widget.uid,
-                                            receiverAgent: profileVM.profile.userId.isNotEmpty ? profileVM.user?.agentId ?? '' : '',
-                                            senderAgent: currentUserData.agentId,
-                                            status: "pending",
-                                            updatedAt: DateTime.now(),
-                                          );
-                                          await wishlistRepo.addWishlist(wishListItem);
-                                        }
-                                      },
-                                    );
-                                  },
-                                  loading: () => const SizedBox.shrink(),
-                                  error: (_, __) => const Icon(Icons.error, color: Colors.white),
-                                );
-                              },
+
+                            // Row 2: Occupation · Earns Income
+                            const SizedBox(height: 2),
+                            Text(
+                              [
+                                if (widget.designation != null)
+                                  widget.designation is BilingualValue
+                                      ? (isHindi ? (widget.designation as BilingualValue).hi : (widget.designation as BilingualValue).en)
+                                      : widget.designation.toString(),
+                                if (widget.income != null)
+                                  "Earns ${widget.income is BilingualValue ? (isHindi ? (widget.income as BilingualValue).hi : (widget.income as BilingualValue).en) : widget.income.toString()}",
+                              ].join(' · '),
+                              style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 14, fontWeight: FontWeight.w500),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            // 3. Call Button
-                            _ActionButton(
-                              icon: Icons.call,
-                              label: "Call",
-                              backgroundColor: Colors.green,
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Calling feature coming soon!")));
-                              },
+
+                            // Row 3: Education/Degree
+                            if (widget.degree != null) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                widget.degree is BilingualValue
+                                    ? (isHindi ? (widget.degree as BilingualValue).hi : (widget.degree as BilingualValue).en)
+                                    : widget.degree.toString(),
+                                style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 14, fontWeight: FontWeight.w500),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+
+                            const SizedBox(height: 6),
+
+                            // Status Chips
+                            Row(
+                              children: [
+                                _StatusChip(
+                                  icon: Icons.circle,
+                                  iconColor: Colors.green,
+                                  label: _timeAgo(widget.lastSeen),
+                                  backgroundColor: Colors.black.withOpacity(0.4),
+                                ),
+                                const SizedBox(width: 10),
+                                _StatusChip(
+                                  icon: Icons.people,
+                                  iconColor: Colors.redAccent,
+                                  label: "You & ${widget.isPremium ? 'Him' : 'Her'}", // Dynamic based on gender if available
+                                  backgroundColor: Colors.black.withOpacity(0.4),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
                     ),
-                ],
+                    const SizedBox(height: 5),
+
+                    // Connect Now Button or Actions
+                    if (!_showActions)
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: GestureDetector(
+                          onTap: () => setState(() => _showActions = true),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Color(0xFF09BE6E), Color(0xFF0AA4B8)],
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                              boxShadow: [
+                                BoxShadow(color: const Color(0xFF0AA4B8).withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4)),
+                              ],
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check, color: Colors.white),
+                                Text(
+                                  " Connect Now",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.all(0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+                          decoration: BoxDecoration(color: Colors.white),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // 1. Chat Button
+                              _ActionButton(
+                                icon: Icons.chat_bubble_rounded,
+                                label: "Chat",
+                                backgroundColor: Colors.teal,
+                                onTap: () {
+                                  final currentUserId = ref.read(currentUserProvider).value?.uid;
+                                  if (currentUserId == null) return;
+                                  final paymentState = ref.read(paymentNotifierProvider(currentUserId));
+
+                                  if (paymentState.status == PayStatus.success) {
+                                    context.pushRoute(UserChatRoomRoute(peerId: widget.uid));
+                                  } else {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      builder: (context) => const PremiumUpgradeBottomSheet(),
+                                    );
+                                  }
+                                },
+                              ),
+                              // 2. Wishlist Button
+                              Consumer(
+                                builder: (context, ref, _) {
+                                  final currentUserId = ref.watch(currentUserProvider).value?.uid;
+                                  if (currentUserId == null) return const SizedBox.shrink();
+                                  final wishlistAsync = ref.watch(myWishlistStreamProvider(currentUserId));
+                                  return wishlistAsync.when(
+                                    data: (wishlists) {
+                                      final isSaved = wishlists.any((w) => w.receiverId == widget.uid);
+                                      return _ActionButton(
+                                        icon: isSaved ? Icons.bookmark : Icons.bookmark_border,
+                                        label: "Wishlist",
+                                        backgroundColor: Colors.red,
+                                        onTap: () async {
+                                          final wishlistRepo = ref.read(myWishlistNotifierProvider.notifier);
+                                          if (isSaved) {
+                                            final wish = wishlists.firstWhere((w) => w.receiverId == widget.uid);
+                                            await wishlistRepo.removeWishlist(wish.id);
+                                          } else {
+                                            final homeProfiles = ref.read(homeControllerProvider).metrimonyProfiles.value ?? [];
+                                            final profileVM = homeProfiles.firstWhere((p) => p.profile.userId == widget.uid);
+                                            final currentUserData = await ref.read(userRepositoryProvider).fetchUser(currentUserId);
+                                            final wishListItem = WishlistEntity(
+                                              senderId: currentUserId,
+                                              receiverId: widget.uid,
+                                              receiverAgent: profileVM.profile.userId.isNotEmpty ? profileVM.user?.agentId ?? '' : '',
+                                              senderAgent: currentUserData.agentId,
+                                              status: "pending",
+                                              updatedAt: DateTime.now(),
+                                            );
+                                            await wishlistRepo.addWishlist(wishListItem);
+                                          }
+                                        },
+                                      );
+                                    },
+                                    loading: () => const SizedBox.shrink(),
+                                    error: (_, __) => const Icon(Icons.error, color: Colors.white),
+                                  );
+                                },
+                              ),
+                              // 3. Call Button
+                              _ActionButton(
+                                icon: Icons.call,
+                                label: "Call",
+                                backgroundColor: Colors.green,
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Calling feature coming soon!")));
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _showProfileOptions(BuildContext context, WidgetRef ref) {
+    final isBlocked = ref.read(blockedUsersProvider).contains(widget.uid);
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildOptionTile(
+                icon: Icons.share_outlined,
+                label: "Share",
+                onTap: () async {
+                  Navigator.pop(context);
+                  final isHindi = Localizations.localeOf(context).languageCode == 'hi';
+                  final profileName = isHindi ? widget.name : widget.name; // name is already local handled
+
+                  final String message = isHindi
+                      ? "शादी मिलन पर इस प्रोफाइल को देखें: $profileName, ${widget.age} वर्ष, ${widget.location}। अभी ऐप डाउनलोड करें: https://play.google.com/store/apps/details?id=com.shaadimilan.app"
+                      : "Check out this profile on Shaadi Milan: $profileName, ${widget.age} yrs, ${widget.location}. Download the app now: https://play.google.com/store/apps/details?id=com.shaadimilan.app";
+
+                  await Share.share(message);
+                },
+              ),
+              _buildOptionTile(
+                icon: Icons.star_border_rounded,
+                label: "Add to Shortlist",
+                onTap: () async {
+                  Navigator.pop(context);
+                  final currentUserId = ref.read(currentUserProvider).value?.uid;
+                  if (currentUserId == null) return;
+
+                  final homeProfiles = ref.read(homeControllerProvider).metrimonyProfiles.value ?? [];
+                  final profileVM = homeProfiles.firstWhere((p) => p.profile.userId == widget.uid);
+                  final currentUserData = await ref.read(userRepositoryProvider).fetchUser(currentUserId);
+
+                  final wishListItem = WishlistEntity(
+                    senderId: currentUserId,
+                    receiverId: widget.uid,
+                    receiverAgent: profileVM.user?.agentId ?? '',
+                    senderAgent: currentUserData.agentId,
+                    status: "pending",
+                    updatedAt: DateTime.now(),
+                  );
+                  await ref.read(myWishlistNotifierProvider.notifier).addWishlist(wishListItem);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Added to Shortlist!")));
+                },
+              ),
+              _buildOptionTile(
+                icon: Icons.visibility_off_outlined,
+                label: "Hide this Profile",
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile hidden successfully")));
+                },
+              ),
+              if (isBlocked)
+                _buildOptionTile(
+                  icon: Icons.undo_rounded,
+                  label: "Unblock this Profile",
+                  onTap: () {
+                    Navigator.pop(context);
+                    ref.read(blockedUsersProvider.notifier).update((state) => {...state}..remove(widget.uid));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile Unblocked!")));
+                  },
+                )
+              else
+                _buildOptionTile(
+                  icon: Icons.block_flipped,
+                  label: "Block this Profile",
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showBlockConfirmation(context, ref);
+                  },
+                ),
+              _buildOptionTile(
+                icon: Icons.report_gmailerrorred_rounded,
+                label: "Report this Profile",
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Report submitted! We will review it.")));
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showBlockConfirmation(BuildContext context, WidgetRef ref) {
+    bool isChecked = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10)),
+                  ),
+                  const SizedBox(height: 24),
+                  const Icon(Icons.block_flipped, color: Colors.redAccent, size: 48),
+                  const SizedBox(height: 16),
+                  Text("Block ${widget.name}?", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "They will no longer be able to see your profile or contact you.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 20),
+                  CheckboxListTile(
+                    value: isChecked,
+                    onChanged: (val) => setModalState(() => isChecked = val ?? false),
+                    title: const Text("I understand this action and want to block this user.", style: TextStyle(fontSize: 13)),
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Colors.redAccent,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: isChecked
+                              ? () {
+                                  ref.read(blockedUsersProvider.notifier).update((state) => {...state, widget.uid});
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("User Blocked")));
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, foregroundColor: Colors.white),
+                          child: const Text("Block"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildOptionTile({required IconData icon, required String label, required VoidCallback onTap}) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.black87),
+      title: Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+      onTap: onTap,
     );
   }
 
@@ -1370,6 +1696,53 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
     if (duration.inHours > 0) return '${duration.inHours}h ago';
     if (duration.inMinutes > 0) return '${duration.inMinutes}m ago';
     return 'Just now';
+  }
+}
+
+class _HomeShimmer extends StatelessWidget {
+  const _HomeShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Filter Header Shimmer
+        Container(
+          height: 60,
+          color: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: List.generate(
+                4,
+                (index) => Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: 100,
+                          height: 36,
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                        ),
+                      ),
+                    )),
+          ),
+        ),
+        // Profile Card Shimmer
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

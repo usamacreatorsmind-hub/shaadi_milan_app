@@ -9,6 +9,8 @@ class HomeFilterState {
   final String gender;
   final bool justJoined;
   final bool fromMyCity;
+  final bool daily;
+  final bool myMatches;
   final double minAge;
   final double maxAge;
   final String searchQuery;
@@ -21,6 +23,8 @@ class HomeFilterState {
     this.gender = '',
     this.justJoined = false,
     this.fromMyCity = false,
+    this.daily = false,
+    this.myMatches = false,
     this.minAge = 18,
     this.maxAge = 60,
     this.searchQuery = '',
@@ -34,6 +38,8 @@ class HomeFilterState {
     String? gender,
     bool? justJoined,
     bool? fromMyCity,
+    bool? daily,
+    bool? myMatches,
     double? minAge,
     double? maxAge,
     String? searchQuery,
@@ -46,6 +52,8 @@ class HomeFilterState {
       gender: gender ?? this.gender,
       justJoined: justJoined ?? this.justJoined,
       fromMyCity: fromMyCity ?? this.fromMyCity,
+      daily: daily ?? this.daily,
+      myMatches: myMatches ?? this.myMatches,
       minAge: minAge ?? this.minAge,
       maxAge: maxAge ?? this.maxAge,
       searchQuery: searchQuery ?? this.searchQuery,

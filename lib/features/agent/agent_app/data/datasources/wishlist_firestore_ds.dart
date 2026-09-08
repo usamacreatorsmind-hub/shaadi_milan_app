@@ -1,6 +1,5 @@
 import 'package:shadi_milan/features/auth/domain/states/user_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 
 abstract class WishlistFirestoreDS {
   /// Add a new wishlist entry to the 'wishlists' collection
@@ -19,11 +18,7 @@ abstract class WishlistFirestoreDS {
   Future<List<WishlistEntity>> getWishlistsForAgent(String agentId);
 
   /// Update wishlist status - accessible by all 4 roles
-  Future<void> updateWishlistStatus({
-    required String wishlistId,
-    required String status,
-    required String updatedBy,
-  });
+  Future<void> updateWishlistStatus({required String wishlistId, required String status, required String updatedBy});
 
   /// Stream wishlists where user is sender
   Stream<List<WishlistEntity>> watchMyWishlists(String userId);
@@ -38,25 +33,18 @@ abstract class WishlistFirestoreDS {
   Future<WishlistEntity?> getWishlistById(String wishlistId);
 
   /// Check if a wishlist already exists between sender and receiver
-  Future<WishlistEntity?> getExistingWishlist({
-    required String senderId,
-    required String receiverId,
-  });
+  Future<WishlistEntity?> getExistingWishlist({required String senderId, required String receiverId});
 }
 
 class WishlistFirestoreDSImpl implements WishlistFirestoreDS {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  CollectionReference<Map<String, dynamic>> get _wishlistsCollection =>
-      _firestore.collection('wishlists');
+  CollectionReference<Map<String, dynamic>> get _wishlistsCollection => _firestore.collection('wishlists');
 
   @override
   Future<String> addWishlist(WishlistEntity wishlist) async {
     // Check if wishlist already exists
-    final existing = await getExistingWishlist(
-      senderId: wishlist.senderId,
-      receiverId: wishlist.receiverId,
-    );
+    final existing = await getExistingWishlist(senderId: wishlist.senderId, receiverId: wishlist.receiverId);
 
     if (existing != null) {
       //throw Exception('Wishlist already exists between these users');
@@ -82,10 +70,7 @@ class WishlistFirestoreDSImpl implements WishlistFirestoreDS {
 
   @override
   Future<List<WishlistEntity>> getMyWishlists(String userId) async {
-    final querySnapshot = await _wishlistsCollection
-        .where('senderId', isEqualTo: userId)
-        .orderBy('updatedAt', descending: true)
-        .get();
+    final querySnapshot = await _wishlistsCollection.where('senderId', isEqualTo: userId).orderBy('updatedAt', descending: true).get();
 
     return querySnapshot.docs.map((doc) {
       final data = doc.data();
@@ -96,10 +81,7 @@ class WishlistFirestoreDSImpl implements WishlistFirestoreDS {
 
   @override
   Future<List<WishlistEntity>> getWishlistedMe(String userId) async {
-    final querySnapshot = await _wishlistsCollection
-        .where('receiverId', isEqualTo: userId)
-        .orderBy('updatedAt', descending: true)
-        .get();
+    final querySnapshot = await _wishlistsCollection.where('receiverId', isEqualTo: userId).orderBy('updatedAt', descending: true).get();
 
     return querySnapshot.docs.map((doc) {
       final data = doc.data();
@@ -123,11 +105,7 @@ class WishlistFirestoreDSImpl implements WishlistFirestoreDS {
   }
 
   @override
-  Future<void> updateWishlistStatus({
-    required String wishlistId,
-    required String status,
-    required String updatedBy,
-  }) async {
+  Future<void> updateWishlistStatus({required String wishlistId, required String status, required String updatedBy}) async {
     await _wishlistsCollection.doc(wishlistId).update({
       'status': status,
       'updatedAt': FieldValue.serverTimestamp(),
@@ -190,10 +168,7 @@ class WishlistFirestoreDSImpl implements WishlistFirestoreDS {
   }
 
   @override
-  Future<WishlistEntity?> getExistingWishlist({
-    required String senderId,
-    required String receiverId,
-  }) async {
+  Future<WishlistEntity?> getExistingWishlist({required String senderId, required String receiverId}) async {
     final querySnapshot = await _wishlistsCollection
         .where('senderId', isEqualTo: senderId)
         .where('receiverId', isEqualTo: receiverId)

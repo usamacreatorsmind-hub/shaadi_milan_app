@@ -1,14 +1,12 @@
-import 'package:shadi_milan/core/constants/app_constants.dart';
+
 import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/features/auth/presentation/providers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../router/app_router.dart';
-import '../../../features/auth/domain/states/user_state.dart';
 import '../../../core/notification/notification_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:riverpod/src/framework.dart';
 
 class AppDrawer extends ConsumerWidget {
   final AsyncValue<dynamic> agentAsync;

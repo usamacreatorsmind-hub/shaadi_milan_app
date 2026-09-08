@@ -19,28 +19,18 @@ class HomeState {
   final AsyncValue<List<MatrimonyProfileViewModel>> metrimonyProfiles;
 
   const HomeState({this.metrimonyProfiles = const AsyncValue.loading()});
-  HomeState copyWith({
-    AsyncValue<List<MatrimonyProfileViewModel>>? metrimonyProfiles,
-  }) {
-    return HomeState(
-      metrimonyProfiles: metrimonyProfiles ?? this.metrimonyProfiles,
-    );
+  HomeState copyWith({AsyncValue<List<MatrimonyProfileViewModel>>? metrimonyProfiles}) {
+    return HomeState(metrimonyProfiles: metrimonyProfiles ?? this.metrimonyProfiles);
   }
 }
 
-final homeControllerProvider = StateNotifierProvider<HomeController, HomeState>(
-  (ref) {
-    final matrimonyRepository = ref.read(matrimonyRepositoryProvider);
-    final userRepository = ref.read(userRepositoryProvider);
-    final agentRepository = ref.read(agentRepositoryProvider);
+final homeControllerProvider = StateNotifierProvider<HomeController, HomeState>((ref) {
+  final matrimonyRepository = ref.read(matrimonyRepositoryProvider);
+  final userRepository = ref.read(userRepositoryProvider);
+  final agentRepository = ref.read(agentRepositoryProvider);
 
-    return HomeController(
-      matrimonyRepository: matrimonyRepository,
-      userRepository: userRepository,
-      agentRepository: agentRepository,
-    );
-  },
-);
+  return HomeController(matrimonyRepository: matrimonyRepository, userRepository: userRepository, agentRepository: agentRepository);
+});
 
 class HomeController extends StateNotifier<HomeState> {
   final MatrimonyRepository _matrimonyRepository;
@@ -72,52 +62,46 @@ class HomeController extends StateNotifier<HomeState> {
     state = state.copyWith(metrimonyProfiles: const AsyncValue.loading());
 
     // Fetch directly from metrimony_profiles
-    _profilesSubscription = _matrimonyRepository
-        .watchAllMatrimonyProfiles()
-        .listen(
-          (profiles) async {
-            try {
-              final data = <MatrimonyProfileViewModel>[];
-
-              for (final profile in profiles) {
-                // Fetch user data for this profile
-                UserEntity? user;
-                try {
-                  user = await _userRepository.fetchUser(profile.userId);
-                } catch (e) {
-                  user = UserEntity.empty();
-                }
-
-                if (user.uid.isEmpty) continue;
-
-                AgentEntity? agent;
-                if (user.agentId.isNotEmpty) {
-                  try {
-                    agent = await _agentRepository.fetchAgent(user.agentId);
-                  } catch (_) {}
-                }
-
-                data.add(
-                  MatrimonyProfileViewModel(
-                    profile: profile,
-                    user: user,
-                    agent: agent,
-                  ),
-                );
+    _profilesSubscription = _matrimonyRepository.watchAllMatrimonyProfiles().listen(
+      (profiles) async {
+        try {
+          // Parallelize data fetching for better performance
+          final data = await Future.wait(
+            profiles.map((profile) async {
+              // Fetch user data
+              UserEntity user;
+              try {
+                user = await _userRepository.fetchUser(profile.userId);
+              } catch (e) {
+                user = UserEntity.empty();
               }
 
-              debugPrint('Fetched ${data.length} home profiles directly');
-              state = state.copyWith(metrimonyProfiles: AsyncValue.data(data));
-            } catch (e, st) {
-              state = state.copyWith(
-                metrimonyProfiles: AsyncValue.error(e, st),
-              );
-            }
-          },
-          onError: (e, st) {
-            state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
-          },
-        );
+              if (user.uid.isEmpty) return null;
+
+              AgentEntity? agent;
+              if (user.agentId.isNotEmpty) {
+                try {
+                  agent = await _agentRepository.fetchAgent(user.agentId);
+                } catch (_) {}
+              }
+
+              return MatrimonyProfileViewModel(profile: profile, user: user, agent: agent);
+            }),
+          );
+
+          // Remove nulls (skipped users)
+          final filteredData = data.whereType<MatrimonyProfileViewModel>().toList();
+
+          debugPrint('Fetched ${filteredData.length} home profiles directly');
+          state = state.copyWith(metrimonyProfiles: AsyncValue.data(filteredData));
+        } catch (e, st) {
+          state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
+        }
+      },
+      onError: (e, st) {
+        state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
+      },
+    );
 
     // Watch opposite gender users (COMMENTED OUT AS PER REQUEST)
     /*

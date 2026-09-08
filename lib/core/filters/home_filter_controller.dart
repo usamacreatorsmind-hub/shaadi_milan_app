@@ -36,11 +36,32 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
   }
 
   void toggleJustJoined() {
-    state = state.copyWith(justJoined: !state.justJoined);
+    // If turning on Just Joined, turn off other quick filters for clarity
+    state = state.copyWith(
+      justJoined: !state.justJoined,
+      daily: false,
+      myMatches: false,
+    );
   }
 
   void toggleFromMyCity() {
     state = state.copyWith(fromMyCity: !state.fromMyCity);
+  }
+
+  void toggleDaily() {
+    state = state.copyWith(
+      daily: !state.daily,
+      justJoined: false,
+      myMatches: false,
+    );
+  }
+
+  void toggleMyMatches() {
+    state = state.copyWith(
+      myMatches: !state.myMatches,
+      justJoined: false,
+      daily: false,
+    );
   }
 
   void updateAgeRange(double min, double max) {
@@ -59,6 +80,8 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
         state.gender.isNotEmpty ||
         state.justJoined ||
         state.fromMyCity ||
+        state.daily ||
+        state.myMatches ||
         state.minAge > 18 ||
         state.maxAge < 60 ||
         state.searchQuery.isNotEmpty;

@@ -492,6 +492,32 @@ class AppLabels {
   static String result(BuildContext context) => _loc(context).result;
   static String matches(BuildContext context) => _loc(context).matches;
 
+  // ─── Wishlist Tabs ────────────────────────────────────────────────────────
+  static String tabReceived(BuildContext context) => _loc(context).tabReceived;
+  static String tabAccepted(BuildContext context) => _loc(context).tabAccepted;
+  static String tabContacts(BuildContext context) => _loc(context).tabContacts;
+  static String tabSent(BuildContext context) => _loc(context).tabSent;
+  static String tabMore(BuildContext context) => _loc(context).tabMore;
+  static String tabRequests(BuildContext context) => _loc(context).tabRequests;
+  static String tabDeleted(BuildContext context) => _loc(context).tabDeleted;
+  static String interestMessage(BuildContext context) => _loc(context).interestMessage;
+  static String moreLabel(BuildContext context) => _loc(context).moreLabel;
+  static String buttonDecline(BuildContext context) => _loc(context).buttonDecline;
+  static String buttonAccept(BuildContext context) => _loc(context).buttonAccept;
+  static String buttonChat(BuildContext context) => _loc(context).buttonChat;
+  static String buttonCall(BuildContext context) => _loc(context).buttonCall;
+  static String errCouldNotLaunchDialer(BuildContext context) => _loc(context).errCouldNotLaunchDialer;
+  static String errPhoneNotAvailable(BuildContext context) => _loc(context).errPhoneNotAvailable;
+
+  static String noContactsYet(BuildContext context) => _loc(context).noContactsYet;
+  static String noContactsSubtitle(BuildContext context) => _loc(context).noContactsSubtitle;
+  static String noSentRequests(BuildContext context) => _loc(context).noSentRequests;
+  static String noSentRequestsSubtitle(BuildContext context) => _loc(context).noSentRequestsSubtitle;
+  static String noNewRequests(BuildContext context) => _loc(context).noNewRequests;
+  static String noNewRequestsSubtitle(BuildContext context) => _loc(context).noNewRequestsSubtitle;
+  static String noAcceptedRequests(BuildContext context) => _loc(context).noAcceptedRequests;
+  static String noAcceptedRequestsSubtitle(BuildContext context) => _loc(context).noAcceptedRequestsSubtitle;
+
   // ─── About Us ───────────────────────────────────────────────────────────────
   static String aboutUs(BuildContext context) => _loc(context).aboutUs;
   static String whoWeAre(BuildContext context) => _loc(context).whoWeAre;

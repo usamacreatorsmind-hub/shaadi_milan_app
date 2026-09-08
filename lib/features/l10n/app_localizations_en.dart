@@ -2517,4 +2517,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectLanguage => 'Select Language';
+
+  @override
+  String get tabReceived => 'Received';
+
+  @override
+  String get tabAccepted => 'Accepted';
+
+  @override
+  String get tabContacts => 'Contacts';
+
+  @override
+  String get tabSent => 'Sent';
+
+  @override
+  String get tabMore => 'More';
+
+  @override
+  String get noContactsYet => 'No Contacts Yet';
+
+  @override
+  String get noContactsSubtitle =>
+      'Profiles you connect with will appear here.';
+
+  @override
+  String get noSentRequests => 'No Sent Requests';
+
+  @override
+  String get noSentRequestsSubtitle => 'Profiles you liked will appear here.';
+
+  @override
+  String get noNewRequests => 'No New Requests';
+
+  @override
+  String get noNewRequestsSubtitle => 'Interests you receive will appear here.';
+
+  @override
+  String get noAcceptedRequests => 'No Accepted Requests';
+
+  @override
+  String get noAcceptedRequestsSubtitle =>
+      'Profiles where interest is matched will appear here.';
+
+  @override
+  String get tabRequests => 'Requests';
+
+  @override
+  String get tabDeleted => 'Deleted';
+
+  @override
+  String get interestMessage => 'We are interested in your profile.';
+
+  @override
+  String get moreLabel => 'more >';
+
+  @override
+  String get buttonDecline => 'Decline';
+
+  @override
+  String get buttonAccept => 'Accept';
+
+  @override
+  String get buttonChat => 'Chat';
+
+  @override
+  String get buttonCall => 'Call';
+
+  @override
+  String get errCouldNotLaunchDialer => 'Could not launch phone dialer';
+
+  @override
+  String get errPhoneNotAvailable => 'Phone number not available';
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'app_status.dart';
 import 'app_status_provider.dart';
 
 /// Debug widget showing current app status

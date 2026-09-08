@@ -1,4 +1,4 @@
-import '../../../../auth/domain/states/agent_state.dart';
+
 import '../screens/agen_profile.screen.dart';
 import '../../../../../core/filters/revenue_filter_controller.dart';
 import '../../domain/states/analytics_state.dart';
@@ -176,7 +176,7 @@ final genderDistributionProvider =
         data: (analyticsState) {
           final Map<String, int> genderCount = {};
           for (final payment in analyticsState.filteredPayments) {
-            final gender = payment.gender ?? 'Unknown';
+            final gender = payment.gender;
             genderCount[gender] = (genderCount[gender] ?? 0) + 1;
           }
           return AsyncValue.data(genderCount);

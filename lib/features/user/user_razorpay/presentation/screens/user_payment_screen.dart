@@ -20,7 +20,7 @@ class UserPaymentScreen extends ConsumerStatefulWidget {
 }
 
 class _UserPaymentScreenState extends ConsumerState<UserPaymentScreen> {
-  int _currentIndex = 1; // Default Premium
+  int _currentIndex = 1;
 
   @override
   void initState() {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'app_status.dart';
 
