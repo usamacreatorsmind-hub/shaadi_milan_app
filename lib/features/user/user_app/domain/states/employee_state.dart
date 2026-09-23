@@ -6,6 +6,7 @@ class EmploymentProfile {
   final BilingualValue? designation;
   final BilingualValue? annualIncome;
   final BilingualValue? workLocation;
+  final BilingualValue? districtEmployment;
 
   EmploymentProfile({
     required this.jobType,
@@ -13,6 +14,7 @@ class EmploymentProfile {
     this.designation,
     this.annualIncome,
     this.workLocation,
+    this.districtEmployment,
   });
 
   Map<String, dynamic> toMap() {
@@ -22,6 +24,7 @@ class EmploymentProfile {
       'designation': designation?.toMap(),
       'annualIncome': annualIncome?.toMap(),
       'workLocation': workLocation?.toMap(),
+      'districtEmployment': districtEmployment?.toMap(),
     };
   }
 
@@ -44,12 +47,13 @@ class EmploymentProfile {
       designation: parseOptionalBilingual(map['designation']),
       annualIncome: parseOptionalBilingual(map['annualIncome']),
       workLocation: parseOptionalBilingual(map['workLocation']),
+      districtEmployment: parseOptionalBilingual(map['districtEmployment']),
     );
   }
 
   @override
   String toString() {
-    return 'EmploymentProfile(jobType: $jobType, company: $company, designation: $designation, annualIncome: $annualIncome, workLocation: $workLocation)';
+    return 'EmploymentProfile(jobType: $jobType, company: $company, designation: $designation, annualIncome: $annualIncome, workLocation: $workLocation, districtEmployment: $districtEmployment)';
   }
 
   EmploymentProfile copyWith({
@@ -58,6 +62,7 @@ class EmploymentProfile {
     BilingualValue? designation,
     BilingualValue? annualIncome,
     BilingualValue? workLocation,
+    BilingualValue? districtEmployment,
   }) {
     return EmploymentProfile(
       jobType: jobType ?? this.jobType,
@@ -65,6 +70,7 @@ class EmploymentProfile {
       designation: designation ?? this.designation,
       annualIncome: annualIncome ?? this.annualIncome,
       workLocation: workLocation ?? this.workLocation,
+      districtEmployment: districtEmployment ?? this.districtEmployment,
     );
   }
 
@@ -75,6 +81,7 @@ class EmploymentProfile {
       designation: null,
       annualIncome: null,
       workLocation: null,
+      districtEmployment: null,
     );
   }
 }

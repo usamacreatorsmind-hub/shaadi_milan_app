@@ -23,6 +23,7 @@ class UserFamilyController extends StateNotifier<FamilyState> {
     required int sisters,
     required BilingualValue familyType,
     required BilingualValue familyStatus,
+    BilingualValue? familyIncome,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     final familyProfile = FamilyProfile(
@@ -34,6 +35,7 @@ class UserFamilyController extends StateNotifier<FamilyState> {
 
       familyType: familyType,
       familyStatus: familyStatus,
+      familyIncome: familyIncome,
     );
 
     try {
@@ -57,6 +59,7 @@ class UserFamilyController extends StateNotifier<FamilyState> {
     required int sisters,
     required BilingualValue familyType,
     required BilingualValue familyStatus,
+    BilingualValue? familyIncome,
   }) {
     state = state.copyWith(isLoading: true, error: null);
     final familyProfile = FamilyProfile(
@@ -66,6 +69,7 @@ class UserFamilyController extends StateNotifier<FamilyState> {
       numberOfSisters: sisters,
       familyType: familyType,
       familyStatus: familyStatus,
+      familyIncome: familyIncome,
     );
 
     try {

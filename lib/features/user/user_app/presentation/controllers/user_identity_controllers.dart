@@ -23,6 +23,9 @@ class UserIdentityController extends StateNotifier<IdentityState> {
     required BilingualValue lastName,
     required DateTime dob,
     required int age,
+    String tob = "",
+    String profileManagedBy = "Self",
+    List<String> alternatePhones = const [],
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -33,6 +36,9 @@ class UserIdentityController extends StateNotifier<IdentityState> {
       lastName: lastName,
       dob: dob,
       age: age,
+      tob: tob,
+      profileManagedBy: profileManagedBy,
+      alternatePhones: alternatePhones,
     );
 
     try {
@@ -56,6 +62,9 @@ class UserIdentityController extends StateNotifier<IdentityState> {
     required BilingualValue lastName,
     required DateTime dob,
     required int age,
+    String tob = "",
+    String profileManagedBy = "Self",
+    List<String> alternatePhones = const [],
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -66,6 +75,9 @@ class UserIdentityController extends StateNotifier<IdentityState> {
       gender: gender,
       dob: dob,
       age: age,
+      tob: tob,
+      profileManagedBy: profileManagedBy,
+      alternatePhones: alternatePhones,
     );
 
     try {

@@ -34,6 +34,14 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
 
   final List<BilingualValue> languages = [];
 
+  BilingualValue? _selectedManglikStatus;
+
+  final List<BilingualValue> _manglikOptions = [
+    BilingualValue(hi: 'मांगलिक', en: 'Manglik'),
+    BilingualValue(hi: 'आंशिक मांगलिक', en: 'Aanshik Manglik'),
+    BilingualValue(hi: 'गैर-मांगलिक', en: 'Gair-Manglik'),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -47,6 +55,10 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
 
       languages.addAll(cult.languages);
 
+      if (cult.manglikStatus != null) {
+        _selectedManglikStatus = _manglikOptions.firstWhere((e) => e.en == cult.manglikStatus?.en, orElse: () => cult.manglikStatus!);
+      }
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(religionControllerProvider.notifier).setReligion(cult.religion.en);
 
@@ -59,14 +71,12 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     final religionId = ref.read(religionControllerProvider).religionId;
-    var casteId = ref.read(religionControllerProvider).casteId;
 
     BilingualValue religionBilingual = BilingualValue.empty();
     BilingualValue casteBilingual = BilingualValue.empty();
 
     final bilingualData = await ref.read(bilingualReligionProvider.future);
     final religionsMap = bilingualData['religions']!;
-    final castesMap = bilingualData['castes']!;
 
     if (religionsMap.containsKey(religionId)) {
       religionBilingual = religionsMap[religionId]!;
@@ -91,8 +101,8 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
     final notifier = ref.read(cultureControllerProvider.notifier);
 
     widget.mode == FormMode.create
-        ? notifier.saveCultural(religion: religionBilingual, caste: casteBilingual, languages: finalLanguages)
-        : notifier.updateCultural(religion: religionBilingual, caste: casteBilingual, languages: finalLanguages);
+        ? notifier.saveCultural(religion: religionBilingual, caste: casteBilingual, languages: finalLanguages, manglikStatus: _selectedManglikStatus)
+        : notifier.updateCultural(religion: religionBilingual, caste: casteBilingual, languages: finalLanguages, manglikStatus: _selectedManglikStatus);
   }
 
   @override
@@ -107,6 +117,7 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(cultureControllerProvider);
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
     ref.listen(cultureControllerProvider, (previous, current) {
       if (current.error != null) {
@@ -162,6 +173,14 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
                 label: AppLabels.caste(context),
                 hint: AppLabels.specifyCasteHint(context),
                 prefixIcon: Icons.edit,
+              ),
+              const SizedBox(height: 16),
+              AppDropDown<BilingualValue>(
+                label: "Manglik Status",
+                items: _manglikOptions,
+                value: _selectedManglikStatus,
+                itemLabel: (val) => isHindi ? val.hi : val.en,
+                onChanged: (val) => setState(() => _selectedManglikStatus = val),
               ),
 
               const SizedBox(height: 24),

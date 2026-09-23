@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
@@ -152,5 +153,36 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> updatePassword(String newPassword) {
     return ds.updatePassword(newPassword);
+  }
+
+  @override
+  Future<Map<String, dynamic>> sendMSG91OTP(String phone) async {
+    try {
+      final result = await FirebaseFunctions.instance.httpsCallable('sendMSG91OTP').call({
+        'phoneNumber': phone,
+      });
+      return Map<String, dynamic>.from(result.data as Map);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> verifyMSG91OTP(String phone, String otp) async {
+    try {
+      final result = await FirebaseFunctions.instance.httpsCallable('verifyMSG91OTP').call({
+        'phoneNumber': phone,
+        'otp': otp,
+      });
+      
+      final data = Map<String, dynamic>.from(result.data as Map);
+      if (data['success'] == true && data['verified'] == true && data['registered'] == true) {
+        final customToken = data['customToken'] as String;
+        await FirebaseAuth.instance.signInWithCustomToken(customToken);
+      }
+      return data;
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
   }
 }

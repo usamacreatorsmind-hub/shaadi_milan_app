@@ -1,7 +1,9 @@
 import { setGlobalOptions } from "firebase-functions/v2";
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from "firebase-functions/v2/firestore";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { logger } from "firebase-functions";
+import axios from "axios";
 
 setGlobalOptions({ maxInstances: 10, region: "us-central1" });
 
@@ -786,6 +788,101 @@ export const notifyUserOnProfileSuggestion = onDocumentWritten(
 );
 
 
+
+// ============================================================
+// MSG91 OTP AUTHENTICATION
+// ============================================================
+
+const MSG91_AUTH_KEY = "570093AlEWh3hjRs6ab21590P1";
+const MSG91_TEMPLATE_ID = "6aa3ce6541f885b75c024db3";
+
+/**
+ * Sends OTP via MSG91
+ */
+export const sendMSG91OTP = onCall(async (request) => {
+  const phoneNumber = request.data.phoneNumber;
+  if (!phoneNumber) {
+    throw new HttpsError("invalid-argument", "Phone number is required.");
+  }
+
+  try {
+    const response = await axios.get("https://control.msg91.com/api/v5/otp", {
+      params: {
+        template_id: MSG91_TEMPLATE_ID,
+        mobile: phoneNumber,
+        authkey: MSG91_AUTH_KEY,
+      },
+      validateStatus: () => true,
+    });
+
+    if (response.data.type === "success") {
+      return { success: true, message: "OTP sent successfully" };
+    } else {
+      logger.error("MSG91 Send OTP Error", response.data);
+      return { success: false, message: response.data.message || "Failed to send OTP" };
+    }
+  } catch (error) {
+    logger.error("MSG91 API Connection Error", error);
+    throw new HttpsError("internal", "Error connecting to OTP service");
+  }
+});
+
+/**
+ * Verifies OTP via MSG91 and returns Firebase Custom Token if user exists
+ */
+export const verifyMSG91OTP = onCall(async (request) => {
+  const { phoneNumber, otp } = request.data;
+  if (!phoneNumber || !otp) {
+    throw new HttpsError("invalid-argument", "Phone number and OTP are required.");
+  }
+
+  try {
+    const response = await axios.get("https://control.msg91.com/api/v5/otp/verify", {
+      params: {
+        mobile: phoneNumber,
+        otp: otp,
+        authkey: MSG91_AUTH_KEY,
+      },
+      validateStatus: () => true,
+    });
+
+    // MSG91 returns success type for verified OTP, or error message containing "already_verified" if retry occurs
+    const isVerifiedOrAlreadyDone =
+      response.data.type === "success" ||
+      (response.data.message && response.data.message.toLowerCase().includes("already_verified"));
+
+    if (isVerifiedOrAlreadyDone) {
+      // Find user by phone in Firestore (handle both with and without 91 prefix)
+      const usersRef = admin.firestore().collection("users");
+      let querySnapshot = await usersRef.where("phone", "==", phoneNumber).limit(1).get();
+
+      if (querySnapshot.empty) {
+        const last10Digits = phoneNumber.slice(-10);
+        querySnapshot = await usersRef.where("phone", "==", last10Digits).limit(1).get();
+      }
+
+      if (querySnapshot.empty) {
+        return { success: true, verified: true, registered: false };
+      }
+
+      const userDoc = querySnapshot.docs[0];
+      const customToken = await admin.auth().createCustomToken(userDoc.id);
+
+      return {
+        success: true,
+        verified: true,
+        registered: true,
+        customToken: customToken,
+      };
+    } else {
+      logger.warn("MSG91 Verify OTP Failure", response.data);
+      return { success: true, verified: false, message: response.data.message || "Invalid OTP" };
+    }
+  } catch (error: any) {
+    logger.error("MSG91 Verify API Connection Error", error);
+    throw new HttpsError("internal", error.message || "Error connecting to verification service");
+  }
+});
 
 export { transliterate } from "./transliterate";
 

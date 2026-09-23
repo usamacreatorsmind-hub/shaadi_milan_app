@@ -45,4 +45,7 @@ abstract class AuthRepository {
   );
 
   Future<void> updatePassword(String newPassword);
+
+  Future<Map<String, dynamic>> sendMSG91OTP(String phone);
+  Future<Map<String, dynamic>> verifyMSG91OTP(String phone, String otp);
 }

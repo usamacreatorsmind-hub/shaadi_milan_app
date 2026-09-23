@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 
 class Validators {

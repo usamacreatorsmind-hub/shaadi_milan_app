@@ -7,6 +7,7 @@ class FamilyProfile {
   final int numberOfSisters;
   final BilingualValue familyType;
   final BilingualValue familyStatus;
+  final BilingualValue? familyIncome;
 
   FamilyProfile({
     required this.fatherName,
@@ -15,6 +16,7 @@ class FamilyProfile {
     required this.numberOfSisters,
     required this.familyType,
     required this.familyStatus,
+    this.familyIncome,
   });
 
   Map<String, dynamic> toMap() {
@@ -25,6 +27,7 @@ class FamilyProfile {
       'numberOfSisters': numberOfSisters,
       'familyType': familyType.toMap(),
       'familyStatus': familyStatus.toMap(),
+      'familyIncome': familyIncome?.toMap(),
     };
   }
 
@@ -45,12 +48,13 @@ class FamilyProfile {
           int.tryParse(map['numberOfSisters']?.toString() ?? '') ?? 0,
       familyType: parseBilingual(map['familyType']),
       familyStatus: parseBilingual(map['familyStatus']),
+      familyIncome: map['familyIncome'] != null ? parseBilingual(map['familyIncome']) : null,
     );
   }
 
   @override
   String toString() {
-    return 'FamilyProfile(fatherName: $fatherName, motherName: $motherName, numberOfBrothers: $numberOfBrothers, numberOfSisters: $numberOfSisters, familyType: $familyType, familyStatus: $familyStatus)';
+    return 'FamilyProfile(fatherName: $fatherName, motherName: $motherName, numberOfBrothers: $numberOfBrothers, numberOfSisters: $numberOfSisters, familyType: $familyType, familyStatus: $familyStatus, familyIncome: $familyIncome)';
   }
 
   FamilyProfile copyWith({
@@ -60,17 +64,16 @@ class FamilyProfile {
     int? numberOfSisters,
     BilingualValue? familyType,
     BilingualValue? familyStatus,
+    BilingualValue? familyIncome,
   }) {
     return FamilyProfile(
       fatherName: fatherName ?? this.fatherName,
       motherName: motherName ?? this.motherName,
-
       numberOfBrothers: numberOfBrothers ?? this.numberOfBrothers,
       numberOfSisters: numberOfSisters ?? this.numberOfSisters,
-
       familyType: familyType ?? this.familyType,
-
       familyStatus: familyStatus ?? this.familyStatus,
+      familyIncome: familyIncome ?? this.familyIncome,
     );
   }
 
@@ -78,12 +81,11 @@ class FamilyProfile {
     return FamilyProfile(
       fatherName: BilingualValue.empty(),
       motherName: BilingualValue.empty(),
-
       numberOfBrothers: 0,
       numberOfSisters: 0,
-
       familyType: BilingualValue.empty(),
       familyStatus: BilingualValue.empty(),
+      familyIncome: null,
     );
   }
 }

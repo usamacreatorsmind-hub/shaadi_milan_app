@@ -7,6 +7,9 @@ class IdentityProfile {
   final BilingualValue lastName;
   final DateTime dob;
   final int age;
+  final String tob;
+  final String profileManagedBy;
+  final List<String> alternatePhones;
 
   IdentityProfile({
     required this.profileId,
@@ -15,6 +18,9 @@ class IdentityProfile {
     required this.lastName,
     required this.dob,
     required this.age,
+    this.tob = "",
+    this.profileManagedBy = "Self",
+    this.alternatePhones = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -25,12 +31,15 @@ class IdentityProfile {
       'lastName': lastName.toMap(),
       'dob': dob.toIso8601String(),
       'age': age,
+      'tob': tob,
+      'profileManagedBy': profileManagedBy,
+      'alternatePhones': alternatePhones,
     };
   }
 
   @override
   String toString() {
-    return 'Name: $firstName $lastName, Gender: $gender, DOB: ${dob.toLocal().toString().split(' ')[0]}, Age: $age';
+    return 'Name: $firstName $lastName, Gender: $gender, DOB: ${dob.toLocal().toString().split(' ')[0]}, Age: $age, TOB: $tob, ManagedBy: $profileManagedBy, AlternatePhones: $alternatePhones';
   }
 
   factory IdentityProfile.fromMap(Map<String, dynamic> map) {
@@ -48,6 +57,9 @@ class IdentityProfile {
       lastName: parseBilingual(map['lastName']),
       dob: map['dob'] != null ? DateTime.tryParse(map['dob'].toString()) ?? DateTime(1900) : DateTime(1900),
       age: map['age'] as int? ?? 0,
+      tob: map['tob'] as String? ?? '',
+      profileManagedBy: map['profileManagedBy'] as String? ?? 'Self',
+      alternatePhones: List<String>.from(map['alternatePhones'] ?? []),
     );
   }
 
@@ -58,6 +70,9 @@ class IdentityProfile {
     BilingualValue? lastName,
     DateTime? dob,
     int? age,
+    String? tob,
+    String? profileManagedBy,
+    List<String>? alternatePhones,
   }) {
     return IdentityProfile(
       profileId: profileId ?? this.profileId,
@@ -66,6 +81,9 @@ class IdentityProfile {
       lastName: lastName ?? this.lastName,
       dob: dob ?? this.dob,
       age: age ?? this.age,
+      tob: tob ?? this.tob,
+      profileManagedBy: profileManagedBy ?? this.profileManagedBy,
+      alternatePhones: alternatePhones ?? this.alternatePhones,
     );
   }
 
@@ -77,6 +95,9 @@ class IdentityProfile {
       lastName: BilingualValue.empty(),
       dob: DateTime(1900),
       age: 0,
+      tob: '',
+      profileManagedBy: 'Self',
+      alternatePhones: [],
     );
   }
 }

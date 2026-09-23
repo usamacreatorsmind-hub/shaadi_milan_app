@@ -23,6 +23,7 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
     BilingualValue? designation,
     BilingualValue? annualIncome,
     BilingualValue? workLocation,
+    BilingualValue? districtEmployment,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     final employmentProfile = EmploymentProfile(
@@ -31,6 +32,7 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
       designation: designation,
       annualIncome: annualIncome,
       workLocation: workLocation,
+      districtEmployment: districtEmployment,
     );
 
     try {
@@ -50,6 +52,7 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
     BilingualValue? designation,
     BilingualValue? annualIncome,
     BilingualValue? workLocation,
+    BilingualValue? districtEmployment,
   }) {
     state = state.copyWith(isLoading: true, error: null);
     final employmentProfile = EmploymentProfile(
@@ -58,6 +61,7 @@ class UserEmploymentController extends StateNotifier<EmploymentState> {
       designation: designation,
       annualIncome: annualIncome,
       workLocation: workLocation,
+      districtEmployment: districtEmployment,
     );
 
     try {

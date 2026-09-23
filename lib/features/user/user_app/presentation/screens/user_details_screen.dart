@@ -57,7 +57,6 @@ final currentUserMatrimonyProfileProvider = FutureProvider<MatrimonyProfileViewM
   return MatrimonyProfileViewModel(profile: matrimonyProfile, user: user, agent: agent);
 });
 
-
 @RoutePage()
 class UserDetailScreen extends ConsumerStatefulWidget {
   final String uid;
@@ -69,11 +68,12 @@ class UserDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
-  List<String> _buildDisplayImages(ProfileImages profileImages) {
+  List<String> _buildDisplayImages(ProfileImages profileImages, String? userProfileImageUrl) {
     final rawImages = <String>[
       profileImages.primaryImageUrl,
-      ...profileImages.secondaryImageUrls,
+      if (userProfileImageUrl != null && userProfileImageUrl.isNotEmpty) userProfileImageUrl,
       profileImages.profileImageUrl,
+      ...profileImages.secondaryImageUrls,
       profileImages.imageWithAgentUrl,
     ];
 
@@ -82,10 +82,6 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
     for (final url in rawImages) {
       if (url.trim().isEmpty) continue;
       if (unique.add(url)) cleaned.add(url);
-    }
-
-    if (cleaned.isEmpty) {
-      return [];
     }
 
     return cleaned;
@@ -129,7 +125,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
         error: (err, stackTrace) => Center(child: Text('Error: $err')),
         data: (viewModel) {
           final profile = viewModel.profile;
-          final List<String> images = _buildDisplayImages(profile.images);
+          final List<String> images = _buildDisplayImages(profile.images, viewModel.user?.profileImageUrl);
 
           return Stack(
             children: [
@@ -344,10 +340,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                           return currentUserAsync.when(
                             data: (currentUserVM) {
                               if (currentUserVM == null) return const SizedBox.shrink();
-                              return _CommonalitiesSection(
-                                currentUser: currentUserVM,
-                                viewedUser: viewModel,
-                              );
+                              return _CommonalitiesSection(currentUser: currentUserVM, viewedUser: viewModel);
                             },
                             loading: () => const SizedBox.shrink(),
                             error: (_, __) => const SizedBox.shrink(),
@@ -1033,11 +1026,7 @@ class _PreferenceMatchSection extends StatelessWidget {
   final MatrimonyProfile viewedUser;
   final String viewedUserName;
 
-  const _PreferenceMatchSection({
-    required this.currentUser,
-    required this.viewedUser,
-    required this.viewedUserName,
-  });
+  const _PreferenceMatchSection({required this.currentUser, required this.viewedUser, required this.viewedUserName});
 
   @override
   Widget build(BuildContext context) {
@@ -1049,13 +1038,14 @@ class _PreferenceMatchSection extends StatelessWidget {
       _MatchItem(
         label: "Age",
         value: "${viewedUser.identity.age - 2} to ${viewedUser.identity.age + 5}",
-        isMatched: currentUser.identity.age >= (viewedUser.identity.age - 2) &&
-            currentUser.identity.age <= (viewedUser.identity.age + 5),
+        isMatched: currentUser.identity.age >= (viewedUser.identity.age - 2) && currentUser.identity.age <= (viewedUser.identity.age + 5),
       ),
       _MatchItem(
         label: "Height",
-        value: "${(viewedUser.physical.height.round() - 10).clamp(120, 250)}cm to ${(viewedUser.physical.height.round() + 10).clamp(120, 250)}cm",
-        isMatched: (currentUser.physical.height >= viewedUser.physical.height - 15) &&
+        value:
+            "${(viewedUser.physical.height.round() - 10).clamp(120, 250)}cm to ${(viewedUser.physical.height.round() + 10).clamp(120, 250)}cm",
+        isMatched:
+            (currentUser.physical.height >= viewedUser.physical.height - 15) &&
             (currentUser.physical.height <= viewedUser.physical.height + 15),
       ),
       _MatchItem(
@@ -1065,19 +1055,18 @@ class _PreferenceMatchSection extends StatelessWidget {
       ),
       _MatchItem(
         label: "Religion / Community",
-        value: "${isHindi ? viewedUser.cultural.religion.hi : viewedUser.cultural.religion.en}: ${isHindi ? viewedUser.cultural.caste.hi : viewedUser.cultural.caste.en}",
+        value:
+            "${isHindi ? viewedUser.cultural.religion.hi : viewedUser.cultural.religion.en}: ${isHindi ? viewedUser.cultural.caste.hi : viewedUser.cultural.caste.en}",
         isMatched: currentUser.cultural.religion.en == viewedUser.cultural.religion.en,
       ),
       _MatchItem(
         label: "Mother Tongue",
-        value: viewedUser.cultural.languages.isNotEmpty ? (isHindi ? viewedUser.cultural.languages.first.hi : viewedUser.cultural.languages.first.en) : "Hindi",
+        value: viewedUser.cultural.languages.isNotEmpty
+            ? (isHindi ? viewedUser.cultural.languages.first.hi : viewedUser.cultural.languages.first.en)
+            : "Hindi",
         isMatched: currentUser.cultural.languages.any((l) => viewedUser.cultural.languages.any((vl) => l.en == vl.en)),
       ),
-      _MatchItem(
-        label: "Country Living in",
-        value: "India",
-        isMatched: true,
-      ),
+      _MatchItem(label: "Country Living in", value: "India", isMatched: true),
       _MatchItem(
         label: "State Living in",
         value: isHindi ? viewedUser.address.state.hi : viewedUser.address.state.en,
@@ -1093,9 +1082,7 @@ class _PreferenceMatchSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 6)),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 6))],
         border: Border.all(color: Colors.pink.withOpacity(0.04)),
       ),
       child: Column(
@@ -1106,55 +1093,44 @@ class _PreferenceMatchSection extends StatelessWidget {
               Expanded(
                 child: Text(
                   "You Match $matchCount/${criteria.length} of ${viewedUser.identity.gender.en.toLowerCase() == 'male' ? 'his' : 'her'} Preferences",
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF2D2D2D),
-                    letterSpacing: -0.3,
-                  ),
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF2D2D2D), letterSpacing: -0.3),
                 ),
               ),
               const Icon(Icons.auto_awesome, color: Colors.redAccent, size: 20),
             ],
           ),
           const SizedBox(height: 20),
-          ...criteria.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.label,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[500],
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            item.value,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF1A1A1A),
-                            ),
-                          ),
-                        ],
-                      ),
+          ...criteria.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.label,
+                          style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          item.value,
+                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF1A1A1A)),
+                        ),
+                      ],
                     ),
-                    Icon(
-                      item.isMatched ? Icons.check_circle : Icons.cancel,
-                      color: item.isMatched ? const Color(0xFF4CAF50) : const Color(0xFFE0E0E0),
-                      size: 24,
-                    ),
-                  ],
-                ),
-              )),
+                  ),
+                  Icon(
+                    item.isMatched ? Icons.check_circle : Icons.cancel,
+                    color: item.isMatched ? const Color(0xFF4CAF50) : const Color(0xFFE0E0E0),
+                    size: 24,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -1183,38 +1159,47 @@ class _CommonalitiesSection extends StatelessWidget {
 
     // 1. Religion Match
     if (currentUser.profile.cultural.religion.en == viewedUser.profile.cultural.religion.en) {
-      items.add(_CommonItem(
-        icon: Icons.temple_hindu,
-        text: "$genderTerm too is ${isHindi ? viewedUser.profile.cultural.religion.hi : viewedUser.profile.cultural.religion.en}",
-      ));
+      items.add(
+        _CommonItem(
+          icon: Icons.temple_hindu,
+          text: "$genderTerm too is ${isHindi ? viewedUser.profile.cultural.religion.hi : viewedUser.profile.cultural.religion.en}",
+        ),
+      );
     }
 
     // 2. Education Match
     if (currentUser.profile.education.education?.course.en == viewedUser.profile.education.education?.course.en &&
         currentUser.profile.education.education != null &&
         viewedUser.profile.education.education != null) {
-      items.add(_CommonItem(
-        icon: Icons.school,
-        text: "$genderTerm too has a ${isHindi ? viewedUser.profile.education.education?.course.hi : viewedUser.profile.education.education?.course.en} degree",
-      ));
+      items.add(
+        _CommonItem(
+          icon: Icons.school,
+          text:
+              "$genderTerm too has a ${isHindi ? viewedUser.profile.education.education?.course.hi : viewedUser.profile.education.education?.course.en} degree",
+        ),
+      );
     }
 
     // 3. Occupation Match
     if (currentUser.profile.employment.designation?.en == viewedUser.profile.employment.designation?.en &&
         currentUser.profile.employment.designation != null &&
         viewedUser.profile.employment.designation != null) {
-      items.add(_CommonItem(
-        icon: Icons.work,
-        text: "You both are ${isHindi ? viewedUser.profile.employment.designation?.hi : viewedUser.profile.employment.designation?.en}",
-      ));
+      items.add(
+        _CommonItem(
+          icon: Icons.work,
+          text: "You both are ${isHindi ? viewedUser.profile.employment.designation?.hi : viewedUser.profile.employment.designation?.en}",
+        ),
+      );
     }
 
     // 4. City Match
     if (currentUser.profile.address.city.en == viewedUser.profile.address.city.en) {
-      items.add(_CommonItem(
-        icon: Icons.location_city,
-        text: "You both live in ${isHindi ? viewedUser.profile.address.city.hi : viewedUser.profile.address.city.en}",
-      ));
+      items.add(
+        _CommonItem(
+          icon: Icons.location_city,
+          text: "You both live in ${isHindi ? viewedUser.profile.address.city.hi : viewedUser.profile.address.city.en}",
+        ),
+      );
     }
 
     if (items.isEmpty) return const SizedBox.shrink();
@@ -1225,9 +1210,7 @@ class _CommonalitiesSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: Colors.blue.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 6)),
-        ],
+        boxShadow: [BoxShadow(color: Colors.blue.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 6))],
         border: Border.all(color: Colors.blue.withOpacity(0.06)),
       ),
       child: Column(
@@ -1244,44 +1227,35 @@ class _CommonalitiesSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          ...items.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        gradient:  LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Colors.red.shade300, Colors.red.shade900],
-                        ),
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blue.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.red.shade300, Colors.red.shade900],
                       ),
-                      child: Icon(item.icon, color: Colors.white, size: 20),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [BoxShadow(color: Colors.blue.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4))],
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        item.text,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF333333),
-                          height: 1.3,
-                        ),
-                      ),
+                    child: Icon(item.icon, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      item.text,
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF333333), height: 1.3),
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -5,6 +5,7 @@ import '../states/education_state.dart';
 import '../states/employee_state.dart';
 import '../states/family_state.dart';
 import '../states/identity_state.dart';
+import '../states/image_state.dart';
 import '../states/metrimony_state.dart';
 import '../states/physical_state.dart';
 
@@ -52,6 +53,8 @@ abstract class MatrimonyRepository {
   Future<void> updateFamilyProfile(String uid, FamilyProfile family);
 
   Future<void> updateAddressProfile(String uid, AddressProfile address);
+
+  Future<void> updateImagesProfile(String uid, ProfileImages images);
 
   Future<void> updateAgentEntity(String uid, AgentEntity agent);
 

@@ -121,7 +121,13 @@ class _ViewMetrimonyProfileScreenState extends ConsumerState<MetrimonyProfileScr
             if (stateObj != null) {
               resolvedState = stateObj.name;
               final cityObj = stateObj.cities
-                  .where((c) => c.id == profile.address.city.en || c.id == profile.address.city.hi || c.name == profile.address.city.en || c.name == profile.address.city.hi)
+                  .where(
+                    (c) =>
+                        c.id == profile.address.city.en ||
+                        c.id == profile.address.city.hi ||
+                        c.name == profile.address.city.en ||
+                        c.name == profile.address.city.hi,
+                  )
                   .firstOrNull;
               if (cityObj != null) {
                 resolvedCity = cityObj.name;
@@ -132,12 +138,24 @@ class _ViewMetrimonyProfileScreenState extends ConsumerState<MetrimonyProfileScr
           if (religionsAsync.hasValue) {
             final religions = religionsAsync.value!;
             final religionObj = religions
-                .where((r) => r.id == profile.cultural.religion.en || r.id == profile.cultural.religion.hi || r.name == profile.cultural.religion.en || r.name == profile.cultural.religion.hi)
+                .where(
+                  (r) =>
+                      r.id == profile.cultural.religion.en ||
+                      r.id == profile.cultural.religion.hi ||
+                      r.name == profile.cultural.religion.en ||
+                      r.name == profile.cultural.religion.hi,
+                )
                 .firstOrNull;
             if (religionObj != null) {
               resolvedReligion = religionObj.name;
               final casteObj = religionObj.castes
-                  .where((c) => c.id == profile.cultural.caste.en || c.id == profile.cultural.caste.hi || c.name == profile.cultural.caste.en || c.name == profile.cultural.caste.hi)
+                  .where(
+                    (c) =>
+                        c.id == profile.cultural.caste.en ||
+                        c.id == profile.cultural.caste.hi ||
+                        c.name == profile.cultural.caste.en ||
+                        c.name == profile.cultural.caste.hi,
+                  )
                   .firstOrNull;
               if (casteObj != null) {
                 resolvedCaste = casteObj.name;
@@ -585,7 +603,7 @@ class _ImageViewer extends StatelessWidget {
                     if (progress == null) return child;
                     return const Center(child: CircularProgressIndicator(color: Colors.white));
                   },
-                  errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.white, size: 64),
+                  errorBuilder: (_, _, ___) => const Icon(Icons.broken_image, color: Colors.white, size: 64),
                 ),
               ),
             ),

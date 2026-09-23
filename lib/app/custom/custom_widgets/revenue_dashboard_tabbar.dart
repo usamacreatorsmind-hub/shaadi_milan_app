@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 
 class RevenueDashboardTabbar extends ConsumerStatefulWidget {

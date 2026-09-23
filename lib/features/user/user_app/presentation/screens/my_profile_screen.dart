@@ -16,7 +16,7 @@ import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
 import '../../domain/states/state_city.dart';
-import '../../widgets/pdf_viewer_bottomsheet.dart';
+import '../controllers/metrimony_profile_controller.dart';
 
 final matrimonyProfileProvider = StreamProvider.family<MetrimonyProfileViewModel, String>((ref, uid) {
   final matrimonyRepo = ref.watch(matrimonyRepositoryProvider);
@@ -159,68 +159,6 @@ class MyProfileScreen extends ConsumerWidget {
 
                 const SizedBox(height: 14),
 
-                // show aadhar widget with file name and a download url and a button to view the pdf
-                _DetailSection(
-                  title: AppLabels.idCards(context),
-                  actionChip: _EditChip(onTap: () => context.router.push(const UserImageFormRoute())),
-                  children: [
-                    if (profile.metrimonyProfile.images.aadharCardUrl.isNotEmpty)
-                      DetailRowWithAction(
-                        label: AppLabels.aadharCard(context),
-                        value: AppLabels.viewDocument(context),
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => PdfViewerBottomsheet(
-                              source: profile.metrimonyProfile.images.aadharCardUrl,
-                              title: AppLabels.aadharCard(context),
-                              isLocal: false,
-                            ),
-                          );
-                        },
-                      ),
-                    if (profile.metrimonyProfile.images.bioDataUrl.isNotEmpty)
-                      DetailRowWithAction(
-                        label: AppLabels.bioData(context),
-                        value: AppLabels.viewDocument(context),
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => PdfViewerBottomsheet(
-                              source: profile.metrimonyProfile.images.bioDataUrl,
-                              title: AppLabels.bioData(context),
-                              isLocal: false,
-                            ),
-                          );
-                        },
-                      ),
-                    if (profile.metrimonyProfile.images.aadharCardUrl.isEmpty && profile.metrimonyProfile.images.bioDataUrl.isEmpty)
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade100),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.badge_outlined, color: Colors.grey.shade400, size: 32),
-                            const SizedBox(height: 8),
-                            Text(
-                              AppLabels.aadharCardNotUploaded(context),
-                              style: TextStyle(color: Colors.grey.shade600, fontSize: 13, fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-
                 // 📋 BASIC INFO
                 _DetailSection(
                   title: AppLabels.basicInformation(context),
@@ -231,6 +169,10 @@ class MyProfileScreen extends ConsumerWidget {
                     _DetailRow(AppLabels.age(context), AppLabels.ageYearsOld(context, profile.identity.age)),
                     _DetailRow(AppLabels.gender(context), profile.identity.gender),
                     _DetailRow(AppLabels.dateOfBirth(context), profile.identity.dob.toString().split(" ").first),
+                    _DetailRow("Time of Birth", profile.identity.tob),
+                    _DetailRow("Profile Managed By", profile.identity.profileManagedBy),
+                    if (profile.identity.alternatePhones.isNotEmpty)
+                      _DetailRow("Alternate Phones", profile.identity.alternatePhones.join(", ")),
                   ],
                 ),
 
@@ -283,6 +225,7 @@ class MyProfileScreen extends ConsumerWidget {
                     _DetailRow(AppLabels.annualIncome(context), profile.employment.annualIncome),
                     _DetailRow(AppLabels.jobType(context), profile.employment.jobType),
                     _DetailRow(AppLabels.designation(context), profile.employment.designation),
+                    _DetailRow("District Employment", profile.employment.districtEmployment),
                   ],
                 ),
 
@@ -305,6 +248,7 @@ class MyProfileScreen extends ConsumerWidget {
                     _DetailRow(AppLabels.fatherName(context), profile.family.fatherName),
                     _DetailRow(AppLabels.motherName(context), profile.family.motherName),
                     _DetailRow(AppLabels.familyType(context), profile.family.familyType),
+                    _DetailRow("Family Annual Income", profile.family.familyIncome),
                   ],
                 ),
 
@@ -337,6 +281,7 @@ class MyProfileScreen extends ConsumerWidget {
                   children: [
                     _DetailRow(AppLabels.religion(context), resolvedReligion),
                     _DetailRow(AppLabels.caste(context), resolvedCaste),
+                    _DetailRow("Manglik Status", profile.cultural.manglikStatus),
                     _DetailRow(
                       AppLabels.addKnownLanguages(context),
                       profile.cultural.languages.map((l) => isHindi ? l.hi : l.en).join(", "),
@@ -459,14 +404,102 @@ class DetailRowWithAction extends StatelessWidget {
   }
 }
 
-class _ProfileHeroCard extends StatelessWidget {
+class _ProfileHeroCard extends ConsumerWidget {
   final MetrimonyProfileViewModel profile;
   const _ProfileHeroCard({required this.profile});
 
   bool get hasImage => profile.userProfile.profileImageUrl.isNotEmpty;
 
+  void _showEditIdDialog(BuildContext context, WidgetRef ref, String uid, String currentId) {
+    final controller = TextEditingController(text: currentId);
+    final formKey = GlobalKey<FormState>();
+    bool isSaving = false;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: const Text("Edit Matrimony ID", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Enter a custom readable profile ID (e.g. ravi_123, SM1001)",
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                        labelText: "Matrimony ID",
+                        hintText: "Enter custom ID",
+                        prefixIcon: const Icon(Icons.badge_outlined),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      ),
+                      validator: (val) {
+                        if (val == null || val.trim().isEmpty) {
+                          return "ID cannot be empty";
+                        }
+                        if (val.trim().length < 3) {
+                          return "ID must be at least 3 characters";
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text("Cancel")),
+                ElevatedButton(
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          if (!formKey.currentState!.validate()) return;
+                          final newId = controller.text.trim();
+                          setState(() => isSaving = true);
+                          try {
+                            await ref.read(metrimonyControllerProvider.notifier).updateMetrimonyId(uid, newId);
+                            if (dialogContext.mounted) {
+                              Navigator.pop(dialogContext);
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(const SnackBar(content: Text("Matrimony ID updated successfully!")));
+                            }
+                          } catch (e) {
+                            if (dialogContext.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to update ID: $e")));
+                            }
+                          } finally {
+                            setState(() => isSaving = false);
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: isSaving
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Text("Save"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final primaryColor = theme.primaryColor;
 
@@ -559,41 +592,66 @@ class _ProfileHeroCard extends StatelessWidget {
                               color: Colors.grey.shade700,
                             ),
                             const SizedBox(height: 10),
-                            // Matrimony ID
-                            GestureDetector(
-                              onTap: () {
-                                Clipboard.setData(ClipboardData(text: profile.metrimonyProfile.metrimonyId));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text("ID Copied"),
-                                    behavior: SnackBarBehavior.floating,
-                                    width: 150,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade50,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Colors.grey.shade200),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        profile.metrimonyProfile.metrimonyId.isEmpty ? "NO-ID" : profile.metrimonyProfile.metrimonyId,
-                                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.grey.shade800),
-                                        overflow: TextOverflow.ellipsis,
+                            // Matrimony ID with Copy and Edit buttons
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Clipboard.setData(ClipboardData(text: profile.metrimonyProfile.metrimonyId));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: const Text("ID Copied"),
+                                          behavior: SnackBarBehavior.floating,
+                                          width: 150,
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade50,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: Colors.grey.shade200),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              profile.metrimonyProfile.metrimonyId.isEmpty ? "NO-ID" : profile.metrimonyProfile.metrimonyId,
+                                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.grey.shade800),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Icon(Icons.copy_all_rounded, size: 14, color: primaryColor),
+                                        ],
                                       ),
                                     ),
-                                    const SizedBox(width: 6),
-                                    Icon(Icons.copy_all_rounded, size: 14, color: primaryColor),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 6),
+                                GestureDetector(
+                                  onTap: () => _showEditIdDialog(
+                                    context,
+                                    ref,
+                                    profile.metrimonyProfile.userId,
+                                    profile.metrimonyProfile.metrimonyId,
+                                  ),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: primaryColor.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: primaryColor.withOpacity(0.3)),
+                                    ),
+                                    child: Icon(Icons.edit_outlined, size: 14, color: primaryColor),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

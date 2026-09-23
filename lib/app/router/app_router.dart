@@ -32,6 +32,7 @@ import '../../features/auth/presentation/screens/forgot_password_otp_screen.dart
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/user_login_screen.dart';
 import '../../features/auth/presentation/screens/user_register_screen.dart';
+import '../../features/auth/presentation/screens/otp_verification_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/onboarding/presentation/screens/role_selection_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';
@@ -50,6 +51,7 @@ import '../../features/user/user_app/presentation/screens/forms/user_culture_for
 import '../../features/user/user_app/presentation/screens/forms/user_education_form_screen.dart';
 import '../../features/user/user_app/presentation/screens/forms/user_employement_form_screen.dart';
 import '../../features/user/user_app/presentation/screens/forms/user_family_form_screen.dart';
+import '../../features/user/user_app/presentation/screens/forms/user_id_card_form_screen.dart';
 import '../../features/user/user_app/presentation/screens/forms/user_identity_form_screen.dart';
 import '../../features/user/user_app/presentation/screens/forms/user_physical_form_screen.dart';
 import '../../features/user/user_app/presentation/screens/metrimony_flow_screen.dart';
@@ -105,6 +107,7 @@ class AppRouter extends RootStackRouter {
     // ================= AUTH & PUBLIC =================
     AutoRoute(page: OnboardingRoute.page),
     AutoRoute(page: UserLoginRoute.page), // For Users
+    AutoRoute(page: OtpVerificationRoute.page),
     AutoRoute(page: AgentLoginRoute.page), // For Agents
     AutoRoute(page: UserRegisterRoute.page),
     AutoRoute(page: AboutUsRoute.page),

@@ -588,7 +588,7 @@ class ForgotPasswordOtpRoute extends PageRouteInfo<void> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return ForgotPasswordOtpScreen();
+      return const ForgotPasswordOtpScreen();
     },
   );
 }
@@ -777,6 +777,56 @@ class OnboardingRoute extends PageRouteInfo<void> {
       return const OnboardingScreen();
     },
   );
+}
+
+/// generated route for
+/// [OtpVerificationScreen]
+class OtpVerificationRoute extends PageRouteInfo<OtpVerificationRouteArgs> {
+  OtpVerificationRoute({
+    Key? key,
+    required String phoneNumber,
+    List<PageRouteInfo>? children,
+  }) : super(
+         OtpVerificationRoute.name,
+         args: OtpVerificationRouteArgs(key: key, phoneNumber: phoneNumber),
+         initialChildren: children,
+       );
+
+  static const String name = 'OtpVerificationRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<OtpVerificationRouteArgs>();
+      return OtpVerificationScreen(
+        key: args.key,
+        phoneNumber: args.phoneNumber,
+      );
+    },
+  );
+}
+
+class OtpVerificationRouteArgs {
+  const OtpVerificationRouteArgs({this.key, required this.phoneNumber});
+
+  final Key? key;
+
+  final String phoneNumber;
+
+  @override
+  String toString() {
+    return 'OtpVerificationRouteArgs{key: $key, phoneNumber: $phoneNumber}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! OtpVerificationRouteArgs) return false;
+    return key == other.key && phoneNumber == other.phoneNumber;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ phoneNumber.hashCode;
 }
 
 /// generated route for
@@ -1685,6 +1735,22 @@ class UserHomeRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const UserHomeScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [UserIdCardFormScreen]
+class UserIdCardFormRoute extends PageRouteInfo<void> {
+  const UserIdCardFormRoute({List<PageRouteInfo>? children})
+    : super(UserIdCardFormRoute.name, initialChildren: children);
+
+  static const String name = 'UserIdCardFormRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const UserIdCardFormScreen();
     },
   );
 }

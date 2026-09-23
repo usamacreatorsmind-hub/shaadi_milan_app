@@ -8,7 +8,6 @@ import 'package:shadi_milan/core/app_version_config/remote_config_service.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
 import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_state.dart';
-import 'package:shadi_milan/features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import '../../../../agent/agent_app/presentation/notifier/wishlist_notifier.dart';
 import '../../../../auth/domain/states/user_state.dart';
@@ -28,6 +27,33 @@ import '../widgets/premium_upgrade_bottom_sheet.dart';
 /// BLOCKED USERS PROVIDER
 /// =======================
 final blockedUsersProvider = StateProvider<Set<String>>((ref) => {});
+
+List<String> getAllImagesForViewModel(MatrimonyProfileViewModel vm) {
+  final profile = vm.profile;
+  final user = vm.user;
+
+  final raw = <String>[
+    profile.images.primaryImageUrl,
+    profile.images.profileImageUrl,
+    if (user?.profileImageUrl != null && user!.profileImageUrl.isNotEmpty) user.profileImageUrl,
+    ...profile.images.secondaryImageUrls,
+    profile.images.imageWithAgentUrl,
+  ];
+
+  final unique = <String>{};
+  final cleaned = <String>[];
+  for (final url in raw) {
+    if (url.trim().isEmpty) continue;
+    if (unique.add(url.trim())) cleaned.add(url.trim());
+  }
+
+  return cleaned;
+}
+
+String getDisplayImageForViewModel(MatrimonyProfileViewModel vm) {
+  final images = getAllImagesForViewModel(vm);
+  return images.isNotEmpty ? images.first : '';
+}
 
 /// =======================
 /// USER HOME SCREEN
@@ -479,18 +505,14 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                               ? "${profile.address.city.hi}, ${profile.address.state.hi}"
                               : "${profile.address.city.en}, ${profile.address.state.en}";
 
-                          final allImages = {
-                            if (profile.images.primaryImageUrl.isNotEmpty) profile.images.primaryImageUrl,
-                            ...profile.images.secondaryImageUrls.where((url) => url.isNotEmpty),
-                            if (profile.images.profileImageUrl.isNotEmpty) profile.images.profileImageUrl,
-                            if (profile.images.imageWithAgentUrl.isNotEmpty) profile.images.imageWithAgentUrl,
-                          }.toList();
+                          final allImages = getAllImagesForViewModel(viewModel);
 
                           // 🚀 PRE-CACHE next profile for smoother scrolling
                           if (profileIndex + 1 < visibleProfiles.length) {
-                            final nextProfile = visibleProfiles[profileIndex + 1].profile;
-                            if (nextProfile.images.primaryImageUrl.isNotEmpty) {
-                              precacheImage(CachedNetworkImageProvider(nextProfile.images.primaryImageUrl), context);
+                            final nextVm = visibleProfiles[profileIndex + 1];
+                            final nextImage = getDisplayImageForViewModel(nextVm);
+                            if (nextImage.isNotEmpty) {
+                              precacheImage(CachedNetworkImageProvider(nextImage), context);
                             }
                           }
 
@@ -1017,20 +1039,25 @@ class _SuggestionsSection extends ConsumerWidget {
                     fit: StackFit.expand,
                     children: [
                       // Properly handled Cached Image
-                      if (vm.profile.images.primaryImageUrl.isNotEmpty)
-                        CachedNetworkImage(
-                          imageUrl: vm.profile.images.primaryImageUrl,
-                          fit: BoxFit.cover,
-                          memCacheWidth: 400, // Smaller for grid suggestions
-                          placeholder: (context, url) => Shimmer.fromColors(
-                            baseColor: Colors.grey[300]!,
-                            highlightColor: Colors.grey[100]!,
-                            child: Container(color: Colors.white),
-                          ),
-                          errorWidget: (context, url, error) => const Icon(Icons.person, size: 40, color: Colors.grey),
-                        )
-                      else
-                        const Icon(Icons.person, size: 40, color: Colors.grey),
+                      Builder(
+                        builder: (context) {
+                          final imageUrl = getDisplayImageForViewModel(vm);
+                          if (imageUrl.isNotEmpty) {
+                            return CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              memCacheWidth: 400, // Smaller for grid suggestions
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: Container(color: Colors.white),
+                              ),
+                              errorWidget: (context, url, error) => const Icon(Icons.person, size: 40, color: Colors.grey),
+                            );
+                          }
+                          return const Icon(Icons.person, size: 40, color: Colors.grey);
+                        },
+                      ),
 
                       // Gradient Overlay
                       Positioned.fill(
@@ -1713,19 +1740,20 @@ class _HomeShimmer extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: List.generate(
-                4,
-                (index) => Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          width: 100,
-                          height: 36,
-                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                        ),
-                      ),
-                    )),
+              4,
+              (index) => Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 100,
+                    height: 36,
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
         // Profile Card Shimmer

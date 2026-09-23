@@ -10,6 +10,7 @@ import '../../../domain/states/education_state.dart';
 import '../../../domain/states/employee_state.dart';
 import '../../../domain/states/family_state.dart';
 import '../../../domain/states/identity_state.dart';
+import '../../../domain/states/image_state.dart';
 import '../../../domain/states/metrimony_state.dart';
 import '../../../domain/states/physical_state.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -99,6 +100,11 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
   @override
   Future<void> updateAddress(String uid, AddressProfile address) async {
     await _updateProfileSection(uid, 'address', address.toMap());
+  }
+
+  @override
+  Future<void> updateImages(String uid, ProfileImages images) async {
+    await _updateProfileSection(uid, 'images', images.toMap());
   }
 
   Future<void> updateAgent(String uid, AgentEntity agent) async {

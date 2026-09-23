@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,8 +26,36 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
   final _companyController = TextEditingController();
   final _companyEnController = TextEditingController();
 
+  final _designationHiCtrl = TextEditingController();
+  final _designationEnCtrl = TextEditingController();
+  bool _isManualDesignation = false;
+
+  final _jobTypeHiCtrl = TextEditingController();
+  final _jobTypeEnCtrl = TextEditingController();
+  bool _isManualJobType = false;
+
+  final _districtEmploymentHiCtrl = TextEditingController();
+  final _districtEmploymentEnCtrl = TextEditingController();
+
   BilingualValue? _selectedDesignation;
   BilingualValue? _selectedAnnualIncome;
+
+  final List<BilingualValue> _customIncomeOptions = [
+    BilingualValue(hi: '₹25,000–₹30,000', en: '₹25,000–₹30,000'),
+    BilingualValue(hi: '₹30,000–₹35,000', en: '₹30,000–₹35,000'),
+    BilingualValue(hi: '₹35,000–₹40,000', en: '₹35,000–₹40,000'),
+    BilingualValue(hi: '₹40,000–₹50,000', en: '₹40,000–₹50,000'),
+    BilingualValue(hi: '₹50,000–₹55,000', en: '₹50,000–₹55,000'),
+    BilingualValue(hi: '₹55,000–₹60,000', en: '₹55,000–₹60,000'),
+    BilingualValue(hi: '₹60,000–₹70,000', en: '₹60,000–₹70,000'),
+    BilingualValue(hi: '₹70,000–₹75,000', en: '₹70,000–₹75,000'),
+    BilingualValue(hi: '₹75,000–₹80,000', en: '₹75,000–₹80,000'),
+    BilingualValue(hi: '₹80,000–₹85,000', en: '₹80,000–₹85,000'),
+    BilingualValue(hi: '₹85,000–₹90,000', en: '₹85,000–₹90,000'),
+    BilingualValue(hi: '₹90,000–₹95,000', en: '₹90,000–₹95,000'),
+    BilingualValue(hi: '₹95,000–₹1,00,000', en: '₹95,000–₹1,00,000'),
+    BilingualValue(hi: 'Above ₹1 Crore', en: 'Above ₹1 Crore'),
+  ];
 
   final _workLocationController = TextEditingController();
   final _workLocationEnController = TextEditingController();
@@ -54,12 +81,28 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
       _companyEnController.text = profile.company?.en ?? "";
 
       _selectedDesignation = profile.designation;
-      _selectedAnnualIncome = profile.annualIncome;
+      if (profile.designation != null) {
+        _designationHiCtrl.text = profile.designation!.hi;
+        _designationEnCtrl.text = profile.designation!.en;
+        _isManualDesignation = true;
+      }
+      
+      if (profile.annualIncome != null) {
+        _selectedAnnualIncome = _customIncomeOptions.firstWhere((e) => e.en == profile.annualIncome?.en, orElse: () => profile.annualIncome!);
+      }
 
       _workLocationController.text = profile.workLocation?.hi ?? "";
       _workLocationEnController.text = profile.workLocation?.en ?? "";
 
-      _selectedJobType = _jobTypeOptions.values.firstWhere((e) => e.en == profile.jobType.en, orElse: () => profile.jobType);
+      _districtEmploymentHiCtrl.text = profile.districtEmployment?.hi ?? "";
+      _districtEmploymentEnCtrl.text = profile.districtEmployment?.en ?? "";
+
+      _selectedJobType = _jobTypeOptions.values.firstWhere((e) => e.en == profile.jobType.en, orElse: () {
+        _isManualJobType = true;
+        _jobTypeHiCtrl.text = profile.jobType.hi;
+        _jobTypeEnCtrl.text = profile.jobType.en;
+        return profile.jobType;
+      });
     }
   }
 
@@ -69,19 +112,28 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
     _companyEnController.dispose();
     _workLocationController.dispose();
     _workLocationEnController.dispose();
+    _designationHiCtrl.dispose();
+    _designationEnCtrl.dispose();
+    _jobTypeHiCtrl.dispose();
+    _jobTypeEnCtrl.dispose();
+    _districtEmploymentHiCtrl.dispose();
+    _districtEmploymentEnCtrl.dispose();
     super.dispose();
   }
 
   void _submitForm() {
     final notifier = ref.read(userEmploymentControllerProvider.notifier);
-    final jobType = _selectedJobType ?? _jobTypeOptions['Not Working']!;
+    
+    final jobTypeValue = _isManualJobType 
+      ? BilingualValue(hi: _jobTypeHiCtrl.text.trim(), en: _jobTypeEnCtrl.text.trim())
+      : (_selectedJobType ?? _jobTypeOptions['Not Working']!);
 
     // If "Not Working" or null, submit with null values
-    if (jobType.en == 'Not Working') {
+    if (jobTypeValue.en == 'Not Working') {
       if (widget.mode == FormMode.create) {
-        notifier.saveEmployment(jobType: jobType, company: null, designation: null, annualIncome: null, workLocation: null);
+        notifier.saveEmployment(jobType: jobTypeValue, company: null, designation: null, annualIncome: null, workLocation: null, districtEmployment: null);
       } else {
-        notifier.updateEmployment(jobType: jobType, company: null, designation: null, annualIncome: null, workLocation: null);
+        notifier.updateEmployment(jobType: jobTypeValue, company: null, designation: null, annualIncome: null, workLocation: null, districtEmployment: null);
       }
 
       return;
@@ -93,21 +145,31 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
         ? null
         : BilingualValue(hi: _workLocationController.text, en: _workLocationEnController.text);
 
+    final designationValue = _isManualDesignation
+        ? BilingualValue(hi: _designationHiCtrl.text.trim(), en: _designationEnCtrl.text.trim())
+        : _selectedDesignation;
+    
+    final districtEmploymentValue = _districtEmploymentHiCtrl.text.isEmpty 
+      ? null 
+      : BilingualValue(hi: _districtEmploymentHiCtrl.text.trim(), en: _districtEmploymentEnCtrl.text.trim());
+
     if (widget.mode == FormMode.create) {
       notifier.saveEmployment(
-        jobType: jobType,
+        jobType: jobTypeValue,
         company: company,
-        designation: _selectedDesignation,
+        designation: designationValue,
         annualIncome: _selectedAnnualIncome,
         workLocation: workLocation,
+        districtEmployment: districtEmploymentValue,
       );
     } else {
       notifier.updateEmployment(
-        jobType: jobType,
+        jobType: jobTypeValue,
         company: company,
-        designation: _selectedDesignation,
+        designation: designationValue,
         annualIncome: _selectedAnnualIncome,
         workLocation: workLocation,
+        districtEmployment: districtEmploymentValue,
       );
     }
   }
@@ -137,23 +199,44 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
             hint: AppLabels.organizationHint(context),
           ),
           const SizedBox(height: 16),
-          // Designation Dropdown
-          Consumer(
-            builder: (context, ref, child) {
-              final designationsAsync = ref.watch(designationsProvider);
-              return designationsAsync.when(
-                data: (items) => AppDropDown<BilingualValue>(
-                  label: AppLabels.designation(context),
-                  items: items,
-                  value: _selectedDesignation,
-                  itemLabel: (d) => isHindi ? d.hi : d.en,
-                  onChanged: (val) => setState(() => _selectedDesignation = val),
-                ),
-                loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text("Error loading designations"),
-              );
+          CheckboxListTile(
+            title: const Text("Type Designation Manually"),
+            value: _isManualDesignation,
+            onChanged: (val) {
+              setState(() {
+                _isManualDesignation = val ?? false;
+              });
             },
+            controlAffinity: ListTileControlAffinity.leading,
+            contentPadding: EdgeInsets.zero,
           ),
+          const SizedBox(height: 8),
+          if (_isManualDesignation) ...[
+            BilingualTextField(
+              controller: _designationHiCtrl,
+              englishController: _designationEnCtrl,
+              prefixIcon: Icons.work_outline,
+              label: "Designation",
+              hint: "Enter designation name",
+            ),
+          ] else ...[
+            Consumer(
+              builder: (context, ref, child) {
+                final designationsAsync = ref.watch(designationsProvider);
+                return designationsAsync.when(
+                  data: (items) => AppDropDown<BilingualValue>(
+                    label: AppLabels.designation(context),
+                    items: items,
+                    value: _selectedDesignation,
+                    itemLabel: (d) => isHindi ? d.hi : d.en,
+                    onChanged: (val) => setState(() => _selectedDesignation = val),
+                  ),
+                  loading: () => const LinearProgressIndicator(),
+                  error: (e, _) => Text("Error loading designations"),
+                );
+              },
+            ),
+          ],
           const SizedBox(height: 16),
           BilingualTextField(
             controller: _workLocationController,
@@ -163,22 +246,20 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
             hint: AppLabels.workLocationHint(context),
           ),
           const SizedBox(height: 16),
-          // Annual Income Dropdown
-          Consumer(
-            builder: (context, ref, child) {
-              final incomesAsync = ref.watch(annualIncomesProvider);
-              return incomesAsync.when(
-                data: (items) => AppDropDown<BilingualValue>(
-                  label: AppLabels.annualIncome(context),
-                  items: items,
-                  value: _selectedAnnualIncome,
-                  itemLabel: (i) => isHindi ? i.hi : i.en,
-                  onChanged: (val) => setState(() => _selectedAnnualIncome = val),
-                ),
-                loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text("Error loading income ranges"),
-              );
-            },
+          BilingualTextField(
+            controller: _districtEmploymentHiCtrl,
+            englishController: _districtEmploymentEnCtrl,
+            prefixIcon: Icons.map_outlined,
+            label: "District Employment",
+            hint: "Enter district of employment",
+          ),
+          const SizedBox(height: 16),
+          AppDropDown<BilingualValue>(
+            label: AppLabels.annualIncome(context),
+            items: _customIncomeOptions,
+            value: _selectedAnnualIncome,
+            itemLabel: (i) => isHindi ? i.hi : i.en,
+            onChanged: (val) => setState(() => _selectedAnnualIncome = val),
           ),
         ],
       );
@@ -192,17 +273,39 @@ class _UserEmploymentFormScreenState extends ConsumerState<UserEmploymentFormScr
           key: _formKey,
           child: ListView(
             children: [
-              AppDropDown<BilingualValue>(
-                label: AppLabels.jobType(context),
-                items: _jobTypeOptions.values.toList(),
-                value: _selectedJobType,
-                itemLabel: (job) => isHindi ? job.hi : job.en,
-                onChanged: (value) {
-                  setState(() => _selectedJobType = value);
+              CheckboxListTile(
+                title: const Text("Type Job Type Manually"),
+                value: _isManualJobType,
+                onChanged: (val) {
+                  setState(() {
+                    _isManualJobType = val ?? false;
+                  });
                 },
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
               ),
+              const SizedBox(height: 8),
+              if (_isManualJobType) ...[
+                BilingualTextField(
+                  controller: _jobTypeHiCtrl,
+                  englishController: _jobTypeEnCtrl,
+                  prefixIcon: Icons.work_history_outlined,
+                  label: "Job Type",
+                  hint: "Enter job type",
+                ),
+              ] else ...[
+                AppDropDown<BilingualValue>(
+                  label: AppLabels.jobType(context),
+                  items: _jobTypeOptions.values.toList(),
+                  value: _selectedJobType,
+                  itemLabel: (job) => isHindi ? job.hi : job.en,
+                  onChanged: (value) {
+                    setState(() => _selectedJobType = value);
+                  },
+                ),
+              ],
               const SizedBox(height: 16),
-              _selectedJobType?.en == 'Not Working' ? const SizedBox() : buildEmploymentForm(),
+              (_isManualJobType || (_selectedJobType?.en != 'Not Working')) ? buildEmploymentForm() : const SizedBox(),
 
               const SizedBox(height: 25),
 

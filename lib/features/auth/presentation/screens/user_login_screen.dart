@@ -23,13 +23,16 @@ class UserLoginScreen extends ConsumerStatefulWidget {
 class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
   final emailCtrl = TextEditingController();
   final pwCtrl = TextEditingController();
+  final phoneCtrl = TextEditingController();
 
   bool isLoading = false;
+  bool isOtpMode = false;
 
   @override
   void dispose() {
     emailCtrl.dispose();
     pwCtrl.dispose();
+    phoneCtrl.dispose();
     super.dispose();
   }
 
@@ -116,6 +119,51 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
     }
   }
 
+  Future<void> _sendOtp(BuildContext context) async {
+    final phone = phoneCtrl.text.trim();
+    if (phone.isEmpty || phone.length < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter a valid 10-digit phone number"),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    final authRepo = ref.read(authRepositoryProvider);
+
+    try {
+      final fullPhone = phone.startsWith('91') && phone.length > 10 ? phone : '91$phone';
+      final res = await authRepo.sendMSG91OTP(fullPhone);
+
+      if (!mounted) return;
+
+      if (res['success'] == true) {
+        context.navigateTo(OtpVerificationRoute(phoneNumber: fullPhone));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['message'] ?? "Failed to send OTP"),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -192,60 +240,122 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
                   child: AutofillGroup(
                     child: Column(
                       children: [
-                        AppTextField(
-                          autofillHints: const [
-                            AutofillHints.username,
-                            AutofillHints.email,
-                          ],
-
-                          iconColor: theme.colorScheme.primary,
-                          obscureText: false,
-
-                          controller: emailCtrl,
-                          prefixIcon: Icons.email_outlined,
-                          label: AppLabels.email(context),
-                          hint: AppLabels.emailHint(context),
-                          keyboardType: TextInputType.emailAddress,
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => isOtpMode = false),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: !isOtpMode ? theme.colorScheme.primary : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Password",
+                                        style: TextStyle(
+                                          color: !isOtpMode ? Colors.white : Colors.grey.shade600,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => isOtpMode = true),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: isOtpMode ? theme.colorScheme.primary : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "OTP Login",
+                                        style: TextStyle(
+                                          color: isOtpMode ? Colors.white : Colors.grey.shade600,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 20),
-                        AppTextField(
-                          autofillHints: const [AutofillHints.password],
-
-                          iconColor: theme.colorScheme.primary,
-                          obscureText: true,
-
-                          controller: pwCtrl,
-                          prefixIcon: Icons.lock_open_rounded,
-                          label: AppLabels.password(context),
-                          hint: AppLabels.passwordHint(context),
-
-                          keyboardType: TextInputType.visiblePassword,
-                        ),
-
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () => context.navigateTo(const ResetPasswordRoute()),
-                            child: Text(
-                              AppLabels.forgotPassword(context),
-                              style: TextStyle(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.w600,
+                        const SizedBox(height: 24),
+                        if (!isOtpMode) ...[
+                          AppTextField(
+                            autofillHints: const [
+                              AutofillHints.username,
+                              AutofillHints.email,
+                            ],
+                            iconColor: theme.colorScheme.primary,
+                            obscureText: false,
+                            controller: emailCtrl,
+                            prefixIcon: Icons.email_outlined,
+                            label: AppLabels.email(context),
+                            hint: AppLabels.emailHint(context),
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                          const SizedBox(height: 20),
+                          AppTextField(
+                            autofillHints: const [AutofillHints.password],
+                            iconColor: theme.colorScheme.primary,
+                            obscureText: true,
+                            controller: pwCtrl,
+                            prefixIcon: Icons.lock_open_rounded,
+                            label: AppLabels.password(context),
+                            hint: AppLabels.passwordHint(context),
+                            keyboardType: TextInputType.visiblePassword,
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () => context.navigateTo(const ResetPasswordRoute()),
+                              child: Text(
+                                AppLabels.forgotPassword(context),
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-
+                        ] else ...[
+                          AppTextField(
+                            iconColor: theme.colorScheme.primary,
+                            obscureText: false,
+                            controller: phoneCtrl,
+                            prefixIcon: Icons.phone_android_rounded,
+                            label: "Mobile Number",
+                            hint: "Enter 10-digit mobile number",
+                            keyboardType: TextInputType.phone,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                         const SizedBox(height: 10),
-
                         SizedBox(
                           width: double.infinity,
                           height: 56,
                           child: AppButton(
                             text: isLoading
-                                ? AppLabels.loggingIn(context)
-                                : AppLabels.login(context),
-                            onPressed: () => _login(context),
+                                ? (isOtpMode ? "Sending OTP..." : AppLabels.loggingIn(context))
+                                : (isOtpMode ? "Send OTP" : AppLabels.login(context)),
+                            onPressed: () => isOtpMode ? _sendOtp(context) : _login(context),
                           ),
                         ),
                       ],

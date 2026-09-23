@@ -34,6 +34,10 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
   final _stateController = TextEditingController();
   final _pinController = TextEditingController();
 
+  final _manualDistrictHiCtrl = TextEditingController();
+  final _manualDistrictEnCtrl = TextEditingController();
+  bool _isManualDistrict = false;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +50,14 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
       _stateController.text = profile.state.en;
       _districtController.text = profile.city.en;
       _pinController.text = profile.pincode;
+
+      _manualDistrictHiCtrl.text = profile.city.hi;
+      _manualDistrictEnCtrl.text = profile.city.en;
+
+      // Automatically enable manual mode if the city value doesn't match standard IDs
+      if (profile.city.en.isNotEmpty) {
+        _isManualDistrict = true;
+      }
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(homeFilterProvider.notifier).updateState(profile.state.en);
@@ -61,6 +73,8 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     _districtController.dispose();
     _stateController.dispose();
     _pinController.dispose();
+    _manualDistrictHiCtrl.dispose();
+    _manualDistrictEnCtrl.dispose();
     super.dispose();
   }
 
@@ -77,7 +91,13 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
     final citiesMap = bilingualData['cities']!;
 
     final stateBilingual = statesMap[location.state] ?? BilingualValue(hi: location.state, en: location.state);
-    final cityBilingual = citiesMap[location.city] ?? BilingualValue(hi: location.city, en: location.city);
+    
+    final BilingualValue cityBilingual;
+    if (_isManualDistrict) {
+      cityBilingual = BilingualValue(hi: _manualDistrictHiCtrl.text.trim(), en: _manualDistrictEnCtrl.text.trim());
+    } else {
+      cityBilingual = citiesMap[location.city] ?? BilingualValue(hi: location.city, en: location.city);
+    }
 
     if (widget.mode == FormMode.create) {
       notifier.saveAddress(
@@ -159,18 +179,40 @@ class _UserAddressFormScreenState extends ConsumerState<UserAddressFormScreen> {
                         ),
 
                         const SizedBox(height: 12),
-                        AppDropDown<CityModel>(
-                          label: AppLabels.districtLabel(context),
-                          items: selectedState?.cities ?? [],
-                          value: selectedCity,
-                          itemLabel: (c) => c.name,
+                        CheckboxListTile(
+                          title: const Text("Type District Manually"),
+                          value: _isManualDistrict,
                           onChanged: (val) {
-                            if (val != null) {
-                              ref.read(homeFilterProvider.notifier).updateCity(val.id);
-                              _districtController.text = val.id;
-                            }
+                            setState(() {
+                              _isManualDistrict = val ?? false;
+                            });
                           },
+                          controlAffinity: ListTileControlAffinity.leading,
+                          contentPadding: EdgeInsets.zero,
                         ),
+                        const SizedBox(height: 8),
+                        if (_isManualDistrict) ...[
+                          BilingualTextField(
+                            controller: _manualDistrictHiCtrl,
+                            englishController: _manualDistrictEnCtrl,
+                            prefixIcon: Icons.map_outlined,
+                            label: "District",
+                            hint: "Enter district name",
+                          ),
+                        ] else ...[
+                          AppDropDown<CityModel>(
+                            label: AppLabels.districtLabel(context),
+                            items: selectedState?.cities ?? [],
+                            value: selectedCity,
+                            itemLabel: (c) => c.name,
+                            onChanged: (val) {
+                              if (val != null) {
+                                ref.read(homeFilterProvider.notifier).updateCity(val.id);
+                                _districtController.text = val.id;
+                              }
+                            },
+                          ),
+                        ],
                       ],
                     );
                   },

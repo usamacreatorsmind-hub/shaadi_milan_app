@@ -6,6 +6,7 @@ import '../../domain/states/education_state.dart';
 import '../../domain/states/employee_state.dart';
 import '../../domain/states/family_state.dart';
 import '../../domain/states/identity_state.dart';
+import '../../domain/states/image_state.dart';
 import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/physical_state.dart';
 import '../datasources/firebase/metrimony_firestore.dart';
@@ -75,6 +76,11 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   @override
   Future<void> updatePhysicalProfile(String uid, PhysicalProfile physical) {
     return _remoteDS.updatePhysical(uid, physical);
+  }
+
+  @override
+  Future<void> updateImagesProfile(String uid, ProfileImages images) {
+    return _remoteDS.updateImages(uid, images);
   }
 
   @override

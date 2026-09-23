@@ -81,6 +81,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   cloud_functions: ^6.3.5
+  pinput: ^3.0.1
 
 dev_dependencies:
   flutter_test:

@@ -23,6 +23,7 @@ import '../../data/repositories_impl/agent_repository_impl.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/states/metrimony_profile_view_model.dart';
+import '../controllers/metrimony_profile_controller.dart';
 import 'user_home_screen.dart';
 
 final userProfileScreenProvider = StreamProvider.family<MetrimonyProfileViewModel, String>((ref, userId) {
@@ -454,31 +455,52 @@ class _ProfileHeaderCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // 🆔 Matrimony ID with Copy Action
-                GestureDetector(
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(text: profile.metrimonyProfile.metrimonyId));
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("ID Copied to Clipboard")));
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          profile.metrimonyProfile.metrimonyId,
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey.shade800),
+                // 🆔 Matrimony ID with Copy & Edit Action
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: profile.metrimonyProfile.metrimonyId));
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("ID Copied to Clipboard")));
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: Colors.grey.shade300),
                         ),
-                        const SizedBox(width: 8),
-                        Icon(Icons.copy_rounded, size: 16, color: Colors.grey.shade600),
-                      ],
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              profile.metrimonyProfile.metrimonyId,
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey.shade800),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(Icons.copy_rounded, size: 16, color: Colors.grey.shade600),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        return GestureDetector(
+                          onTap: () => _showEditIdDialog(context, ref, profile.userProfile.uid, profile.metrimonyProfile.metrimonyId),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: theme.primaryColor.withOpacity(0.1),
+                              borderRadius: const BorderRadius.only(topRight: Radius.circular(30), bottomRight: Radius.circular(30)),
+                              border: Border.all(color: theme.primaryColor.withOpacity(0.3)),
+                            ),
+                            child: Icon(Icons.edit_rounded, size: 16, color: theme.primaryColor),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 
@@ -575,6 +597,42 @@ class _ProfileHeaderCard extends StatelessWidget {
 
   Widget _buildVerticalDivider() {
     return Container(height: 24, width: 1, color: Colors.grey[300]);
+  }
+
+  void _showEditIdDialog(BuildContext context, WidgetRef ref, String uid, String currentId) {
+    final controller = TextEditingController(text: currentId);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Edit Matrimony ID"),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: "New Matrimony ID", border: OutlineInputBorder()),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () async {
+              final newId = controller.text.trim();
+              if (newId.isNotEmpty) {
+                try {
+                  await ref.read(metrimonyControllerProvider.notifier).updateMetrimonyId(uid, newId);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("ID Updated Successfully")));
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error updating ID: $e")));
+                  }
+                }
+              }
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
+    );
   }
 }
 

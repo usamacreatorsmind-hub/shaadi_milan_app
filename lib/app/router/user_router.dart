@@ -42,6 +42,7 @@ class UserRouter {
     AutoRoute(page: UserDetailRoute.page, guards: [AuthGuard(ref), UserGuard(ref)]),
     AutoRoute(page: UserChatRoomRoute.page, guards: [AuthGuard(ref), UserGuard(ref)]),
     AutoRoute(page: UserImageFormRoute.page, guards: [AuthGuard(ref), UserGuard(ref)]),
+    AutoRoute(page: UserIdCardFormRoute.page, guards: [AuthGuard(ref), UserGuard(ref)]),
     AutoRoute(page: SearchRoute.page, guards: [AuthGuard(ref), UserGuard(ref)]),
     AutoRoute(page: UserNotificationRoute.page, guards: [AuthGuard(ref), UserGuard(ref)]),
     AutoRoute(page: MyProfileDetailRoute.page, guards: [AuthGuard(ref), UserGuard(ref)]),

@@ -4,6 +4,7 @@ import '../../../domain/states/education_state.dart';
 import '../../../domain/states/employee_state.dart';
 import '../../../domain/states/family_state.dart';
 import '../../../domain/states/identity_state.dart'; 
+import '../../../domain/states/image_state.dart';
 import '../../../domain/states/metrimony_state.dart';
 import '../../../domain/states/physical_state.dart';
 
@@ -27,6 +28,7 @@ abstract class MatrimonyDataSource {
   Future<void> updateEmployment(String uid, EmploymentProfile employment);
   Future<void> updateFamily(String uid, FamilyProfile family);
   Future<void> updateAddress(String uid, AddressProfile address);  
+  Future<void> updateImages(String uid, ProfileImages images);
   Future<List<MatrimonyProfile>> getAllMatrimonyProfiles();
   
 

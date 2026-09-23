@@ -1,18 +1,16 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
-import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 
-import '../../../../../../app/custom/custom_widgets/validators.dart';
 import '../../../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../../../app/providers/global_providers.dart';
 import '../../../../../../core/constants/app_labels.dart';
 import '../../../../../../core/enums/enum.dart';
 import '../../../../../translitration/widgets/bilingual_text_field.dart';
+import '../../../data/repositories_impl/user_repo_impl.dart';
 import '../../../domain/states/identity_state.dart';
 import '../../controllers/user_identity_controllers.dart';
 
@@ -37,6 +35,10 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
   final _lastNameEnCtrl = TextEditingController();
 
   DateTime? _selectedDate;
+  String _selectedTime = "";
+
+  String? _managedBy;
+  final List<TextEditingController> _alternatePhoneCtrls = [];
 
   @override
   void initState() {
@@ -49,6 +51,11 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
       _lastNameCtrl.text = profile.lastName.hi;
       _lastNameEnCtrl.text = profile.lastName.en;
       _selectedDate = profile.dob;
+      _selectedTime = profile.tob;
+      _managedBy = profile.profileManagedBy;
+      for (var phone in profile.alternatePhones) {
+        _alternatePhoneCtrls.add(TextEditingController(text: phone));
+      }
     }
   }
 
@@ -58,6 +65,9 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
     _firstNameEnCtrl.dispose();
     _lastNameCtrl.dispose();
     _lastNameEnCtrl.dispose();
+    for (var ctrl in _alternatePhoneCtrls) {
+      ctrl.dispose();
+    }
     super.dispose();
   }
 
@@ -92,6 +102,15 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
     return _calculateAge(_selectedDate!);
   }
 
+  Future<void> _selectTime(BuildContext context) async {
+    final picked = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    if (picked != null) {
+      setState(() {
+        _selectedTime = picked.format(context);
+      });
+    }
+  }
+
   Future<void> _submitForm() async {
     final targetUid = ref.read(targetUserIdProvider);
     if (targetUid == null) return;
@@ -103,7 +122,7 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
       if (!mounted) return;
       gender = user.gender;
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.errorFetchingUserData(context, e.toString()))));
       }
@@ -123,11 +142,32 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
 
     final dob = _selectedDate ?? DateTime(1900);
     final ageValue = _age ?? 0;
+    final tobValue = _selectedTime;
+    final managedByValue = _managedBy ?? "Self";
+    final altPhones = _alternatePhoneCtrls.map((c) => c.text.trim()).where((t) => t.isNotEmpty).toList();
 
     if (widget.mode == FormMode.create) {
-      notifier.saveIdentity(gender: gender, firstName: firstName, lastName: lastName, dob: dob, age: ageValue);
+      notifier.saveIdentity(
+        gender: gender,
+        firstName: firstName,
+        lastName: lastName,
+        dob: dob,
+        age: ageValue,
+        tob: tobValue,
+        profileManagedBy: managedByValue,
+        alternatePhones: altPhones,
+      );
     } else {
-      notifier.updateIdentity(gender: gender, firstName: firstName, lastName: lastName, dob: dob, age: ageValue);
+      notifier.updateIdentity(
+        gender: gender,
+        firstName: firstName,
+        lastName: lastName,
+        dob: dob,
+        age: ageValue,
+        tob: tobValue,
+        profileManagedBy: managedByValue,
+        alternatePhones: altPhones,
+      );
     }
   }
 
@@ -137,7 +177,7 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
 
     ref.listen<IdentityState>(identityControllerProvider, (previous, current) {
       if (current.error != null) {
-        print(current.error);
+        debugPrint(current.error);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.error(context, current.error.toString()))));
       }
 
@@ -180,6 +220,14 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
                 showHindi: false,
               ),
               const SizedBox(height: 16),
+              AppDropDown<String>(
+                label: "Profile Managed By",
+                items: const ["Self", "Parent"],
+                value: _managedBy,
+                itemLabel: (s) => s,
+                onChanged: (val) => setState(() => _managedBy = val),
+              ),
+              const SizedBox(height: 16),
               ListTile(
                 leading: CircleAvatar(
                   radius: 20,
@@ -198,6 +246,56 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
                   side: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
                 ),
               ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                  child: Icon(Icons.access_time_outlined, color: Theme.of(context).colorScheme.primary),
+                ),
+                title: Text(_selectedTime.isEmpty ? "Select Time of Birth" : "Time of Birth: $_selectedTime"),
+                onTap: () => _selectTime(context),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  side: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
+                ),
+              ),
+              const SizedBox(height: 24),
+              _sectionHeader("Additional Mobile Numbers"),
+              const SizedBox(height: 8),
+              ..._alternatePhoneCtrls.asMap().entries.map((entry) {
+                int index = entry.key;
+                TextEditingController ctrl = entry.value;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: AppTextField(
+                          iconColor: Colors.red,
+                          controller: ctrl,
+                          prefixIcon: Icons.phone_android,
+                          label: "Alternate Phone ${index + 1}",
+                          hint: "Enter mobile number",
+                          obscureText: false,
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                        onPressed: () => setState(() => _alternatePhoneCtrls.removeAt(index)),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              if (_alternatePhoneCtrls.length < 2)
+                TextButton.icon(
+                  onPressed: () => setState(() => _alternatePhoneCtrls.add(TextEditingController())),
+                  icon: const Icon(Icons.add),
+                  label: const Text("Add Another Number"),
+                ),
               const SizedBox(height: 20),
               identityState.isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -211,6 +309,17 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _sectionHeader(String title) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.primary.withOpacity(0.08)),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),
       ),
     );
   }

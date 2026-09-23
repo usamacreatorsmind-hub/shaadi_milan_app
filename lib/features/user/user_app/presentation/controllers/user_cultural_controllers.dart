@@ -20,9 +20,10 @@ class UserCulturalController extends StateNotifier<CulturalState> {
     required BilingualValue religion,
     required BilingualValue caste,
     required List<BilingualValue> languages,
+    BilingualValue? manglikStatus,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-    final culturalProfile = CulturalProfile(religion: religion, caste: caste, languages: languages);
+    final culturalProfile = CulturalProfile(religion: religion, caste: caste, languages: languages, manglikStatus: manglikStatus);
 
     try {
       _ref.read(metrimonyControllerProvider.notifier).saveCultural(culturalProfile);
@@ -37,9 +38,14 @@ class UserCulturalController extends StateNotifier<CulturalState> {
     }
   }
 
-  void updateCultural({required BilingualValue religion, required BilingualValue caste, required List<BilingualValue> languages}) {
+  void updateCultural({
+    required BilingualValue religion,
+    required BilingualValue caste,
+    required List<BilingualValue> languages,
+    BilingualValue? manglikStatus,
+  }) {
     state = state.copyWith(isLoading: true, error: null);
-    final culturalProfile = CulturalProfile(religion: religion, caste: caste, languages: languages);
+    final culturalProfile = CulturalProfile(religion: religion, caste: caste, languages: languages, manglikStatus: manglikStatus);
 
     try {
       _ref.read(matrimonyRepositoryProvider).updateCulturalProfile(_uid, culturalProfile);

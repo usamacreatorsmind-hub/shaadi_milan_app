@@ -17,10 +17,7 @@ import '../../domain/states/metrimony_state.dart';
 import '../../domain/states/physical_state.dart';
 import '../screens/metrimony_flow_screen.dart';
 
-final metrimonyControllerProvider =
-    StateNotifierProvider<MetrimonyController, MetrimonyState>(
-      (ref) => MetrimonyController(ref),
-    );
+final metrimonyControllerProvider = StateNotifierProvider<MetrimonyController, MetrimonyState>((ref) => MetrimonyController(ref));
 
 class MetrimonyController extends StateNotifier<MetrimonyState> {
   final Ref ref;
@@ -61,16 +58,12 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
   }
 
   void saveEducation(EducationProfile data) {
-    state = state.copyWith(
-      metrimony: state.metrimony.copyWith(education: data),
-    );
+    state = state.copyWith(metrimony: state.metrimony.copyWith(education: data));
     nextStep();
   }
 
   void saveEmployment(EmploymentProfile data) {
-    state = state.copyWith(
-      metrimony: state.metrimony.copyWith(employment: data),
-    );
+    state = state.copyWith(metrimony: state.metrimony.copyWith(employment: data));
     nextStep();
   }
 
@@ -90,9 +83,7 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
   }
 
   void saveImages(ProfileImages profileImages) {
-    state = state.copyWith(
-      metrimony: state.metrimony.copyWith(images: profileImages),
-    );
+    state = state.copyWith(metrimony: state.metrimony.copyWith(images: profileImages));
     nextStep();
   }
 
@@ -110,10 +101,7 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     }
 
     // fetch full name of user
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get();
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
     final userData = userDoc.data();
     final fullNameMap = userData?['fullName'];
     String fullName = '';
@@ -141,10 +129,7 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
       images: ProfileImages.empty(),
     );
 
-    await FirebaseFirestore.instance
-        .collection('metrimony_profiles')
-        .doc(uid)
-        .set(metrimonyProfile.toMap());
+    await FirebaseFirestore.instance.collection('metrimony_profiles').doc(uid).set(metrimonyProfile.toMap());
 
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
       'isProfileCreated': false,
@@ -154,14 +139,8 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
 
   // ================= SUBMIT PROFILE =================
 
-  Future<void> submitProfile({
-    required String uid,
-    required String agentId,
-  }) async {
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get();
+  Future<void> submitProfile({required String uid, required String agentId}) async {
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
     final userData = userDoc.data();
     final fullNameMap = userData?['fullName'];
     String fullName = '';
@@ -202,13 +181,11 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
       uid: uid,
     );
 
-    await ref
-        .read(matrimonyRepositoryProvider)
-        .updateMatrimonyProfile(uid, profile);
+    await ref.read(matrimonyRepositoryProvider).updateMatrimonyProfile(uid, profile);
 
     // If this was an agent-led registration, we might want to do something specific
     // like clearing the targetUserId after successful submission.
-    
+
     // Update profileImageUrl in users collection with profileImageUrl
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
       'profileImageUrl': profile.images.profileImageUrl,
@@ -217,10 +194,19 @@ class MetrimonyController extends StateNotifier<MetrimonyState> {
     });
   }
 
+  Future<void> updateMetrimonyId(String uid, String newId) async {
+    try {
+      await FirebaseFirestore.instance.collection('metrimony_profiles').doc(uid).update({'metrimonyId': newId});
+
+      state = state.copyWith(metrimony: state.metrimony.copyWith(metrimonyId: newId));
+    } catch (e) {
+      debugPrint('Error updating Matrimony ID: $e');
+      rethrow;
+    }
+  }
+
   /// Sets the initial state for an agent-led registration
   void startAgentLedRegistration(String clientUid) {
-    state = MetrimonyState.initial().copyWith(
-      metrimony: MatrimonyProfile.empty().copyWith(userId: clientUid),
-    );
+    state = MetrimonyState.initial().copyWith(metrimony: MatrimonyProfile.empty().copyWith(userId: clientUid));
   }
 }
