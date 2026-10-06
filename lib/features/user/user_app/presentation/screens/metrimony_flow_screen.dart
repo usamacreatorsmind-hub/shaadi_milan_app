@@ -231,7 +231,7 @@ class _MatrimonyFormFlowScreenState extends ConsumerState<MatrimonyFormFlowScree
         existingPhysicalProfile: state.metrimony.physical,
         registerSubmit: (cb) => _registerSubmit(MatrimonyStep.physical, cb),
       ),
-      const UserImageFormScreen(),
+      UserImageFormScreen(registerSubmit: (cb) => _registerSubmit(MatrimonyStep.image, cb)),
 
       const UserBiodataCheckScreen(isAgreed: false),
     ];

@@ -19,6 +19,8 @@ class UserFamilyController extends StateNotifier<FamilyState> {
   Future<void> saveFamily({
     required BilingualValue fatherName,
     required BilingualValue motherName,
+    BilingualValue? fatherOccupation,
+    BilingualValue? motherOccupation,
     required int brothers,
     required int sisters,
     required BilingualValue familyType,
@@ -29,23 +31,21 @@ class UserFamilyController extends StateNotifier<FamilyState> {
     final familyProfile = FamilyProfile(
       fatherName: fatherName,
       motherName: motherName,
-
+      fatherOccupation: fatherOccupation,
+      motherOccupation: motherOccupation,
       numberOfBrothers: brothers,
       numberOfSisters: sisters,
-
       familyType: familyType,
       familyStatus: familyStatus,
       familyIncome: familyIncome,
     );
 
     try {
-      // await _matrimonyRepository.updateFamilyProfile(_uid, familyProfile);
-
       _ref.read(metrimonyControllerProvider.notifier).saveFamily(familyProfile);
 
       state = state.copyWith(family: familyProfile, isLoading: false);
 
-      debugPrint('✅ Identity Saved Successfully');
+      debugPrint('✅ Family Saved Successfully');
       debugPrint(familyProfile.toString());
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -55,6 +55,8 @@ class UserFamilyController extends StateNotifier<FamilyState> {
   void updateFamily({
     required BilingualValue fatherName,
     required BilingualValue motherName,
+    BilingualValue? fatherOccupation,
+    BilingualValue? motherOccupation,
     required int brothers,
     required int sisters,
     required BilingualValue familyType,
@@ -65,6 +67,8 @@ class UserFamilyController extends StateNotifier<FamilyState> {
     final familyProfile = FamilyProfile(
       fatherName: fatherName,
       motherName: motherName,
+      fatherOccupation: fatherOccupation,
+      motherOccupation: motherOccupation,
       numberOfBrothers: brothers,
       numberOfSisters: sisters,
       familyType: familyType,

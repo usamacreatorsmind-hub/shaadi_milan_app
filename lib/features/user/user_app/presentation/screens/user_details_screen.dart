@@ -348,7 +348,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                         },
                       ),
 
-                      // 1️⃣ BASIC INFO
+                      // 1BASIC INFO
                       _InfoCard(
                         title: AppLabels.basicInformation(context),
                         icon: Icons.person,
@@ -364,10 +364,12 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             icon: Icons.calendar_today_outlined,
                             value: DateFormat('dd-MM-yyyy').format(profile.identity.dob),
                           ),
+                          _InfoTile(label: "Birthplace", icon: Icons.location_on_outlined, bilingualValue: profile.identity.birthplace),
+                          _InfoTile(label: "Marital Status", icon: Icons.favorite_outline, bilingualValue: profile.identity.maritalStatus),
                         ],
                       ),
 
-                      // 2️⃣ PHYSICAL & ADDRESS
+                      // 2 PHYSICAL & ADDRESS
                       _InfoCard(
                         title: AppLabels.physical(context),
                         icon: Icons.accessibility,
@@ -514,11 +516,23 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             icon: Icons.person_outline,
                             bilingualValue: profile.family.fatherName,
                           ),
+                          if (profile.family.fatherOccupation != null && !profile.family.fatherOccupation!.isEmpty)
+                            _InfoTile(
+                              label: "Father's Occupation",
+                              icon: Icons.work_outline,
+                              bilingualValue: profile.family.fatherOccupation!,
+                            ),
                           _InfoTile(
                             label: AppLabels.mother(context),
                             icon: Icons.person_outline,
                             bilingualValue: profile.family.motherName,
                           ),
+                          if (profile.family.motherOccupation != null && !profile.family.motherOccupation!.isEmpty)
+                            _InfoTile(
+                              label: "Mother's Occupation",
+                              icon: Icons.work_outline,
+                              bilingualValue: profile.family.motherOccupation!,
+                            ),
                           _InfoTile(
                             label: AppLabels.familyType(context),
                             icon: Icons.family_restroom,

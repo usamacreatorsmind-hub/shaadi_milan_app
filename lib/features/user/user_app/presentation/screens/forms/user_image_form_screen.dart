@@ -15,7 +15,8 @@ import '../my_profile_screen.dart';
 
 @RoutePage()
 class UserImageFormScreen extends ConsumerStatefulWidget {
-  const UserImageFormScreen({super.key});
+  final void Function(VoidCallback)? registerSubmit;
+  const UserImageFormScreen({super.key, this.registerSubmit});
 
   @override
   ConsumerState<UserImageFormScreen> createState() => _UserImageFormScreenState();
@@ -23,6 +24,12 @@ class UserImageFormScreen extends ConsumerStatefulWidget {
 
 class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
   bool _isUploading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.registerSubmit?.call(_savePhotos);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -242,34 +249,35 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
 
               const SizedBox(height: 40),
 
-              // 💾 SAVE BUTTON (Always visible if standalone or if new photos picked)
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: _isUploading ? null : _savePhotos,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              // 💾 SAVE BUTTON (Only visible if standalone, hidden in flow where Next button handles it)
+              if (widget.registerSubmit == null) ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: _isUploading ? null : _savePhotos,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
                     ),
-                    elevation: 2,
+                    child: _isUploading
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                          )
+                        : const Text(
+                            "Save Photos",
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
                   ),
-                  child: _isUploading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                        )
-                      : const Text(
-                          "Save Photos",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
                 ),
-              ),
-
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
+              ],
             ],
           ),
         ),
@@ -297,61 +305,33 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
   Future<void> _savePhotos() async {
     final uid = ref.read(targetUserIdProvider);
     if (uid == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User ID not found.")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("User ID not found.")),
+        );
+      }
       return;
     }
 
     final imageState = ref.read(imagePickerProvider);
+    // If no new images picked, we can still proceed to next step
     if (imageState.profileImage == null && imageState.secondaryImages.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No new photos selected to upload.")),
-      );
+      // If standalone mode and no images, show message
+      if (widget.registerSubmit == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No new photos selected to upload.")),
+        );
+      }
       return;
     }
 
     setState(() => _isUploading = true);
     try {
-      final imageService = ref.read(imageUploadServiceProvider);
+      // Use controller's uploadImages which handles upload and advances step via MatrimonyController
+      await ref.read(imagePickerProvider.notifier).uploadImages(context, uid);
+      // NOTE: We do NOT call reset() here so images remain visible on screen.
 
-      final currentMatrimony = await ref.read(matrimonyRepositoryProvider).getMatrimonyProfile(uid);
-      ProfileImages currentImages = currentMatrimony.images;
-
-      String updatedProfileUrl = currentImages.profileImageUrl;
-      List<String> updatedSecondaryUrls = List.from(currentImages.secondaryImageUrls);
-
-      // 1. Upload Profile Image if picked
-      if (imageState.profileImage != null) {
-        updatedProfileUrl = await imageService.uploadProfileImage(
-          uid: uid,
-          filePath: imageState.profileImage!,
-        );
-        await ref.read(userFirestoreDSProvider).updateProfilePhoto(uid, updatedProfileUrl);
-      }
-
-      // 2. Upload Secondary Images if picked
-      if (imageState.secondaryImages.isNotEmpty) {
-        final uploadedGallery = await imageService.uploadSecondaryImages(
-          uid: uid,
-          filePaths: imageState.secondaryImages,
-        );
-        updatedSecondaryUrls = uploadedGallery;
-      }
-
-      // 3. Construct updated ProfileImages
-      final newProfileImages = currentImages.copyWith(
-        profileImageUrl: updatedProfileUrl,
-        secondaryImageUrls: updatedSecondaryUrls,
-      );
-
-      // 4. Update in Firestore matrimony profile
-      await ref.read(matrimonyRepositoryProvider).updateImagesProfile(uid, newProfileImages);
-
-      // 5. Reset local image picker state
-      ref.read(imagePickerProvider.notifier).reset();
-
-      if (mounted) {
+      if (mounted && widget.registerSubmit == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Photos saved successfully!")),
         );
@@ -362,9 +342,10 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error saving photos: $e")),
+          SnackBar(content: Text("Error uploading photos: $e")),
         );
       }
+      rethrow;
     } finally {
       if (mounted) setState(() => _isUploading = false);
     }

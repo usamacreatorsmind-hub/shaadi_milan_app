@@ -39,7 +39,9 @@ class HomeController extends StateNotifier<HomeState> {
   StreamSubscription? _usersSubscription;
   StreamSubscription? _profilesSubscription;
 
-  List<UserEntity> _currentUsers = [];
+  // 🚀 In-memory caches to avoid redundant Firestore network reads and speed up loading
+  final Map<String, UserEntity> _userCache = {};
+  final Map<String, AgentEntity> _agentCache = {};
 
   HomeController({
     required MatrimonyRepository matrimonyRepository,
@@ -61,28 +63,38 @@ class HomeController extends StateNotifier<HomeState> {
 
     state = state.copyWith(metrimonyProfiles: const AsyncValue.loading());
 
-    // Fetch directly from metrimony_profiles
+    // Fetch directly from metrimony_profiles with cached user/agent mapping
     _profilesSubscription = _matrimonyRepository.watchAllMatrimonyProfiles().listen(
       (profiles) async {
         try {
-          // Parallelize data fetching for better performance
+          // Parallelize data fetching with in-memory caching for blazing fast performance
           final data = await Future.wait(
             profiles.map((profile) async {
-              // Fetch user data
-              UserEntity user;
-              try {
-                user = await _userRepository.fetchUser(profile.userId);
-              } catch (e) {
-                user = UserEntity.empty();
+              UserEntity? user = _userCache[profile.userId];
+              if (user == null || user.uid.isEmpty) {
+                try {
+                  user = await _userRepository.fetchUser(profile.userId);
+                  if (user.uid.isNotEmpty) {
+                    _userCache[profile.userId] = user;
+                  }
+                } catch (e) {
+                  user = UserEntity.empty();
+                }
               }
 
-              if (user.uid.isEmpty) return null;
+              if (user == null || user.uid.isEmpty) return null;
 
               AgentEntity? agent;
               if (user.agentId.isNotEmpty) {
-                try {
-                  agent = await _agentRepository.fetchAgent(user.agentId);
-                } catch (_) {}
+                agent = _agentCache[user.agentId];
+                if (agent == null) {
+                  try {
+                    agent = await _agentRepository.fetchAgent(user.agentId);
+                    if (agent != null) {
+                      _agentCache[user.agentId] = agent;
+                    }
+                  } catch (_) {}
+                }
               }
 
               return MatrimonyProfileViewModel(profile: profile, user: user, agent: agent);
@@ -92,7 +104,7 @@ class HomeController extends StateNotifier<HomeState> {
           // Remove nulls (skipped users)
           final filteredData = data.whereType<MatrimonyProfileViewModel>().toList();
 
-          debugPrint('Fetched ${filteredData.length} home profiles directly');
+          debugPrint('Fetched ${filteredData.length} home profiles with caching');
           state = state.copyWith(metrimonyProfiles: AsyncValue.data(filteredData));
         } catch (e, st) {
           state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
@@ -102,29 +114,6 @@ class HomeController extends StateNotifier<HomeState> {
         state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
       },
     );
-
-    // Watch opposite gender users (COMMENTED OUT AS PER REQUEST)
-    /*
-    _usersSubscription = _userRepository
-        .watchOppositeGenderUsers(currentUid)
-        .listen(
-          (users) {
-            _currentUsers = users;
-            _watchProfiles(users.map((u) => u.uid).toList());
-          },
-          onError: (e, st) {
-            state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
-          },
-        );
-    */
-  }
-
-  void _watchProfiles(List<String> userIds) {
-    // COMMENTED OUT AS PER REQUEST
-    /*
-    _profilesSubscription?.cancel();
-    ...
-    */
   }
 
   @override

@@ -69,6 +69,8 @@ class _UserBiodataCheckScreenState extends ConsumerState<UserBiodataCheckScreen>
               _section(AppLabels.saveIdentity(context), Icons.badge_outlined, [
                 _infoRow("First Name", profile.identity.firstName),
                 _infoRow("Last Name", profile.identity.lastName),
+                _infoRow("Birthplace", profile.identity.birthplace),
+                _infoRow("Marital Status", profile.identity.maritalStatus),
                 _infoRow(AppLabels.gender(context), profile.identity.gender),
                 _infoRow(AppLabels.selectDateOfBirth(context), DateFormat('dd MMM yyyy').format(profile.identity.dob)),
                 _infoRow(AppLabels.ageYrs(context), AppLabels.ageYears(context, profile.identity.age)),
@@ -111,7 +113,11 @@ class _UserBiodataCheckScreenState extends ConsumerState<UserBiodataCheckScreen>
 
               _section(AppLabels.familyDetails(context), Icons.family_restroom_outlined, [
                 _infoRow(AppLabels.fatherName(context), profile.family.fatherName),
+                if (profile.family.fatherOccupation != null && !profile.family.fatherOccupation!.isEmpty)
+                  _infoRow("Father's Occupation", profile.family.fatherOccupation!),
                 _infoRow(AppLabels.motherName(context), profile.family.motherName),
+                if (profile.family.motherOccupation != null && !profile.family.motherOccupation!.isEmpty)
+                  _infoRow("Mother's Occupation", profile.family.motherOccupation!),
                 _infoRow(AppLabels.numberOfBrothers(context), profile.family.numberOfBrothers),
                 _infoRow(AppLabels.numberOfSisters(context), profile.family.numberOfSisters),
                 _infoRow(AppLabels.familyType(context), profile.family.familyType),

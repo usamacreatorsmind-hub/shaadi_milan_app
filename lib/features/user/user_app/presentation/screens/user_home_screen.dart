@@ -531,7 +531,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                                   dob: profile.identity.dob,
                                   designation: designation,
                                   income: profile.employment.annualIncome,
-                                  degree: profile.education.education,
+                                  degree: profile.education.education?.course,
                                   religion: isHindi ? profile.cultural.religion.hi : profile.cultural.religion.en,
                                   images: allImages,
                                   agentDesignation: agent?.designation.label,
@@ -1362,33 +1362,45 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
                             ),
 
                             // Row 2: Occupation · Earns Income
-                            const SizedBox(height: 2),
-                            Text(
-                              [
-                                if (widget.designation != null)
-                                  widget.designation is BilingualValue
+                            ...(() {
+                              final des = widget.designation != null
+                                  ? (widget.designation is BilingualValue
                                       ? (isHindi ? (widget.designation as BilingualValue).hi : (widget.designation as BilingualValue).en)
-                                      : widget.designation.toString(),
-                                if (widget.income != null)
-                                  "Earns ${widget.income is BilingualValue ? (isHindi ? (widget.income as BilingualValue).hi : (widget.income as BilingualValue).en) : widget.income.toString()}",
-                              ].join(' · '),
-                              style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 14, fontWeight: FontWeight.w500),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                                      : widget.designation.toString())
+                                  : '';
+                              final inc = widget.income != null
+                                  ? "Earns ${widget.income is BilingualValue ? (isHindi ? (widget.income as BilingualValue).hi : (widget.income as BilingualValue).en) : widget.income.toString()}"
+                                  : '';
+                              final items = [if (des.isNotEmpty) des, if (inc.isNotEmpty) inc];
+                              if (items.isEmpty) return <Widget>[];
+                              return [
+                                const SizedBox(height: 1),
+                                Text(
+                                  items.join(' · '),
+                                  style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 13.5, fontWeight: FontWeight.w500),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ];
+                            }()),
 
                             // Row 3: Education/Degree
-                            if (widget.degree != null) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                widget.degree is BilingualValue
-                                    ? (isHindi ? (widget.degree as BilingualValue).hi : (widget.degree as BilingualValue).en)
-                                    : widget.degree.toString(),
-                                style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 14, fontWeight: FontWeight.w500),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                            ...(() {
+                              if (widget.degree == null) return <Widget>[];
+                              final deg = widget.degree is BilingualValue
+                                  ? (isHindi ? (widget.degree as BilingualValue).hi : (widget.degree as BilingualValue).en)
+                                  : widget.degree.toString();
+                              if (deg.isEmpty) return <Widget>[];
+                              return [
+                                const SizedBox(height: 1),
+                                Text(
+                                  deg,
+                                  style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 13.5, fontWeight: FontWeight.w500),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ];
+                            }()),
 
                             const SizedBox(height: 6),
 

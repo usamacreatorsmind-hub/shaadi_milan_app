@@ -168,6 +168,8 @@ class MyProfileScreen extends ConsumerWidget {
                   children: [
                     _DetailRow(AppLabels.age(context), AppLabels.ageYearsOld(context, profile.identity.age)),
                     _DetailRow(AppLabels.gender(context), profile.identity.gender),
+                    _DetailRow("Birthplace", profile.identity.birthplace),
+                    _DetailRow("Marital Status", profile.identity.maritalStatus),
                     _DetailRow(AppLabels.dateOfBirth(context), profile.identity.dob.toString().split(" ").first),
                     _DetailRow("Time of Birth", profile.identity.tob),
                     _DetailRow("Profile Managed By", profile.identity.profileManagedBy),
@@ -246,7 +248,11 @@ class MyProfileScreen extends ConsumerWidget {
                   ),
                   children: [
                     _DetailRow(AppLabels.fatherName(context), profile.family.fatherName),
+                    if (profile.family.fatherOccupation != null && !profile.family.fatherOccupation!.isEmpty)
+                      _DetailRow("Father's Occupation", profile.family.fatherOccupation!),
                     _DetailRow(AppLabels.motherName(context), profile.family.motherName),
+                    if (profile.family.motherOccupation != null && !profile.family.motherOccupation!.isEmpty)
+                      _DetailRow("Mother's Occupation", profile.family.motherOccupation!),
                     _DetailRow(AppLabels.familyType(context), profile.family.familyType),
                     _DetailRow("Family Annual Income", profile.family.familyIncome),
                   ],

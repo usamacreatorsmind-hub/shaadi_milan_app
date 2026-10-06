@@ -38,7 +38,10 @@ class _UserCultureFormScreenState extends ConsumerState<UserCultureFormScreen> {
 
   final List<BilingualValue> _manglikOptions = [
     BilingualValue(hi: 'मांगलिक', en: 'Manglik'),
-    BilingualValue(hi: 'आंशिक मांगलिक', en: 'Aanshik Manglik'),
+    BilingualValue(hi: 'पूर्ण मांगलिक', en: 'Purna Manglik'),
+    BilingualValue(hi: 'आंशिक मांगलिक', en: 'Anshik Manglik'),
+    BilingualValue(hi: 'चंद्र मांगलिक', en: 'Chandra Manglik'),
+    BilingualValue(hi: 'सात्विक मांगलिक', en: 'Saatvik Manglik'),
     BilingualValue(hi: 'गैर-मांगलिक', en: 'Gair-Manglik'),
   ];
 

@@ -27,29 +27,20 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
   final _fatherNameEnController = TextEditingController();
   final _motherNameController = TextEditingController();
   final _motherNameEnController = TextEditingController();
+
+  final _fatherOccupationHiCtrl = TextEditingController();
+  final _fatherOccupationEnCtrl = TextEditingController();
+  final _motherOccupationHiCtrl = TextEditingController();
+  final _motherOccupationEnCtrl = TextEditingController();
+
   final _brothersController = TextEditingController();
   final _familyStatusController = TextEditingController();
   final _sistersController = TextEditingController();
 
-  BilingualValue? _selectedFamilyIncome;
-  String? _familyType;
+  final _familyIncomeHiCtrl = TextEditingController();
+  final _familyIncomeEnCtrl = TextEditingController();
 
-  final List<BilingualValue> _incomeOptions = [
-    BilingualValue(hi: '₹25,000–₹30,000', en: '₹25,000–₹30,000'),
-    BilingualValue(hi: '₹30,000–₹35,000', en: '₹30,000–₹35,000'),
-    BilingualValue(hi: '₹35,000–₹40,000', en: '₹35,000–₹40,000'),
-    BilingualValue(hi: '₹40,000–₹50,000', en: '₹40,000–₹50,000'),
-    BilingualValue(hi: '₹50,000–₹55,000', en: '₹50,000–₹55,000'),
-    BilingualValue(hi: '₹55,000–₹60,000', en: '₹55,000–₹60,000'),
-    BilingualValue(hi: '₹60,000–₹70,000', en: '₹60,000–₹70,000'),
-    BilingualValue(hi: '₹70,000–₹75,000', en: '₹70,000–₹75,000'),
-    BilingualValue(hi: '₹75,000–₹80,000', en: '₹75,000–₹80,000'),
-    BilingualValue(hi: '₹80,000–₹85,000', en: '₹80,000–₹85,000'),
-    BilingualValue(hi: '₹85,000–₹90,000', en: '₹85,000–₹90,000'),
-    BilingualValue(hi: '₹90,000–₹95,000', en: '₹90,000–₹95,000'),
-    BilingualValue(hi: '₹95,000–₹1,00,000', en: '₹95,000–₹1,00,000'),
-    BilingualValue(hi: 'Above ₹1 Crore', en: 'Above ₹1 Crore'),
-  ];
+  String? _familyType;
 
   @override
   void initState() {
@@ -61,12 +52,19 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
       _fatherNameEnController.text = profile.fatherName.en;
       _motherNameController.text = profile.motherName.hi;
       _motherNameEnController.text = profile.motherName.en;
+
+      _fatherOccupationHiCtrl.text = profile.fatherOccupation?.hi ?? '';
+      _fatherOccupationEnCtrl.text = profile.fatherOccupation?.en ?? '';
+      _motherOccupationHiCtrl.text = profile.motherOccupation?.hi ?? '';
+      _motherOccupationEnCtrl.text = profile.motherOccupation?.en ?? '';
+
       _brothersController.text = profile.numberOfBrothers.toString();
       _sistersController.text = profile.numberOfSisters.toString();
       _familyType = profile.familyType.en;
       _familyStatusController.text = profile.familyStatus.en;
       if (profile.familyIncome != null) {
-        _selectedFamilyIncome = _incomeOptions.where((e) => e.en == profile.familyIncome?.en).firstOrNull ?? profile.familyIncome;
+        _familyIncomeHiCtrl.text = profile.familyIncome!.hi;
+        _familyIncomeEnCtrl.text = profile.familyIncome!.en;
       }
     }
   }
@@ -81,25 +79,41 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
     final fatherName = BilingualValue(hi: _fatherNameController.text.trim(), en: _fatherNameEnController.text.trim());
     final motherName = BilingualValue(hi: _motherNameController.text.trim(), en: _motherNameEnController.text.trim());
 
+    final fatherOccupation = _fatherOccupationHiCtrl.text.trim().isEmpty && _fatherOccupationEnCtrl.text.trim().isEmpty
+        ? null
+        : BilingualValue(hi: _fatherOccupationHiCtrl.text.trim(), en: _fatherOccupationEnCtrl.text.trim());
+
+    final motherOccupation = _motherOccupationHiCtrl.text.trim().isEmpty && _motherOccupationEnCtrl.text.trim().isEmpty
+        ? null
+        : BilingualValue(hi: _motherOccupationHiCtrl.text.trim(), en: _motherOccupationEnCtrl.text.trim());
+
+    final familyIncomeValue = _familyIncomeHiCtrl.text.trim().isEmpty && _familyIncomeEnCtrl.text.trim().isEmpty
+        ? null
+        : BilingualValue(hi: _familyIncomeHiCtrl.text.trim(), en: _familyIncomeEnCtrl.text.trim());
+
     if (widget.mode == FormMode.create) {
       notifier.saveFamily(
         fatherName: fatherName,
         motherName: motherName,
+        fatherOccupation: fatherOccupation,
+        motherOccupation: motherOccupation,
         brothers: int.tryParse(_brothersController.text) ?? 0,
         sisters: int.tryParse(_sistersController.text) ?? 0,
         familyType: BilingualValue(hi: familyType, en: familyType),
         familyStatus: BilingualValue(hi: familyStatus, en: familyStatus),
-        familyIncome: _selectedFamilyIncome,
+        familyIncome: familyIncomeValue,
       );
     } else {
       notifier.updateFamily(
         fatherName: fatherName,
         motherName: motherName,
+        fatherOccupation: fatherOccupation,
+        motherOccupation: motherOccupation,
         brothers: int.tryParse(_brothersController.text) ?? 0,
         sisters: int.tryParse(_sistersController.text) ?? 0,
         familyType: BilingualValue(hi: familyType, en: familyType),
         familyStatus: BilingualValue(hi: familyStatus, en: familyStatus),
-        familyIncome: _selectedFamilyIncome,
+        familyIncome: familyIncomeValue,
       );
     }
   }
@@ -110,9 +124,15 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
     _fatherNameEnController.dispose();
     _motherNameController.dispose();
     _motherNameEnController.dispose();
+    _fatherOccupationHiCtrl.dispose();
+    _fatherOccupationEnCtrl.dispose();
+    _motherOccupationHiCtrl.dispose();
+    _motherOccupationEnCtrl.dispose();
     _brothersController.dispose();
     _familyStatusController.dispose();
     _sistersController.dispose();
+    _familyIncomeHiCtrl.dispose();
+    _familyIncomeEnCtrl.dispose();
     super.dispose();
   }
 
@@ -145,11 +165,27 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
               ),
               const SizedBox(height: 16),
               BilingualTextField(
+                controller: _fatherOccupationHiCtrl,
+                englishController: _fatherOccupationEnCtrl,
+                prefixIcon: Icons.work_outline,
+                label: "Father's Occupation",
+                hint: "Enter father's occupation (e.g. Business, Govt Job)",
+              ),
+              const SizedBox(height: 16),
+              BilingualTextField(
                 controller: _motherNameController,
                 englishController: _motherNameEnController,
                 prefixIcon: Icons.person,
                 label: AppLabels.motherName(context),
                 hint: AppLabels.motherNameHint(context),
+              ),
+              const SizedBox(height: 16),
+              BilingualTextField(
+                controller: _motherOccupationHiCtrl,
+                englishController: _motherOccupationEnCtrl,
+                prefixIcon: Icons.work_outline,
+                label: "Mother's Occupation",
+                hint: "Enter mother's occupation (e.g. Homemaker, Teacher)",
               ),
               const SizedBox(height: 16),
               AppTextField(
@@ -185,7 +221,6 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
               ),
               const SizedBox(height: 16),
 
-              // use dropdown
               AppDropDown<String>(
                 label: AppLabels.lifeStyleStatus(context),
                 items: [
@@ -202,12 +237,12 @@ class _UserFamilyFormScreenState extends ConsumerState<UserFamilyFormScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              AppDropDown<BilingualValue>(
-                label: "Family Annual Income",
-                items: _incomeOptions,
-                value: _selectedFamilyIncome,
-                itemLabel: (i) => i.en,
-                onChanged: (val) => setState(() => _selectedFamilyIncome = val),
+              BilingualTextField(
+                controller: _familyIncomeHiCtrl,
+                englishController: _familyIncomeEnCtrl,
+                prefixIcon: Icons.currency_rupee,
+                label: "Family Income (Monthly / Annually)",
+                hint: "Enter income (e.g. ₹50k/Month or ₹6L/Year)",
               ),
 
               const SizedBox(height: 20),

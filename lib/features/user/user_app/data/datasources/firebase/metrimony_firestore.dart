@@ -23,25 +23,14 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
 
   MatrimonyFirestoreDS(this._firestore);
 
-  CollectionReference<Map<String, dynamic>> get _profiles =>
-      _firestore.collection(AppCollections.metrimonyProfiles);
+  CollectionReference<Map<String, dynamic>> get _profiles => _firestore.collection(AppCollections.metrimonyProfiles);
 
-  Future<void> _updateProfileSection(
-    String uid,
-    String key,
-    dynamic data,
-  ) async {
-    await _profiles.doc(uid).update({
-      key: data,
-      AppConstants.fieldUpdatedAt: FieldValue.serverTimestamp(),
-    });
+  Future<void> _updateProfileSection(String uid, String key, dynamic data) async {
+    await _profiles.doc(uid).set({key: data, AppConstants.fieldUpdatedAt: FieldValue.serverTimestamp()}, SetOptions(merge: true));
   }
 
   @override
-  Future<void> createProfile(
-    String uid,
-    Map<String, dynamic> profileData,
-  ) async {
+  Future<void> createProfile(String uid, Map<String, dynamic> profileData) async {
     await _profiles.doc(uid).set(profileData, SetOptions(merge: true));
   }
 
@@ -49,7 +38,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
   Future<MatrimonyProfile> getMatrimonyProfile(String uid) async {
     final doc = await _profiles.doc(uid).get();
     if (!doc.exists) {
-      throw Exception('Matrimony profile not found');
+      return MatrimonyProfile.empty().copyWith(userId: uid, metrimonyId: uid);
     }
     return MatrimonyProfile.fromMap(doc.data()!);
   }
@@ -58,7 +47,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
   Stream<MatrimonyProfile> watchMatrimonyProfile(String uid) {
     return _profiles.doc(uid).snapshots().map((doc) {
       if (!doc.exists) {
-        throw Exception('Matrimony profile not found');
+        return MatrimonyProfile.empty().copyWith(userId: uid, metrimonyId: uid);
       }
       return MatrimonyProfile.fromMap(doc.data()!);
     });
@@ -85,10 +74,7 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
   }
 
   @override
-  Future<void> updateEmployment(
-    String uid,
-    EmploymentProfile employment,
-  ) async {
+  Future<void> updateEmployment(String uid, EmploymentProfile employment) async {
     await _updateProfileSection(uid, 'employment', employment.toMap());
   }
 
@@ -126,30 +112,17 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
     final currentUid = FirebaseAuth.instance.currentUser!.uid;
 
     // Fetch only active profiles from metrimony_profiles collection
-    final querySnapshot = await _profiles
-        .where(
-          AppConstants.fieldProfileStatus,
-          isEqualTo: AppConstants.statusActive,
-        )
-        .get();
+    final querySnapshot = await _profiles.where(AppConstants.fieldProfileStatus, isEqualTo: AppConstants.statusActive).get();
 
-    final profiles = querySnapshot.docs
-        .map((doc) => MatrimonyProfile.fromMap(doc.data()))
-        .toList();
+    final profiles = querySnapshot.docs.map((doc) => MatrimonyProfile.fromMap(doc.data())).toList();
 
     // Exclude current user's profile
-    List<MatrimonyProfile> profileData = profiles
-        .where((profile) => profile.userId != currentUid)
-        .toList();
+    List<MatrimonyProfile> profileData = profiles.where((profile) => profile.userId != currentUid).toList();
 
     // Get current user's gender
-    final userDoc = await _firestore
-        .collection(AppCollections.users)
-        .doc(currentUid)
-        .get();
+    final userDoc = await _firestore.collection(AppCollections.users).doc(currentUid).get();
 
-    final userGender = (userDoc.data()?[AppConstants.fieldGender] as String?)
-        ?.toLowerCase();
+    final userGender = (userDoc.data()?[AppConstants.fieldGender] as String?)?.toLowerCase();
 
     if (userGender == null) return profileData;
 
@@ -172,39 +145,19 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
 
   Stream<List<MatrimonyProfile>> watchAllMatrimonyProfiles() {
     final currentUid = FirebaseAuth.instance.currentUser?.uid;
-    return _profiles
-        .where(
-          AppConstants.fieldProfileStatus,
-          isEqualTo: AppConstants.statusActive,
-        )
-        .snapshots()
-        .map((snapshot) {
-          return snapshot.docs
-              .map((doc) => MatrimonyProfile.fromMap(doc.data()))
-              .where((profile) => profile.userId != currentUid)
-              .toList();
-        });
+    return _profiles.where(AppConstants.fieldProfileStatus, isEqualTo: AppConstants.statusActive).snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => MatrimonyProfile.fromMap(doc.data())).where((profile) => profile.userId != currentUid).toList();
+    });
   }
 
-  Stream<List<MatrimonyProfile>> watchMatrimonyProfilesForUsers(
-    List<String> userIds,
-  ) {
+  Stream<List<MatrimonyProfile>> watchMatrimonyProfilesForUsers(List<String> userIds) {
     if (userIds.isEmpty) {
       return Stream.value([]);
     }
 
     // Watch only active matrimony profiles and filter by userIds
-    return _profiles
-        .where(
-          AppConstants.fieldProfileStatus,
-          isEqualTo: AppConstants.statusActive,
-        )
-        .snapshots()
-        .map((snapshot) {
-          return snapshot.docs
-              .where((doc) => userIds.contains(doc.id))
-              .map((doc) => MatrimonyProfile.fromMap(doc.data()))
-              .toList();
-        });
+    return _profiles.where(AppConstants.fieldProfileStatus, isEqualTo: AppConstants.statusActive).snapshots().map((snapshot) {
+      return snapshot.docs.where((doc) => userIds.contains(doc.id)).map((doc) => MatrimonyProfile.fromMap(doc.data())).toList();
+    });
   }
 }

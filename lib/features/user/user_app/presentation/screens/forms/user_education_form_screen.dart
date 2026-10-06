@@ -58,13 +58,8 @@ class _UserEducationFormScreenState extends ConsumerState<UserEducationFormScree
         _collegeCtrl.text = profile.education!.college.hi;
         _collegeEnCtrl.text = profile.education!.college.en;
 
-        _selectedDegree = profile.education!.course;
         _degreeHiCtrl.text = profile.education!.course.hi;
         _degreeEnCtrl.text = profile.education!.course.en;
-        
-        if (_selectedDegree?.en.isNotEmpty ?? false) {
-           _isManualDegree = true;
-        }
       }
 
       if (profile.extraQualification != null) {
@@ -105,9 +100,7 @@ class _UserEducationFormScreenState extends ConsumerState<UserEducationFormScree
       finalExtraCourses.add(BilingualValue(hi: hiExtra, en: enExtra));
     }
 
-    final degreeValue = _isManualDegree 
-        ? BilingualValue(hi: _degreeHiCtrl.text.trim(), en: _degreeEnCtrl.text.trim())
-        : (_selectedDegree ?? BilingualValue.empty());
+    final degreeValue = BilingualValue(hi: _degreeHiCtrl.text.trim(), en: _degreeEnCtrl.text.trim());
 
     final profile = EducationProfile(
       isIlletrate: false,
@@ -182,48 +175,14 @@ class _UserEducationFormScreenState extends ConsumerState<UserEducationFormScree
                     label: AppLabels.collegeUniversity(context),
                     hint: AppLabels.collegeHint(context),
                   ),
-                  const SizedBox(height: 12),
-                  CheckboxListTile(
-                    title: const Text("Type Degree/Course Manually"),
-                    value: _isManualDegree,
-                    onChanged: (val) {
-                      setState(() {
-                        _isManualDegree = val ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: EdgeInsets.zero,
+                  const SizedBox(height: 16),
+                  BilingualTextField(
+                    controller: _degreeHiCtrl,
+                    englishController: _degreeEnCtrl,
+                    prefixIcon: Icons.book_outlined,
+                    label: "Degree/Course",
+                    hint: "Enter degree or course name",
                   ),
-                  const SizedBox(height: 8),
-                  if (_isManualDegree) ...[
-                    BilingualTextField(
-                      controller: _degreeHiCtrl,
-                      englishController: _degreeEnCtrl,
-                      prefixIcon: Icons.book_outlined,
-                      label: "Degree/Course",
-                      hint: "Enter degree or course name",
-                    ),
-                  ] else ...[
-                    // Degree Dropdown
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final degreesAsync = ref.watch(degreesProvider);
-                        final isHindi = Localizations.localeOf(context).languageCode == 'hi';
-                        return degreesAsync.when(
-                          data: (degrees) => AppDropDown<BilingualValue>(
-                            label: AppLabels.degreeCourse(context),
-                            items: degrees,
-                            value: _selectedDegree,
-                            itemLabel: (d) => isHindi ? d.hi : d.en,
-                            onChanged: (val) => setState(() => _selectedDegree = val),
-                            validator: (val) => val == null ? "${AppLabels.degreeCourse(context)} is required" : null,
-                          ),
-                          loading: () => const Center(child: CircularProgressIndicator()),
-                          error: (e, st) => Text("Error loading degrees: $e"),
-                        );
-                      },
-                    ),
-                  ],
                   const SizedBox(height: 24),
                   _sectionHeader(AppLabels.additionalQualifications(context)),
                   const SizedBox(height: 16),

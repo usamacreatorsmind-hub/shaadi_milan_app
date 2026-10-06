@@ -25,6 +25,9 @@ class ImagePickerController extends StateNotifier<ImagesState> {
   Future<String?> _cropImage(BuildContext context, String path, {bool isPrimary = false}) async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
+      compressQuality: 80,
+      maxWidth: 1200,
+      maxHeight: 1200,
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: AppLabels.cropImage(context),

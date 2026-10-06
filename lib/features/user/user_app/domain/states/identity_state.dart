@@ -5,6 +5,8 @@ class IdentityProfile {
   final BilingualValue gender;
   final BilingualValue firstName;
   final BilingualValue lastName;
+  final BilingualValue birthplace;
+  final BilingualValue maritalStatus;
   final DateTime dob;
   final int age;
   final String tob;
@@ -16,12 +18,15 @@ class IdentityProfile {
     required this.gender,
     required this.firstName,
     required this.lastName,
+    BilingualValue? birthplace,
+    BilingualValue? maritalStatus,
     required this.dob,
     required this.age,
     this.tob = "",
     this.profileManagedBy = "Self",
     this.alternatePhones = const [],
-  });
+  }) : birthplace = birthplace ?? BilingualValue.empty(),
+       maritalStatus = maritalStatus ?? BilingualValue.empty();
 
   Map<String, dynamic> toMap() {
     return {
@@ -29,6 +34,8 @@ class IdentityProfile {
       'gender': gender.toMap(),
       'firstName': firstName.toMap(),
       'lastName': lastName.toMap(),
+      'birthplace': birthplace.toMap(),
+      'maritalStatus': maritalStatus.toMap(),
       'dob': dob.toIso8601String(),
       'age': age,
       'tob': tob,
@@ -39,7 +46,7 @@ class IdentityProfile {
 
   @override
   String toString() {
-    return 'Name: $firstName $lastName, Gender: $gender, DOB: ${dob.toLocal().toString().split(' ')[0]}, Age: $age, TOB: $tob, ManagedBy: $profileManagedBy, AlternatePhones: $alternatePhones';
+    return 'Name: $firstName $lastName, Birthplace: $birthplace, MaritalStatus: $maritalStatus, Gender: $gender, DOB: ${dob.toLocal().toString().split(' ')[0]}, Age: $age, TOB: $tob, ManagedBy: $profileManagedBy, AlternatePhones: $alternatePhones';
   }
 
   factory IdentityProfile.fromMap(Map<String, dynamic> map) {
@@ -55,6 +62,8 @@ class IdentityProfile {
       gender: parseBilingual(map['gender']),
       firstName: parseBilingual(map['firstName']),
       lastName: parseBilingual(map['lastName']),
+      birthplace: parseBilingual(map['birthplace']),
+      maritalStatus: parseBilingual(map['maritalStatus']),
       dob: map['dob'] != null ? DateTime.tryParse(map['dob'].toString()) ?? DateTime(1900) : DateTime(1900),
       age: map['age'] as int? ?? 0,
       tob: map['tob'] as String? ?? '',
@@ -68,6 +77,8 @@ class IdentityProfile {
     BilingualValue? gender,
     BilingualValue? firstName,
     BilingualValue? lastName,
+    BilingualValue? birthplace,
+    BilingualValue? maritalStatus,
     DateTime? dob,
     int? age,
     String? tob,
@@ -79,6 +90,8 @@ class IdentityProfile {
       gender: gender ?? this.gender,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
+      birthplace: birthplace ?? this.birthplace,
+      maritalStatus: maritalStatus ?? this.maritalStatus,
       dob: dob ?? this.dob,
       age: age ?? this.age,
       tob: tob ?? this.tob,
@@ -93,6 +106,8 @@ class IdentityProfile {
       gender: BilingualValue.empty(),
       firstName: BilingualValue.empty(),
       lastName: BilingualValue.empty(),
+      birthplace: BilingualValue.empty(),
+      maritalStatus: BilingualValue.empty(),
       dob: DateTime(1900),
       age: 0,
       tob: '',

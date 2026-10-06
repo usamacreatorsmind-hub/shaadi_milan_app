@@ -26,11 +26,6 @@ class _ViewMetrimonyProfileScreenState extends ConsumerState<MetrimonyProfileScr
   @override
   void initState() {
     super.initState();
-    // If you want fresh data every time the screen is entered,
-    // invalidate is fine. However, watch() will trigger the fetch
-    // automatically if not already loaded. If you need a manual refresh,
-    // consider adding a RefreshIndicator to the UI instead of
-    // invalidating on every initState.
   }
 
   @override
@@ -179,6 +174,8 @@ class _ViewMetrimonyProfileScreenState extends ConsumerState<MetrimonyProfileScr
                   children: [
                     _InfoRow("First Name", profile.identity.firstName),
                     _InfoRow("Last Name", profile.identity.lastName),
+                    _InfoRow("Birthplace", profile.identity.birthplace),
+                    _InfoRow("Marital Status", profile.identity.maritalStatus),
                     _InfoRow(context.l10n.fullName, profile.user.fullName),
                     _InfoRow(context.l10n.dateOfBirth, profile.identity.dob.toLocal().toString().split(' ')[0]),
                     _InfoRow(context.l10n.age, context.l10n.yearsOld(profile.identity.age)),
@@ -254,7 +251,11 @@ class _ViewMetrimonyProfileScreenState extends ConsumerState<MetrimonyProfileScr
                   icon: Icons.family_restroom,
                   children: [
                     _InfoRow(context.l10n.fatherName, profile.family.fatherName),
+                    if (profile.family.fatherOccupation != null && !profile.family.fatherOccupation!.isEmpty)
+                      _InfoRow("Father's Occupation", profile.family.fatherOccupation!),
                     _InfoRow(context.l10n.motherName, profile.family.motherName),
+                    if (profile.family.motherOccupation != null && !profile.family.motherOccupation!.isEmpty)
+                      _InfoRow("Mother's Occupation", profile.family.motherOccupation!),
                     _InfoRow(context.l10n.numberOfBrothers, '${profile.family.numberOfBrothers}'),
                     _InfoRow(context.l10n.numberOfSisters, '${profile.family.numberOfSisters}'),
                     _InfoRow(context.l10n.familyType, profile.family.familyType),

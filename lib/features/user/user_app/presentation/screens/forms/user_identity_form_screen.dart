@@ -34,6 +34,12 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
   final _lastNameCtrl = TextEditingController();
   final _lastNameEnCtrl = TextEditingController();
 
+  final _birthplaceCtrl = TextEditingController();
+  final _birthplaceEnCtrl = TextEditingController();
+
+  final _maritalStatusCtrl = TextEditingController();
+  final _maritalStatusEnCtrl = TextEditingController();
+
   DateTime? _selectedDate;
   String _selectedTime = "";
 
@@ -50,6 +56,10 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
       _firstNameEnCtrl.text = profile.firstName.en;
       _lastNameCtrl.text = profile.lastName.hi;
       _lastNameEnCtrl.text = profile.lastName.en;
+      _birthplaceCtrl.text = profile.birthplace.hi;
+      _birthplaceEnCtrl.text = profile.birthplace.en;
+      _maritalStatusCtrl.text = profile.maritalStatus.hi;
+      _maritalStatusEnCtrl.text = profile.maritalStatus.en;
       _selectedDate = profile.dob;
       _selectedTime = profile.tob;
       _managedBy = profile.profileManagedBy;
@@ -65,6 +75,10 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
     _firstNameEnCtrl.dispose();
     _lastNameCtrl.dispose();
     _lastNameEnCtrl.dispose();
+    _birthplaceCtrl.dispose();
+    _birthplaceEnCtrl.dispose();
+    _maritalStatusCtrl.dispose();
+    _maritalStatusEnCtrl.dispose();
     for (var ctrl in _alternatePhoneCtrls) {
       ctrl.dispose();
     }
@@ -139,6 +153,8 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
 
     final firstName = BilingualValue(hi: _firstNameCtrl.text.trim(), en: _firstNameEnCtrl.text.trim());
     final lastName = BilingualValue(hi: _lastNameCtrl.text.trim(), en: _lastNameEnCtrl.text.trim());
+    final birthplace = BilingualValue(hi: _birthplaceCtrl.text.trim(), en: _birthplaceEnCtrl.text.trim());
+    final maritalStatus = BilingualValue(hi: _maritalStatusCtrl.text.trim(), en: _maritalStatusEnCtrl.text.trim());
 
     final dob = _selectedDate ?? DateTime(1900);
     final ageValue = _age ?? 0;
@@ -151,6 +167,8 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
         gender: gender,
         firstName: firstName,
         lastName: lastName,
+        birthplace: birthplace,
+        maritalStatus: maritalStatus,
         dob: dob,
         age: ageValue,
         tob: tobValue,
@@ -162,6 +180,8 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
         gender: gender,
         firstName: firstName,
         lastName: lastName,
+        birthplace: birthplace,
+        maritalStatus: maritalStatus,
         dob: dob,
         age: ageValue,
         tob: tobValue,
@@ -220,9 +240,27 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
                 showHindi: false,
               ),
               const SizedBox(height: 16),
+              BilingualTextField(
+                controller: _birthplaceCtrl,
+                englishController: _birthplaceEnCtrl,
+                prefixIcon: Icons.location_city_outlined,
+                label: "Birthplace",
+                hint: "Enter birthplace",
+                showHindi: false,
+              ),
+              const SizedBox(height: 16),
+              BilingualTextField(
+                controller: _maritalStatusCtrl,
+                englishController: _maritalStatusEnCtrl,
+                prefixIcon: Icons.favorite_outline,
+                label: "Marital Status",
+                hint: "Enter marital status (e.g. Unmarried, Divorced)",
+                showHindi: false,
+              ),
+              const SizedBox(height: 16),
               AppDropDown<String>(
                 label: "Profile Managed By",
-                items: const ["Self", "Parent"],
+                items: const ["Self", "Parent", "Father", "Mother", "Brother", "Sister", "Guardian", "Friend"],
                 value: _managedBy,
                 itemLabel: (s) => s,
                 onChanged: (val) => setState(() => _managedBy = val),

@@ -14,13 +14,14 @@ class UserIdentityController extends StateNotifier<IdentityState> {
   final String _uid;
   final Ref _ref;
 
-  UserIdentityController(this._matrimonyRepository, this._uid, this._ref)
-    : super(IdentityState.initial);
+  UserIdentityController(this._matrimonyRepository, this._uid, this._ref) : super(IdentityState.initial);
 
   Future<void> updateIdentity({
     required BilingualValue gender,
     required BilingualValue firstName,
     required BilingualValue lastName,
+    required BilingualValue birthplace,
+    required BilingualValue maritalStatus,
     required DateTime dob,
     required int age,
     String tob = "",
@@ -34,6 +35,8 @@ class UserIdentityController extends StateNotifier<IdentityState> {
       gender: gender,
       firstName: firstName,
       lastName: lastName,
+      birthplace: birthplace,
+      maritalStatus: maritalStatus,
       dob: dob,
       age: age,
       tob: tob,
@@ -42,15 +45,11 @@ class UserIdentityController extends StateNotifier<IdentityState> {
     );
 
     try {
-      await _ref
-          .read(matrimonyRepositoryProvider)
-          .updateIdentityProfile(_uid, identityProfile);
+      await _ref.read(matrimonyRepositoryProvider).updateIdentityProfile(_uid, identityProfile);
 
       state = state.copyWith(identity: identityProfile, isLoading: false);
 
-      _ref
-          .read(metrimonyControllerProvider.notifier)
-          .saveIdentity(identityProfile);
+      _ref.read(metrimonyControllerProvider.notifier).saveIdentity(identityProfile);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
@@ -60,6 +59,8 @@ class UserIdentityController extends StateNotifier<IdentityState> {
     required BilingualValue gender,
     required BilingualValue firstName,
     required BilingualValue lastName,
+    required BilingualValue birthplace,
+    required BilingualValue maritalStatus,
     required DateTime dob,
     required int age,
     String tob = "",
@@ -72,6 +73,8 @@ class UserIdentityController extends StateNotifier<IdentityState> {
       profileId: _uid,
       firstName: firstName,
       lastName: lastName,
+      birthplace: birthplace,
+      maritalStatus: maritalStatus,
       gender: gender,
       dob: dob,
       age: age,
@@ -81,13 +84,9 @@ class UserIdentityController extends StateNotifier<IdentityState> {
     );
 
     try {
-      await FirebaseFirestore.instance.collection('users').doc(_uid).update({
-        'gender': gender.toMap(),
-      });
+      await FirebaseFirestore.instance.collection('users').doc(_uid).update({'gender': gender.toMap()});
 
-      _ref
-          .read(metrimonyControllerProvider.notifier)
-          .saveIdentity(identityProfile);
+      _ref.read(metrimonyControllerProvider.notifier).saveIdentity(identityProfile);
 
       state = state.copyWith(identity: identityProfile, isLoading: false);
     } catch (e) {
@@ -96,10 +95,9 @@ class UserIdentityController extends StateNotifier<IdentityState> {
   }
 }
 
-final identityControllerProvider =
-    StateNotifierProvider<UserIdentityController, IdentityState>((ref) {
-      final repo = ref.read(matrimonyRepositoryProvider);
-      final uid = ref.watch(targetUserIdProvider);
+final identityControllerProvider = StateNotifierProvider<UserIdentityController, IdentityState>((ref) {
+  final repo = ref.read(matrimonyRepositoryProvider);
+  final uid = ref.watch(targetUserIdProvider);
 
-      return UserIdentityController(repo, uid ?? '', ref);
-    });
+  return UserIdentityController(repo, uid ?? '', ref);
+});

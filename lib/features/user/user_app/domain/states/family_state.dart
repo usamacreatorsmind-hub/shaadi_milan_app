@@ -3,6 +3,8 @@ import '../../../../translitration/models/bilingual_value.dart';
 class FamilyProfile {
   final BilingualValue fatherName;
   final BilingualValue motherName;
+  final BilingualValue? fatherOccupation;
+  final BilingualValue? motherOccupation;
   final int numberOfBrothers;
   final int numberOfSisters;
   final BilingualValue familyType;
@@ -12,6 +14,8 @@ class FamilyProfile {
   FamilyProfile({
     required this.fatherName,
     required this.motherName,
+    this.fatherOccupation,
+    this.motherOccupation,
     required this.numberOfBrothers,
     required this.numberOfSisters,
     required this.familyType,
@@ -23,6 +27,8 @@ class FamilyProfile {
     return {
       'fatherName': fatherName.toMap(),
       'motherName': motherName.toMap(),
+      'fatherOccupation': fatherOccupation?.toMap(),
+      'motherOccupation': motherOccupation?.toMap(),
       'numberOfBrothers': numberOfBrothers,
       'numberOfSisters': numberOfSisters,
       'familyType': familyType.toMap(),
@@ -39,9 +45,16 @@ class FamilyProfile {
       return BilingualValue(en: val?.toString() ?? '', hi: '');
     }
 
+    BilingualValue? parseOptionalBilingual(dynamic val) {
+      if (val == null) return null;
+      return parseBilingual(val);
+    }
+
     return FamilyProfile(
       fatherName: parseBilingual(map['fatherName']),
       motherName: parseBilingual(map['motherName']),
+      fatherOccupation: parseOptionalBilingual(map['fatherOccupation']),
+      motherOccupation: parseOptionalBilingual(map['motherOccupation']),
       numberOfBrothers:
           int.tryParse(map['numberOfBrothers']?.toString() ?? '') ?? 0,
       numberOfSisters:
@@ -54,12 +67,14 @@ class FamilyProfile {
 
   @override
   String toString() {
-    return 'FamilyProfile(fatherName: $fatherName, motherName: $motherName, numberOfBrothers: $numberOfBrothers, numberOfSisters: $numberOfSisters, familyType: $familyType, familyStatus: $familyStatus, familyIncome: $familyIncome)';
+    return 'FamilyProfile(fatherName: $fatherName, motherName: $motherName, fatherOccupation: $fatherOccupation, motherOccupation: $motherOccupation, numberOfBrothers: $numberOfBrothers, numberOfSisters: $numberOfSisters, familyType: $familyType, familyStatus: $familyStatus, familyIncome: $familyIncome)';
   }
 
   FamilyProfile copyWith({
     BilingualValue? fatherName,
     BilingualValue? motherName,
+    BilingualValue? fatherOccupation,
+    BilingualValue? motherOccupation,
     int? numberOfBrothers,
     int? numberOfSisters,
     BilingualValue? familyType,
@@ -69,6 +84,8 @@ class FamilyProfile {
     return FamilyProfile(
       fatherName: fatherName ?? this.fatherName,
       motherName: motherName ?? this.motherName,
+      fatherOccupation: fatherOccupation ?? this.fatherOccupation,
+      motherOccupation: motherOccupation ?? this.motherOccupation,
       numberOfBrothers: numberOfBrothers ?? this.numberOfBrothers,
       numberOfSisters: numberOfSisters ?? this.numberOfSisters,
       familyType: familyType ?? this.familyType,
@@ -81,6 +98,8 @@ class FamilyProfile {
     return FamilyProfile(
       fatherName: BilingualValue.empty(),
       motherName: BilingualValue.empty(),
+      fatherOccupation: null,
+      motherOccupation: null,
       numberOfBrothers: 0,
       numberOfSisters: 0,
       familyType: BilingualValue.empty(),
