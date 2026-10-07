@@ -25,9 +25,10 @@ class ImagePickerController extends StateNotifier<ImagesState> {
   Future<String?> _cropImage(BuildContext context, String path, {bool isPrimary = false}) async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
-      compressQuality: 80,
-      maxWidth: 1200,
-      maxHeight: 1200,
+      compressQuality: 70,
+      maxWidth: 1080,
+      maxHeight: 1080,
+      compressFormat: ImageCompressFormat.jpg,
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: AppLabels.cropImage(context),
@@ -87,7 +88,12 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      final XFile? image = await _picker.pickImage(source: source);
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        imageQuality: 70,
+        maxWidth: 1080,
+        maxHeight: 1080,
+      );
 
       if (image == null) return;
 
@@ -106,7 +112,12 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      final images = await _picker.pickMultiImage(limit: maxSecondaryImages);
+      final images = await _picker.pickMultiImage(
+        limit: maxSecondaryImages,
+        imageQuality: 70,
+        maxWidth: 1080,
+        maxHeight: 1080,
+      );
 
       if (images.isEmpty) return;
 
@@ -246,7 +257,12 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 70,
+        maxWidth: 1080,
+        maxHeight: 1080,
+      );
 
       if (image == null) return;
 
@@ -269,7 +285,12 @@ class ImagePickerController extends StateNotifier<ImagesState> {
     _isPicking = true;
 
     try {
-      final XFile? image = await _picker.pickImage(source: source);
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        imageQuality: 70,
+        maxWidth: 1080,
+        maxHeight: 1080,
+      );
 
       if (image == null) return;
 

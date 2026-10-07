@@ -1365,8 +1365,8 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
                             ...(() {
                               final des = widget.designation != null
                                   ? (widget.designation is BilingualValue
-                                      ? (isHindi ? (widget.designation as BilingualValue).hi : (widget.designation as BilingualValue).en)
-                                      : widget.designation.toString())
+                                        ? (isHindi ? (widget.designation as BilingualValue).hi : (widget.designation as BilingualValue).en)
+                                        : widget.designation.toString())
                                   : '';
                               final inc = widget.income != null
                                   ? "Earns ${widget.income is BilingualValue ? (isHindi ? (widget.income as BilingualValue).hi : (widget.income as BilingualValue).en) : widget.income.toString()}"

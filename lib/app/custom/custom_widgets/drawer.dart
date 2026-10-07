@@ -1,4 +1,5 @@
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/features/auth/presentation/providers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,7 +38,7 @@ class AppDrawer extends ConsumerWidget {
                       radius: 34,
                       backgroundColor: Colors.white,
 
-                      backgroundImage: data.profileImageUrl.isNotEmpty ? NetworkImage(data.profileImageUrl) : null,
+                      backgroundImage: data.profileImageUrl.isNotEmpty ? CachedNetworkImageProvider(data.profileImageUrl) : null,
                       child: data.profileImageUrl.isEmpty
                           ? Text(data.agentName[0].toUpperCase(), style: TextStyle(fontSize: 28, color: theme.primaryColor))
                           : null,

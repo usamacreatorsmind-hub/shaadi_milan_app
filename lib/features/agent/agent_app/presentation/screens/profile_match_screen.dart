@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/app/router/app_router.dart';
@@ -14,9 +15,7 @@ import '../../../../user/user_app/domain/states/religion_state.dart';
 import '../../../../user/user_app/domain/states/state_city.dart';
 
 // Provider to fetch all matrimony profile view models
-final allProfilesProvider = FutureProvider<List<MetrimonyProfileViewModel>>((
-  ref,
-) async {
+final allProfilesProvider = FutureProvider<List<MetrimonyProfileViewModel>>((ref) async {
   final datasource = ref.watch(metrimonyFirestoreDsProvider);
   final paymentsRepository = ref.watch(userPaymentsRepositoryProvider);
   final profilesData = await datasource.getAllMetrimonyProfiles();
@@ -25,9 +24,7 @@ final allProfilesProvider = FutureProvider<List<MetrimonyProfileViewModel>>((
   final results = await Future.wait(
     profilesData.map((profile) async {
       try {
-        final vm = await datasource.getMetrimonyProfileViewModel(
-          profile['userId'],
-        );
+        final vm = await datasource.getMetrimonyProfileViewModel(profile['userId']);
 
         if (vm == null) return null;
 
@@ -36,10 +33,7 @@ final allProfilesProvider = FutureProvider<List<MetrimonyProfileViewModel>>((
 
         // Optional: If you only want to show matches who have paid
         if (vm.user.agentId.isNotEmpty) {
-          final payment = await paymentsRepository.getUserPayment(
-            userId: vm.user.uid,
-            agentId: vm.user.agentId,
-          );
+          final payment = await paymentsRepository.getUserPayment(userId: vm.user.uid, agentId: vm.user.agentId);
           if (payment?.status.toUpperCase() != 'SUCCESS') return null;
         }
 
@@ -60,8 +54,7 @@ class ProfileMatchScreen extends ConsumerStatefulWidget {
   const ProfileMatchScreen({super.key, required this.profile});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _ProfileMatchScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _ProfileMatchScreenState();
 }
 
 class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
@@ -91,9 +84,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
   Future<void> _loadExistingRecommendations() async {
     try {
       final repo = ref.read(userRecemmondedRepositoryProvider);
-      final existing = await repo.fetchRecommendedProfiles(
-        widget.profile.user.uid,
-      );
+      final existing = await repo.fetchRecommendedProfiles(widget.profile.user.uid);
       setState(() {
         _recommendedProfiles = existing;
       });
@@ -147,11 +138,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            success
-                ? context.l10n.profileRecommendedSuccessfully
-                : context.l10n.failedToRecommendProfile,
-          ),
+          content: Text(success ? context.l10n.profileRecommendedSuccessfully : context.l10n.failedToRecommendProfile),
           backgroundColor: success ? Colors.green : Colors.red,
           behavior: SnackBarBehavior.floating,
         ),
@@ -163,10 +150,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
     final repo = ref.read(userRecemmondedRepositoryProvider);
 
     // Perform mutual recommendation removal using the repository's batch update method
-    final success = await repo.removeMutualRecommendedProfiles(
-      sourceUid: widget.profile.user.uid,
-      targetUid: match.user.uid,
-    );
+    final success = await repo.removeMutualRecommendedProfiles(sourceUid: widget.profile.user.uid, targetUid: match.user.uid);
 
     if (mounted) {
       if (success) {
@@ -177,11 +161,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            success
-                ? context.l10n.recommendationRemovedSuccessfully
-                : context.l10n.failedToRemoveRecommendation,
-          ),
+          content: Text(success ? context.l10n.recommendationRemovedSuccessfully : context.l10n.failedToRemoveRecommendation),
           backgroundColor: success ? Colors.green : Colors.red,
           behavior: SnackBarBehavior.floating,
         ),
@@ -216,9 +196,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: theme.primaryColor,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(20),
-              ),
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
             ),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
@@ -227,47 +205,25 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: context.l10n.searchMatchHint,
-                  hintStyle: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    fontSize: 13,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Colors.white.withValues(alpha: 0.8),
-                    size: 20,
-                  ),
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
+                  prefixIcon: Icon(Icons.search, color: Colors.white.withValues(alpha: 0.8), size: 20),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
-                          icon: Icon(
-                            Icons.close,
-                            size: 18,
-                            color: Colors.white.withValues(alpha: 0.8),
-                          ),
+                          icon: Icon(Icons.close, size: 18, color: Colors.white.withValues(alpha: 0.8)),
                           onPressed: () => _searchController.clear(),
                         )
                       : null,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 0,
-                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                   filled: true,
                   fillColor: Colors.white.withValues(alpha: 0.15),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.3),
-                    ),
+                    borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(
-                      color: Colors.white,
-                      width: 1.5,
-                    ),
+                    borderSide: const BorderSide(color: Colors.white, width: 1.5),
                   ),
                 ),
               ),
@@ -281,14 +237,11 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
         data: (profiles) {
           // ── 1. Caste / region filter (existing logic) ──────
           final matches = profiles.where((p) {
-            final isOppositeGender =
-                p.identity.gender.en.toLowerCase() == targetGender;
+            final isOppositeGender = p.identity.gender.en.toLowerCase() == targetGender;
             final isNotSelf = p.user.uid != widget.profile.user.uid;
             if (!isOppositeGender || !isNotSelf) return false;
 
-            final sameReligion =
-                sourceReligion.isNotEmpty &&
-                _normalize(p.cultural.religion.en) == sourceReligion;
+            final sameReligion = sourceReligion.isNotEmpty && _normalize(p.cultural.religion.en) == sourceReligion;
 
             return sameReligion;
           }).toList();
@@ -309,10 +262,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text(
-                  context.l10n.noMatchingReligionProfiles,
-                  textAlign: TextAlign.center,
-                ),
+                child: Text(context.l10n.noMatchingReligionProfiles, textAlign: TextAlign.center),
               ),
             );
           }
@@ -324,19 +274,11 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.search_off,
-                      size: 56,
-                      color: Colors.grey.shade300,
-                    ),
+                    Icon(Icons.search_off, size: 56, color: Colors.grey.shade300),
                     const SizedBox(height: 12),
                     Text(
                       context.l10n.noResultsFor(_searchQuery),
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade600,
-                      ),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
                     ),
                     const SizedBox(height: 8),
                     TextButton.icon(
@@ -361,30 +303,18 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                     Expanded(
                       child: Text(
                         context.l10n.matchesFor(widget.profile.user.fullName.en),
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(color: theme.primaryColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
                       child: Text(
                         q.isEmpty
                             ? '${filtered.length} ${filtered.length != 1 ? context.l10n.matches : context.l10n.match}'
                             : '${filtered.length} / ${matches.length}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: theme.primaryColor,
-                        ),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: theme.primaryColor),
                       ),
                     ),
                   ],
@@ -404,16 +334,10 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
 
                     if (locationAsync.hasValue) {
                       final states = locationAsync.value!;
-                      final stateObj = states
-                          .where((s) => s.name == match.address.state)
-                          .firstOrNull;
+                      final stateObj = states.where((s) => s.name == match.address.state).firstOrNull;
                       if (stateObj != null) {
                         final cityObj = stateObj.cities
-                            .where(
-                              (c) =>
-                                  c.id == match.address.city ||
-                                  c.name == match.address.city,
-                            )
+                            .where((c) => c.id == match.address.city || c.name == match.address.city)
                             .firstOrNull;
                         if (cityObj != null) {
                           resolvedCity = cityObj.name;
@@ -424,20 +348,12 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                     if (religionsAsync.hasValue) {
                       final religions = religionsAsync.value!;
                       final religionObj = religions
-                          .where(
-                            (r) =>
-                                r.id == match.cultural.religion ||
-                                r.name == match.cultural.religion,
-                          )
+                          .where((r) => r.id == match.cultural.religion || r.name == match.cultural.religion)
                           .firstOrNull;
                       if (religionObj != null) {
                         resolvedReligion = religionObj.name;
                         final casteObj = religionObj.castes
-                            .where(
-                              (c) =>
-                                  c.id == match.cultural.caste ||
-                                  c.name == match.cultural.caste,
-                            )
+                            .where((c) => c.id == match.cultural.caste || c.name == match.cultural.caste)
                             .firstOrNull;
                         if (casteObj != null) {
                           resolvedCaste = casteObj.name;
@@ -448,45 +364,37 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                     return InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () =>
-                          _recommendedProfiles!.ids.contains(match.user.uid)
-                          ? _removeRecommendation(match)
-                          : _recommendProfile(match),
+                          _recommendedProfiles!.ids.contains(match.user.uid) ? _removeRecommendation(match) : _recommendProfile(match),
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 18),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             /// IMAGE
                             ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(20),
-                              ),
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                               child: SizedBox(
                                 height: 240,
                                 width: double.infinity,
                                 child: match.images.primaryImageUrl.isNotEmpty
-                                    ? Image.network(
-                                        match.images.primaryImageUrl,
+                                    ? CachedNetworkImage(
+                                        imageUrl: match.images.primaryImageUrl,
                                         fit: BoxFit.cover,
-                                      )
-                                    : Container(
-                                        color: Colors.grey.shade200,
-                                        child: const Icon(
-                                          Icons.person,
-                                          size: 80,
+                                        placeholder: (context, url) => Container(
+                                          color: Colors.grey.shade100,
+                                          child: const Center(child: CircularProgressIndicator()),
                                         ),
-                                      ),
+                                        errorWidget: (context, url, error) => Container(
+                                          color: Colors.grey.shade200,
+                                          child: const Icon(Icons.broken_image, size: 80, color: Colors.grey),
+                                        ),
+                                      )
+                                    : Container(color: Colors.grey.shade200, child: const Icon(Icons.person, size: 80)),
                               ),
                             ),
 
@@ -498,42 +406,20 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                   /// NAME + VERIFIED
                                   Row(
                                     children: [
-                                      Expanded(
-                                        child: 
-                                        BilingualParser(value: match.user.fullName)
-                                        
-                                  
-                                      ),
+                                      Expanded(child: BilingualParser(value: match.user.fullName)),
 
-                                      if (_recommendedProfiles!.ids.contains(
-                                        match.user.uid,
-                                      ))
+                                      if (_recommendedProfiles!.ids.contains(match.user.uid))
                                         Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 5,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.green.shade100,
-                                            borderRadius: BorderRadius.circular(
-                                              30,
-                                            ),
-                                          ),
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                          decoration: BoxDecoration(color: Colors.green.shade100, borderRadius: BorderRadius.circular(30)),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              const Icon(
-                                                Icons.check_circle,
-                                                color: Colors.green,
-                                                size: 16,
-                                              ),
+                                              const Icon(Icons.check_circle, color: Colors.green, size: 16),
                                               const SizedBox(width: 4),
                                               Text(
                                                 context.l10n.recommended,
-                                                style: const TextStyle(
-                                                  color: Colors.green,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                                style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
                                               ),
                                             ],
                                           ),
@@ -548,22 +434,13 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                     spacing: 10,
                                     runSpacing: 10,
                                     children: [
-                                      _infoChip(
-                                        Icons.cake,
-                                        '${match.identity.age} ${context.l10n.years}',
-                                      ),
+                                      _infoChip(Icons.cake, '${match.identity.age} ${context.l10n.years}'),
 
-                                      _infoChip(
-                                        Icons.temple_hindu,
-                                        resolvedReligion,
-                                      ),
+                                      _infoChip(Icons.temple_hindu, resolvedReligion),
 
                                       _infoChip(Icons.people, resolvedCaste),
 
-                                      _infoChip(
-                                        Icons.location_on,
-                                        resolvedCity,
-                                      ),
+                                      _infoChip(Icons.location_on, resolvedCity),
                                     ],
                                   ),
 
@@ -573,43 +450,24 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                   SizedBox(
                                     width: double.infinity,
                                     child: ElevatedButton.icon(
-                                      onPressed: () =>
-                                          _recommendedProfiles!.ids.contains(
-                                            match.user.uid,
-                                          )
+                                      onPressed: () => _recommendedProfiles!.ids.contains(match.user.uid)
                                           ? _removeRecommendation(match)
                                           : _recommendProfile(match),
                                       icon: Icon(
-                                        _recommendedProfiles!.ids.contains(
-                                              match.user.uid,
-                                            )
-                                            ? Icons.favorite_border
-                                            : Icons.favorite,
+                                        _recommendedProfiles!.ids.contains(match.user.uid) ? Icons.favorite_border : Icons.favorite,
                                       ),
                                       label: Text(
-                                        _recommendedProfiles!.ids.contains(
-                                              match.user.uid,
-                                            )
+                                        _recommendedProfiles!.ids.contains(match.user.uid)
                                             ? context.l10n.removeRecommendation
                                             : context.l10n.recommendProfile,
                                       ),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            _recommendedProfiles!.ids.contains(
-                                              match.user.uid,
-                                            )
+                                        backgroundColor: _recommendedProfiles!.ids.contains(match.user.uid)
                                             ? Colors.red.shade400
                                             : theme.primaryColor,
                                         foregroundColor: Colors.white,
-                                        minimumSize: const Size(
-                                          double.infinity,
-                                          50,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            14,
-                                          ),
-                                        ),
+                                        minimumSize: const Size(double.infinity, 50),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                       ),
                                     ),
                                   ),
@@ -617,24 +475,12 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                   SizedBox(
                                     width: double.infinity,
                                     child: OutlinedButton.icon(
-                                      onPressed: () => context.pushRoute(
-                                        ViewUserRoute(
-                                          userId: match.user.uid,
-                                          showMatchButton: false,
-                                        ),
-                                      ),
+                                      onPressed: () => context.pushRoute(ViewUserRoute(userId: match.user.uid, showMatchButton: false)),
                                       icon: const Icon(Icons.person_outline),
                                       label: Text(context.l10n.viewFullProfile),
                                       style: OutlinedButton.styleFrom(
-                                        minimumSize: const Size(
-                                          double.infinity,
-                                          50,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            14,
-                                          ),
-                                        ),
+                                        minimumSize: const Size(double.infinity, 50),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                       ),
                                     ),
                                   ),
@@ -658,10 +504,7 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
   Widget _infoChip(IconData icon, String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(30),
-      ),
+      decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(30)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

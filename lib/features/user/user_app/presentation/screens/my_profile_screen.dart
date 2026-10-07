@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -113,23 +114,18 @@ class MyProfileScreen extends ConsumerWidget {
                                     ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
-                                      child: Image.network(
-                                        profile.images.secondaryImageUrls[index],
+                                      child: CachedNetworkImage(
+                                        imageUrl: profile.images.secondaryImageUrls[index],
                                         width: 100,
                                         height: 100,
                                         fit: BoxFit.cover,
-                                        loadingBuilder: (context, child, loadingProgress) {
-                                          if (loadingProgress == null) return child;
-                                          return ShimmerProfileCard(width: 100, height: 100);
-                                        },
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Container(
-                                            width: 100,
-                                            height: 100,
-                                            color: Colors.grey.shade100,
-                                            child: const Icon(Icons.broken_image, color: Colors.grey),
-                                          );
-                                        },
+                                        placeholder: (context, url) => ShimmerProfileCard(width: 100, height: 100),
+                                        errorWidget: (context, url, error) => Container(
+                                          width: 100,
+                                          height: 100,
+                                          color: Colors.grey.shade100,
+                                          child: const Icon(Icons.broken_image, color: Colors.grey),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -337,26 +333,19 @@ class PhotoPreviewDialog extends StatelessWidget {
             child: Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  photoUrl,
+                child: CachedNetworkImage(
+                  imageUrl: photoUrl,
                   fit: BoxFit.contain,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) {
-                      return child;
-                    }
-                    return ShimmerProfileCard(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      height: MediaQuery.of(context).size.height * 0.7,
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      height: MediaQuery.of(context).size.height * 0.7,
-                      decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12)),
-                      child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
-                    );
-                  },
+                  placeholder: (context, url) => ShimmerProfileCard(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    height: MediaQuery.of(context).size.height * 0.7,
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12)),
+                    child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
+                  ),
                 ),
               ),
             ),
@@ -549,7 +538,7 @@ class _ProfileHeroCard extends ConsumerWidget {
                               child: CircleAvatar(
                                 radius: 43,
                                 backgroundColor: primaryColor.withOpacity(0.1),
-                                backgroundImage: hasImage ? NetworkImage(profile.userProfile.profileImageUrl) : null,
+                                backgroundImage: hasImage ? CachedNetworkImageProvider(profile.userProfile.profileImageUrl) : null,
                                 child: !hasImage
                                     ? Text(
                                         profile.userProfile.fullName.en.isNotEmpty ? profile.userProfile.fullName.en[0].toUpperCase() : '?',

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ProfileCard extends StatelessWidget {
@@ -24,23 +25,24 @@ class ProfileCard extends StatelessWidget {
       margin: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          Image.network(
-            imageUrl,
+          CachedNetworkImage(
+            imageUrl: imageUrl,
             height: 200,
             width: double.infinity,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) =>
-                const SizedBox(height: 200, child: Icon(Icons.broken_image)),
+            placeholder: (context, url) => Container(
+              height: 200,
+              color: Colors.grey.shade200,
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+            errorWidget: (context, url, error) => const SizedBox(height: 200, child: Icon(Icons.broken_image)),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '$name, $age',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                Text('$name, $age', style: Theme.of(context).textTheme.titleLarge),
                 Text('$height | $occupation'),
                 Text(profileId),
               ],
