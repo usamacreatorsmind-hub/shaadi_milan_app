@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'features/l10n/app_translation_service.dart';
-
 import 'app/app.dart';
 import 'core/env/app_env.dart';
 import 'core/env/app_env_config.dart';
