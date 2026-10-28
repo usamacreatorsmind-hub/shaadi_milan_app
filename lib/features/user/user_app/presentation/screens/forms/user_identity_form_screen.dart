@@ -278,7 +278,7 @@ class _UserIdentityFormScreenState extends ConsumerState<UserIdentityFormScreen>
                       : AppLabels.dobValue(context, DateFormat('dd/MM/yyyy').format(_selectedDate!)),
                 ),
                 subtitle: _age == null ? null : Text(AppLabels.ageYears(context, _age!)),
-                onTap: widget.mode == FormMode.edit ? null : () => _selectDate(context),
+                onTap: () => _selectDate(context),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                   side: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),

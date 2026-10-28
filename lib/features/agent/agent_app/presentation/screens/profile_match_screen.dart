@@ -385,9 +385,14 @@ class _ProfileMatchScreenState extends ConsumerState<ProfileMatchScreen> {
                                     ? CachedNetworkImage(
                                         imageUrl: match.images.primaryImageUrl,
                                         fit: BoxFit.cover,
+                                        memCacheWidth: 600,
+                                        memCacheHeight: 600,
+                                        maxWidthDiskCache: 800,
+                                        maxHeightDiskCache: 800,
+                                        fadeInDuration: const Duration(milliseconds: 200),
                                         placeholder: (context, url) => Container(
                                           color: Colors.grey.shade100,
-                                          child: const Center(child: CircularProgressIndicator()),
+                                          child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
                                         ),
                                         errorWidget: (context, url, error) => Container(
                                           color: Colors.grey.shade200,

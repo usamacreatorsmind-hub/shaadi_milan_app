@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,10 +79,7 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
               if (!canPop) ...[
                 Text(
                   AppLabels.uploadProfileImages(context),
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
-                  ),
+                  style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor),
                 ),
                 const SizedBox(height: 32),
               ],
@@ -95,29 +93,14 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: theme.primaryColor.withOpacity(0.2),
-                        width: 4,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
+                      border: Border.all(color: theme.primaryColor.withOpacity(0.2), width: 4),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10))],
                     ),
                     child: CircleAvatar(
                       radius: 70,
                       backgroundColor: Colors.grey.shade100,
                       backgroundImage: avatarImage,
-                      child: avatarImage == null
-                          ? Icon(
-                              Icons.person_outline_rounded,
-                              size: 70,
-                              color: Colors.grey.shade400,
-                            )
-                          : null,
+                      child: avatarImage == null ? Icon(Icons.person_outline_rounded, size: 70, color: Colors.grey.shade400) : null,
                     ),
                   ),
                   GestureDetector(
@@ -131,10 +114,7 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-              Text(
-                "Upload a clear face photo",
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-              ),
+              Text("Upload a clear face photo", style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
 
               const SizedBox(height: 40),
 
@@ -156,12 +136,7 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(12),
-                              child: Image.file(
-                                File(path),
-                                width: 120,
-                                height: 120,
-                                fit: BoxFit.cover,
-                              ),
+                              child: Image.file(File(path), width: 120, height: 120, fit: BoxFit.cover),
                             ),
                             Positioned(
                               top: 4,
@@ -170,10 +145,7 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
                                 onTap: () => controller.removeSecondaryImage(path),
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
+                                  decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
                                   child: const Icon(Icons.close, color: Colors.white, size: 16),
                                 ),
                               ),
@@ -196,12 +168,17 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
                         padding: const EdgeInsets.only(right: 12),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            url,
+                          child: CachedNetworkImage(
+                            imageUrl: url,
                             width: 120,
                             height: 120,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Container(
+                            memCacheWidth: 240,
+                            memCacheHeight: 240,
+                            maxWidthDiskCache: 480,
+                            maxHeightDiskCache: 480,
+                            placeholder: (_, __) => Container(width: 120, height: 120, color: Colors.grey.shade200),
+                            errorWidget: (context, url, error) => Container(
                               width: 120,
                               height: 120,
                               color: Colors.grey.shade200,
@@ -223,10 +200,7 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
                     border: Border.all(color: Colors.grey.shade200, style: BorderStyle.solid),
                   ),
                   child: Center(
-                    child: Text(
-                      "No extra photos added",
-                      style: TextStyle(color: Colors.grey.shade400),
-                    ),
+                    child: Text("No extra photos added", style: TextStyle(color: Colors.grey.shade400)),
                   ),
                 ),
 
@@ -240,9 +214,7 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
                   label: const Text("Add More Photos"),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ),
@@ -259,21 +231,12 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.primaryColor,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 2,
                     ),
                     child: _isUploading
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                          )
-                        : const Text(
-                            "Save Photos",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
+                        ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+                        : const Text("Save Photos", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -292,11 +255,7 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
         ),
       ],
     );
@@ -306,9 +265,7 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
     final uid = ref.read(targetUserIdProvider);
     if (uid == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User ID not found.")),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("User ID not found.")));
       }
       return;
     }
@@ -318,9 +275,7 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
     if (imageState.profileImage == null && imageState.secondaryImages.isEmpty) {
       // If standalone mode and no images, show message
       if (widget.registerSubmit == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("No new photos selected to upload.")),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("No new photos selected to upload.")));
       }
       return;
     }
@@ -332,18 +287,14 @@ class _UserImageFormScreenState extends ConsumerState<UserImageFormScreen> {
       // NOTE: We do NOT call reset() here so images remain visible on screen.
 
       if (mounted && widget.registerSubmit == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Photos saved successfully!")),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Photos saved successfully!")));
         if (Navigator.canPop(context)) {
           context.router.maybePop();
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error uploading photos: $e")),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error uploading photos: $e")));
       }
       rethrow;
     } finally {

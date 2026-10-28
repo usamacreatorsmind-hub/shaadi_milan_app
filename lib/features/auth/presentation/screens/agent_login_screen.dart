@@ -1,15 +1,13 @@
+import 'package:flutter/gestures.dart';
 import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/core/notification/notification_service.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import '../providers/auth_providers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../../app/custom/custom_widgets/widgets.dart';
 import '../../../../app/router/app_router.dart';
 
@@ -277,51 +275,70 @@ class _AgentLoginScreenState extends ConsumerState<AgentLoginScreen> {
   }
 }
 
-class _TermsPrivacyFooter extends StatelessWidget {
+class _TermsPrivacyFooter extends StatefulWidget {
   const _TermsPrivacyFooter();
 
-  Future<void> _openPrivacy() async {
-    final uri = Uri.parse(AppConstants.privacyPolicyUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+  @override
+  State<_TermsPrivacyFooter> createState() => _TermsPrivacyFooterState();
+}
+
+class _TermsPrivacyFooterState extends State<_TermsPrivacyFooter> {
+  late TapGestureRecognizer _termsRecognizer;
+  late TapGestureRecognizer _privacyRecognizer;
+
+  @override
+  void initState() {
+    super.initState();
+    _termsRecognizer = TapGestureRecognizer()
+      ..onTap = () {
+        AppConstants.openUrl(AppConstants.termsAndConditionsUrl);
+      };
+    _privacyRecognizer = TapGestureRecognizer()
+      ..onTap = () {
+        AppConstants.openUrl(AppConstants.privacyPolicyUrl);
+      };
+  }
+
+  @override
+  void dispose() {
+    _termsRecognizer.dispose();
+    _privacyRecognizer.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final baseStyle = TextStyle(color: Colors.grey.shade600, fontSize: 13, height: 1.4);
     final linkStyle = TextStyle(
       color: theme.colorScheme.primary,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.bold,
       fontSize: 13,
       decoration: TextDecoration.underline,
+      height: 1.4,
     );
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        children: [
-          Text(
-            AppLabels.byContinuingAgree(context),
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-          ),
-          GestureDetector(
-            onTap: null,
-            child: Text(
-              AppLabels.termsAndConditions(context),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: RichText(
+        textAlign: TextAlign.center,
+        text: TextSpan(
+          style: baseStyle,
+          children: [
+            TextSpan(text: '${AppLabels.byContinuingAgree(context)} '),
+            TextSpan(
+              text: AppLabels.termsAndConditions(context),
               style: linkStyle,
+              recognizer: _termsRecognizer,
             ),
-          ),
-          Text(
-            AppLabels.andLabel(context),
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-          ),
-          GestureDetector(
-            onTap: _openPrivacy,
-            child: Text(AppLabels.privacyPolicy(context), style: linkStyle),
-          ),
-        ],
+            TextSpan(text: ' ${AppLabels.andLabel(context)} '),
+            TextSpan(
+              text: AppLabels.privacyPolicy(context),
+              style: linkStyle,
+              recognizer: _privacyRecognizer,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -104,7 +105,7 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
                   ),
                   title: Text(AppLocalizations.of(context)!.privacyPolicy),
                   trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () => context.pushRoute(const PrivacyPolicyRoute()),
+                  onTap: () => AppConstants.openUrl(AppConstants.privacyPolicyUrl),
                 ),
                 const Divider(height: 1),
                 ListTile(
@@ -114,8 +115,17 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
                   ),
                   title: Text(AppLocalizations.of(context)!.termsAndConditions),
                   trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () =>
-                      context.pushRoute(const TermsAndConditionsRoute()),
+                  onTap: () => AppConstants.openUrl(AppConstants.termsAndConditionsUrl),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: Icon(
+                    Icons.security_outlined,
+                    color: theme.primaryColor,
+                  ),
+                  title: const Text("Child Safety Standards"),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: () => AppConstants.openUrl(AppConstants.childSafetyStandardsUrl),
                 ),
               ],
             ),

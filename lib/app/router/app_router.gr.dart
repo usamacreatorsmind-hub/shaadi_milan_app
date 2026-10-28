@@ -562,6 +562,22 @@ class ChangePasswordRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ChildSafetyStandardsScreen]
+class ChildSafetyStandardsRoute extends PageRouteInfo<void> {
+  const ChildSafetyStandardsRoute({List<PageRouteInfo>? children})
+    : super(ChildSafetyStandardsRoute.name, initialChildren: children);
+
+  static const String name = 'ChildSafetyStandardsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ChildSafetyStandardsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ContactUsScreen]
 class ContactUsRoute extends PageRouteInfo<void> {
   const ContactUsRoute({List<PageRouteInfo>? children})
@@ -1828,18 +1844,54 @@ class UserIdentityFormRouteArgs {
 
 /// generated route for
 /// [UserImageFormScreen]
-class UserImageFormRoute extends PageRouteInfo<void> {
-  const UserImageFormRoute({List<PageRouteInfo>? children})
-    : super(UserImageFormRoute.name, initialChildren: children);
+class UserImageFormRoute extends PageRouteInfo<UserImageFormRouteArgs> {
+  UserImageFormRoute({
+    Key? key,
+    void Function(VoidCallback)? registerSubmit,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UserImageFormRoute.name,
+         args: UserImageFormRouteArgs(key: key, registerSubmit: registerSubmit),
+         initialChildren: children,
+       );
 
   static const String name = 'UserImageFormRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const UserImageFormScreen();
+      final args = data.argsAs<UserImageFormRouteArgs>(
+        orElse: () => const UserImageFormRouteArgs(),
+      );
+      return UserImageFormScreen(
+        key: args.key,
+        registerSubmit: args.registerSubmit,
+      );
     },
   );
+}
+
+class UserImageFormRouteArgs {
+  const UserImageFormRouteArgs({this.key, this.registerSubmit});
+
+  final Key? key;
+
+  final void Function(VoidCallback)? registerSubmit;
+
+  @override
+  String toString() {
+    return 'UserImageFormRouteArgs{key: $key, registerSubmit: $registerSubmit}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! UserImageFormRouteArgs) return false;
+    return key == other.key;
+  }
+
+  @override
+  int get hashCode => key.hashCode;
 }
 
 /// generated route for

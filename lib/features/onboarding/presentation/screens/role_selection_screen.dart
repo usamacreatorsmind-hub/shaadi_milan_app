@@ -207,12 +207,12 @@ class RoleSelectionScreen extends ConsumerWidget {
                           children: [
                             _FooterLink(
                               text: AppLabels.privacyPolicy(context),
-                              onTap: () => context.pushRoute(const PrivacyPolicyRoute()),
+                              onTap: () => AppConstants.openUrl(AppConstants.privacyPolicyUrl),
                             ),
                             _LinkSeparator(),
                             _FooterLink(
                               text: AppLabels.termsAndConditions(context),
-                              onTap: () => context.pushRoute(const TermsAndConditionsRoute()),
+                              onTap: () => AppConstants.openUrl(AppConstants.termsAndConditionsUrl),
                             ),
                             _LinkSeparator(),
                             _FooterLink(

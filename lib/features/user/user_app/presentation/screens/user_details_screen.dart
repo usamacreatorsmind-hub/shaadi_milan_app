@@ -1,3 +1,4 @@
+import 'package:shadi_milan/core/utils/image_url_optimizer.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +82,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
     final cleaned = <String>[];
     for (final url in rawImages) {
       if (url.trim().isEmpty) continue;
-      if (unique.add(url)) cleaned.add(url);
+      final optimized = optimizeImageUrl(url, width: 1000, quality: 80);
+      if (unique.add(optimized)) cleaned.add(optimized);
     }
 
     return cleaned;

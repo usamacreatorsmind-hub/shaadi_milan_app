@@ -78,6 +78,7 @@ import '../../features/user/user_app/widgets/agent_contact_screen.dart';
 import '../../features/user/user_razorpay/presentation/screens/user_payment_order_history_screen.dart';
 import '../../features/user/user_razorpay/presentation/screens/user_payment_screen.dart';
 import '../../features/user/user_razorpay/presentation/screens/user_payment_success_screen.dart';
+import '../custom/custom_widgets/child_safety_standards_route.dart';
 import '../custom/custom_widgets/contact_us_screen.dart';
 import '../custom/custom_widgets/privacy_policy_route.dart';
 import '../custom/custom_widgets/terms_and_conditions_route.dart';
@@ -114,6 +115,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: ContactUsRoute.page),
     AutoRoute(page: PrivacyPolicyRoute.page),
     AutoRoute(page: TermsAndConditionsRoute.page),
+    AutoRoute(page: ChildSafetyStandardsRoute.page),
     AutoRoute(page: ViewAgentProfileRoute.page),
     // ================= USER ROUTES =================
     ...UserRouter.routes(ref),

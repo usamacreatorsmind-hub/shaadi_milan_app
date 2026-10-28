@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../app/providers/global_providers.dart';
-import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../../../translitration/models/bilingual_value.dart';
 import '../../data/repositories_impl/matrimony_repository_impl.dart';
+import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../domain/repositories/metrimony_repository.dart';
 import '../../domain/states/identity_state.dart';
 import 'metrimony_profile_controller.dart';
@@ -46,6 +46,12 @@ class UserIdentityController extends StateNotifier<IdentityState> {
 
     try {
       await _ref.read(matrimonyRepositoryProvider).updateIdentityProfile(_uid, identityProfile);
+
+      final fullName = BilingualValue(
+        hi: '${firstName.hi} ${lastName.hi}'.trim(),
+        en: '${firstName.en} ${lastName.en}'.trim(),
+      );
+      await _ref.read(userRepositoryProvider).updateFullName(_uid, fullName);
 
       state = state.copyWith(identity: identityProfile, isLoading: false);
 

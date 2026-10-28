@@ -17,6 +17,7 @@ import '../../../../../app/router/app_router.dart';
 import '../../domain/states/religion_state.dart';
 import '../../domain/states/state_city.dart';
 import '../controllers/home_controller.dart';
+import 'package:shadi_milan/core/utils/image_url_optimizer.dart';
 import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,8 @@ List<String> getAllImagesForViewModel(MatrimonyProfileViewModel vm) {
   final cleaned = <String>[];
   for (final url in raw) {
     if (url.trim().isEmpty) continue;
-    if (unique.add(url.trim())) cleaned.add(url.trim());
+    final optimized = optimizeImageUrl(url, width: 800, quality: 75);
+    if (unique.add(optimized)) cleaned.add(optimized);
   }
 
   return cleaned;
@@ -512,7 +514,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                             final nextVm = visibleProfiles[profileIndex + 1];
                             final nextImage = getDisplayImageForViewModel(nextVm);
                             if (nextImage.isNotEmpty) {
-                              precacheImage(CachedNetworkImageProvider(nextImage), context);
+                              precacheImage(CachedNetworkImageProvider(nextImage, maxWidth: 800, maxHeight: 1000), context);
                             }
                           }
 
@@ -1173,7 +1175,11 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
                       return CachedNetworkImage(
                         imageUrl: widget.images[index],
                         fit: BoxFit.cover,
-                        memCacheWidth: 800, // Optimize memory and loading speed
+                        memCacheWidth: 800,
+                        memCacheHeight: 1000,
+                        maxWidthDiskCache: 800,
+                        maxHeightDiskCache: 1000,
+                        fadeInDuration: const Duration(milliseconds: 150),
                         placeholder: (context, url) => Shimmer.fromColors(
                           baseColor: Colors.grey[300]!,
                           highlightColor: Colors.grey[100]!,

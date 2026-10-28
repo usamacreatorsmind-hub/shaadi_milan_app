@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
@@ -296,17 +297,19 @@ class UserProfileScreen extends ConsumerWidget {
                         _SettingsTile(
                           icon: Icons.privacy_tip_outlined,
                           title: AppLabels.privacyPolicy(context),
-                          onTap: () {
-                            AutoRouter.of(context).push(const PrivacyPolicyRoute());
-                          },
+                          onTap: () => AppConstants.openUrl(AppConstants.privacyPolicyUrl),
                         ),
 
                         _SettingsTile(
                           icon: Icons.description_outlined,
                           title: AppLabels.termsAndConditions(context),
-                          onTap: () {
-                            AutoRouter.of(context).push(const TermsAndConditionsRoute());
-                          },
+                          onTap: () => AppConstants.openUrl(AppConstants.termsAndConditionsUrl),
+                        ),
+
+                        _SettingsTile(
+                          icon: Icons.security_outlined,
+                          title: "Child Safety Standards",
+                          onTap: () => AppConstants.openUrl(AppConstants.childSafetyStandardsUrl),
                         ),
 
                         _SettingsTile(
@@ -431,7 +434,7 @@ class _ProfileHeaderCard extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 50,
                         backgroundColor: primaryColor.withOpacity(0.1),
-                        backgroundImage: hasImage ? NetworkImage(profile.userProfile.profileImageUrl) : null,
+                        backgroundImage: hasImage ? CachedNetworkImageProvider(profile.userProfile.profileImageUrl) : null,
                         child: !hasImage
                             ? Text(
                                 profile.userProfile.fullName.en.isNotEmpty ? profile.userProfile.fullName.en[0].toUpperCase() : '?',
@@ -868,7 +871,9 @@ class _AgentFormWidgetState extends ConsumerState<AgentFormWidget> {
                   CircleAvatar(
                     radius: 50,
 
-                    backgroundImage: _fetchedAgent!.profileImageUrl.isNotEmpty ? NetworkImage(_fetchedAgent!.profileImageUrl) : null,
+                    backgroundImage: _fetchedAgent!.profileImageUrl.isNotEmpty
+                        ? CachedNetworkImageProvider(_fetchedAgent!.profileImageUrl)
+                        : null,
 
                     backgroundColor: Theme.of(context).primaryColor.withOpacity(0.15),
                   ),

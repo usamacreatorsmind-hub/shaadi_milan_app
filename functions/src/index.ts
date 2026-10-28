@@ -805,6 +805,12 @@ export const sendMSG91OTP = onCall(async (request) => {
     throw new HttpsError("invalid-argument", "Phone number is required.");
   }
 
+  // 🧪 Play Console Test Bypass for Male (9988998899) and Female (8877887788)
+  const cleanPhone = String(phoneNumber).replace(/\D/g, "");
+  if (cleanPhone.endsWith("9988998899") || cleanPhone.endsWith("8877887788")) {
+    return { success: true, message: "OTP sent successfully (Test Bypass)" };
+  }
+
   try {
     const response = await axios.get("https://control.msg91.com/api/v5/otp", {
       params: {
@@ -834,6 +840,44 @@ export const verifyMSG91OTP = onCall(async (request) => {
   const { phoneNumber, otp } = request.data;
   if (!phoneNumber || !otp) {
     throw new HttpsError("invalid-argument", "Phone number and OTP are required.");
+  }
+
+  const cleanPhone = String(phoneNumber).replace(/\D/g, "");
+  const isMaleBypass = cleanPhone.endsWith("9988998899");
+  const isFemaleBypass = cleanPhone.endsWith("8877887788");
+
+  if (isMaleBypass || isFemaleBypass) {
+    const expectedOtp = isMaleBypass ? "1234" : "4567";
+
+    if (String(otp).trim() === expectedOtp) {
+      const usersRef = admin.firestore().collection("users");
+      let querySnapshot = await usersRef.where("phone", "==", phoneNumber).limit(1).get();
+
+      if (querySnapshot.empty) {
+        const last10Digits = cleanPhone.slice(-10);
+        querySnapshot = await usersRef.where("phone", "==", last10Digits).limit(1).get();
+      }
+
+      if (querySnapshot.empty) {
+        return { success: true, verified: true, registered: false, message: "Test number verified" };
+      }
+
+      const userDoc = querySnapshot.docs[0];
+      const customToken = await admin.auth().createCustomToken(userDoc.id);
+
+      return {
+        success: true,
+        verified: true,
+        registered: true,
+        customToken: customToken,
+      };
+    } else {
+      return {
+        success: true,
+        verified: false,
+        message: `Invalid OTP. Please enter ${expectedOtp} for test number.`,
+      };
+    }
   }
 
   try {
@@ -894,3 +938,15 @@ export { transliterate } from "./transliterate";
 
 
 // send notification on new profile suggestion (when agent adds a profile to suggested_profiles collection for a user)
+// 1.
+// Male Test Account:
+// ◦
+// Phone: 9988998899 (ya +919988998899)
+// ◦
+// OTP: 1234
+// 2.
+// Female Test Account:
+// ◦
+// Phone: 8877887788 (ya +918877887788)
+// ◦
+// OTP: 4567

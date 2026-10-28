@@ -157,6 +157,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Map<String, dynamic>> sendMSG91OTP(String phone) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'\D'), '');
+
+    // 🧪 Play Console Reviewer Bypass for Test Numbers: Male (9988998899) & Female (8877887788)
+    if (cleanPhone.endsWith('9988998899') || cleanPhone.endsWith('8877887788')) {
+      return {
+        'success': true,
+        'message': 'OTP sent successfully (Test Bypass)',
+      };
+    }
+
     try {
       final result = await FirebaseFunctions.instance.httpsCallable('sendMSG91OTP').call({
         'phoneNumber': phone,
@@ -169,12 +179,57 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Map<String, dynamic>> verifyMSG91OTP(String phone, String otp) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'\D'), '');
+
+    // 🧪 Play Console Reviewer Bypass for Male (9988998899 -> 1234) & Female (8877887788 -> 4567)
+    final bool isMaleBypass = cleanPhone.endsWith('9988998899');
+    final bool isFemaleBypass = cleanPhone.endsWith('8877887788');
+
+    if (isMaleBypass || isFemaleBypass) {
+      final String expectedOtp = isMaleBypass ? '1234' : '4567';
+
+      if (otp == expectedOtp) {
+        try {
+          final result = await FirebaseFunctions.instance.httpsCallable('verifyMSG91OTP').call({
+            'phoneNumber': phone,
+            'otp': expectedOtp,
+          });
+          final data = Map<String, dynamic>.from(result.data as Map);
+          if (data['success'] == true && data['verified'] == true && data['registered'] == true) {
+            final customToken = data['customToken'] as String;
+            await FirebaseAuth.instance.signInWithCustomToken(customToken);
+            return data;
+          }
+        } catch (_) {
+          // Fallback if backend functions doesn't have custom token or bypass
+        }
+
+        if (FirebaseAuth.instance.currentUser == null) {
+          await FirebaseAuth.instance.signInAnonymously();
+        }
+
+        return {
+          'success': true,
+          'verified': true,
+          'registered': true,
+          'message': 'Login successful',
+        };
+      } else {
+        return {
+          'success': false,
+          'verified': false,
+          'registered': true,
+          'message': 'Invalid OTP. Please enter $expectedOtp for test number.',
+        };
+      }
+    }
+
     try {
       final result = await FirebaseFunctions.instance.httpsCallable('verifyMSG91OTP').call({
         'phoneNumber': phone,
         'otp': otp,
       });
-      
+
       final data = Map<String, dynamic>.from(result.data as Map);
       if (data['success'] == true && data['verified'] == true && data['registered'] == true) {
         final customToken = data['customToken'] as String;

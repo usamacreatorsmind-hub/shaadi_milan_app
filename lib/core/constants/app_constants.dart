@@ -1,3 +1,5 @@
+import 'package:url_launcher/url_launcher.dart';
+
 /// Central place to manage all app-wide technical constants.
 /// UI labels are managed in AppLabels.
 class AppConstants {
@@ -21,8 +23,22 @@ class AppConstants {
   static const String supportHours = '9 AM – 6 PM (IST), Monday to Sunday';
 
   // ─── URLs ───────────────────────────────────────────────────────────────────
-  static const String privacyPolicyUrl = 'https://privacy.creatorsmind.co.in/shaadi-milan-app-privacy-policy/';
-  static const String termsAndConditionsUrl = 'https://privacy.creatorsmind.co.in/terms-and-conditions-for-shaadi-milan-app/';
+  static const String privacyPolicyUrl = 'https://privacy.ezyknotcareers.com/shaadimilan-com-app-privacy-policy/';
+  static const String termsAndConditionsUrl = 'https://privacy.ezyknotcareers.com/terms-conditions-for-shaadimilan-com/';
+  static const String childSafetyStandardsUrl = 'https://privacy.ezyknotcareers.com/shaadimilan-com-child-safety-standards-declaration/';
+
+  static Future<void> openUrl(String url) async {
+    if (url.trim().isEmpty) return;
+    try {
+      final uri = Uri.parse(url);
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }
 
   // ─── Deep / Action Links ────────────────────────────────────────────────────
   static const String emailLink = 'mailto:$supportEmail';

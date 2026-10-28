@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -559,19 +560,16 @@ class _ImageViewer extends StatelessWidget {
               onTap: () => _openFullscreen(context),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  imageUrl,
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
                   width: double.infinity,
                   fit: BoxFit.contain,
-
-                  /// ✅ LOADING (VERY IMPORTANT)
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return const Center(child: CircularProgressIndicator());
-                  },
-
-                  /// ✅ ERROR HANDLING
-                  errorBuilder: (_, __, ___) => _ImageError(label: label),
+                  memCacheWidth: 800,
+                  memCacheHeight: 1000,
+                  maxWidthDiskCache: 1000,
+                  maxHeightDiskCache: 1200,
+                  placeholder: (_, __) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  errorWidget: (_, __, ___) => _ImageError(label: label),
                 ),
               ),
             ),
@@ -597,14 +595,11 @@ class _ImageViewer extends StatelessWidget {
               child: InteractiveViewer(
                 minScale: 1,
                 maxScale: 4,
-                child: Image.network(
-                  imageUrl,
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
                   fit: BoxFit.contain,
-                  loadingBuilder: (_, child, progress) {
-                    if (progress == null) return child;
-                    return const Center(child: CircularProgressIndicator(color: Colors.white));
-                  },
-                  errorBuilder: (_, _, ___) => const Icon(Icons.broken_image, color: Colors.white, size: 64),
+                  placeholder: (_, __) => const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
+                  errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.white, size: 64),
                 ),
               ),
             ),

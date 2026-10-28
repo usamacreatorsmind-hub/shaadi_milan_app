@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 
 import '../../../core/themes/app_theme.dart';
+import '../../../features/user/user_app/data/repositories_impl/matrimony_repository_impl.dart';
 import '../../../features/user/user_app/data/repositories_impl/user_image_repo_impl.dart';
 import '../../../features/user/user_app/domain/states/image_state.dart';
 import '../../../features/user/user_app/presentation/controllers/metrimony_profile_controller.dart';
@@ -234,18 +236,27 @@ class ImagePickerController extends StateNotifier<ImagesState> {
         currentStep++;
       }
 
-      ref
-          .read(metrimonyControllerProvider.notifier)
-          .saveImages(
-            ProfileImages(
-              profileImageUrl: profileImageUrl,
-              primaryImageUrl: primaryImageUrl,
-              imageWithAgentUrl: imageWithAgentUrl,
-              aadharCardUrl: aadharCardUrl,
-              secondaryImageUrls: secondaryImageUrls,
-              bioDataUrl: bioDataUrl,
-            ),
-          );
+      final existingProfile = await ref.read(matrimonyRepositoryProvider).getMatrimonyProfile(uid);
+      final existingImages = existingProfile.images;
+
+      final profileImages = ProfileImages(
+        profileImageUrl: profileImageUrl.isNotEmpty ? profileImageUrl : existingImages.profileImageUrl,
+        primaryImageUrl: primaryImageUrl.isNotEmpty ? primaryImageUrl : existingImages.primaryImageUrl,
+        imageWithAgentUrl: imageWithAgentUrl.isNotEmpty ? imageWithAgentUrl : existingImages.imageWithAgentUrl,
+        aadharCardUrl: aadharCardUrl.isNotEmpty ? aadharCardUrl : existingImages.aadharCardUrl,
+        secondaryImageUrls: secondaryImageUrls.isNotEmpty ? secondaryImageUrls : existingImages.secondaryImageUrls,
+        bioDataUrl: bioDataUrl.isNotEmpty ? bioDataUrl : existingImages.bioDataUrl,
+      );
+
+      await ref.read(matrimonyRepositoryProvider).updateImagesProfile(uid, profileImages);
+
+      if (profileImages.profileImageUrl.isNotEmpty) {
+        await FirebaseFirestore.instance.collection('users').doc(uid).update({
+          'profileImageUrl': profileImages.profileImageUrl,
+        });
+      }
+
+      ref.read(metrimonyControllerProvider.notifier).saveImages(profileImages);
     } catch (e) {
       rethrow;
     }

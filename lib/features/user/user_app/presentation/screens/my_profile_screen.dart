@@ -92,7 +92,7 @@ class MyProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 8),
                 _DetailSection(
                   title: AppLabels.photos(context),
-                  actionChip: _EditChip(onTap: () => context.router.push(const UserImageFormRoute())),
+                  actionChip: _EditChip(onTap: () => context.router.push( UserImageFormRoute())),
                   children: [
                     profile.images.secondaryImageUrls.isNotEmpty
                         ? SizedBox(
@@ -119,6 +119,11 @@ class MyProfileScreen extends ConsumerWidget {
                                         width: 100,
                                         height: 100,
                                         fit: BoxFit.cover,
+                                        memCacheWidth: 200,
+                                        memCacheHeight: 200,
+                                        maxWidthDiskCache: 400,
+                                        maxHeightDiskCache: 400,
+                                        fadeInDuration: const Duration(milliseconds: 200),
                                         placeholder: (context, url) => ShimmerProfileCard(width: 100, height: 100),
                                         errorWidget: (context, url, error) => Container(
                                           width: 100,

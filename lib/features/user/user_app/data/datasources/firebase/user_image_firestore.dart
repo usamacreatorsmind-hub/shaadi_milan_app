@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:shadi_milan/core/utils/image_compress_util.dart';
 
 /// Custom exception for upload-related errors
 class UploadException implements Exception {
@@ -15,7 +16,7 @@ class ImageUploadService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   /// Validate file exists and is accessible
-  bool _validateFile(String filePath) {
+  bool _validateFile(String filePath) {//
     try {
       final file = File(filePath);
       if (!file.existsSync()) {
@@ -50,10 +51,7 @@ class ImageUploadService {
       final file = File(filePath);
       final sizeInMB = file.lengthSync() / (1024 * 1024);
       if (sizeInMB > maxMB) {
-        throw UploadException(
-          'File too large: ${sizeInMB.toStringAsFixed(2)}MB exceeds ${maxMB}MB limit',
-          code: 'size-exceeded',
-        );
+        throw UploadException('File too large: ${sizeInMB.toStringAsFixed(2)}MB exceeds ${maxMB}MB limit', code: 'size-exceeded');
       }
       return true;
     } catch (e) {
@@ -63,25 +61,19 @@ class ImageUploadService {
   }
 
   // 🔥 PRIMARY IMAGE UPLOAD
-  Future<String> uploadPrimaryImage({
-    required String uid,
-    required String filePath,
-    void Function(double)? onProgress,
-  }) async {
+  Future<String> uploadPrimaryImage({required String uid, required String filePath, void Function(double)? onProgress}) async {
     try {
       _validateFile(filePath);
 
       final ext = _getFileExtension(filePath);
       if (!_isValidImageFormat(ext)) {
-        throw UploadException(
-          'Invalid image format: .$ext. Allowed: jpg, jpeg, png, gif, webp',
-          code: 'invalid-format',
-        );
+        throw UploadException('Invalid image format: .$ext. Allowed: jpg, jpeg, png, gif, webp', code: 'invalid-format');
       }
 
       _validateFileSize(filePath);
 
-      final file = File(filePath);
+      final compressedPath = await compressAndGetImageFile(filePath);
+      final file = File(compressedPath);
       final ref = _storage.ref().child('profile_images/$uid/primary.jpg');
 
       final task = ref.putFile(file);
@@ -96,10 +88,7 @@ class ImageUploadService {
 
       return await ref.getDownloadURL();
     } on FirebaseException catch (e) {
-      throw UploadException(
-        'Firebase upload failed: ${e.message}',
-        code: e.code,
-      );
+      throw UploadException('Firebase upload failed: ${e.message}', code: e.code);
     } on UploadException {
       rethrow;
     } catch (e) {
@@ -128,18 +117,14 @@ class ImageUploadService {
 
           final ext = _getFileExtension(filePath);
           if (!_isValidImageFormat(ext)) {
-            throw UploadException(
-              'File $i: Invalid format .$ext. Allowed: jpg, jpeg, png, gif, webp',
-              code: 'invalid-format',
-            );
+            throw UploadException('File $i: Invalid format .$ext. Allowed: jpg, jpeg, png, gif, webp', code: 'invalid-format');
           }
 
           _validateFileSize(filePath);
 
-          final file = File(filePath);
-          final ref = _storage.ref().child(
-            'profile_images/$uid/gallery_$i.jpg',
-          );
+          final compressedPath = await compressAndGetImageFile(filePath);
+          final file = File(compressedPath);
+          final ref = _storage.ref().child('profile_images/$uid/gallery_$i.jpg');
 
           final task = ref.putFile(file);
 
@@ -163,10 +148,7 @@ class ImageUploadService {
 
       return urls;
     } on FirebaseException catch (e) {
-      throw UploadException(
-        'Firebase batch upload failed: ${e.message}',
-        code: e.code,
-      );
+      throw UploadException('Firebase batch upload failed: ${e.message}', code: e.code);
     } on UploadException {
       rethrow;
     } catch (e) {
@@ -177,9 +159,7 @@ class ImageUploadService {
   // two methods for fetching images
   // 🔥 FETCH PROFILE IMAGES
   Future<Map<String, dynamic>> getProfileImages(String uid) async {
-    final ListResult result = await _storage
-        .ref('profile_images/$uid')
-        .listAll();
+    final ListResult result = await _storage.ref('profile_images/$uid').listAll();
 
     String primaryImageUrl = '';
     List<String> secondaryImageUrls = [];
@@ -215,20 +195,13 @@ class ImageUploadService {
   }
 
   // 🔥 AADHAR CARD UPLOAD
-  Future<String> uploadAadharCard({
-    required String uid,
-    required String filePath,
-    void Function(double)? onProgress,
-  }) async {
+  Future<String> uploadAadharCard({required String uid, required String filePath, void Function(double)? onProgress}) async {
     try {
       _validateFile(filePath);
 
       final ext = _getFileExtension(filePath);
       if (!_isValidDocumentFormat(ext)) {
-        throw UploadException(
-          'Invalid file format: .$ext. Allowed: pdf, doc, docx, jpg, jpeg, png',
-          code: 'invalid-format',
-        );
+        throw UploadException('Invalid file format: .$ext. Allowed: pdf, doc, docx, jpg, jpeg, png', code: 'invalid-format');
       }
 
       _validateFileSize(filePath, maxMB: 50);
@@ -249,10 +222,7 @@ class ImageUploadService {
 
       return await ref.getDownloadURL();
     } on FirebaseException catch (e) {
-      throw UploadException(
-        'Firebase document upload failed: ${e.message}',
-        code: e.code,
-      );
+      throw UploadException('Firebase document upload failed: ${e.message}', code: e.code);
     } on UploadException {
       rethrow;
     } catch (e) {
@@ -269,30 +239,20 @@ class ImageUploadService {
       if (e.code == 'object-not-found') {
         return null; // Aadhar card not found
       }
-      throw UploadException(
-        'Failed to fetch Aadhar card URL: ${e.message}',
-        code: e.code,
-      );
+      throw UploadException('Failed to fetch Aadhar card URL: ${e.message}', code: e.code);
     } catch (e) {
       throw UploadException('Unexpected error fetching Aadhar card: $e');
     }
   }
 
   // 🔥 BIODATA UPLOAD
-  Future<String> uploadBioData({
-    required String uid,
-    required String filePath,
-    void Function(double)? onProgress,
-  }) async {
+  Future<String> uploadBioData({required String uid, required String filePath, void Function(double)? onProgress}) async {
     try {
       _validateFile(filePath);
 
       final ext = _getFileExtension(filePath);
       if (!_isValidDocumentFormat(ext)) {
-        throw UploadException(
-          'Invalid file format: .$ext. Allowed: pdf, doc, docx, jpg, jpeg, png',
-          code: 'invalid-format',
-        );
+        throw UploadException('Invalid file format: .$ext. Allowed: pdf, doc, docx, jpg, jpeg, png', code: 'invalid-format');
       }
 
       _validateFileSize(filePath, maxMB: 50);
@@ -312,10 +272,7 @@ class ImageUploadService {
 
       return await ref.getDownloadURL();
     } on FirebaseException catch (e) {
-      throw UploadException(
-        'Firebase biodata upload failed: ${e.message}',
-        code: e.code,
-      );
+      throw UploadException('Firebase biodata upload failed: ${e.message}', code: e.code);
     } on UploadException {
       rethrow;
     } catch (e) {
@@ -323,29 +280,21 @@ class ImageUploadService {
     }
   }
 
-  Future<String> uploadImageWithAgent({
-    required String uid,
-    required String filePath,
-    required void Function(double) onProgress,
-  }) async {
+  Future<String> uploadImageWithAgent({required String uid, required String filePath, required void Function(double) onProgress}) async {
     try {
       _validateFile(filePath);
 
       final ext = _getFileExtension(filePath);
       if (!_isValidImageFormat(ext)) {
-        throw UploadException(
-          'Invalid image format: .$ext. Allowed: jpg, jpeg, png, gif, webp',
-          code: 'invalid-format',
-        );
+        throw UploadException('Invalid image format: .$ext. Allowed: jpg, jpeg, png, gif, webp', code: 'invalid-format');
       }
 
       _validateFileSize(filePath);
 
-      final file = File(filePath);
+      final compressedPath = await compressAndGetImageFile(filePath);
+      final file = File(compressedPath);
 
-      final ref = _storage.ref().child(
-        'profile_images/$uid/image_with_agent.jpg',
-      );
+      final ref = _storage.ref().child('profile_images/$uid/image_with_agent.jpg');
 
       final task = ref.putFile(file);
 
@@ -359,10 +308,7 @@ class ImageUploadService {
 
       return await ref.getDownloadURL();
     } on FirebaseException catch (e) {
-      throw UploadException(
-        'Firebase image upload failed: ${e.message}',
-        code: e.code,
-      );
+      throw UploadException('Firebase image upload failed: ${e.message}', code: e.code);
     } on UploadException {
       rethrow;
     } catch (e) {
@@ -373,43 +319,32 @@ class ImageUploadService {
   // download image with agent
   Future<String?> getImageWithAgentUrl(String uid) async {
     try {
-      final ref = _storage.ref().child(
-        'profile_images/$uid/image_with_agent.jpg',
-      );
+      final ref = _storage.ref().child('profile_images/$uid/image_with_agent.jpg');
       return await ref.getDownloadURL();
     } on FirebaseException catch (e) {
       if (e.code == 'object-not-found') {
         return null; // Image with agent not found
       }
-      throw UploadException(
-        'Failed to fetch image with agent: ${e.message}',
-        code: e.code,
-      );
+      throw UploadException('Failed to fetch image with agent: ${e.message}', code: e.code);
     } catch (e) {
       throw UploadException('Unexpected error fetching image with agent: $e');
     }
   }
 
   // 🔥 PROFILE IMAGE UPLOAD
-  Future<String> uploadProfileImage({
-    required String uid,
-    required String filePath,
-    void Function(double)? onProgress,
-  }) async {
+  Future<String> uploadProfileImage({required String uid, required String filePath, void Function(double)? onProgress}) async {
     try {
       _validateFile(filePath);
 
       final ext = _getFileExtension(filePath);
       if (!_isValidImageFormat(ext)) {
-        throw UploadException(
-          'Invalid image format: .$ext. Allowed: jpg, jpeg, png, gif, webp',
-          code: 'invalid-format',
-        );
+        throw UploadException('Invalid image format: .$ext. Allowed: jpg, jpeg, png, gif, webp', code: 'invalid-format');
       }
 
       _validateFileSize(filePath);
 
-      final file = File(filePath);
+      final compressedPath = await compressAndGetImageFile(filePath);
+      final file = File(compressedPath);
       final ref = _storage.ref().child('profile_images/$uid/profile_image.jpg');
 
       final task = ref.putFile(file);
@@ -424,10 +359,7 @@ class ImageUploadService {
 
       return await ref.getDownloadURL();
     } on FirebaseException catch (e) {
-      throw UploadException(
-        'Firebase upload failed: ${e.message}',
-        code: e.code,
-      );
+      throw UploadException('Firebase upload failed: ${e.message}', code: e.code);
     } on UploadException {
       rethrow;
     } catch (e) {

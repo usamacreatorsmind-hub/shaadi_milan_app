@@ -621,6 +621,11 @@ class WishlistProfileCard extends ConsumerWidget {
                           ? CachedNetworkImage(
                               imageUrl: imageUrl,
                               fit: BoxFit.cover,
+                              memCacheWidth: 400,
+                              memCacheHeight: 400,
+                              maxWidthDiskCache: 600,
+                              maxHeightDiskCache: 600,
+                              fadeInDuration: const Duration(milliseconds: 200),
                               placeholder: (context, url) => const ShimmerLoading.rectangular(height: 160, width: 160),
                               errorWidget: (context, url, error) => const Icon(Icons.person, size: 80),
                             )

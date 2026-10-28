@@ -23,8 +23,12 @@ class CarouselImage extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: url,
       fit: fit,
-      memCacheWidth: 1000, // 🚀 Improve loading speed by caching resized version
-      placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
+      memCacheWidth: 800, // 🚀 Improve loading speed by caching resized version
+      memCacheHeight: 1000,
+      maxWidthDiskCache: 1000,
+      maxHeightDiskCache: 1200,
+      fadeInDuration: const Duration(milliseconds: 200),
+      placeholder: (context, url) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
       errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 40),
     );
   }

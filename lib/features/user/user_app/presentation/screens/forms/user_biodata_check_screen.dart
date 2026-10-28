@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -381,7 +382,16 @@ class _UserBiodataCheckScreenState extends ConsumerState<UserBiodataCheckScreen>
           child: ClipOval(
             child: hasLocalProfile
                 ? Image.file(File(localImages.profileImage!), fit: BoxFit.cover)
-                : Image.network(images!.profileImageUrl, fit: BoxFit.cover),
+                : CachedNetworkImage(
+                    imageUrl: images!.profileImageUrl,
+                    fit: BoxFit.cover,
+                    memCacheWidth: 320,
+                    memCacheHeight: 320,
+                    maxWidthDiskCache: 600,
+                    maxHeightDiskCache: 600,
+                    placeholder: (_, __) => Container(color: Colors.grey.shade200),
+                    errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                  ),
           ),
         ),
       ),
