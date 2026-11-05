@@ -125,6 +125,14 @@ class MatrimonyRepositoryImpl implements MatrimonyRepository {
   Stream<List<MatrimonyProfile>> watchAllMatrimonyProfiles() {
     return _remoteDS.watchAllMatrimonyProfiles();
   }
+
+  @override
+  Future<({List<MatrimonyProfile> profiles, DocumentSnapshot? lastDoc})> getMatrimonyProfilesBatch({
+    int limit = 5,
+    DocumentSnapshot? startAfter,
+  }) {
+    return _remoteDS.getMatrimonyProfilesBatch(limit: limit, startAfter: startAfter);
+  }
 }
 
 final matrimonyFirestoreDSProvider = Provider<MatrimonyFirestoreDS>((ref) {

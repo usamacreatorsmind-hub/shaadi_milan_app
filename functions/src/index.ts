@@ -851,19 +851,43 @@ export const verifyMSG91OTP = onCall(async (request) => {
 
     if (String(otp).trim() === expectedOtp) {
       const usersRef = admin.firestore().collection("users");
+      const last10Digits = cleanPhone.slice(-10);
+
       let querySnapshot = await usersRef.where("phone", "==", phoneNumber).limit(1).get();
 
       if (querySnapshot.empty) {
-        const last10Digits = cleanPhone.slice(-10);
         querySnapshot = await usersRef.where("phone", "==", last10Digits).limit(1).get();
       }
 
       if (querySnapshot.empty) {
+        querySnapshot = await usersRef.where("phone", "==", `+91${last10Digits}`).limit(1).get();
+      }
+
+      if (querySnapshot.empty) {
+        querySnapshot = await usersRef.where("phone", "==", `91${last10Digits}`).limit(1).get();
+      }
+
+      let userDocId: string | null = null;
+
+      if (!querySnapshot.empty) {
+        userDocId = querySnapshot.docs[0].id;
+      } else {
+        // Fallback: search all users by phone ending with test digits
+        const allUsers = await usersRef.get();
+        for (const doc of allUsers.docs) {
+          const p = String(doc.data().phone || "").replace(/\D/g, "");
+          if (p.endsWith(last10Digits)) {
+            userDocId = doc.id;
+            break;
+          }
+        }
+      }
+
+      if (!userDocId) {
         return { success: true, verified: true, registered: false, message: "Test number verified" };
       }
 
-      const userDoc = querySnapshot.docs[0];
-      const customToken = await admin.auth().createCustomToken(userDoc.id);
+      const customToken = await admin.auth().createCustomToken(userDocId);
 
       return {
         success: true,
@@ -898,19 +922,43 @@ export const verifyMSG91OTP = onCall(async (request) => {
     if (isVerifiedOrAlreadyDone) {
       // Find user by phone in Firestore (handle both with and without 91 prefix)
       const usersRef = admin.firestore().collection("users");
+      const cleanDigits = String(phoneNumber).replace(/\D/g, "");
+      const last10Digits = cleanDigits.slice(-10);
+
       let querySnapshot = await usersRef.where("phone", "==", phoneNumber).limit(1).get();
 
       if (querySnapshot.empty) {
-        const last10Digits = phoneNumber.slice(-10);
         querySnapshot = await usersRef.where("phone", "==", last10Digits).limit(1).get();
       }
 
       if (querySnapshot.empty) {
+        querySnapshot = await usersRef.where("phone", "==", `+91${last10Digits}`).limit(1).get();
+      }
+
+      if (querySnapshot.empty) {
+        querySnapshot = await usersRef.where("phone", "==", `91${last10Digits}`).limit(1).get();
+      }
+
+      let userDocId: string | null = null;
+
+      if (!querySnapshot.empty) {
+        userDocId = querySnapshot.docs[0].id;
+      } else {
+        const allUsers = await usersRef.get();
+        for (const doc of allUsers.docs) {
+          const p = String(doc.data().phone || "").replace(/\D/g, "");
+          if (p.endsWith(last10Digits)) {
+            userDocId = doc.id;
+            break;
+          }
+        }
+      }
+
+      if (!userDocId) {
         return { success: true, verified: true, registered: false };
       }
 
-      const userDoc = querySnapshot.docs[0];
-      const customToken = await admin.auth().createCustomToken(userDoc.id);
+      const customToken = await admin.auth().createCustomToken(userDocId);
 
       return {
         success: true,

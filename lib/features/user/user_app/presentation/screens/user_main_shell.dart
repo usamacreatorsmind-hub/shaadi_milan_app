@@ -1,4 +1,3 @@
-import 'package:shadi_milan/core/constants/app_constants.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 import 'package:shadi_milan/features/user/user_app/presentation/widgets/user_drawer.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
@@ -24,14 +23,20 @@ class UserMainShellScreen extends ConsumerStatefulWidget {
 }
 
 class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
-  final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+  String get currentUid {
+    final authUser = ref.watch(authStateProvider).value?.fold((agent) => agent.uid, (user) => user.uid);
+    if (authUser != null && authUser.isNotEmpty) return authUser;
+    return FirebaseAuth.instance.currentUser?.uid ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
+    final uid = currentUid;
+
     ref.listen(authStateProvider, (previous, next) {
       next.whenData((data) {
         if (data == null) {
-          context.router.replaceAll([const OnboardingRoute()]);
+          context.router.replaceAll([const RoleSelectionRoute()]);
         }
       });
     });

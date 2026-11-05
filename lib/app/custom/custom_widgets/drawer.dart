@@ -181,7 +181,7 @@ class AppDrawer extends ConsumerWidget {
                         if (confirm == true) {
                           await ref.read(authRepositoryProvider).signOut();
                           if (context.mounted) {
-                            context.router.replaceAll([const AuthWrapperRoute()]);
+                            context.router.replaceAll([const RoleSelectionRoute()]);
                           }
                         }
                       },

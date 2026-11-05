@@ -11,6 +11,7 @@ import 'package:shadi_milan/features/user/user_app/domain/states/metrimony_state
 import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import '../../../../agent/agent_app/presentation/notifier/wishlist_notifier.dart';
 import '../../../../auth/domain/states/user_state.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../../../../core/filters/home_filter_controller.dart';
 import '../../../../../app/router/app_router.dart';
@@ -73,25 +74,12 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
   final PageController _pageController = PageController();
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   void initState() {
     super.initState();
+    _pageController.addListener(_onScroll);
 
-    // If you want fresh data every time the screen is entered,
-    // invalidate is fine. However, watch() will trigger the fetch
-    // automatically if not already loaded. If you need a manual refresh,
-    // consider adding a RefreshIndicator to the UI instead of
-    // invalidating on every initState.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-
-      // No need to invalidate here as watch() handles initial fetch and stream updates.
-      // Caching provided by Riverpod will make the app feel much faster on subsequent opens.
 
       try {
         // ignore: use_build_context_synchronously
@@ -102,6 +90,23 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
         debugPrint('RemoteConfig check failed on UserHomeScreen: $e');
       }
     });
+  }
+
+  void _onScroll() {
+    if (_pageController.hasClients) {
+      final maxScroll = _pageController.position.maxScrollExtent;
+      final currentScroll = _pageController.position.pixels;
+      if (currentScroll >= maxScroll - 400) {
+        ref.read(homeControllerProvider.notifier).fetchNextBatch();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.removeListener(_onScroll);
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -174,9 +179,21 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
     return Scaffold(
       body: currentUserAsync.when(
         loading: () => const _HomeShimmer(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) {
+          final authUser = ref.watch(authStateProvider).valueOrNull?.fold((_) => null, (u) => u);
+          if (authUser != null && authUser.uid.isNotEmpty) {
+            return const _HomeShimmer();
+          }
+          return Center(child: Text('Error: $e'));
+        },
         data: (user) {
-          if (user == null) return Center(child: Text(AppLabels.userNotFound(context)));
+          if (user == null) {
+            final authUser = ref.watch(authStateProvider).valueOrNull?.fold((_) => null, (u) => u);
+            if (authUser != null && authUser.uid.isNotEmpty) {
+              return const _HomeShimmer();
+            }
+            return Center(child: Text(AppLabels.userNotFound(context)));
+          }
 
           final paymentState = ref.watch(paymentNotifierProvider(user.uid));
 
@@ -480,8 +497,12 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                     : PageView.builder(
                         controller: _pageController,
                         scrollDirection: Axis.vertical,
-                        itemCount: visibleProfiles.length + (visibleProfiles.length ~/ 6),
+                        itemCount: visibleProfiles.length + (visibleProfiles.length ~/ 6) + (homeState.isLoadingMore ? 1 : 0),
                         itemBuilder: (context, index) {
+                          if (index >= visibleProfiles.length + (visibleProfiles.length ~/ 6)) {
+                            return const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()));
+                          }
+
                           // Every 5th item is a suggestions section
                           if (index > 0 && (index + 1) % 5 == 0) {
                             return Padding(

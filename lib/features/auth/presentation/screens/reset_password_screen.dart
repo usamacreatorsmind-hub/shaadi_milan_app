@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pinput/pinput.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
 import '../../../../app/custom/custom_widgets/widgets.dart';
 import '../providers/auth_providers.dart';
@@ -147,6 +147,22 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final defaultPinTheme = PinTheme(
+      width: 48,
+      height: 52,
+      textStyle: const TextStyle(fontSize: 20, color: Colors.black87, fontWeight: FontWeight.bold),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 4))],
+      ),
+    );
+
+    final focusedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration!.copyWith(border: Border.all(color: theme.colorScheme.primary, width: 2)),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Forgot Password"),
@@ -194,15 +210,15 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 style: TextStyle(color: Colors.grey[600]),
               ),
               const SizedBox(height: 20),
-              AppTextField(
+              Pinput(
+                length: 6,
                 controller: otpCtrl,
-                prefixIcon: Icons.lock_clock_rounded,
-                label: "Enter OTP",
-                hint: "6-digit code",
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                obscureText: false,
-                iconColor: theme.primaryColor,
+                androidSmsAutofillMethod: AndroidSmsAutofillMethod.smsUserConsentApi,
+                autofillHints: const [AutofillHints.oneTimeCode],
+                defaultPinTheme: defaultPinTheme,
+                focusedPinTheme: focusedPinTheme,
+                hapticFeedbackType: HapticFeedbackType.lightImpact,
+                onCompleted: (pin) => _verifyOtp(),
               ),
               const SizedBox(height: 24),
               SizedBox(

@@ -357,9 +357,31 @@ class UserProfileScreen extends ConsumerWidget {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       backgroundColor: Colors.red.shade50.withOpacity(0.5),
                     ),
-                    onPressed: () {
-                      ref.read(authRepositoryProvider).signOut();
-                      AutoRouter.of(context).replace(UserLoginRoute());
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(AppLabels.logout(context)),
+                          content: Text(AppLabels.logoutConfirm(context)),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: Text(AppLabels.cancel(context)),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: Text(AppLabels.logout(context), style: const TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true) {
+                        await ref.read(authRepositoryProvider).signOut();
+                        if (context.mounted) {
+                          AutoRouter.of(context).replaceAll([const RoleSelectionRoute()]);
+                        }
+                      }
                     },
                   ),
                 ),

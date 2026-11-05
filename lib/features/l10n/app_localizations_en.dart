@@ -9,10 +9,10 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Shaadi Milan';
+  String get appName => 'ShaadiMilan.com';
 
   @override
-  String get welcomeMessage => 'Welcome to Shaadi Milan';
+  String get welcomeMessage => 'Welcome to ShaadiMilan.com';
 
   @override
   String get somethingWentWrong => 'Something went wrong';
@@ -34,7 +34,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashTagline => 'Your Journey to a Beautiful Union Begins Here';
 
   @override
-  String get copyright => '© 2026 Shaadi Milan. All rights reserved.';
+  String get copyright => '© 2026 ShaadiMilan.com. All rights reserved.';
 
   @override
   String get missionTitle => 'Our Mission';

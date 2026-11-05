@@ -101,13 +101,13 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:
-  /// **'Shaadi Milan'**
+  /// **'ShaadiMilan.com'**
   String get appName;
 
   /// No description provided for @welcomeMessage.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Shaadi Milan'**
+  /// **'Welcome to ShaadiMilan.com'**
   String get welcomeMessage;
 
   /// No description provided for @somethingWentWrong.
@@ -149,7 +149,7 @@ abstract class AppLocalizations {
   /// No description provided for @copyright.
   ///
   /// In en, this message translates to:
-  /// **'© 2026 Shaadi Milan. All rights reserved.'**
+  /// **'© 2026 ShaadiMilan.com. All rights reserved.'**
   String get copyright;
 
   /// No description provided for @missionTitle.

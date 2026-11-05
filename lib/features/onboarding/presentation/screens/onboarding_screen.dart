@@ -1,21 +1,25 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
 import '../../../../app/router/app_router.dart';
+import '../../../l10n/app_translation_service.dart';
 import 'page_view_model_list.dart';
 
 @RoutePage()
-class OnboardingScreen extends StatelessWidget {
+class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
 
-  void _onDone(BuildContext context) {
-    // When done button is press
+  Future<void> _onDone(BuildContext context, WidgetRef ref) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setBool('has_seen_onboarding', true);
+    if (!context.mounted) return;
     context.router.replace(const RoleSelectionRoute());
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return IntroductionScreen(
       // when i pressing button the image slides but goes back to some pixcels and and push back to left side solve it
 
@@ -70,8 +74,8 @@ class OnboardingScreen extends StatelessWidget {
       animationDuration: 1000,
       globalBackgroundColor: Colors.white,
       pages: pageViewModelList(context),
-      onDone: () => _onDone(context),
-      onSkip: () => _onDone(context), // You can also override onSkip behavior
+      onDone: () => _onDone(context, ref),
+      onSkip: () => _onDone(context, ref), // You can also override onSkip behavior
 
       next: Container(
         height: 60,

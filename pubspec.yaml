@@ -105,6 +105,7 @@ dev_dependencies:
 dependency_overrides:
   firebase_crashlytics: ^5.0.5
   firebase_core: ^4.2.1
+  smart_auth: 2.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

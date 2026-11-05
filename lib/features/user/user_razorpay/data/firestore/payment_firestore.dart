@@ -7,6 +7,7 @@ class PaymentFirestore {
 
   /// Fetch payment data once (one-time fetch)
   Future<Payment?> getUserPayment(String uid) async {
+    if (uid.isEmpty) return null;
     try {
       final doc = await _firestore
           .collection('registrationPayment')
@@ -24,6 +25,7 @@ class PaymentFirestore {
 
   /// Watch payment data in real-time (stream)
   Stream<Payment?> watchUserPayment(String uid) {
+    if (uid.isEmpty) return Stream.value(null);
     return _firestore
         .collection('registrationPayment')
         .doc(uid)

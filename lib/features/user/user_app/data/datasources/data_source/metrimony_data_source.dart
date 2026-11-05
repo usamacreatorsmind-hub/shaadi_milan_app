@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../domain/states/address_state.dart';
 import '../../../domain/states/cultural_state.dart';
 import '../../../domain/states/education_state.dart';
@@ -30,6 +31,10 @@ abstract class MatrimonyDataSource {
   Future<void> updateAddress(String uid, AddressProfile address);  
   Future<void> updateImages(String uid, ProfileImages images);
   Future<List<MatrimonyProfile>> getAllMatrimonyProfiles();
+  Future<({List<MatrimonyProfile> profiles, DocumentSnapshot? lastDoc})> getMatrimonyProfilesBatch({
+    int limit = 5,
+    DocumentSnapshot? startAfter,
+  });
   
 
 

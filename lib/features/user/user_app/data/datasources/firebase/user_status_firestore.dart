@@ -7,6 +7,7 @@ class UserStatusFirestore {
 
   /// ---------------- FETCH (ONE TIME) ----------------
   Future<UserStatus> fetchUserStatus(String uid) async {
+    if (uid.isEmpty) return const UserStatus.empty();
     try {
       final doc = _firestore
           .collection('userStatus')
@@ -26,6 +27,7 @@ class UserStatusFirestore {
 
   /// ---------------- REAL-TIME LISTENER ----------------
   Stream<UserStatus> watchUserStatus(String uid) {
+    if (uid.isEmpty) return Stream.value(const UserStatus.empty());
     return _firestore.collection('userStatus').doc(uid).snapshots().map((
       snapshot,
     ) {

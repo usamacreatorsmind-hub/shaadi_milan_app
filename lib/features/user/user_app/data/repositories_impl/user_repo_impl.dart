@@ -115,16 +115,25 @@ final currentUserProvider = StreamProvider<UserEntity?>((ref) {
   return authState.when(
     data: (eitherUser) {
       if (eitherUser == null) {
-        return const Stream.empty();
+        return Stream.value(null);
       }
 
       return eitherUser.fold(
-        (agent) => const Stream.empty(),
-        (user) => ref.watch(userRepositoryProvider).watchUser(user.uid),
+        (agent) => Stream.value(null),
+        (user) {
+          if (user.uid.isEmpty) return Stream.value(null);
+          final userRepository = ref.watch(userRepositoryProvider);
+          return userRepository.watchUser(user.uid).handleError((error, stackTrace) {
+            // Fallback to authState user if watchUser stream encounters an error
+          }).asyncMap((userFromDb) async {
+            if (userFromDb.uid.isEmpty) return user;
+            return userFromDb;
+          });
+        },
       );
     },
     loading: () => const Stream.empty(),
-    error: (_, __) => const Stream.empty(),
+    error: (error, stackTrace) => Stream.error(error, stackTrace),
   );
 });
 
@@ -139,10 +148,15 @@ final currentUserProfileProvider = StreamProvider<UserEntity?>((ref) {
       }
       return eitherUser.fold(
         (agent) => Stream.value(null),
-        (user) => userRepository.watchUser(user.uid),
+        (user) {
+          if (user.uid.isEmpty) return Stream.value(null);
+          return userRepository.watchUser(user.uid).handleError((error, stackTrace) {
+            // Fallback to authState user if watchUser stream encounters an error
+          });
+        },
       );
     },
-    loading: () => Stream.value(null),
-    error: (error, stackTrace) => Stream.value(null),
+    loading: () => const Stream.empty(),
+    error: (error, stackTrace) => Stream.error(error, stackTrace),
   );
 });

@@ -141,27 +141,27 @@ class RoleSelectionScreen extends ConsumerWidget {
 
                       Column(
                         children: [
-                          /// 👔 Agent Card
-                          _EnhancedRoleCard(
-                            title: AppLabels.staffPortal(context),
-                            subtitle: AppLabels.manageLeadsSubtitle(context),
-                            icon: Icons.business_center_rounded,
-                            beginColor: const Color(0xFFC70310), // Matching Theme Red
-                            endColor: const Color(0xFF8B0000),   // Deep Maroon
-                            delay: 0.2,
-                            onTap: () => context.router.push(AgentLoginRoute()),
-                          ),
-                          const SizedBox(height: 24),
-
-                          /// ❤️ User Card
+                          /// ❤️ User Card (Member Portal)
                           _EnhancedRoleCard(
                             title: AppLabels.memberPortal(context),
                             subtitle: AppLabels.findSoulmateSubtitle(context),
                             icon: Icons.favorite_rounded,
                             beginColor: const Color(0xFFFFD700), // Gold
                             endColor: const Color(0xFFB8860B),   // Dark Gold
-                            delay: 0.4,
+                            delay: 0.2,
                             onTap: () => context.router.push(UserLoginRoute()),
+                          ),
+                          const SizedBox(height: 24),
+
+                          /// 👔 Agent Card (Staff Portal)
+                          _EnhancedRoleCard(
+                            title: AppLabels.staffPortal(context),
+                            subtitle: AppLabels.manageLeadsSubtitle(context),
+                            icon: Icons.business_center_rounded,
+                            beginColor: const Color(0xFFC70310), // Matching Theme Red
+                            endColor: const Color(0xFF8B0000),   // Deep Maroon
+                            delay: 0.4,
+                            onTap: () => context.router.push(AgentLoginRoute()),
                           ),
                         ],
                       ),

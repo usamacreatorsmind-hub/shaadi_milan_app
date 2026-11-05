@@ -8,6 +8,7 @@ class NotificationRepository {
 
   /// Stream of notifications for a user or agent
   Stream<List<NotificationModel>> watchNotifications(String collection, String uid) {
+    if (uid.isEmpty) return Stream.value([]);
     return _firestore
         .collection(collection)
         .doc(uid)

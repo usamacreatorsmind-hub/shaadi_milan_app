@@ -36,6 +36,9 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
 
   @override
   Future<MatrimonyProfile> getMatrimonyProfile(String uid) async {
+    if (uid.isEmpty) {
+      return MatrimonyProfile.empty();
+    }
     final doc = await _profiles.doc(uid).get();
     if (!doc.exists) {
       return MatrimonyProfile.empty().copyWith(userId: uid, metrimonyId: uid);
@@ -45,6 +48,9 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
 
   @override
   Stream<MatrimonyProfile> watchMatrimonyProfile(String uid) {
+    if (uid.isEmpty) {
+      return Stream.value(MatrimonyProfile.empty());
+    }
     return _profiles.doc(uid).snapshots().map((doc) {
       if (!doc.exists) {
         return MatrimonyProfile.empty().copyWith(userId: uid, metrimonyId: uid);
@@ -159,5 +165,31 @@ class MatrimonyFirestoreDS implements MatrimonyDataSource {
     return _profiles.where(AppConstants.fieldProfileStatus, isEqualTo: AppConstants.statusActive).snapshots().map((snapshot) {
       return snapshot.docs.where((doc) => userIds.contains(doc.id)).map((doc) => MatrimonyProfile.fromMap(doc.data())).toList();
     });
+  }
+
+  @override
+  Future<({List<MatrimonyProfile> profiles, DocumentSnapshot? lastDoc})> getMatrimonyProfilesBatch({
+    int limit = 5,
+    DocumentSnapshot? startAfter,
+  }) async {
+    final currentUid = FirebaseAuth.instance.currentUser?.uid;
+
+    Query<Map<String, dynamic>> query = _profiles
+        .where(AppConstants.fieldProfileStatus, isEqualTo: AppConstants.statusActive)
+        .limit(limit);
+
+    if (startAfter != null) {
+      query = query.startAfterDocument(startAfter);
+    }
+
+    final snapshot = await query.get();
+    final lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+
+    final profiles = snapshot.docs
+        .map((doc) => MatrimonyProfile.fromMap(doc.data()))
+        .where((profile) => profile.userId != currentUid)
+        .toList();
+
+    return (profiles: profiles, lastDoc: lastDoc);
   }
 }

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../auth/domain/states/agent_state.dart';
@@ -17,10 +17,25 @@ import '../../domain/states/metrimony_state.dart';
 
 class HomeState {
   final AsyncValue<List<MatrimonyProfileViewModel>> metrimonyProfiles;
+  final bool isLoadingMore;
+  final bool hasMore;
 
-  const HomeState({this.metrimonyProfiles = const AsyncValue.loading()});
-  HomeState copyWith({AsyncValue<List<MatrimonyProfileViewModel>>? metrimonyProfiles}) {
-    return HomeState(metrimonyProfiles: metrimonyProfiles ?? this.metrimonyProfiles);
+  const HomeState({
+    this.metrimonyProfiles = const AsyncValue.loading(),
+    this.isLoadingMore = false,
+    this.hasMore = true,
+  });
+
+  HomeState copyWith({
+    AsyncValue<List<MatrimonyProfileViewModel>>? metrimonyProfiles,
+    bool? isLoadingMore,
+    bool? hasMore,
+  }) {
+    return HomeState(
+      metrimonyProfiles: metrimonyProfiles ?? this.metrimonyProfiles,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMore: hasMore ?? this.hasMore,
+    );
   }
 }
 
@@ -36,12 +51,13 @@ class HomeController extends StateNotifier<HomeState> {
   final MatrimonyRepository _matrimonyRepository;
   final UserRepository _userRepository;
   final AgentRepository _agentRepository;
-  StreamSubscription? _usersSubscription;
-  StreamSubscription? _profilesSubscription;
 
   // 🚀 In-memory caches to avoid redundant Firestore network reads and speed up loading
   final Map<String, UserEntity> _userCache = {};
   final Map<String, AgentEntity> _agentCache = {};
+
+  DocumentSnapshot? _lastDocument;
+  static const int _pageSize = 5;
 
   HomeController({
     required MatrimonyRepository matrimonyRepository,
@@ -51,76 +67,80 @@ class HomeController extends StateNotifier<HomeState> {
        _userRepository = userRepository,
        _agentRepository = agentRepository,
        super(const HomeState()) {
-    _watchData();
+    loadInitialBatch();
   }
 
-  void _watchData() {
-    final currentUid = FirebaseAuth.instance.currentUser?.uid;
-    if (currentUid == null) {
-      state = state.copyWith(metrimonyProfiles: const AsyncValue.data([]));
-      return;
+  Future<void> loadInitialBatch() async {
+    _lastDocument = null;
+    state = state.copyWith(metrimonyProfiles: const AsyncValue.loading(), hasMore: true, isLoadingMore: false);
+    await fetchNextBatch();
+  }
+
+  Future<void> fetchNextBatch() async {
+    if (state.isLoadingMore || !state.hasMore) return;
+
+    final currentList = state.metrimonyProfiles.value ?? [];
+    if (currentList.isNotEmpty) {
+      state = state.copyWith(isLoadingMore: true);
     }
 
-    state = state.copyWith(metrimonyProfiles: const AsyncValue.loading());
+    try {
+      final res = await _matrimonyRepository.getMatrimonyProfilesBatch(
+        limit: _pageSize,
+        startAfter: _lastDocument,
+      );
 
-    // Fetch directly from metrimony_profiles with cached user/agent mapping
-    _profilesSubscription = _matrimonyRepository.watchAllMatrimonyProfiles().listen(
-      (profiles) async {
-        try {
-          // Parallelize data fetching with in-memory caching for blazing fast performance
-          final data = await Future.wait(
-            profiles.map((profile) async {
-              UserEntity? user = _userCache[profile.userId];
-              if (user == null || user.uid.isEmpty) {
-                try {
-                  user = await _userRepository.fetchUser(profile.userId);
-                  if (user.uid.isNotEmpty) {
-                    _userCache[profile.userId] = user;
-                  }
-                } catch (e) {
-                  user = UserEntity.empty();
-                }
+      _lastDocument = res.lastDoc;
+      final profiles = res.profiles;
+
+      final viewModels = await Future.wait(
+        profiles.map((profile) async {
+          UserEntity? user = _userCache[profile.userId];
+          if (user == null || user.uid.isEmpty) {
+            try {
+              user = await _userRepository.fetchUser(profile.userId);
+              if (user.uid.isNotEmpty) {
+                _userCache[profile.userId] = user;
               }
+            } catch (_) {
+              user = UserEntity.empty();
+            }
+          }
 
-              if (user == null || user.uid.isEmpty) return null;
+          if (user == null || user.uid.isEmpty) return null;
 
-              AgentEntity? agent;
-              if (user.agentId.isNotEmpty) {
-                agent = _agentCache[user.agentId];
-                if (agent == null) {
-                  try {
-                    agent = await _agentRepository.fetchAgent(user.agentId);
-                    if (agent != null) {
-                      _agentCache[user.agentId] = agent;
-                    }
-                  } catch (_) {}
+          AgentEntity? agent;
+          if (user.agentId.isNotEmpty) {
+            agent = _agentCache[user.agentId];
+            if (agent == null) {
+              try {
+                agent = await _agentRepository.fetchAgent(user.agentId);
+                if (agent != null) {
+                  _agentCache[user.agentId] = agent;
                 }
-              }
+              } catch (_) {}
+            }
+          }
 
-              return MatrimonyProfileViewModel(profile: profile, user: user, agent: agent);
-            }),
-          );
+          return MatrimonyProfileViewModel(profile: profile, user: user, agent: agent);
+        }),
+      );
 
-          // Remove nulls (skipped users)
-          final filteredData = data.whereType<MatrimonyProfileViewModel>().toList();
+      final newItems = viewModels.whereType<MatrimonyProfileViewModel>().toList();
+      final updatedList = [...currentList, ...newItems];
 
-          debugPrint('Fetched ${filteredData.length} home profiles with caching');
-          state = state.copyWith(metrimonyProfiles: AsyncValue.data(filteredData));
-        } catch (e, st) {
-          state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
-        }
-      },
-      onError: (e, st) {
-        state = state.copyWith(metrimonyProfiles: AsyncValue.error(e, st));
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _usersSubscription?.cancel();
-    _profilesSubscription?.cancel();
-    super.dispose();
+      debugPrint('Fetched batch of ${newItems.length} profiles. Total: ${updatedList.length}');
+      state = state.copyWith(
+        metrimonyProfiles: AsyncValue.data(updatedList),
+        isLoadingMore: false,
+        hasMore: res.lastDoc != null && profiles.length >= _pageSize,
+      );
+    } catch (e, st) {
+      state = state.copyWith(
+        metrimonyProfiles: currentList.isNotEmpty ? AsyncValue.data(currentList) : AsyncValue.error(e, st),
+        isLoadingMore: false,
+      );
+    }
   }
 
   Future<MatrimonyProfile> getMatrimonyProfile(String uid) {

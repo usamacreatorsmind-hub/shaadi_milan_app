@@ -16,6 +16,7 @@ final userProvider = Provider<User?>((ref) {
   return ref.watch(authStateChangesProvider).when(data: (user) => user, loading: () => null, error: (error, stack) => null);
 });
 final userDocProvider = StreamProvider.family<DocumentSnapshot?, String>((ref, uid) {
+  if (uid.isEmpty) return Stream.value(null);
   return ref.watch(firestoreProvider).collection('users').doc(uid).snapshots();
 });
 final userRoleProvider = Provider<String?>((ref) {

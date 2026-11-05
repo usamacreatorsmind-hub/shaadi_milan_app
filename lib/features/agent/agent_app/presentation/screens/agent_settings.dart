@@ -29,9 +29,12 @@ class _AgentSettingsState extends ConsumerState<AgentSettingsScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              FirebaseAuth.instance.signOut();
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                context.router.replaceAll([const RoleSelectionRoute()]);
+              }
             },
             child: Text(
               AppLocalizations.of(context)!.logout,

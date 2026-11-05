@@ -21,7 +21,7 @@
     <!-- ================= APPLICATION ================= -->
     <application
         android:name="${applicationName}"
-        android:label="Shaadi Milan"
+        android:label="ShaadiMilan.com"
         android:icon="@mipmap/ic_launcher">
         <!-- uCrop activity -->
         <activity

@@ -22,7 +22,7 @@ class _AgentMainShellState extends ConsumerState<AgentMainShellScreen> {
     ref.listen(authStateProvider, (previous, next) {
       next.whenData((data) {
         if (data == null) {
-          context.router.replaceAll([const OnboardingRoute()]);
+          context.router.replaceAll([const RoleSelectionRoute()]);
         }
       });
     });

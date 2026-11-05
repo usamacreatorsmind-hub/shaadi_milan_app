@@ -49,6 +49,19 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  /// SCREENSHOT BLOCKER (Non-blocking) - Commented out for taking screenshots
+  /*
+  Future.microtask(() async {
+    try {
+      await FlutterScreenshotBlocker.enableScreenshotBlocking();
+      await FlutterScreenshotBlocker.enableSecureMode();
+      await FlutterScreenshotBlocker.setSecureFlag(true);
+    } catch (e) {
+      debugPrint('Screenshot blocker error: $e');
+    }
+  });
+  */
+
   /// SHARED PREFERENCES
   final sharedPreferences = await SharedPreferences.getInstance();
 
@@ -117,3 +130,16 @@ Future<void> main() async {
     ),
   );
 }
+
+// 1.
+// Male Account:
+// ◦
+// Phone: 9988998899 (ya +919988998899)
+// ◦
+// OTP: 1234
+// 2.
+// Female Account:
+// ◦
+// Phone: 8877887788 (ya +918877887788)
+// ◦
+// OTP: 4567

@@ -5,8 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'Shaadi Milan';
-  static const String appNameRaw = 'Shaadi Milan';
+  static const String appName = 'ShaadiMilan.com';
+  static const String appNameRaw = 'ShaadiMilan.com';
 
   // ─── Assets ─────────────────────────────────────────────────────────────────
   static const String appLogoPath = 'assets/logo.png';

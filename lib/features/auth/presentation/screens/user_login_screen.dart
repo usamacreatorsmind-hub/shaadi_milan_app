@@ -76,7 +76,7 @@ class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
 
         await Future.delayed(const Duration(milliseconds: 500));
         if (!mounted) return;
-        context.router.replace(AuthWrapperRoute());
+        context.router.replaceAll([const AuthWrapperRoute()]);
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;

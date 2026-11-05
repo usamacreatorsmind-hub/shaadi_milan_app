@@ -442,9 +442,12 @@ class _AgentDashboardScreenState extends ConsumerState<AgentDashboardScreen> {
             TextButton(onPressed: () => Navigator.pop(context), child: Text(AppLabels.cancel(context))),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
-                FirebaseAuth.instance.signOut();
+                await FirebaseAuth.instance.signOut();
+                if (context.mounted) {
+                  context.router.replaceAll([const RoleSelectionRoute()]);
+                }
               },
               child: Text(AppLabels.logout(context), style: const TextStyle(color: Colors.white)),
             ),

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../auth/domain/states/agent_state.dart';
 import '../states/address_state.dart';
 import '../states/cultural_state.dart';
@@ -29,6 +30,11 @@ abstract class MatrimonyRepository {
   Future<List<MatrimonyProfile>> getAllMatrimonyProfiles();
 
   Stream<List<MatrimonyProfile>> watchAllMatrimonyProfiles();
+
+  Future<({List<MatrimonyProfile> profiles, DocumentSnapshot? lastDoc})> getMatrimonyProfilesBatch({
+    int limit = 5,
+    DocumentSnapshot? startAfter,
+  });
 
   Stream<MatrimonyProfile> watchMatrimonyProfile(String uid);
 

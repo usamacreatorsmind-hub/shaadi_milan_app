@@ -56,12 +56,14 @@ class UserFirestoreDS {
   }
 
   Future<Map<String, dynamic>> fetchUser(String uid) async {
+    if (uid.isEmpty) return <String, dynamic>{};
     final doc = await _users.doc(uid).get();
     if (!doc.exists) throw Exception('User not found');
     return doc.data()!;
   }
 
   Stream<Map<String, dynamic>> watchUser(String uid) {
+    if (uid.isEmpty) return Stream.value(<String, dynamic>{});
     return _users.doc(uid).snapshots().map((doc) {
       if (!doc.exists) throw Exception('User not found');
       return doc.data()!;
