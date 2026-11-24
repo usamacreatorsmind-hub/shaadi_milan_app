@@ -72,6 +72,12 @@ class _MatrimonyFormFlowScreenState extends ConsumerState<MatrimonyFormFlowScree
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        leading: context.router.canPop()
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                onPressed: () => context.router.maybePop(),
+              )
+            : null,
         title: Text(
           '${AppLocalizations.of(context)!.step} ${MatrimonyStep.values.indexOf(state.step) + 1} / ${MatrimonyStep.values.length}',
           style: Theme.of(context).textTheme.headlineMedium,

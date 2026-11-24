@@ -1,0 +1,28 @@
+{
+  "name": "shaadi_milan_app",
+  "version": "1.0.0",
+  "description": "Shaadi Milan App - A comprehensive matchmaking platform connecting individuals seeking meaningful relationships.",
+  "main": "extract_schema.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aasimcreatorsmind/shaadi_milan_app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/aasimcreatorsmind/shaadi_milan_app/issues"
+  },
+  "homepage": "https://github.com/aasimcreatorsmind/shaadi_milan_app#readme",
+  "dependencies": {
+    "firebase-admin": "^14.3.0"
+  }
+}

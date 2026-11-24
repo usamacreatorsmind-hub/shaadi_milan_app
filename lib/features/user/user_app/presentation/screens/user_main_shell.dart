@@ -12,7 +12,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../app/router/app_router.dart';
-import '../widgets/premium_upgrade_bottom_sheet.dart';
+import '../../data/repositories_impl/user_repo_impl.dart';
+import '../controllers/home_controller.dart';
+import '../utils/profile_action_gate.dart';
 
 @RoutePage()
 class UserMainShellScreen extends ConsumerStatefulWidget {
@@ -52,6 +54,9 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
       builder: (context, child) {
         final tabsRouter = AutoTabsRouter.of(context);
         final paymentState = ref.watch(paymentNotifierProvider(uid));
+        final currentUser = ref.watch(currentUserProvider).valueOrNull ??
+            ref.watch(authStateProvider).valueOrNull?.fold((_) => null, (u) => u);
+        final isProfileCreated = currentUser?.isProfileCreated ?? false;
 
         return Scaffold(
           drawer: tabsRouter.activeIndex == 3 ? null : UserDrawer(userId: uid),
@@ -76,11 +81,20 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
                     builder: (context) => IconButton(icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer()),
                   ),
                   actions: [
-                    if (tabsRouter.activeIndex == 0)
+                    if (tabsRouter.activeIndex == 0) ...[
+                      IconButton(
+                        icon: const Icon(Icons.refresh_rounded),
+                        tooltip: "Refresh Matches",
+                        onPressed: () {
+                          ref.read(homeControllerProvider.notifier).refreshAndShuffle();
+                          HapticFeedback.lightImpact();
+                        },
+                      ),
                       IconButton(
                         icon: const Icon(Icons.notifications_none_outlined),
                         onPressed: () => context.router.push(const UserNotificationRoute()),
                       ),
+                    ],
                   ],
                 ),
           body: child,
@@ -89,11 +103,24 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
             onTap: (index) {
               if (paymentState.status == PayStatus.loading) return;
 
-              // If tapping Chat tab (index 2) and not premium, show bottom sheet
-              if (index == 2 && paymentState.status != PayStatus.success) {
-                HapticFeedback.heavyImpact();
-                _showPremiumBottomSheet(context);
+              // If already on Matches (index 0) and tapped again -> refresh & shuffle
+              if (index == 0 && tabsRouter.activeIndex == 0) {
+                ref.read(homeControllerProvider.notifier).refreshAndShuffle();
+                HapticFeedback.lightImpact();
                 return;
+              }
+
+              // Chat tab (index 2): enforce 2-step rule (Complete Profile -> Premium)
+              if (index == 2) {
+                final allowed = ProfileActionGate.ensureCanContact(
+                  context,
+                  isProfileCreated: isProfileCreated,
+                  isPremium: paymentState.status == PayStatus.success,
+                );
+                if (!allowed) {
+                  HapticFeedback.heavyImpact();
+                  return;
+                }
               }
 
               HapticFeedback.lightImpact();
@@ -147,15 +174,6 @@ class _UserMainShellState extends ConsumerState<UserMainShellScreen> {
           ),
         );
       },
-    );
-  }
-
-  void _showPremiumBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const PremiumUpgradeBottomSheet(),
     );
   }
 }

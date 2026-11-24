@@ -25,6 +25,10 @@ class UserRouter {
 
     // ================= USER FLOW =================
     AutoRoute(
+      page: OnboardingChoiceRoute.page,
+      guards: [AuthGuard(ref), UserGuard(ref)],
+    ),
+    AutoRoute(
       page: MatrimonyFormFlowRoute.page,
       guards: [AuthGuard(ref)], // Allow Agent or User
     ),

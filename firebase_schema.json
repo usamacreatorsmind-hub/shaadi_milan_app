@@ -1,0 +1,278 @@
+{
+  "admins": {
+    "name": "string",
+    "createdAt": "Timestamp",
+    "role": "string",
+    "email": "string"
+  },
+  "agents": {
+    "uid": "string",
+    "agentId": "string",
+    "agentAuthId": "string",
+    "agentEmail": "string",
+    "agentName": "string",
+    "agentMobile": "string",
+    "agentAddress": "string",
+    "agentCity": "string",
+    "agentState": "string",
+    "agentPincode": "string",
+    "agentAadhar": "string",
+    "agentLicenseNumber": "string",
+    "aadharUrl": "string",
+    "primaryImageUrl": "string",
+    "profileImageUrl": "string",
+    "role": "string",
+    "platform": "string",
+    "isRejected": "boolean",
+    "registrationDate": "string",
+    "tempPassword": "string",
+    "isApproved": "boolean",
+    "fcmTokenUpdatedAt": "Timestamp",
+    "fcmToken": "string",
+    "designation": "string"
+  },
+  "amounts": {
+    "currency": "string",
+    "amount": "number",
+    "paymentType": "string"
+  },
+  "chats": {
+    "unreadCount_1lfYahm68abbzxM9eA1hiY0RTx72": "number",
+    "unreadCount_MmEnWzLZxAhjtSHvt1GjzWIhUKP2": "number",
+    "lastMessage": "string",
+    "lastMessageTime": "Timestamp",
+    "participants": "Array",
+    "unreadCount_QaZBIETWMBVsrwcYROLkbBNPjHx2": "number",
+    "unreadCount_ZlMX0fIpxgTQMygpoCYGS4i7npp1": "number",
+    "unreadCount_hcAOjFVdJNgih12NgqyN7vmORkB3": "number",
+    "unreadCount_1xVA8K9maiPQaAiZcI0v20PhyPx2": "number"
+  },
+  "configurations": {
+    "mode": "string",
+    "msg91AuthKey": "string",
+    "msg91TemplateId": "string",
+    "updatedAt": "Timestamp",
+    "functionsBaseUrl": "string"
+  },
+  "master_annual_incomes": {
+    "hi": "string",
+    "en": "string"
+  },
+  "master_degrees": {
+    "hi": "string",
+    "en": "string"
+  },
+  "master_designations": {
+    "hi": "string",
+    "en": "string"
+  },
+  "metrimony_profiles": {
+    "cultural": {
+      "religion": "string",
+      "language": "object",
+      "languages": "object",
+      "caste": "string"
+    },
+    "images": {
+      "bioDataUrl": "string",
+      "primaryImageUrl": "string",
+      "secondaryImageUrls": "object",
+      "aadharCardUrl": "string",
+      "profileImageUrl": "string",
+      "imageWithAgentUrl": "string"
+    },
+    "address": {
+      "pincode": "string",
+      "city": "object",
+      "addressLine1": "object",
+      "state": "object"
+    },
+    "education": {
+      "isLiterate": "boolean",
+      "extraQualification": "object",
+      "degree": "object",
+      "college": "object",
+      "extraQualifications": "object"
+    },
+    "identity": {
+      "lastName": "object",
+      "firstName": "object",
+      "gender": "object",
+      "dob": "string",
+      "profileId": "string",
+      "age": "number"
+    },
+    "profileStatus": "string",
+    "metrimonyId": "string",
+    "employment": {
+      "jobType": "string",
+      "organization": "object",
+      "annualIncome": "string",
+      "workLocation": "object",
+      "designation": "object"
+    },
+    "family": {
+      "noOfBrothers": "string",
+      "familyType": "string",
+      "lifestyleStatus": "string",
+      "noOfSisters": "string",
+      "fatherName": "object",
+      "motherName": "object"
+    },
+    "userId": "string",
+    "updatedAt": "Timestamp",
+    "physical": {
+      "height": "string",
+      "physicallyChallenged": "boolean",
+      "bodyType": "string",
+      "complexion": "string",
+      "weight": "string"
+    },
+    "source": "string",
+    "status": "string",
+    "mediaUrls": {
+      "profileImage": "string"
+    },
+    "personalInfo": {
+      "dob": "string"
+    },
+    "createdAt": "Timestamp"
+  },
+  "notifications": {
+    "target": "string",
+    "title": "string",
+    "message": "string",
+    "sentTo": "number",
+    "totalUsers": "number",
+    "status": "string",
+    "type": "string",
+    "createdBy": "string",
+    "createdAt": "Timestamp",
+    "sentAt": "Timestamp"
+  },
+  "orders": {
+    "orderId": "string",
+    "razorpayOrderId": "string",
+    "uid": "string",
+    "email": "string",
+    "phone": "string",
+    "fullName": "string",
+    "agentId": "string",
+    "gender": "string",
+    "paymentType": "string",
+    "region": "string",
+    "district": "string",
+    "amount": "number",
+    "gateway": "string",
+    "status": "string",
+    "paidAt": "null",
+    "createdAt": "Timestamp"
+  },
+  "paymentCredentials": {
+    "payment_url": "string"
+  },
+  "payments": {
+    "agentId": "string",
+    "amount": "number",
+    "gender": "string",
+    "fullName": "string",
+    "paymentType": "string",
+    "uid": "string",
+    "phone": "string",
+    "district": "string",
+    "region": "string",
+    "email": "string",
+    "gateway": "string",
+    "status": "string",
+    "createdAt": "Timestamp",
+    "orderId": "string",
+    "razorpayOrderId": "string",
+    "updatedAt": "Timestamp"
+  },
+  "registrationPayment": {
+    "district": "string",
+    "status": "string",
+    "region": "string",
+    "orderId": "string",
+    "razorpayOrderId": "string",
+    "userId": "string",
+    "paymentType": "string",
+    "agentDesignation": "string",
+    "razorpayPaymentId": "string",
+    "agentId": "string",
+    "commissionRate": "number",
+    "agentCommission": "number",
+    "gateway": "string",
+    "caste": "string",
+    "razorpaySignature": "null",
+    "amount": "number",
+    "gender": "string",
+    "phone": "string",
+    "religion": "string",
+    "fullName": "string",
+    "email": "string",
+    "createdAt": "Timestamp",
+    "updatedAt": "Timestamp"
+  },
+  "supportTickets": {
+    "agentId": "string",
+    "attachments": "Array",
+    "resolvedAt": "null",
+    "subject": "string",
+    "description": "string",
+    "userName": "string",
+    "priority": "string",
+    "userId": "string",
+    "createdAt": "Timestamp",
+    "adminResponse": "null",
+    "userEmail": "string",
+    "id": "string",
+    "category": "string",
+    "status": "string",
+    "updatedAt": "null"
+  },
+  "transliteration_cache": {
+    "english": "string",
+    "hindi": "string",
+    "createdAt": "Timestamp"
+  },
+  "users": {
+    "fcmTokenUpdatedAt": "Timestamp",
+    "fcmToken": "string",
+    "platform": "string",
+    "userStatus": {
+      "isProfileCreated": "boolean"
+    },
+    "isProfileCreated": "boolean",
+    "profileImageUrl": "string",
+    "profileId": "string",
+    "email": "string",
+    "profileStatus": "string",
+    "userType": "string",
+    "metrimonyId": "string",
+    "phone": "string",
+    "role": "string",
+    "agentId": "string",
+    "fullName": {
+      "hi": "string",
+      "en": "string"
+    },
+    "uid": "string",
+    "gender": {
+      "en": "string",
+      "hi": "string"
+    },
+    "createdAt": "Timestamp",
+    "lastSeen": "Timestamp"
+  },
+  "wishlists": {
+    "senderId": "string",
+    "receiverId": "string",
+    "senderAgent": "string",
+    "receiverAgent": "string",
+    "status": "string",
+    "createdAt": "Timestamp",
+    "updatedAt": "Timestamp",
+    "updatedBy": "string"
+  }
+}

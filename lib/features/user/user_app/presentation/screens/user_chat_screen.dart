@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:shadi_milan/app/providers/global_providers.dart';
 import 'package:shadi_milan/app/router/app_router.dart';
+import 'package:shadi_milan/features/auth/presentation/providers/auth_providers.dart';
 import 'package:shadi_milan/features/translitration/models/bilingual_value.dart';
+import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import 'package:shadi_milan/features/user/user_razorpay/domain/states/payment.dart';
 import '../../../../../../core/constants/app_labels.dart';
@@ -24,7 +26,49 @@ class _UserChatScreenState extends ConsumerState<UserChatScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currentUserId = ref.watch(userProvider)?.uid ?? '';
+    final currentUser = ref.watch(currentUserProvider).valueOrNull ??
+        ref.watch(authStateProvider).valueOrNull?.fold((_) => null, (u) => u);
+    final isProfileCreated = currentUser?.isProfileCreated ?? false;
     final paymentState = ref.watch(paymentNotifierProvider(currentUserId));
+
+    if (!isProfileCreated) {
+      return Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.lock_outline_rounded, size: 64, color: theme.primaryColor),
+                const SizedBox(height: 16),
+                const Text(
+                  'Complete Your Profile First',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Complete your matrimony profile and upgrade to Premium to start chatting.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => context.router.push(const MatrimonyFormFlowRoute()),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: const Text('Complete Your Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     if (paymentState.status != PayStatus.success) {
       return const Scaffold(

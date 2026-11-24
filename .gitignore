@@ -63,3 +63,11 @@ app.*.symbols
 app.*.map.json
 
  
+
+# Keystore & credentials
+*.keystore
+*.jks
+key.properties
+
+# Node modules
+node_modules/

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadi_milan/core/constants/app_labels.dart';
+import 'package:shadi_milan/features/auth/presentation/screens/onboarding_choice_screen.dart';
 import 'package:shadi_milan/features/l10n/app_translation_service.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 import 'app_router.dart';
@@ -165,7 +166,14 @@ class _AuthWrapperScreenState extends ConsumerState<AuthWrapperScreen>
           }
 
           if (!profileCreated) {
-            context.router.replaceAll([const MatrimonyFormFlowRoute()]);
+            final prefs = ref.read(sharedPreferencesProvider);
+            final hasChosenExplore =
+                prefs.getBool(onboardingExplorePrefKey(user.uid)) ?? false;
+            if (hasChosenExplore) {
+              context.router.replaceAll([UserMainShellRoute()]);
+            } else {
+              context.router.replaceAll([const OnboardingChoiceRoute()]);
+            }
             return;
           }
           context.router.replaceAll([UserMainShellRoute()]);

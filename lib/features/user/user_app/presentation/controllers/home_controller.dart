@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class HomeController extends StateNotifier<HomeState> {
   final Map<String, AgentEntity> _agentCache = {};
 
   DocumentSnapshot? _lastDocument;
-  static const int _pageSize = 5;
+  static const int _pageSize = 30;
 
   HomeController({
     required MatrimonyRepository matrimonyRepository,
@@ -74,6 +75,20 @@ class HomeController extends StateNotifier<HomeState> {
     _lastDocument = null;
     state = state.copyWith(metrimonyProfiles: const AsyncValue.loading(), hasMore: true, isLoadingMore: false);
     await fetchNextBatch();
+  }
+
+  Future<void> refreshAndShuffle() async {
+    _lastDocument = null;
+    state = state.copyWith(metrimonyProfiles: const AsyncValue.loading(), hasMore: true, isLoadingMore: false);
+    await fetchNextBatch();
+  }
+
+  void shuffleCurrent() {
+    final currentList = state.metrimonyProfiles.value;
+    if (currentList != null && currentList.isNotEmpty) {
+      final shuffled = List<MatrimonyProfileViewModel>.from(currentList)..shuffle(Random());
+      state = state.copyWith(metrimonyProfiles: AsyncValue.data(shuffled));
+    }
   }
 
   Future<void> fetchNextBatch() async {
@@ -127,6 +142,8 @@ class HomeController extends StateNotifier<HomeState> {
       );
 
       final newItems = viewModels.whereType<MatrimonyProfileViewModel>().toList();
+      // 🎲 Randomly shuffle profiles so different profiles appear at the top each time!
+      newItems.shuffle(Random());
       final updatedList = [...currentList, ...newItems];
 
       debugPrint('Fetched batch of ${newItems.length} profiles. Total: ${updatedList.length}');

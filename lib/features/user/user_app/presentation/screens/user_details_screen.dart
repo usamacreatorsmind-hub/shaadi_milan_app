@@ -12,7 +12,8 @@ import 'package:shadi_milan/features/auth/presentation/providers/auth_providers.
 import 'package:shadi_milan/features/user/user_app/data/datasources/firebase/agent_firestore_ds.dart' show agentFirestoreDsProvider;
 import 'package:shadi_milan/features/user/user_app/data/repositories_impl/user_repo_impl.dart';
 import 'package:shadi_milan/features/user/user_app/widgets/agent_bottom_sheet.dart';
-import 'package:shadi_milan/features/user/user_app/presentation/widgets/premium_upgrade_bottom_sheet.dart';
+import 'package:shadi_milan/features/user/user_app/presentation/utils/profile_action_gate.dart';
+import 'package:shadi_milan/features/user/user_app/presentation/widgets/sensitive_data_blur.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../../../core/constants/app_labels.dart';
@@ -115,6 +116,9 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final profileAsync = ref.watch(matrimonyProfileProvider(widget.uid));
+    final viewerUser = ref.watch(currentUserProvider).valueOrNull ??
+        ref.watch(authStateProvider).valueOrNull?.fold((_) => null, (u) => u);
+    final bool isViewerProfileComplete = viewerUser?.isProfileCreated ?? false;
     final isHindi = Localizations.localeOf(context).languageCode == 'hi';
     String bText(BilingualValue val) {
       final text = isHindi ? val.hi : val.en;
@@ -222,7 +226,9 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '${bText(profile.address.city)}, ${bText(profile.address.state)}',
+                                    isViewerProfileComplete
+                                        ? '${bText(profile.address.city)}, ${bText(profile.address.state)}'
+                                        : bText(profile.address.state),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       color: Colors.white,
@@ -316,39 +322,43 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                   padding: const EdgeInsets.only(bottom: 100),
                   child: Column(
                     children: [
-                      // 🌟 PREFERENCE MATCH SECTION
-                      Consumer(
-                        builder: (context, ref, _) {
-                          final currentUserAsync = ref.watch(currentUserMatrimonyProfileProvider);
-                          return currentUserAsync.when(
-                            data: (currentUserVM) {
-                              if (currentUserVM == null) return const SizedBox.shrink();
-                              return _PreferenceMatchSection(
-                                currentUser: currentUserVM.profile,
-                                viewedUser: profile,
-                                viewedUserName: bText(viewModel.user?.fullName ?? BilingualValue.empty()),
-                              );
-                            },
-                            loading: () => const SizedBox.shrink(),
-                            error: (_, __) => const SizedBox.shrink(),
-                          );
-                        },
-                      ),
+                      if (!isViewerProfileComplete)
+                        const _CompleteProfileUnlockBanner()
+                      else ...[
+                        // 🌟 PREFERENCE MATCH SECTION
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final currentUserAsync = ref.watch(currentUserMatrimonyProfileProvider);
+                            return currentUserAsync.when(
+                              data: (currentUserVM) {
+                                if (currentUserVM == null) return const SizedBox.shrink();
+                                return _PreferenceMatchSection(
+                                  currentUser: currentUserVM.profile,
+                                  viewedUser: profile,
+                                  viewedUserName: bText(viewModel.user?.fullName ?? BilingualValue.empty()),
+                                );
+                              },
+                              loading: () => const SizedBox.shrink(),
+                              error: (_, __) => const SizedBox.shrink(),
+                            );
+                          },
+                        ),
 
-                      // 🤝 COMMONALITIES SECTION
-                      Consumer(
-                        builder: (context, ref, _) {
-                          final currentUserAsync = ref.watch(currentUserMatrimonyProfileProvider);
-                          return currentUserAsync.when(
-                            data: (currentUserVM) {
-                              if (currentUserVM == null) return const SizedBox.shrink();
-                              return _CommonalitiesSection(currentUser: currentUserVM, viewedUser: viewModel);
-                            },
-                            loading: () => const SizedBox.shrink(),
-                            error: (_, __) => const SizedBox.shrink(),
-                          );
-                        },
-                      ),
+                        // 🤝 COMMONALITIES SECTION
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final currentUserAsync = ref.watch(currentUserMatrimonyProfileProvider);
+                            return currentUserAsync.when(
+                              data: (currentUserVM) {
+                                if (currentUserVM == null) return const SizedBox.shrink();
+                                return _CommonalitiesSection(currentUser: currentUserVM, viewedUser: viewModel);
+                              },
+                              loading: () => const SizedBox.shrink(),
+                              error: (_, __) => const SizedBox.shrink(),
+                            );
+                          },
+                        ),
+                      ],
 
                       // 1BASIC INFO
                       _InfoCard(
@@ -365,9 +375,40 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             label: AppLabels.dateOfBirth(context),
                             icon: Icons.calendar_today_outlined,
                             value: DateFormat('dd-MM-yyyy').format(profile.identity.dob),
+                            isBlurred: !isViewerProfileComplete,
+                            maskedPlaceholder: '••-••-••••',
                           ),
-                          _InfoTile(label: "Birthplace", icon: Icons.location_on_outlined, bilingualValue: profile.identity.birthplace),
+                          _InfoTile(
+                            label: "Birthplace",
+                            icon: Icons.location_on_outlined,
+                            bilingualValue: profile.identity.birthplace,
+                            isBlurred: !isViewerProfileComplete,
+                            maskedPlaceholder: 'Hidden Location',
+                          ),
                           _InfoTile(label: "Marital Status", icon: Icons.favorite_outline, bilingualValue: profile.identity.maritalStatus),
+                        ],
+                      ),
+
+                      // 📞 CONTACT DETAILS (Sensitive — hidden/blurred for incomplete profiles)
+                      _InfoCard(
+                        title: isHindi ? 'संपर्क जानकारी' : 'Contact Details',
+                        icon: Icons.contact_phone_outlined,
+                        children: [
+                          _InfoTile(
+                            label: AppLabels.phone(context),
+                            icon: Icons.phone_android_rounded,
+                            value: (viewModel.user?.phone.isNotEmpty ?? false) ? viewModel.user!.phone : 'N/A',
+                            isBlurred: !isViewerProfileComplete,
+                            maskedPlaceholder: '+91 ••••••••••',
+                          ),
+                          if (viewModel.user?.email.isNotEmpty ?? false)
+                            _InfoTile(
+                              label: AppLabels.email(context),
+                              icon: Icons.email_outlined,
+                              value: viewModel.user!.email,
+                              isBlurred: !isViewerProfileComplete,
+                              maskedPlaceholder: '••••••@••••.com',
+                            ),
                         ],
                       ),
 
@@ -401,12 +442,30 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                         title: AppLabels.address(context),
                         icon: Icons.location_on,
                         children: [
+                          if (!profile.address.addressLine1.isEmpty)
+                            _InfoTile(
+                              label: AppLabels.address(context),
+                              icon: Icons.home_outlined,
+                              bilingualValue: profile.address.addressLine1,
+                              isBlurred: !isViewerProfileComplete,
+                              maskedPlaceholder: 'Hidden Address',
+                            ),
                           _InfoTile(
                             label: AppLabels.city(context),
                             icon: Icons.location_city_outlined,
                             bilingualValue: profile.address.city,
+                            isBlurred: !isViewerProfileComplete,
+                            maskedPlaceholder: 'Hidden City',
                           ),
                           _InfoTile(label: AppLabels.state(context), icon: Icons.map_outlined, bilingualValue: profile.address.state),
+                          if (profile.address.pincode.isNotEmpty)
+                            _InfoTile(
+                              label: AppLabels.pinCodeLabel(context),
+                              icon: Icons.pin_drop_outlined,
+                              value: profile.address.pincode,
+                              isBlurred: !isViewerProfileComplete,
+                              maskedPlaceholder: '••••••',
+                            ),
                         ],
                       ),
 
@@ -426,6 +485,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               label: AppLabels.organization(context),
                               icon: Icons.business,
                               bilingualValue: profile.employment.company,
+                              isBlurred: !isViewerProfileComplete,
+                              maskedPlaceholder: 'Hidden Organization',
                             ),
                             _InfoTile(
                               label: AppLabels.designation(context),
@@ -441,6 +502,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                               label: AppLabels.workLocation(context),
                               icon: Icons.location_city_outlined,
                               bilingualValue: profile.employment.workLocation,
+                              isBlurred: !isViewerProfileComplete,
+                              maskedPlaceholder: 'Hidden Location',
                             ),
                           ],
                         ],
@@ -469,6 +532,8 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                                 label: AppLabels.college(context),
                                 icon: Icons.account_balance,
                                 bilingualValue: profile.education.education!.college,
+                                isBlurred: !isViewerProfileComplete,
+                                maskedPlaceholder: 'Hidden College',
                               ),
                               _InfoTile(
                                 label: AppLabels.course(context),
@@ -517,23 +582,31 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             label: AppLabels.father(context),
                             icon: Icons.person_outline,
                             bilingualValue: profile.family.fatherName,
+                            isBlurred: !isViewerProfileComplete,
+                            maskedPlaceholder: 'Hidden Name',
                           ),
                           if (profile.family.fatherOccupation != null && !profile.family.fatherOccupation!.isEmpty)
                             _InfoTile(
                               label: "Father's Occupation",
                               icon: Icons.work_outline,
                               bilingualValue: profile.family.fatherOccupation!,
+                              isBlurred: !isViewerProfileComplete,
+                              maskedPlaceholder: 'Hidden Details',
                             ),
                           _InfoTile(
                             label: AppLabels.mother(context),
                             icon: Icons.person_outline,
                             bilingualValue: profile.family.motherName,
+                            isBlurred: !isViewerProfileComplete,
+                            maskedPlaceholder: 'Hidden Name',
                           ),
                           if (profile.family.motherOccupation != null && !profile.family.motherOccupation!.isEmpty)
                             _InfoTile(
                               label: "Mother's Occupation",
                               icon: Icons.work_outline,
                               bilingualValue: profile.family.motherOccupation!,
+                              isBlurred: !isViewerProfileComplete,
+                              maskedPlaceholder: 'Hidden Details',
                             ),
                           _InfoTile(
                             label: AppLabels.familyType(context),
@@ -598,15 +671,13 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                             if (currentUserId == null) return;
                             final paymentState = ref.read(paymentNotifierProvider(currentUserId));
 
-                            if (paymentState.status == PayStatus.success) {
+                            final allowed = ProfileActionGate.ensureCanContact(
+                              context,
+                              isProfileCreated: isViewerProfileComplete,
+                              isPremium: paymentState.status == PayStatus.success,
+                            );
+                            if (allowed) {
                               context.pushRoute(UserChatRoomRoute(peerId: viewModel.user!.uid));
-                            } else {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) => const PremiumUpgradeBottomSheet(),
-                              );
                             }
                           },
                         ),
@@ -670,6 +741,17 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
                           label: AppLabels.contactAgent(context),
                           backgroundColor: theme.primaryColor,
                           onTap: () {
+                            final currentUserId = ref.read(authRepositoryProvider).currentUser?.uid;
+                            if (currentUserId == null) return;
+                            final paymentState = ref.read(paymentNotifierProvider(currentUserId));
+
+                            final allowed = ProfileActionGate.ensureCanContact(
+                              context,
+                              isProfileCreated: isViewerProfileComplete,
+                              isPremium: paymentState.status == PayStatus.success,
+                            );
+                            if (!allowed) return;
+
                             if (viewModel.user!.agentId.isEmpty) {
                               showModalBottomSheet(
                                 context: context,
@@ -986,11 +1068,32 @@ class _InfoTile extends StatelessWidget {
   final BilingualValue? bilingualValue;
   final IconData icon;
   final String? value;
+  final bool isBlurred;
+  final String maskedPlaceholder;
 
-  const _InfoTile({required this.label, this.value, this.bilingualValue, required this.icon});
+  const _InfoTile({
+    required this.label,
+    this.value,
+    this.bilingualValue,
+    required this.icon,
+    this.isBlurred = false,
+    this.maskedPlaceholder = 'Hidden Details',
+  });
 
   @override
   Widget build(BuildContext context) {
+    final valueWidget = bilingualValue != null
+        ? BilingualParser(
+            value: bilingualValue!,
+            textAlign: TextAlign.end,
+            style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black87, fontSize: 14),
+          )
+        : Text(
+            value ?? 'N/A',
+            textAlign: TextAlign.end,
+            style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black87, fontSize: 14),
+          );
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
       child: Container(
@@ -1018,20 +1121,95 @@ class _InfoTile extends StatelessWidget {
             ),
             Expanded(
               flex: 3,
-              child: bilingualValue != null
-                  ? BilingualParser(
-                      value: bilingualValue!,
-                      textAlign: TextAlign.end,
-                      style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black87, fontSize: 14),
-                    )
-                  : Text(
-                      value ?? 'N/A',
-                      textAlign: TextAlign.end,
-                      style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black87, fontSize: 14),
-                    ),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: SensitiveDataBlur(
+                  isUnlocked: !isBlurred,
+                  maskedPlaceholder: maskedPlaceholder,
+                  placeholderStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade700,
+                    fontSize: 14,
+                  ),
+                  child: valueWidget,
+                ),
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CompleteProfileUnlockBanner extends StatelessWidget {
+  const _CompleteProfileUnlockBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            theme.primaryColor.withValues(alpha: 0.10),
+            Colors.orange.shade50,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.primaryColor.withValues(alpha: 0.28)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.lock_outline_rounded, color: theme.primaryColor, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  isHindi
+                      ? 'व्यक्तिगत जानकारी छिपी हुई है'
+                      : 'Some Personal Details Are Hidden',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            isHindi
+                ? 'पिता का नाम, मोबाइल नंबर, पता और अन्य जानकारी देखने के लिए अपनी प्रोफाइल पूरी करें।'
+                : 'Complete your profile to view father\'s name, mobile number, full address, and unlock Chat & Call options.',
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade700, height: 1.4),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => context.pushRoute(const MatrimonyFormFlowRoute()),
+              icon: const Icon(Icons.edit_note_rounded, size: 18),
+              label: Text(
+                isHindi ? 'अपनी प्रोफाइल पूरी करें' : 'Complete Your Profile',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

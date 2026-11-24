@@ -10,7 +10,7 @@ import 'package:shadi_milan/features/agent/agent_app/presentation/notifier/wishl
 import 'package:shadi_milan/features/user/user_razorpay/presentation/notifier/payment_notifier.dart';
 import '../../../../../app/router/app_router.dart';
 import '../../domain/states/state_city.dart';
-import '../widgets/premium_upgrade_bottom_sheet.dart';
+import '../utils/profile_action_gate.dart';
 import '../../data/repositories_impl/user_repo_impl.dart';
 import '../../../user_razorpay/domain/states/payment.dart';
 import 'my_profile_screen.dart';
@@ -25,7 +25,8 @@ class UserWishListScreen extends ConsumerStatefulWidget {
   ConsumerState<UserWishListScreen> createState() => _UserWishListScreenState();
 }
 
-class _UserWishListScreenState extends ConsumerState<UserWishListScreen> with SingleTickerProviderStateMixin {
+class _UserWishListScreenState extends ConsumerState<UserWishListScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -35,8 +36,12 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> with Si
 
     // Load wishlists
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(myWishlistNotifierProvider.notifier).loadWishlists(widget.userId);
-      ref.read(wishlistedMeNotifierProvider.notifier).loadWishlists(widget.userId);
+      ref
+          .read(myWishlistNotifierProvider.notifier)
+          .loadWishlists(widget.userId);
+      ref
+          .read(wishlistedMeNotifierProvider.notifier)
+          .loadWishlists(widget.userId);
     });
   }
 
@@ -50,7 +55,9 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> with Si
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final myWishlistAsync = ref.watch(myWishlistStreamProvider(widget.userId));
-    final wishlistedMeAsync = ref.watch(wishlistedMeStreamProvider(widget.userId));
+    final wishlistedMeAsync = ref.watch(
+      wishlistedMeStreamProvider(widget.userId),
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -72,13 +79,22 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> with Si
               labelPadding: const EdgeInsets.symmetric(horizontal: 12),
               isScrollable: true,
               tabAlignment: TabAlignment.start,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
               tabs: [
                 Tab(
                   child: wishlistedMeAsync.when(
-                    data: (list) => Text("${AppLabels.tabReceived(context)} (${list.where((e) => e.status == 'pending').length})"),
-                    loading: () => Text("${AppLabels.tabReceived(context)} (...)"),
+                    data: (list) => Text(
+                      "${AppLabels.tabReceived(context)} (${list.where((e) => e.status == 'pending').length})",
+                    ),
+                    loading: () =>
+                        Text("${AppLabels.tabReceived(context)} (...)"),
                     error: (_, __) => Text(AppLabels.tabReceived(context)),
                   ),
                 ),
@@ -87,13 +103,20 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> with Si
                     data: (received) => myWishlistAsync.when(
                       data: (sent) {
                         final count =
-                            received.where((e) => e.status == 'interested').length + sent.where((e) => e.status == 'interested').length;
-                        return Text("${AppLabels.tabAccepted(context)} ($count)");
+                            received
+                                .where((e) => e.status == 'interested')
+                                .length +
+                            sent.where((e) => e.status == 'interested').length;
+                        return Text(
+                          "${AppLabels.tabAccepted(context)} ($count)",
+                        );
                       },
-                      loading: () => Text("${AppLabels.tabAccepted(context)} (...)"),
+                      loading: () =>
+                          Text("${AppLabels.tabAccepted(context)} (...)"),
                       error: (_, __) => Text(AppLabels.tabAccepted(context)),
                     ),
-                    loading: () => Text("${AppLabels.tabAccepted(context)} (...)"),
+                    loading: () =>
+                        Text("${AppLabels.tabAccepted(context)} (...)"),
                     error: (_, __) => Text(AppLabels.tabAccepted(context)),
                   ),
                 ),
@@ -102,19 +125,28 @@ class _UserWishListScreenState extends ConsumerState<UserWishListScreen> with Si
                     data: (received) => myWishlistAsync.when(
                       data: (sent) {
                         final count =
-                            received.where((e) => e.status == 'contacted').length + sent.where((e) => e.status == 'contacted').length;
-                        return Text("${AppLabels.tabContacts(context)} ($count)");
+                            received
+                                .where((e) => e.status == 'contacted')
+                                .length +
+                            sent.where((e) => e.status == 'contacted').length;
+                        return Text(
+                          "${AppLabels.tabContacts(context)} ($count)",
+                        );
                       },
-                      loading: () => Text("${AppLabels.tabContacts(context)} (...)"),
+                      loading: () =>
+                          Text("${AppLabels.tabContacts(context)} (...)"),
                       error: (_, __) => Text(AppLabels.tabContacts(context)),
                     ),
-                    loading: () => Text("${AppLabels.tabContacts(context)} (...)"),
+                    loading: () =>
+                        Text("${AppLabels.tabContacts(context)} (...)"),
                     error: (_, __) => Text(AppLabels.tabContacts(context)),
                   ),
                 ),
                 Tab(
                   child: myWishlistAsync.when(
-                    data: (list) => Text("${AppLabels.tabSent(context)} (${list.where((e) => e.status == 'pending').length})"),
+                    data: (list) => Text(
+                      "${AppLabels.tabSent(context)} (${list.where((e) => e.status == 'pending').length})",
+                    ),
                     loading: () => Text("${AppLabels.tabSent(context)} (...)"),
                     error: (_, __) => Text(AppLabels.tabSent(context)),
                   ),
@@ -158,8 +190,12 @@ class _ContactsTab extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (err, stack) => Center(child: Text('Error: $err')),
           data: (wishlistedMe) {
-            final contactedSent = myWishlists.where((w) => w.status == 'contacted').toList();
-            final contactedReceived = wishlistedMe.where((w) => w.status == 'contacted').toList();
+            final contactedSent = myWishlists
+                .where((w) => w.status == 'contacted')
+                .toList();
+            final contactedReceived = wishlistedMe
+                .where((w) => w.status == 'contacted')
+                .toList();
             final combined = [...contactedSent, ...contactedReceived];
             combined.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
@@ -177,7 +213,9 @@ class _ContactsTab extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final wishlist = combined[index];
                 final isMeSender = wishlist.senderId == userId;
-                final targetId = isMeSender ? wishlist.receiverId : wishlist.senderId;
+                final targetId = isMeSender
+                    ? wishlist.receiverId
+                    : wishlist.senderId;
 
                 return WishlistProfileCard(
                   wishlist: wishlist,
@@ -207,7 +245,9 @@ class _SentTab extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, stack) => Center(child: Text('Error: $err')),
       data: (myWishlists) {
-        final pendingSent = myWishlists.where((w) => w.status == 'pending').toList();
+        final pendingSent = myWishlists
+            .where((w) => w.status == 'pending')
+            .toList();
         pendingSent.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
         if (pendingSent.isEmpty) {
@@ -231,7 +271,11 @@ class _SentTab extends ConsumerWidget {
               onStatusUpdate: (status) async {
                 await ref
                     .read(myWishlistNotifierProvider.notifier)
-                    .updateStatus(wishlistId: wishlist.id, status: status, updatedBy: userId);
+                    .updateStatus(
+                      wishlistId: wishlist.id,
+                      status: status,
+                      updatedBy: userId,
+                    );
               },
             );
           },
@@ -292,7 +336,9 @@ class _MoreTabState extends State<_MoreTab> {
         color: isSelected ? theme.primaryColor : Colors.black87,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
-      side: BorderSide(color: isSelected ? theme.primaryColor : Colors.grey.shade300),
+      side: BorderSide(
+        color: isSelected ? theme.primaryColor : Colors.grey.shade300,
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       showCheckmark: false,
     );
@@ -310,7 +356,8 @@ class _AllRequestsList extends ConsumerWidget {
     return myWishlistAsync.when(
       data: (sent) {
         sent.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-        if (sent.isEmpty) return const Center(child: Text("No sent requests found"));
+        if (sent.isEmpty)
+          return const Center(child: Text("No sent requests found"));
 
         return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -325,7 +372,11 @@ class _AllRequestsList extends ConsumerWidget {
               onStatusUpdate: (status) async {
                 await ref
                     .read(myWishlistNotifierProvider.notifier)
-                    .updateStatus(wishlistId: wishlist.id, status: status, updatedBy: userId);
+                    .updateStatus(
+                      wishlistId: wishlist.id,
+                      status: status,
+                      updatedBy: userId,
+                    );
               },
             );
           },
@@ -347,9 +398,12 @@ class _DeletedRequestsList extends ConsumerWidget {
 
     return myWishlistAsync.when(
       data: (sent) {
-        final deletedSent = sent.where((w) => w.status == 'notinterested').toList();
+        final deletedSent = sent
+            .where((w) => w.status == 'notinterested')
+            .toList();
 
-        if (deletedSent.isEmpty) return const Center(child: Text("No declined profiles"));
+        if (deletedSent.isEmpty)
+          return const Center(child: Text("No declined profiles"));
 
         return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -364,7 +418,11 @@ class _DeletedRequestsList extends ConsumerWidget {
               onStatusUpdate: (status) async {
                 await ref
                     .read(myWishlistNotifierProvider.notifier)
-                    .updateStatus(wishlistId: wishlist.id, status: status, updatedBy: userId);
+                    .updateStatus(
+                      wishlistId: wishlist.id,
+                      status: status,
+                      updatedBy: userId,
+                    );
               },
             );
           },
@@ -394,8 +452,12 @@ class _AcceptedTab extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (err, stack) => Center(child: Text('Error: $err')),
           data: (wishlistedMe) {
-            final acceptedSent = myWishlists.where((w) => w.status == 'interested').toList();
-            final acceptedReceived = wishlistedMe.where((w) => w.status == 'interested').toList();
+            final acceptedSent = myWishlists
+                .where((w) => w.status == 'interested')
+                .toList();
+            final acceptedReceived = wishlistedMe
+                .where((w) => w.status == 'interested')
+                .toList();
 
             final combinedAccepted = [...acceptedSent, ...acceptedReceived];
             combinedAccepted.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
@@ -416,19 +478,28 @@ class _AcceptedTab extends ConsumerWidget {
                     children: [
                       Text(
                         "Accepted Requests (${combinedAccepted.length})",
-                        style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600, fontSize: 15),
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     itemCount: combinedAccepted.length,
                     itemBuilder: (context, index) {
                       final wishlist = combinedAccepted[index];
                       final isMeSender = wishlist.senderId == userId;
-                      final targetProfileId = isMeSender ? wishlist.receiverId : wishlist.senderId;
+                      final targetProfileId = isMeSender
+                          ? wishlist.receiverId
+                          : wishlist.senderId;
 
                       return WishlistProfileCard(
                         wishlist: wishlist,
@@ -439,11 +510,19 @@ class _AcceptedTab extends ConsumerWidget {
                           if (isMeSender) {
                             await ref
                                 .read(myWishlistNotifierProvider.notifier)
-                                .updateStatus(wishlistId: wishlist.id, status: newStatus, updatedBy: userId);
+                                .updateStatus(
+                                  wishlistId: wishlist.id,
+                                  status: newStatus,
+                                  updatedBy: userId,
+                                );
                           } else {
                             await ref
                                 .read(wishlistedMeNotifierProvider.notifier)
-                                .updateStatus(wishlistId: wishlist.id, status: newStatus, updatedBy: userId);
+                                .updateStatus(
+                                  wishlistId: wishlist.id,
+                                  status: newStatus,
+                                  updatedBy: userId,
+                                );
                           }
                         },
                       );
@@ -473,7 +552,9 @@ class _WishlistedMeTab extends ConsumerWidget {
       error: (err, stack) => Center(child: Text('Error: $err')),
       data: (wishlists) {
         // Show only 'pending' in Received tab
-        final filteredWishlists = wishlists.where((w) => w.status == 'pending').toList();
+        final filteredWishlists = wishlists
+            .where((w) => w.status == 'pending')
+            .toList();
 
         if (filteredWishlists.isEmpty) {
           return _EmptyState(
@@ -491,14 +572,21 @@ class _WishlistedMeTab extends ConsumerWidget {
                 children: [
                   Text(
                     "All Requests (${filteredWishlists.length})",
-                    style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600, fontSize: 15),
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
                   ),
                 ],
               ),
             ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 itemCount: filteredWishlists.length,
                 itemBuilder: (context, index) {
                   final wishlist = filteredWishlists[index];
@@ -510,7 +598,11 @@ class _WishlistedMeTab extends ConsumerWidget {
                     onStatusUpdate: (newStatus) async {
                       await ref
                           .read(wishlistedMeNotifierProvider.notifier)
-                          .updateStatus(wishlistId: wishlist.id, status: newStatus, updatedBy: userId);
+                          .updateStatus(
+                            wishlistId: wishlist.id,
+                            status: newStatus,
+                            updatedBy: userId,
+                          );
                     },
                   );
                 },
@@ -523,7 +615,14 @@ class _WishlistedMeTab extends ConsumerWidget {
   }
 }
 
-enum WishlistTabType { received, accepted, contacts, sent, moreRequests, moreDeleted }
+enum WishlistTabType {
+  received,
+  accepted,
+  contacts,
+  sent,
+  moreRequests,
+  moreDeleted,
+}
 
 class WishlistProfileCard extends ConsumerWidget {
   final dynamic wishlist;
@@ -545,7 +644,9 @@ class WishlistProfileCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final locationAsync = ref.watch(locationJsonProvider);
     final profileAsync = ref.watch(matrimonyProfileProvider(profileId));
-    final paymentState = ref.watch(paymentNotifierProvider(ref.watch(currentUserProvider).value?.uid ?? ''));
+    final paymentState = ref.watch(
+      paymentNotifierProvider(ref.watch(currentUserProvider).value?.uid ?? ''),
+    );
     final isPremium = paymentState.status == PayStatus.success;
 
     return Container(
@@ -553,7 +654,13 @@ class WishlistProfileCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(28),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 20, offset: const Offset(0, 10))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
         border: Border.all(color: Colors.grey.shade100),
       ),
       clipBehavior: Clip.antiAlias,
@@ -563,7 +670,9 @@ class WishlistProfileCard extends ConsumerWidget {
         data: (profile) {
           final imageUrl = profile.images.primaryImageUrl.isNotEmpty
               ? profile.images.primaryImageUrl
-              : (profile.images.profileImageUrl.isNotEmpty ? profile.images.profileImageUrl : '');
+              : (profile.images.profileImageUrl.isNotEmpty
+                    ? profile.images.profileImageUrl
+                    : '');
           final hasImage = imageUrl.isNotEmpty;
 
           String resolvedState = profile.address.state.en;
@@ -571,11 +680,17 @@ class WishlistProfileCard extends ConsumerWidget {
 
           if (locationAsync.hasValue) {
             final states = locationAsync.value!;
-            final stateObj = states.where((s) => s.name == profile.address.state.en).firstOrNull;
+            final stateObj = states
+                .where((s) => s.name == profile.address.state.en)
+                .firstOrNull;
             if (stateObj != null) {
               resolvedState = stateObj.name;
               final cityObj = stateObj.cities
-                  .where((c) => c.id == profile.address.city.en || c.name == profile.address.city.en)
+                  .where(
+                    (c) =>
+                        c.id == profile.address.city.en ||
+                        c.name == profile.address.city.en,
+                  )
                   .firstOrNull;
               if (cityObj != null) {
                 resolvedCity = cityObj.name;
@@ -589,7 +704,8 @@ class WishlistProfileCard extends ConsumerWidget {
               '${profile.cultural.languages.map((l) => l.en).join(", ")}, ${profile.cultural.caste.en} • $resolvedCity, $resolvedState...';
 
           return InkWell(
-            onTap: () => context.router.push(UserDetailRoute(uid: profile.user.uid)),
+            onTap: () =>
+                context.router.push(UserDetailRoute(uid: profile.user.uid)),
             child: Column(
               children: [
                 // Date Only
@@ -600,7 +716,11 @@ class WishlistProfileCard extends ConsumerWidget {
                     children: [
                       Text(
                         _formatDateOnly(wishlist.updatedAt, context),
-                        style: TextStyle(color: Colors.grey.shade500, fontSize: 12, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
@@ -614,7 +734,13 @@ class WishlistProfileCard extends ConsumerWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.grey.shade200, width: 1),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4))],
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: ClipOval(
                       child: hasImage
@@ -626,8 +752,13 @@ class WishlistProfileCard extends ConsumerWidget {
                               maxWidthDiskCache: 600,
                               maxHeightDiskCache: 600,
                               fadeInDuration: const Duration(milliseconds: 200),
-                              placeholder: (context, url) => const ShimmerLoading.rectangular(height: 160, width: 160),
-                              errorWidget: (context, url, error) => const Icon(Icons.person, size: 80),
+                              placeholder: (context, url) =>
+                                  const ShimmerLoading.rectangular(
+                                    height: 160,
+                                    width: 160,
+                                  ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.person, size: 80),
                             )
                           : const Icon(Icons.person, size: 80),
                     ),
@@ -648,12 +779,20 @@ class WishlistProfileCard extends ConsumerWidget {
                           Expanded(
                             child: Text(
                               AppLabels.interestMessage(context),
-                              style: const TextStyle(color: Color(0xFF0369A1), fontSize: 13, fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                color: Color(0xFF0369A1),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                           Text(
                             AppLabels.moreLabel(context),
-                            style: const TextStyle(color: Color(0xFF0EA5E9), fontSize: 13, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: Color(0xFF0EA5E9),
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -671,7 +810,12 @@ class WishlistProfileCard extends ConsumerWidget {
                     children: [
                       Text(
                         profile.user.fullName.en,
-                        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: Colors.black87, letterSpacing: 0.2),
+                        style: const TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black87,
+                          letterSpacing: 0.2,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -686,12 +830,20 @@ class WishlistProfileCard extends ConsumerWidget {
                       const SizedBox(height: 8),
                       Text(
                         ageHeightJob,
-                        style: TextStyle(fontSize: 13, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         langCasteLoc,
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade500, height: 1.4),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade500,
+                          height: 1.4,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -702,7 +854,10 @@ class WishlistProfileCard extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 // Action Buttons based on tabType
-                Padding(padding: const EdgeInsets.fromLTRB(24, 0, 24, 24), child: _buildActionButtons(context, ref, isPremium, profile)),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                  child: _buildActionButtons(context, ref, isPremium, profile),
+                ),
               ],
             ),
           );
@@ -711,7 +866,12 @@ class WishlistProfileCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, WidgetRef ref, bool isPremium, dynamic profile) {
+  Widget _buildActionButtons(
+    BuildContext context,
+    WidgetRef ref,
+    bool isPremium,
+    dynamic profile,
+  ) {
     if (tabType == WishlistTabType.received) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -727,18 +887,32 @@ class WishlistProfileCard extends ConsumerWidget {
             InkWell(
               onTap: () => onStatusUpdate('notinterested'),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: Colors.grey.shade200, shape: BoxShape.circle),
-                      child: Icon(Icons.close, size: 20, color: Colors.grey.shade400),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        size: 20,
+                        color: Colors.grey.shade400,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Text(
                       AppLabels.buttonDecline(context),
-                      style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 15),
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ],
                 ),
@@ -748,22 +922,41 @@ class WishlistProfileCard extends ConsumerWidget {
             InkWell(
               onTap: () => onStatusUpdate('interested'),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 child: Row(
                   children: [
                     Text(
                       AppLabels.buttonAccept(context),
-                      style: const TextStyle(color: Color(0xFF22C55E), fontWeight: FontWeight.bold, fontSize: 15),
+                      style: const TextStyle(
+                        color: Color(0xFF22C55E),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: const BoxDecoration(
-                        gradient: LinearGradient(colors: [Color(0xFF4ADE80), Color(0xFF22C55E)]),
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF4ADE80), Color(0xFF22C55E)],
+                        ),
                         shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Color(0x4022C55E), blurRadius: 8, offset: Offset(0, 4))],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x4022C55E),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: const Icon(Icons.check, size: 24, color: Colors.white),
+                      child: const Icon(
+                        Icons.check,
+                        size: 24,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
@@ -772,7 +965,9 @@ class WishlistProfileCard extends ConsumerWidget {
           ],
         ),
       );
-    } else if (tabType == WishlistTabType.accepted || tabType == WishlistTabType.contacts || tabType == WishlistTabType.sent) {
+    } else if (tabType == WishlistTabType.accepted ||
+        tabType == WishlistTabType.contacts ||
+        tabType == WishlistTabType.sent) {
       return Row(
         children: [
           Expanded(
@@ -780,7 +975,13 @@ class WishlistProfileCard extends ConsumerWidget {
               label: AppLabels.buttonChat(context),
               icon: Icons.chat_bubble_outline_rounded,
               colors: [const Color(0xFF60A5FA), const Color(0xFF2563EB)],
-              onPressed: () => _handlePremiumAction(context, isPremium, "Chat", profile),
+              onPressed: () => _handlePremiumAction(
+                context,
+                ref,
+                isPremium,
+                "Chat",
+                profile,
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -789,7 +990,13 @@ class WishlistProfileCard extends ConsumerWidget {
               label: AppLabels.buttonCall(context),
               icon: Icons.call_outlined,
               colors: [const Color(0xFFFB923C), const Color(0xFFEA580C)],
-              onPressed: () => _handlePremiumAction(context, isPremium, "Call", profile),
+              onPressed: () => _handlePremiumAction(
+                context,
+                ref,
+                isPremium,
+                "Call",
+                profile,
+              ),
             ),
           ),
         ],
@@ -798,59 +1005,97 @@ class WishlistProfileCard extends ConsumerWidget {
     return const SizedBox.shrink();
   }
 
-  Widget _buildActionButton({required String label, required IconData icon, required List<Color> colors, required VoidCallback onPressed}) {
+  Widget _buildActionButton({
+    required String label,
+    required IconData icon,
+    required List<Color> colors,
+    required VoidCallback onPressed,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: colors, begin: Alignment.topLeft, end: Alignment.bottomRight),
+        gradient: LinearGradient(
+          colors: colors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(30),
-        boxShadow: [BoxShadow(color: colors.last.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: colors.last.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: ElevatedButton.icon(
         onPressed: onPressed,
         icon: Icon(icon, size: 18),
-        label: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        label: Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.white,
           shadowColor: Colors.transparent,
           padding: const EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
         ),
       ),
     );
   }
 
-  void _handlePremiumAction(BuildContext context, bool isPremium, String type, dynamic profile) async {
-    if (isPremium) {
-      if (type == "Chat") {
-        // Update status to contacted if not already
-        if (wishlist.status != 'contacted' && (tabType == WishlistTabType.accepted || tabType == WishlistTabType.sent)) {
-          await onStatusUpdate('contacted');
-        }
-        // Navigate to chat
-        if (context.mounted) {
-          context.router.push(UserChatRoomRoute(peerId: profile.user.uid));
-        }
-      } else if (type == "Call") {
-        final phone = profile.user.phone;
-        if (phone.isNotEmpty) {
-          final url = Uri.parse('tel:$phone');
-          if (await canLaunchUrl(url)) {
-            await launchUrl(url);
-          } else {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.errCouldNotLaunchDialer(context))));
-            }
-          }
+  void _handlePremiumAction(
+    BuildContext context,
+    WidgetRef ref,
+    bool isPremium,
+    String type,
+    dynamic profile,
+  ) async {
+    final isProfileCreated =
+        ref.read(currentUserProvider).valueOrNull?.isProfileCreated ?? false;
+    final allowed = ProfileActionGate.ensureCanContact(
+      context,
+      isProfileCreated: isProfileCreated,
+      isPremium: isPremium,
+    );
+    if (!allowed) return;
+
+    if (type == "Chat") {
+      // Update status to contacted if not already
+      if (wishlist.status != 'contacted' &&
+          (tabType == WishlistTabType.accepted ||
+              tabType == WishlistTabType.sent)) {
+        await onStatusUpdate('contacted');
+      }
+      // Navigate to chat
+      if (context.mounted) {
+        context.router.push(UserChatRoomRoute(peerId: profile.user.uid));
+      }
+    } else if (type == "Call") {
+      final phone = profile.user.phone;
+      if (phone.isNotEmpty) {
+        final url = Uri.parse('tel:$phone');
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url);
         } else {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLabels.errPhoneNotAvailable(context))));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(AppLabels.errCouldNotLaunchDialer(context)),
+              ),
+            );
           }
         }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLabels.errPhoneNotAvailable(context))),
+          );
+        }
       }
-    } else {
-      // Show Premium Upgrade Bottom Sheet
-      showModalBottomSheet(context: context, backgroundColor: Colors.transparent, builder: (context) => const PremiumUpgradeBottomSheet());
     }
   }
 
@@ -862,7 +1107,10 @@ class WishlistProfileCard extends ConsumerWidget {
   }
 
   String _formatDateOnly(DateTime date, BuildContext context) {
-    return DateFormat('d MMM', Localizations.localeOf(context).toString()).format(date);
+    return DateFormat(
+      'd MMM',
+      Localizations.localeOf(context).toString(),
+    ).format(date);
   }
 }
 
@@ -871,7 +1119,11 @@ class _EmptyState extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const _EmptyState({required this.icon, required this.title, required this.subtitle});
+  const _EmptyState({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -886,20 +1138,38 @@ class _EmptyState extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10))],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              child: Icon(icon, size: 64, color: Theme.of(context).primaryColor.withOpacity(0.3)),
+              child: Icon(
+                icon,
+                size: 64,
+                color: Theme.of(context).primaryColor.withOpacity(0.3),
+              ),
             ),
             const SizedBox(height: 24),
             Text(
               title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.black87),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: Colors.black87,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
               subtitle,
-              style: TextStyle(color: Colors.grey[500], fontSize: 15, height: 1.4),
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 15,
+                height: 1.4,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -936,25 +1206,37 @@ class _BubblePainter extends CustomPainter {
     path.lineTo(size.width - radius, tipHeight);
 
     // Top-right corner
-    path.arcToPoint(Offset(size.width, tipHeight + radius), radius: const Radius.circular(radius));
+    path.arcToPoint(
+      Offset(size.width, tipHeight + radius),
+      radius: const Radius.circular(radius),
+    );
 
     // Right edge
     path.lineTo(size.width, size.height - radius);
 
     // Bottom-right corner
-    path.arcToPoint(Offset(size.width - radius, size.height), radius: const Radius.circular(radius));
+    path.arcToPoint(
+      Offset(size.width - radius, size.height),
+      radius: const Radius.circular(radius),
+    );
 
     // Bottom edge
     path.lineTo(radius, size.height);
 
     // Bottom-left corner
-    path.arcToPoint(Offset(0, size.height - radius), radius: const Radius.circular(radius));
+    path.arcToPoint(
+      Offset(0, size.height - radius),
+      radius: const Radius.circular(radius),
+    );
 
     // Left edge
     path.lineTo(0, tipHeight + radius);
 
     // Top-left corner
-    path.arcToPoint(Offset(radius, tipHeight), radius: const Radius.circular(radius));
+    path.arcToPoint(
+      Offset(radius, tipHeight),
+      radius: const Radius.circular(radius),
+    );
 
     path.close();
 

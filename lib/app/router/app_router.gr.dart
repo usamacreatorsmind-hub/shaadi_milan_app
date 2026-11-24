@@ -780,6 +780,22 @@ class MyReviewRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [OnboardingChoiceScreen]
+class OnboardingChoiceRoute extends PageRouteInfo<void> {
+  const OnboardingChoiceRoute({List<PageRouteInfo>? children})
+    : super(OnboardingChoiceRoute.name, initialChildren: children);
+
+  static const String name = 'OnboardingChoiceRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const OnboardingChoiceScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [OnboardingScreen]
 class OnboardingRoute extends PageRouteInfo<void> {
   const OnboardingRoute({List<PageRouteInfo>? children})

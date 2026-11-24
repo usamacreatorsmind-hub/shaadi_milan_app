@@ -1,10 +1,8 @@
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:flutter_screenshot_blocker/flutter_screenshot_blocker.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'features/l10n/app_translation_service.dart';
@@ -49,18 +47,9 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  /// SCREENSHOT BLOCKER (Non-blocking) - Commented out for taking screenshots
-  /*
-  Future.microtask(() async {
-    try {
-      await FlutterScreenshotBlocker.enableScreenshotBlocking();
-      await FlutterScreenshotBlocker.enableSecureMode();
-      await FlutterScreenshotBlocker.setSecureFlag(true);
-    } catch (e) {
-      debugPrint('Screenshot blocker error: $e');
-    }
-  });
-  */
+  /// SCREENSHOT & SCREEN RECORDING PROTECTION
+  /// Managed dynamically in App via ScreenshotProtectionService based on the
+  /// authenticated user (allowed only for whitelisted test accounts).
 
   /// SHARED PREFERENCES
   final sharedPreferences = await SharedPreferences.getInstance();
@@ -110,7 +99,10 @@ Future<void> main() async {
         await AwesomeNotifications().requestPermissionToSendNotifications();
       }
 
-      await Future.wait([NotificationService.init(), InAppMessagingService.init()]);
+      await Future.wait([
+        NotificationService.init(),
+        InAppMessagingService.init(),
+      ]);
     } catch (e, s) {
       debugPrint('Initialization Error: $e');
       debugPrintStack(stackTrace: s);
@@ -126,7 +118,12 @@ Future<void> main() async {
   runApp(
     SafeArea(
       top: false,
-      child: ProviderScope(overrides: [sharedPreferencesProvider.overrideWithValue(sharedPreferences)], child: App()),
+      child: ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        ],
+        child: App(),
+      ),
     ),
   );
 }

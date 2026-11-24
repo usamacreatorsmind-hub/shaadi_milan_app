@@ -584,10 +584,12 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
 
                 // Search
                 if (filter.searchQuery.isNotEmpty) {
-                  final q = filter.searchQuery.toLowerCase();
-                  if (!user.fullName.en.toLowerCase().contains(q) &&
-                      !user.phone.toLowerCase().contains(q) &&
-                      !user.email.toLowerCase().contains(q)) {
+                  final q = filter.searchQuery.toLowerCase().trim();
+                  final parts = q.split(RegExp(r'\s+'));
+                  final addr = addressMap[user.uid];
+                  final cult = culturalMap[user.uid];
+                  final combined = '${user.fullName.en} ${user.fullName.hi} ${user.phone} ${user.email} ${user.metrimonyId} ${addr?.city.en ?? ''} ${addr?.city.hi ?? ''} ${addr?.state.en ?? ''} ${addr?.state.hi ?? ''} ${cult?.religion.en ?? ''} ${cult?.religion.hi ?? ''} ${cult?.caste.en ?? ''} ${cult?.caste.hi ?? ''}'.toLowerCase();
+                  if (!parts.every((p) => combined.contains(p))) {
                     return false;
                   }
                 }
@@ -596,14 +598,20 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 if (filter.state.isNotEmpty) {
                   final addr = addressMap[user.uid];
                   if (addr == null) return false;
-                  if (addr.state.en.toLowerCase() != filter.state.toLowerCase()) {
+                  final sEn = addr.state.en.toLowerCase().trim();
+                  final sHi = addr.state.hi.toLowerCase().trim();
+                  final fs = filter.state.toLowerCase().trim();
+                  if (sEn != fs && sHi != fs && !sEn.contains(fs) && !sHi.contains(fs)) {
                     return false;
                   }
                 }
                 if (filter.city.isNotEmpty) {
                   final addr = addressMap[user.uid];
                   if (addr == null) return false;
-                  if (addr.city.en.toLowerCase() != filter.city.toLowerCase()) {
+                  final cEn = addr.city.en.toLowerCase().trim();
+                  final cHi = addr.city.hi.toLowerCase().trim();
+                  final fc = filter.city.toLowerCase().trim();
+                  if (cEn != fc && cHi != fc && !cEn.contains(fc) && !cHi.contains(fc)) {
                     return false;
                   }
                 }
@@ -612,15 +620,20 @@ class _AgentUserScreenState extends ConsumerState<AgentUserScreen> {
                 if (filter.religion.isNotEmpty) {
                   final cult = culturalMap[user.uid];
                   if (cult == null) return false;
-                  if (cult.religion.en.toLowerCase() !=
-                      filter.religion.toLowerCase()) {
+                  final rEn = cult.religion.en.toLowerCase().trim();
+                  final rHi = cult.religion.hi.toLowerCase().trim();
+                  final fr = filter.religion.toLowerCase().trim();
+                  if (rEn != fr && rHi != fr && !rEn.contains(fr)) {
                     return false;
                   }
                 }
                 if (filter.caste.isNotEmpty) {
                   final cult = culturalMap[user.uid];
                   if (cult == null) return false;
-                  if (cult.caste.en.toLowerCase() != filter.caste.toLowerCase()) {
+                  final caEn = cult.caste.en.toLowerCase().trim();
+                  final caHi = cult.caste.hi.toLowerCase().trim();
+                  final fca = filter.caste.toLowerCase().trim();
+                  if (caEn != fca && caHi != fca && !caEn.contains(fca)) {
                     return false;
                   }
                 }

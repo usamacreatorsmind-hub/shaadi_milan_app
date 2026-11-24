@@ -4,7 +4,10 @@ import 'home_filter_state.dart';
 /// =======================
 /// FILTER PROVIDER
 /// =======================
-final homeFilterProvider = StateNotifierProvider<HomeFilterController, HomeFilterState>((ref) => HomeFilterController());
+final homeFilterProvider =
+    StateNotifierProvider<HomeFilterController, HomeFilterState>(
+      (ref) => HomeFilterController(),
+    );
 
 class HomeFilterController extends StateNotifier<HomeFilterState> {
   HomeFilterController() : super(HomeFilterState());
@@ -32,7 +35,12 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
   }
 
   void updateGender(String value) {
-    state = state.copyWith(gender: value);
+    final lower = value.toLowerCase().trim();
+    if (lower.isEmpty || lower.contains('all') || lower.contains('सभी')) {
+      state = state.copyWith(gender: '');
+    } else {
+      state = state.copyWith(gender: value);
+    }
   }
 
   void toggleJustJoined() {
@@ -73,17 +81,17 @@ class HomeFilterController extends StateNotifier<HomeFilterState> {
   }
 
   bool get isFilterActive {
-    return state.state.isNotEmpty ||
-        state.city.isNotEmpty ||
-        state.religion.isNotEmpty ||
-        state.caste.isNotEmpty ||
-        state.gender.isNotEmpty ||
+    return state.state.trim().isNotEmpty ||
+        state.city.trim().isNotEmpty ||
+        state.religion.trim().isNotEmpty ||
+        state.caste.trim().isNotEmpty ||
+        state.gender.trim().isNotEmpty ||
         state.justJoined ||
         state.fromMyCity ||
         state.daily ||
         state.myMatches ||
         state.minAge > 18 ||
         state.maxAge < 60 ||
-        state.searchQuery.isNotEmpty;
+        state.searchQuery.trim().isNotEmpty;
   }
 }

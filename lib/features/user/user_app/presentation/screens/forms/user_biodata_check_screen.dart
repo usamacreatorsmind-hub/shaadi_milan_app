@@ -16,6 +16,8 @@ import '../../../../../translitration/models/bilingual_value.dart';
 import '../../../domain/states/image_state.dart';
 import '../../../../../../app/providers/global_providers.dart';
 import '../../../widgets/pdf_viewer_bottomsheet.dart';
+import '../../../data/repositories_impl/user_repo_impl.dart';
+import '../user_details_screen.dart';
 import '../../controllers/metrimony_profile_controller.dart';
 
 @RoutePage()
@@ -484,6 +486,11 @@ class _UserBiodataCheckScreenState extends ConsumerState<UserBiodataCheckScreen>
 
           context.router.replaceAll([AgentMainShellRoute(agentId: agentId)]);
         } else {
+          // Refresh auth & current user providers so isProfileCreated=true
+          // takes effect immediately (unlocking details & Chat/Call gates).
+          ref.invalidate(authStateProvider);
+          ref.invalidate(currentUserProvider);
+          ref.invalidate(currentUserMatrimonyProfileProvider);
           context.router.replaceAll([UserMainShellRoute()]);
         }
       }

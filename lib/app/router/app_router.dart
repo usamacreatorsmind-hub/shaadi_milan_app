@@ -33,6 +33,7 @@ import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/user_login_screen.dart';
 import '../../features/auth/presentation/screens/user_register_screen.dart';
 import '../../features/auth/presentation/screens/otp_verification_screen.dart';
+import '../../features/auth/presentation/screens/onboarding_choice_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/onboarding/presentation/screens/role_selection_screen.dart';
 import '../../features/onboarding/presentation/screens/splash_screen.dart';

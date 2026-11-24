@@ -93,6 +93,7 @@ class FirebaseAuthDS implements FirebaseAuthDs {
         'profileImageUrl': '',
         'profileStatus': 'active',
         'isProfileCreated': false,
+        'phoneVerified': true,
         'metrimonyId': '',
         'profileId': '',
         'lastSeen': FieldValue.serverTimestamp(),
