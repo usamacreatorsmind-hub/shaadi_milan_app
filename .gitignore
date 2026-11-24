@@ -71,3 +71,4 @@ key.properties
 
 # Node modules
 node_modules/
+serviceAccountKey.json
